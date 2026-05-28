@@ -1253,6 +1253,16 @@ html, body {
 
 /* Accordion testo visibile */
 .shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
+
+/* ── Fix topbar: NON fixed, dentro app-main ── */
+#topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  z-index: 10 !important;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
@@ -5566,7 +5576,19 @@ function shopRenderListTabs() {
     // Tieni premuto per rinominare
     let pt; btn.addEventListener('touchstart', () => { pt = setTimeout(() => shopRenameList(id), 600); });
     btn.addEventListener('touchend', () => clearTimeout(pt));
-    container.appendChild(btn);
+    // Wrapper con tasto elimina per la lista attiva
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:4px;flex-shrink:0;';
+    wrap.appendChild(btn);
+    if (id === _shopCurId) {
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '🗑';
+      delBtn.title = 'Elimina lista';
+      delBtn.style.cssText = 'padding:5px 8px;border-radius:99px;font-size:12px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;flex-shrink:0;';
+      delBtn.onclick = (e) => { e.stopPropagation(); shopDeleteList(id); };
+      wrap.appendChild(delBtn);
+    }
+    container.appendChild(wrap);
   });
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
