@@ -1282,13 +1282,21 @@ html, body {
 
 .pw-cats-grid {
   display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
+  grid-template-columns: repeat(2, 1fr) !important;
   gap: 10px;
   padding: 12px 14px;
 }
 @media (max-width: 480px) {
   .pw-cats-grid { grid-template-columns: repeat(2, 1fr) !important; }
 }
+
+/* Colori ciclici categorie password */
+.pw-cat-tile:nth-child(6n+1) .pw-cat-icon-wrap { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.25); }
+.pw-cat-tile:nth-child(6n+2) .pw-cat-icon-wrap { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.25); }
+.pw-cat-tile:nth-child(6n+3) .pw-cat-icon-wrap { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.25); }
+.pw-cat-tile:nth-child(6n+4) .pw-cat-icon-wrap { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); }
+.pw-cat-tile:nth-child(6n+5) .pw-cat-icon-wrap { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.25); }
+.pw-cat-tile:nth-child(6n+6) .pw-cat-icon-wrap { background: rgba(6,182,212,0.12); border-color: rgba(6,182,212,0.25); }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -3128,6 +3136,9 @@ function switchTab(tab) {
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
+  // Nascondi FAB password se non siamo in passwords
+  const fab = document.getElementById('pw-fab');
+  if (fab) fab.style.display = tab === 'passwords' ? 'block' : 'none';
 }
 
 function switchTabFromDrawer(tab) {
@@ -3452,20 +3463,38 @@ function pwShowCats(q='') {
   document.getElementById('topbar-back').classList.remove('visible');
   // Tasti topbar: + Cartella e + Password
   const acts = document.getElementById('topbar-actions');
-  if (acts) {
-    acts.innerHTML = '';
-    const btnCat = document.createElement('button');
-    btnCat.textContent = '+ Cartella';
-    btnCat.style.cssText = 'padding:7px 13px;border-radius:10px;border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:6px;';
-    btnCat.onclick = () => pwNewCategory();
-    const btnPw = document.createElement('button');
-    btnPw.title = 'Nuova password';
-    btnPw.style.cssText = 'width:36px;height:36px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:300;';
-    btnPw.textContent = '+';
-    btnPw.onclick = () => pwNewItem();
-    acts.appendChild(btnCat);
-    acts.appendChild(btnPw);
+  if (acts) acts.innerHTML = '';
+  // FAB in basso a destra (come v11)
+  let pwFab = document.getElementById('pw-fab');
+  if (!pwFab) {
+    pwFab = document.createElement('div');
+    pwFab.id = 'pw-fab';
+    pwFab.style.cssText = 'position:absolute;bottom:24px;right:20px;z-index:10;';
+    // Menu dropdown
+    const menu = document.createElement('div');
+    menu.id = 'pw-fab-menu';
+    menu.style.cssText = 'display:none;position:absolute;bottom:64px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);min-width:190px;';
+    menu.innerHTML = '<button id="pw-fab-newpw" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;">🔐 Nuova Password</button><div style="height:1px;background:var(--border);margin:0 12px;"></div><button id="pw-fab-newcat" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;">📁 Nuova Categoria</button>';
+    // FAB button
+    const btn = document.createElement('button');
+    btn.style.cssText = 'width:54px;height:54px;border-radius:18px;border:none;background:var(--accent);color:white;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;line-height:1;';
+    btn.textContent = '+';
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      if (menu.style.display === 'block') {
+        setTimeout(() => document.addEventListener('click', function h(ev) {
+          if (!pwFab.contains(ev.target)) { menu.style.display='none'; document.removeEventListener('click',h); }
+        }), 100);
+      }
+    };
+    pwFab.appendChild(menu);
+    pwFab.appendChild(btn);
+    document.getElementById('tab-container').appendChild(pwFab);
+    document.getElementById('pw-fab-newpw').onclick = () => { menu.style.display='none'; pwNewItem(); };
+    document.getElementById('pw-fab-newcat').onclick = () => { menu.style.display='none'; pwNewCategory(); };
   }
+  pwFab.style.display = 'block';
   pwRenderCats(q);
 }
 
@@ -3484,10 +3513,13 @@ function pwRenderCats(q='') {
     const div = document.createElement('div');
     div.className = 'pw-cat-tile';
     div.onclick = () => pwShowItems(cat.id, cat.name);
+    const CAT_COLORS=['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
+    const ci = _pwCats.indexOf(cat);
+    const color = CAT_COLORS[ci >= 0 ? ci % CAT_COLORS.length : 0];
     div.innerHTML = `
-      <div class="pw-cat-icon" style="background:${cat.color||'rgba(99,102,241,0.12)'}20;">${icon}</div>
-      <div class="pw-cat-name">${cat.name}</div>
-      <div class="pw-cat-badge">${count}</div>
+      <div class="pw-cat-icon-wrap" style="width:60px;height:60px;border-radius:18px;border:1.5px solid ${color}40;background:${color}18;display:flex;align-items:center;justify-content:center;font-size:28px;">${icon}</div>
+      <div style="font-size:11px;font-weight:800;color:var(--text);text-align:center;word-break:break-word;padding:0 4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${cat.name}</div>
+      <div style="font-size:10px;font-weight:700;color:${color};">${count > 0 ? count + ' pw' : '—'}</div>
     `;
     grid.appendChild(div);
   });
