@@ -2945,6 +2945,23 @@ function switchTab(tab) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item.more-btn')?.classList.add('active');
   }
+
+  // Chiama onOpen del modulo
+  const moduleOpeners = {
+    otp:       () => typeof otpOpen === 'function' && otpOpen(),
+    shopping:  () => typeof shopOpen === 'function' && shopOpen(),
+    wifi:      () => typeof wifiOpen === 'function' && wifiOpen(),
+    passwords: () => typeof pwOpen === 'function' && pwOpen(),
+    notes:     () => typeof noteOpen === 'function' && noteOpen(),
+    cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
+    finance:   () => typeof financeOpen === 'function' && financeOpen(),
+    server:    () => typeof serverOpen === 'function' && serverOpen(),
+    documents: () => typeof docsOpen === 'function' && docsOpen(),
+    calendar:  () => typeof calOpen === 'function' && calOpen(),
+    family:    () => typeof familyOpen === 'function' && familyOpen(),
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+  };
+  moduleOpeners[tab]?.();
 }
 
 function switchTabFromDrawer(tab) {
