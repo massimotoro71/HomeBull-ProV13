@@ -1006,9 +1006,16 @@ html, body {
 }
 /* QR Modal */
 #wifi-qr-modal {
-  position: fixed; inset: 0; z-index: 9000;
-  background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-  display: none; align-items: center; justify-content: center;
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  right: 0 !important; bottom: 0 !important;
+  width: 100vw; height: 100dvh;
+  z-index: 9500;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
 }
 #wifi-qr-modal.open { display: flex; }
 
@@ -2420,10 +2427,11 @@ function wifiDelete(id) {
 
 <!-- QR Code Modal (Wi-Fi) -->
 <div id="wifi-qr-modal" onclick="wifiCloseQR()">
-  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;" onclick="event.stopPropagation()">
-    <div id="wifi-qr-ssid-label" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;"></div>
+  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;position:relative;" onclick="event.stopPropagation()">
+    <button onclick="wifiCloseQR()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f5;color:#333;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+    <div id="wifi-qr-ssid-label" style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;margin-right:20px;"></div>
     <div style="font-size:12px;color:#9090b0;margin-bottom:16px;">Scansiona per connetterti</div>
-    <canvas id="wifi-qr-canvas" style="border-radius:12px;"></canvas>
+    <canvas id="wifi-qr-canvas" style="border-radius:12px;max-width:100%;"></canvas>
     <div style="margin-top:16px;">
       <button onclick="wifiCloseQR()" style="padding:12px 28px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
     </div>
