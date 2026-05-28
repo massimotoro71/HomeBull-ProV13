@@ -10,6 +10,17 @@
 // ═══════════════════════════════════════════════════════════
 
 const HB = {
+  version: '13.0.0-beta',
+  currentTab: 'home',
+  authState: 'email',
+  user: null,
+  sessionKey: null,
+  pinBuffer: '',
+  pinMode: 'setup',
+  pinFirst: '',
+  otpCode: '',
+  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','family','shopping']
+};
 const HB_BIO_KEY     = 'hb12_bio_credId';
 const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
 const HB_BIO_SALT    = 'hb12-biometric-key-v1';
