@@ -3444,7 +3444,7 @@ function pwRenderCats(q='') {
   grid.innerHTML = '';
   cats.forEach(cat => {
     const count = _pwItems.filter(i => i.categoryId === cat.id).length;
-    if (count === 0 && q === '') return; // nascondi categorie vuote
+    // mostra sempre tutte le categorie
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
     const div = document.createElement('div');
     div.className = 'pw-cat-tile';
