@@ -1264,7 +1264,48 @@ html, body {
   z-index: 10 !important;
 }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
+function shopAddCustom() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+  overlay.innerHTML = `
+    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
+      <div style="font-size:17px;font-weight:800;margin-bottom:16px;">➕ Aggiungi prodotto</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Nome prodotto</div>
+        <input id="shop-custom-name" type="text" placeholder="es. Prosciutto crudo, Latte intero..." autocomplete="off"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Emoji (opzionale)</div>
+        <input id="shop-custom-icon" type="text" placeholder="🛍️" maxlength="2"
+          style="width:80px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;outline:none;text-align:center;">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="this.closest('[style]').remove()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+        <button onclick="shopConfirmCustom(this)" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi alla lista</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('shop-custom-name')?.focus(), 100);
+  document.getElementById('shop-custom-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') overlay.querySelector('button:last-child').click();
+  });
+}
+
+function shopConfirmCustom(btn) {
+  const name = document.getElementById('shop-custom-name')?.value.trim();
+  const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
+  if (!name) { showToast('Inserisci il nome del prodotto'); return; }
+  const id = 'custom_' + Date.now();
+  _shopList[id] = { name, icon, qty: 1 };
+  shopSave();
+  btn.closest('[style]').remove();
+  shopRenderAll();
+  showToast('✅ ' + name + ' aggiunto!');
+}
+
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
 <body>
@@ -2903,6 +2944,7 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
+  if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
