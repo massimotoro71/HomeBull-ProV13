@@ -127,8 +127,11 @@ function authLogout() {
 //  APP START
 // ════════════════════════════════════════════════════════
 function appStart() {
+  applyTheme();
+  applyHomePrefs();
+  updateHomeDate();
+  renderQuickAccess();
   switchTab('home');
-  // Inizializza i moduli
   if (typeof shopInit === 'function') shopInit();
 }
 
@@ -161,6 +164,11 @@ function switchTab(tabId) {
   updateTopbar(tabId);
 
   // Chiama onOpen del modulo se esiste
+  // Aggiorna home quando si apre
+  if (tabId === 'home') {
+    updateHomeDate();
+    renderQuickAccess();
+  }
   const onOpen = window[`${tabId}Open`];
   if (typeof onOpen === 'function') onOpen();
 }
@@ -272,3 +280,223 @@ function fmtDate(iso) {
   return d.toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric' });
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+
+
+// ═══════════════════════════════════════════════════════════
+//  HOME DASHBOARD — funzioni da v22
+// ═══════════════════════════════════════════════════════════
+
+const ALL_TABS_META = [
+const QA_KEY = 'hb12_quick_access';
+const HOME_PREFS_KEY = 'hb12_home_prefs';
+const HB_NAME_KEY = 'hb12_display_name';
+
+function updateHomeDate() {
+  const now  = new Date();
+  const h    = now.getHours();
+  const greet = h < 12 ? 'Buongiorno,' : h < 18 ? 'Buon pomeriggio,' : 'Buonasera,';
+  const name  = getDisplayName();
+  const dateStr = now.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  const saluto = document.getElementById('home-saluto');
+  const el = document.getElementById('home-greeting');
+  const de = document.getElementById('home-date');
+  if (saluto) saluto.textContent = greet;
+  if (el) el.textContent = name;
+  if (de) de.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+}
+
+function renderQuickAccess() {
+  const tabs = loadQuickAccess();
+  const grid = document.getElementById('quick-access-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  tabs.forEach(tabId => {
+    const meta = ALL_TABS_META.find(t => t.id === tabId);
+    if (!meta) return;
+    const card = document.createElement('div');
+    card.className = 'qa-card';
+    card.onclick = () => switchTab(tabId);
+    card.innerHTML = `<div class="qa-card-icon">${meta.icon}</div><div class="qa-card-label">${meta.label}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function editQuickAccess() {
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 6) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede nell\'accesso rapido');
+      }
+    };
+    container.appendChild(el);
+  });
+  document.getElementById('qa-edit-modal').classList.add('open');
+}
+
+function saveQaEdit() {
+  if (qaSelected.length === 0) { showToast('Seleziona almeno una scheda'); return; }
+  localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
+  renderQuickAccess();
+  closeQaEdit();
+  showToast('✅ Accesso rapido aggiornato');
+}
+
+function closeQaEdit() {
+  document.getElementById('qa-edit-modal').classList.remove('open');
+}
+
+function openGlobalSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
+}
+
+function runSearch(q) {
+  const container = document.getElementById('search-results');
+  if (!q.trim()) {
+    container.innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
+    return;
+  }
+  // Cerca nei dati disponibili (espandibile per ogni scheda)
+  const results = [];
+  const ql = q.toLowerCase();
+
+  // Placeholder: cerca nelle schede registrate
+  ALL_TABS_META.forEach(tab => {
+    if (tab.label.toLowerCase().includes(ql)) {
+      results.push({
+        icon: tab.icon, title: 'Vai a ' + tab.label,
+        sub: 'Sezione ' + tab.label, tab: tab.id, tabLabel: tab.label
+      });
+    }
+  });
+
+  // TODO: quando le schede avranno dati reali, cercare lì
+  // results.push(...searchPasswords(q), ...searchNotes(q), ...searchCards(q));
+
+  if (!results.length) {
+    container.innerHTML = `<div class="search-empty">Nessun risultato per "<strong>${q}</strong>"</div>`;
+    return;
+  }
+  container.innerHTML = results.map(r => `
+    <div class="search-result-item" onclick="closeGlobalSearch();switchTab('${r.tab}')">
+      <div class="search-result-icon">${r.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="search-result-title">${r.title}</div>
+        <div class="search-result-sub">${r.sub}</div>
+      </div>
+      <div class="search-result-tab">${r.tabLabel}</div>
+    </div>
+  `).join('');
+}
+
+function openHomeCustom() {
+  const prefs = loadHomePrefs();
+  // Precompila checkbox sezioni
+  const defaults = { search:true, quick:true, stats:true, alerts:true };
+  ['search','quick','stats','alerts'].forEach(k => {
+    const el = document.getElementById('hc-' + k);
+    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
+  });
+  // Precompila quick access
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs-home');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 6) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede');
+      }
+    };
+    container.appendChild(el);
+  });
+  // Tema
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
+  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
+  document.getElementById('home-custom-modal').style.display = 'flex';
+}
+
+function closeHomeCustom() {
+  document.getElementById('home-custom-modal').style.display = 'none';
+}
+
+function saveHomeCustom() {
+  const prefs = {
+    search: document.getElementById('hc-search').checked,
+    quick:  document.getElementById('hc-quick').checked,
+    alerts: document.getElementById('hc-alerts').checked,
+  };
+  saveHomePrefs(prefs);
+  if (qaSelected.length > 0) localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
+  applyHomePrefs();
+  renderQuickAccess();
+  closeHomeCustom();
+  showToast('✅ Home personalizzata');
+}
+
+function applyHomePrefs() {
+  const prefs = loadHomePrefs();
+  const map = {
+    search: 'home-search-bar',
+    quick:  'home-quick-section',
+    alerts: 'home-alerts-section',
+  };
+  Object.entries(map).forEach(([key, elId]) => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = (prefs[key] === false) ? 'none' : '';
+  });
+}
+
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('hb12_theme', t);
+  document.getElementById('theme-dark-btn').style.borderWidth  = t === 'dark'  ? '2px' : '1px';
+  document.getElementById('theme-light-btn').style.borderWidth = t === 'light' ? '2px' : '1px';
+}
+
+function editDisplayName() {
+  const current = getDisplayName();
+  const newName = prompt('Come vuoi essere chiamato?', current);
+  if (newName === null) return; // annullato
+  const trimmed = newName.trim();
+  if (trimmed) {
+    localStorage.setItem(HB_NAME_KEY, trimmed);
+    updateHomeDate();
+    showToast('✅ Nome aggiornato: ' + trimmed);
+  }
+}
+
+function getDisplayName() {
+  return localStorage.getItem(HB_NAME_KEY) ||
+         (HB.user?.email?.split('@')[0] || 'Utente');
+}
