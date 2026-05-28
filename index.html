@@ -1305,6 +1305,25 @@ function shopConfirmCustom(btn) {
   showToast('✅ ' + name + ' aggiunto!');
 }
 
+function wifiShowAdd() {
+  document.getElementById('wifi-view-list').style.display = 'none';
+  document.getElementById('wifi-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuova Rete';
+  document.getElementById('wifi-add-ssid').value = '';
+  document.getElementById('wifi-add-pw').value = '';
+  _wifiSec = 'WPA';
+  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sec === 'WPA');
+  });
+}
+function wifiDelete(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
+  _wifiNets = _wifiNets.filter(n => n.id !== id);
+  wifiSaveAll(); wifiRender();
+  showToast('Rete rimossa');
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
