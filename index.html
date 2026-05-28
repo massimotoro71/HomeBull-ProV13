@@ -3724,20 +3724,6 @@ async function pwHandleImport(event) {
 
 function pwNewItem() {
   pwShowAddForm(null);
-};
-  document.getElementById('_pw_save').onclick = () => {
-    const site = document.getElementById('_pw_new_site')?.value.trim();
-    const user = document.getElementById('_pw_new_user')?.value.trim();
-    const pass = document.getElementById('_pw_new_pass')?.value;
-    const note = document.getElementById('_pw_new_note')?.value.trim();
-    if (!site || !pass) { showToast('Inserisci sito e password'); return; }
-    const newItem = { id: 'pw_' + Date.now(), site, user, pass, note, createdAt: new Date().toISOString() };
-    _pwItems.push(newItem);
-    pwSave();
-    overlay.remove();
-    pwOpen();
-    showToast('✅ Password salvata!');
-  };
 }
 
 // ── AI icon lookup per categorie ────────────────────────────
