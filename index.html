@@ -2811,18 +2811,18 @@ function logout() {
 
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
-  home:      { title: 'Home',       sub: '', actions: ['customize'] },
-  passwords: { title: 'Password',   sub: '', actions: ['search','add'] },
-  documents: { title: 'Documenti',  sub: '', actions: ['add'] },
-  notes:     { title: 'Note',       sub: '', actions: ['search','add'] },
-  calendar:  { title: 'Calendario', sub: '', actions: ['add'] },
-  otp:       { title: 'OTP / 2FA',  sub: 'Codici TOTP', actions: ['add'] },
-  cards:     { title: 'Carte',      sub: '', actions: ['add'] },
-  wifi:      { title: 'Wi-Fi',      sub: 'Reti salvate', actions: ['add'] },
-  finance:   { title: 'Finanze',    sub: 'IBAN e conti', actions: ['add'] },
-  server:    { title: 'Server / IT',sub: 'SSH, API, credenziali', actions: ['add'] },
-  family:    { title: 'Famiglia',   sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: 'Spesa e acquisti', actions: ['add'] },
+  home:      { title: 'Home',        sub: '', actions: ['customize'] },
+  passwords: { title: 'Password',    sub: '', actions: ['search'] },
+  documents: { title: 'Documenti',   sub: '', actions: [] },
+  notes:     { title: 'Note',        sub: '', actions: ['search'] },
+  calendar:  { title: 'Calendario',  sub: '', actions: [] },
+  otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
+  cards:     { title: 'Carte',       sub: '', actions: [] },
+  wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
+  finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
+  server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
+  family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
 };
 
 function switchTab(tab) {
