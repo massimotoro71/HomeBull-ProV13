@@ -5618,7 +5618,21 @@ function shopRenderListTabs() {
     // Tieni premuto per rinominare
     let pt; btn.addEventListener('touchstart', () => { pt = setTimeout(() => shopRenameList(id), 600); });
     btn.addEventListener('touchend', () => clearTimeout(pt));
-    container.appendChild(btn);
+    // Tasto 🗑 accanto alla lista attiva (solo se ci sono più liste)
+    if (id === _shopCurId && Object.keys(_shopLists).length > 1) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:3px;flex-shrink:0;';
+      wrap.appendChild(btn);
+      const del = document.createElement('button');
+      del.textContent = '🗑';
+      del.title = 'Elimina lista';
+      del.style.cssText = 'padding:4px 7px;border-radius:99px;font-size:11px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;';
+      del.onclick = (e) => { e.stopPropagation(); shopDeleteList(id); };
+      wrap.appendChild(del);
+      container.appendChild(wrap);
+    } else {
+      container.appendChild(btn);
+    }
   });
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
@@ -5824,49 +5838,66 @@ function shopClearAll() {
 
 function shopNewList() {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
-    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista della spesa</div>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata, ne crei una nuova.</div>
-    <input id="shop-new-name" type="text" placeholder="Nome lista (es. Settimana, Festa...)" value="Spesa"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata.</div>
+    <input id="shop-new-name" type="text" placeholder="es. Settimana, Festa, Farmacia..." value="Spesa"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="shopCreateList(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
-    </div>
-  </div>`;
+      <button id="_snl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_snl_ok" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => { const inp = document.getElementById('shop-new-name'); inp?.focus(); inp?.select(); }, 200);
+  const inp = document.getElementById('shop-new-name');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_snl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_snl_ok').onclick = () => {
+    const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
+    shopSave();
+    const id = 'lst_' + Date.now();
+    _shopLists[id] = { name, items: {} };
+    _shopCurId = id;
+    _shopList = _shopLists[id].items;
+    shopSave();
+    overlay.remove();
+    shopRenderAll();
+    showToast('✅ Lista "' + name + '" creata');
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_snl_ok').click(); });
 }
 
-function shopCreateList(btn) {
-  const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
-  shopSave(); // salva lista corrente
-  const id = 'lst_' + Date.now();
-  _shopLists[id] = { name, items:{} };
-  _shopCurId = id;
-  _shopList  = _shopLists[id].items;
-  shopSave();
-  btn.closest('[style]').remove();
-  shopRenderAll();
-  showToast('✅ Lista "' + name + '" creata');
-}
+function shopCreateList() {} // legacy — non usato
 
 function shopRenameList(id) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
     <div style="font-size:16px;font-weight:800;margin-bottom:14px;">Rinomina lista</div>
-    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name||''}"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name || ''}"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button onclick="shopDeleteList('${id}');this.closest('[style]').remove()" style="padding:13px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="_shopLists['${id}'].name=document.getElementById('shop-rename-inp').value.trim()||_shopLists['${id}'].name;shopSave();shopRenderAll();this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>
-  </div>`;
+      <button id="_srl_del" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑</button>
+      <button id="_srl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_srl_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => { const inp = document.getElementById('shop-rename-inp'); inp?.focus(); inp?.select(); }, 200);
+  const inp = document.getElementById('shop-rename-inp');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_srl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_srl_del').onclick = () => { overlay.remove(); shopDeleteList(id); };
+  document.getElementById('_srl_ok').onclick = () => {
+    const newName = inp?.value.trim();
+    if (newName && _shopLists[id]) _shopLists[id].name = newName;
+    shopSave(); shopRenderAll(); overlay.remove();
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_srl_ok').click(); });
 }
 
 function shopDeleteList(id) {
