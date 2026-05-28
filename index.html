@@ -1331,6 +1331,46 @@ function wifiDelete(id) {
   wifiSaveAll(); wifiRender();
   showToast('Rete rimossa');
 }
+function otpShowAdd() {
+  document.getElementById('otp-view-list').style.display = 'none';
+  document.getElementById('otp-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuovo Account';
+  if (_otpTimer) clearInterval(_otpTimer);
+  // Reset form
+  document.getElementById('otp-add-name').value = '';
+  document.getElementById('otp-add-user').value = '';
+  document.getElementById('otp-add-secret').value = '';
+  _otpIcon = '🔐';
+  document.querySelectorAll('.otp-icon-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.icon === '🔐');
+  });
+}
+function otpShowList(q='') {
+  document.getElementById('otp-view-list').style.display = 'flex';
+  document.getElementById('otp-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
+  otpRenderList(q);
+  otpStartUpdater();
+}
+function otpCopy(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
+  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+function otpScanQR() {
+  qrScannerOpen('Scansiona QR 2FA', (data) => {
+    const parsed = qrParseOTP(data);
+    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
+    document.getElementById('otp-add-name').value   = parsed.name;
+    document.getElementById('otp-add-user').value   = parsed.user;
+    document.getElementById('otp-add-secret').value = parsed.secret;
+    showToast('✅ QR letto — verifica i dati e salva');
+  });
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
