@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HomeBull Pro — Reset Cache</title>
+<style>
+  body { font-family: sans-serif; background: #0a0a0f; color: #f0f0f8;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; margin: 0; text-align: center; padding: 20px; }
+  .box { max-width: 320px; }
+  .logo { font-size: 48px; margin-bottom: 16px; }
+  h1 { font-size: 20px; margin-bottom: 8px; }
+  p { color: #9090b0; font-size: 14px; margin-bottom: 24px; }
+  button { padding: 14px 28px; border-radius: 12px; border: none;
+    background: #6366f1; color: white; font-size: 14px; font-weight: 700;
+    cursor: pointer; width: 100%; }
+  .status { margin-top: 16px; font-size: 13px; color: #10b981; min-height: 20px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">🔄</div>
+  <h1>Reset Cache</h1>
+  <p>Tocca il pulsante per disregistrare il Service Worker e forzare il caricamento della versione più recente.</p>
+  <button onclick="resetCache()">Aggiorna HomeBull Pro</button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+async function resetCache() {
+  const status = document.getElementById('status');
+  status.textContent = 'Pulizia in corso...';
+  try {
+    // Disregistra tutti i SW
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) await reg.unregister();
+    }
+    // Svuota tutte le cache
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    status.textContent = '✅ Cache pulita! Reindirizzamento...';
+    setTimeout(() => { window.location.href = './index.html'; }, 1500);
+  } catch(e) {
+    status.textContent = '⚠️ Errore: ' + e.message;
+  }
+}
+// Avvia automaticamente
+window.addEventListener('load', resetCache);
+</script>
+</body>
+</html>
