@@ -1,196 +1,105 @@
 <!DOCTYPE html>
 <html lang="it" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>HomeBull</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0d0d1a">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0f">
+<title>HomeBull Pro</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,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">
+<style>
 /* ═══════════════════════════════════════════════════════════
-   HomeBull — base.css
-   Reset + variabili + componenti condivisi
+   HOMEBULL PRO v12 — Design System
+   Font: DM Sans (body) + Syne (display)
+   Palette: dark-first, indigo accent, per-tab accent colors
 ═══════════════════════════════════════════════════════════ */
 
-/* ── Reset ─────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,700&family=Syne:wght@700;800&display=swap');
 
-html, body {
-  height: 100%;
-  font-family: 'DM Sans', system-ui, sans-serif;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-}
-
-input, textarea, select, button {
-  font-family: inherit;
-  font-size: 16px; /* evita zoom automatico su iOS */
-}
-
-button { cursor: pointer; }
-input, textarea { outline: none; }
-
-/* ── Variabili dark (default) ───────────────────────────── */
 :root {
-  --bg:       #0d0d1a;
-  --bg2:      #13131f;
-  --bg3:      #1a1a2e;
-  --surface:  #1e1e30;
-  --border:   rgba(255,255,255,0.07);
-  --border2:  rgba(255,255,255,0.13);
-  --text:     #f0f0f8;
-  --text2:    #9090b8;
-  --text3:    #5a5a7a;
-  --accent:   #6366f1;
-  --accent2:  #8b5cf6;
-  --accent-bg: rgba(99,102,241,0.12);
-  --danger:   #ef4444;
-  --success:  #22c55e;
-  --radius:   14px;
-  --radius-sm: 10px;
-  --topbar-h:   54px;
-  --sidebar-w:  220px;
-  --bottombar-h: 64px;
+  /* Base palette */
+  --bg:          #0a0a0f;
+  --bg2:         #111118;
+  --bg3:         #1a1a26;
+  --surface:     #1e1e2e;
+  --surface2:    #252538;
+  --border:      rgba(255,255,255,0.08);
+  --border2:     rgba(255,255,255,0.14);
+  --text:        #f0f0f8;
+  --text2:       #9090b0;
+  --text3:       #5a5a7a;
+
+  /* Accent — indigo default, override per tab */
+  --accent:      #6366f1;
+  --accent2:     #818cf8;
+  --accent-bg:   rgba(99,102,241,0.12);
+  --accent-glow: rgba(99,102,241,0.3);
+
+  /* Tab accent colors */
+  --tab-home:    #6366f1;
+  --tab-pass:    #10b981;
+  --tab-docs:    #f59e0b;
+  --tab-notes:   #8b5cf6;
+  --tab-cal:     #ef4444;
+  --tab-otp:     #06b6d4;
+  --tab-cards:   #f97316;
+  --tab-wifi:    #84cc16;
+  --tab-finance: #eab308;
+  --tab-server:  #64748b;
+  --tab-family:  #ec4899;
+
+  /* Layout */
+  --topbar-h:    54px;
+  --bottombar-h: 70px;
+  --sidebar-w:   220px;
+  --radius:      16px;
+  --radius-sm:   10px;
+  --radius-lg:   24px;
+
+  /* Safe areas */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  font-family: 'DM Sans', system-ui, sans-serif;
 }
 
-/* ── Variabili light ────────────────────────────────────── */
+/* Light theme */
 [data-theme="light"] {
   --bg:       #f4f4f8;
   --bg2:      #ffffff;
   --bg3:      #eeeef6;
   --surface:  #ffffff;
-  --border:   rgba(0,0,0,0.07);
-  --border2:  rgba(0,0,0,0.13);
+  --surface2: #f0f0f8;
+  --border:   rgba(0,0,0,0.08);
+  --border2:  rgba(0,0,0,0.14);
   --text:     #0f0f1a;
   --text2:    #5a5a7a;
   --text3:    #9090b0;
 }
 
-/* ── Scrollbar ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%; width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
 
 /* ═══════════════════════════════════════════════════════════
-   LAYOUT STRUTTURA
+   AUTH SCREEN
 ═══════════════════════════════════════════════════════════ */
-.app-layout {
-  display: flex;
-  height: 100dvh;
-  overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
-}
-
-.app-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0;
-}
-
-/* ── Topbar ─────────────────────────────────────────────── */
-#topbar {
-  height: var(--topbar-h);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 14px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  z-index: 10;
-}
-
-.topbar-back {
-  width: 36px; height: 36px;
-  display: none;
-  align-items: center; justify-content: center;
-  border-radius: 10px;
-  cursor: pointer;
-  color: var(--text2);
-  flex-shrink: 0;
-}
-.topbar-back.visible { display: flex; }
-
-.topbar-title { flex: 1; min-width: 0; }
-.topbar-title h1 {
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.topbar-title span {
-  font-size: 11px;
-  color: var(--text3);
-  font-weight: 600;
-}
-
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.topbar-btn {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  color: var(--text2);
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
-.topbar-btn:hover { background: var(--surface); }
-
-/* ── Tab container ──────────────────────────────────────── */
-#tab-container {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  min-height: 0;
-}
-
-/* ── Tab panel ──────────────────────────────────────────── */
-.tab-panel {
-  position: absolute;
-  inset: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s ease;
-  background: var(--bg);
-}
-.tab-panel.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.tab-inner {
-  padding: 16px 14px 24px;
-  max-width: 700px;
-}
-
-
-/* ── Da v20 (auth + componenti) ── */
 #auth-screen {
   position: fixed; inset: 0; z-index: 9999;
   background: var(--bg);
@@ -406,43 +315,20 @@ input, textarea { outline: none; }
   overflow: hidden;
   z-index: 1;
 }
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   #tab-container {
     bottom: 0;
   }
 }
 
 /* Mobile: layout compatto senza overflow */
-@media (max-width: 1023px) {
-  /* Stat cards: orizzontali e compatte */
-  .home-stat-card {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 10px 14px !important;
-  }
-  .hsc-icon { font-size: 22px; margin-bottom: 0 !important; flex-shrink: 0; }
-  .hsc-value { font-size: 18px; line-height: 1; }
-  .hsc-label { font-size: 10px; margin-top: 1px; }
-  .home-stat-card > div:last-child { display: flex; flex-direction: column; }
-  /* Griglia stat: 1 colonna su mobile */
-  .home-grid { grid-template-columns: 1fr !important; gap: 8px; }
-  /* Quick access 2 col */
-  .qa-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-  .qa-card { padding: 14px 8px; gap: 6px; }
-  .qa-card-icon { font-size: 22px; }
-  .section-title { font-size: 20px; }
-  .home-section-title { font-size: 11px; }
-  .alert-item { padding: 10px 12px; }
-  #home-search-bar { padding: 11px 14px; }
-}
-@media (min-width: 1024px) {
+
+@media (min-width: 900px) {
   .qa-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
 }
 
 /* On desktop: sidebar replaces bottombar */
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   #sidebar {
     display: flex !important;
   }
@@ -491,7 +377,7 @@ input, textarea { outline: none; }
   will-change: transform;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   #bottombar { display: none; }
 }
 
@@ -555,7 +441,7 @@ input, textarea { outline: none; }
   padding: calc(var(--safe-top) + 20px) 0 20px;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   #sidebar { display: flex; }
 }
 
@@ -628,7 +514,7 @@ input, textarea { outline: none; }
   width: 100%;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   .tab-inner { padding: 28px 32px; max-width: 900px; }
 }
 
@@ -814,7 +700,7 @@ input, textarea { outline: none; }
   opacity: 1; transform: translateX(-50%) translateY(0);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   #toast { bottom: 24px; }
 }
 
@@ -1230,7 +1116,7 @@ input, textarea { outline: none; }
   background: var(--bg);
 }
 @media (min-width: 500px) { .shop-accordion-body { grid-template-columns: repeat(5,1fr); } }
-@media (min-width: 1024px) { .shop-accordion-body { grid-template-columns: repeat(8,1fr); } }
+@media (min-width: 900px) { .shop-accordion-body { grid-template-columns: repeat(8,1fr); } }
 
 /* ── Ricerca globale ───────────────────────────────────── */
 #search-overlay {
@@ -1340,441 +1226,52 @@ input, textarea { outline: none; }
 .qa-tab-option.selected { border-color: var(--accent); background: var(--accent-bg); }
 .qa-tab-option-icon { font-size: 22px; }
 .qa-tab-option-label { font-size: 11px; font-weight: 700; color: var(--text2); text-align: center; }
-@media (min-width: 1024px) {
+@media (min-width: 900px) {
   .home-grid { grid-template-columns: repeat(4, 1fr); }
   .section-title { font-size: 32px; }
 }
 
+/* ── v13: Solo desktop — mobile da aggiungere dopo ── */
+#bottombar, #bottom-more-popup, .nav-item, #more-drawer { display: none !important; }
 
-/* ═══════════════════════════════════════════════════════════
-   HomeBull — mobile.css
-   Layout mobile (< 900px)
-═══════════════════════════════════════════════════════════ */
+/* Sidebar sempre visibile */
+#sidebar { display: flex !important; }
 
-@media (max-width: 899px) {
+/* Layout flex row */
+.app-layout, #app { display: flex !important; flex-direction: row !important; height: 100dvh !important; }
+.app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
+#tab-container { flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; }
 
-  /* sidebar nascosta su mobile */
-  #sidebar { display: none !important; }
+/* Tab panel: block su desktop */
+.tab-panel { position: absolute !important; inset: 0 !important; overflow-y: auto !important;
+  opacity: 0; pointer-events: none; transition: opacity 0.18s; background: var(--bg); }
+.tab-panel.active { opacity: 1 !important; pointer-events: auto !important; }
 
-  /* layout colonna: topbar → content → bottombar */
-  .app-layout { flex-direction: column; }
-  .app-main   { flex-direction: column; }
+/* Topbar sticky */
+#topbar { position: sticky !important; top: 0 !important; left: auto !important;
+  right: auto !important; width: 100% !important; flex-shrink: 0; }
 
-  /* tab-inner: padding adatto al mobile */
-  .tab-inner {
-    padding: 14px 12px calc(14px + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* ── Bottombar ──────────────────────────────────────────── */
-  #bottombar {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    height: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px));
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  .bottom-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    height: 100%;
-    background: none;
-    border: none;
-    color: var(--text3);
-    font-size: 10px;
-    font-weight: 700;
-    padding: 6px 4px;
-    position: relative;
-    transition: color 0.15s;
-  }
-  .bottom-btn.active { color: var(--accent); }
-
-  .bottom-badge {
-    position: absolute;
-    top: 4px; right: calc(50% - 18px);
-    min-width: 16px; height: 16px;
-    border-radius: 99px;
-    background: var(--accent);
-    color: white;
-    font-size: 9px; font-weight: 900;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0 4px;
-  }
-
-  /* Toast sopra la bottombar */
-  #toast {
-    bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px) + 12px);
-  }
-
-  /* ── Popup "Altro" ──────────────────────────────────────── */
-  #bottom-more-popup {
-    position: fixed;
-    bottom: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px) + 8px);
-    left: 8px; right: 8px;
-    z-index: 500;
-    display: none;
-  }
-  #bottom-more-popup.open { display: block; }
-
-  .more-popup-grid {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 12px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-  }
-
-  .more-popup-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 10px 4px;
-    border-radius: 12px;
-    color: var(--text2);
-    font-size: 10px;
-    font-weight: 700;
-    transition: background 0.15s;
-  }
-  .more-popup-btn:active { background: var(--surface); }
-
-}
-
-
-/* ═══════════════════════════════════════════════════════════
-   HomeBull — desktop.css
-   Layout desktop (>= 900px)
-═══════════════════════════════════════════════════════════ */
-
-@media (min-width: 900px) {
-
-  /* layout riga: sidebar | main */
-  .app-layout { flex-direction: row; }
-
-  /* ── Sidebar ──────────────────────────────────────────── */
-  #sidebar {
-    width: var(--sidebar-w);
-    flex-shrink: 0;
-    height: 100%;
-    display: flex !important;
-    flex-direction: column;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    padding: 16px 10px;
-    gap: 2px;
-  }
-
-  .sidebar-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px 16px;
-    margin-bottom: 4px;
-  }
-  .sidebar-logo-icon {
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .sidebar-logo-text {
-    font-size: 15px;
-    font-weight: 900;
-    color: var(--text);
-  }
-  .sidebar-logo-ver {
-    font-size: 10px;
-    color: var(--text3);
-    font-weight: 600;
-  }
-
-  .sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    cursor: pointer;
-    color: var(--text2);
-    font-size: 13px;
-    font-weight: 700;
-    transition: background 0.15s, color 0.15s;
-    user-select: none;
-  }
-  .sidebar-item:hover { background: var(--surface); color: var(--text); }
-  .sidebar-item.active { background: var(--accent-bg); color: var(--accent); }
-  .sidebar-item svg { flex-shrink: 0; opacity: 0.8; }
-  .sidebar-item.active svg { opacity: 1; }
-
-  .sidebar-spacer { flex: 1; }
-
-  .sidebar-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 8px 0;
-  }
-
-  .sidebar-badge {
-    margin-left: auto;
-    min-width: 18px; height: 18px;
-    border-radius: 99px;
-    background: var(--accent);
-    color: white;
-    font-size: 10px; font-weight: 900;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0 5px;
-  }
-
-  /* ── Main area ────────────────────────────────────────── */
-  .app-main {
-    flex: 1;
-    min-width: 0;
-    height: 100%;
-    flex-direction: column;
-  }
-
-  /* tab-container: scorre naturalmente su desktop */
-  #tab-container {
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  /* pannelli: da absolute a block su desktop */
-  .tab-panel {
-    position: relative !important;
-    inset: auto !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    display: none;
-    min-height: 100%;
-    transition: none !important;
-  }
-  .tab-panel.active {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    display: block !important;
-  }
-
-  .tab-inner {
-    padding: 24px 28px 40px;
-    max-width: 860px;
-  }
-
-  /* bottombar nascosta su desktop */
-  #bottombar { display: none !important; }
-
-  /* toast: sopra il contenuto, niente bottombar */
-  #toast {
-    bottom: 24px;
-  }
-
-  /* topbar: sticky su desktop */
-  #topbar {
-    position: sticky;
-    top: 0;
-    padding: 0 20px;
-  }
-
-}
-
-  
-@media (min-width: 900px) {
-  #bottom-more-popup { display: none !important; }
-  #bottombar { display: none !important; }
-  .more-popup-grid { display: none !important; }
-}
-
-@media (min-width: 900px) {
-  #tab-container {
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 100%;
-  }
-  .tab-panel.active {
-    display: block !important;
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  .tab-inner {
-    padding: 24px 28px 40px !important;
-    max-width: 860px;
-  }
-}
-
-/* ══════════════════════════════════════════════════════
-   LAYOUT OVERRIDE v13 — sovrascrive tutto il v20
-══════════════════════════════════════════════════════ */
-
-/* Reset: niente position:fixed su topbar e tab-container */
-html, body { height: 100%; overflow: hidden; margin: 0; padding: 0; }
-
-body { display: flex; flex-direction: column; }
-
-.app-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  overflow: hidden;
-  flex: 1;
-}
-
-.app-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
-  min-width: 0;
-}
-
-#topbar {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  height: var(--topbar-h);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 16px;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
-  z-index: 10;
-  backdrop-filter: blur(20px);
-}
-
-#tab-container {
-  position: relative !important;
-  top: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  flex: 1 !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch;
-  min-height: 0;
-}
-
-.tab-panel {
-  position: absolute !important;
-  inset: 0 !important;
-  overflow-y: auto !important;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.18s ease;
-  background: var(--bg);
-}
-.tab-panel.active {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
-#bottombar {
-  position: relative !important;
-  bottom: auto !important;
-  flex-shrink: 0;
-}
-
-/* ── DESKTOP >= 900px ── */
-@media (min-width: 900px) {
-  .app-layout { flex-direction: row !important; }
-
-  #sidebar {
-    display: flex !important;
-    width: 220px !important;
-    flex-shrink: 0;
-    height: 100dvh;
-    overflow-y: auto;
-    flex-direction: column;
-  }
-
-  .app-main {
-    flex: 1;
-    min-width: 0;
-    height: 100dvh;
-  }
-
-  #topbar {
-    position: sticky !important;
-    top: 0 !important;
-    left: auto !important;
-    width: 100% !important;
-    padding: 0 24px !important;
-  }
-
-  #tab-container {
-    flex: 1;
-    overflow-y: auto !important;
-    min-height: 0;
-  }
-
-  .tab-panel {
-    position: relative !important;
-    inset: auto !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    display: none;
-    min-height: 100%;
-    overflow: visible !important;
-  }
-  .tab-panel.active {
-    display: block !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-
-  #bottombar, #bottom-more-popup { display: none !important; }
-
-  .tab-inner {
-    padding: 24px 28px 40px;
-    max-width: 860px;
-  }
-}
-
-/* ── MOBILE < 900px ── */
-@media (max-width: 899px) {
-  #sidebar { display: none !important; }
-  .app-layout { flex-direction: column !important; }
-  .tab-inner { padding: 14px 12px 24px; }
-  #bottombar { display: flex !important; }
-}
-
-/* Fix accordion lista spesa */
-.shop-accordion-header,
-.shop-accordion-header span,
-.shop-accordion-header * {
-  color: var(--text) !important;
-}
-.shop-accordion-header {
-  background: var(--surface) !important;
-}
-.shop-accordion { color: var(--text) !important; }
-.shop-list-tabs-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+/* Accordion testo visibile */
+.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
-
 <body>
 
-<!-- ═══════════════════════════════════════════════════════
-     AUTH SCREEN
-═══════════════════════════════════════════════════════════ -->
+<!-- Loading -->
+<div id="loading-overlay">
+  <div class="loading-logo">
+    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="8" y="12" width="20" height="16" rx="3"/>
+      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
+      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
+    </svg>
+  </div>
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
 <div id="auth-screen">
   <div class="auth-logo">
     <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1885,107 +1382,128 @@ body { display: flex; flex-direction: column; }
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     APP LAYOUT
-═══════════════════════════════════════════════════════════ -->
-<div class="app-layout">
+<!-- ══ APP SHELL ════════════════════════════════════════════ -->
+<div id="app">
 
-  <!-- ── Sidebar (desktop) ────────────────────────────── -->
+  <!-- Sidebar (desktop) -->
   <nav id="sidebar">
     <div class="sidebar-logo">
-      <div class="sidebar-logo-icon">🏠</div>
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+          <rect x="5" y="8" width="14" height="11" rx="2"/>
+          <path d="M8 8V6a4 4 0 0 1 8 0v2"/>
+          <circle cx="12" cy="14" r="1.5" fill="white" stroke="none"/>
+        </svg>
+      </div>
       <div>
         <div class="sidebar-logo-text">HomeBull</div>
-        <div class="sidebar-logo-ver" id="sidebar-ver">v13</div>
+        <div>
+          <div class="sidebar-logo-ver">Pro v12</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.0.0-beta</div>
+        </div>
       </div>
     </div>
 
-    <div class="sidebar-item active" data-tab="home" onclick="switchTab('home')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      Home
-    </div>
-    <div class="sidebar-item" data-tab="calendar" onclick="switchTab('calendar')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Calendario
-    </div>
-    <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      Carte
-    </div>
-    <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Documenti
-    </div>
-    <div class="sidebar-item" data-tab="family" onclick="switchTab('family')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Famiglia
-    </div>
-    <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      Finanze
-    </div>
-    <div class="sidebar-item" data-tab="shopping" onclick="switchTab('shopping')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      Lista Spesa
-    </div>
-    <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      Note
-    </div>
-    <div class="sidebar-item" data-tab="otp" onclick="switchTab('otp')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      OTP / 2FA
-    </div>
-    <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Password
-      <span class="sidebar-badge" id="pw-sidebar-badge" style="display:none;"></span>
-    </div>
-    <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-      Server / IT
-    </div>
-    <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-      Wi-Fi
+    <div class="sidebar-nav">
+      <div class="sidebar-item active" data-tab="home" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="sidebar-item-label">Home</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="calendar" onclick="switchTab('calendar')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="sidebar-item-label">Calendario</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
+        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <span class="sidebar-item-label">Carte</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="sidebar-item-label">Documenti</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="family" onclick="switchTab('family')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="sidebar-item-label">Famiglia</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span class="sidebar-item-label">Finanze</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="shopping" onclick="switchTab('shopping')">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="sidebar-item-label">Lista Spesa</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span class="sidebar-item-label">Note</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="otp" onclick="switchTab('otp')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="sidebar-item-label">OTP / 2FA</span>
+      </div>
+
+
+      <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="sidebar-item-label">Password</span>
+        <span class="sidebar-item-badge" id="sb-pass-count">0</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        <span class="sidebar-item-label">Server / IT</span>
+      </div>
+
+      <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
+        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <span class="sidebar-item-label">Wi-Fi</span>
+      </div>
+
     </div>
 
-    <div class="sidebar-spacer"></div>
-    <div class="sidebar-divider"></div>
-
-    <div class="sidebar-item" onclick="toggleTheme()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      Tema
-    </div>
-    <div class="sidebar-item" onclick="authLogout()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Esci
+    <div class="sidebar-footer">
+      <div class="sidebar-item" onclick="openSettings()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span class="sidebar-item-label">Impostazioni</span>
+      </div>
+      <div class="sidebar-item" onclick="logout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span class="sidebar-item-label">Esci</span>
+      </div>
     </div>
   </nav>
 
-  <!-- ── Main ─────────────────────────────────────────── -->
-  <div class="app-main">
+  <!-- Topbar -->
+  <header id="topbar">
+    <div class="topbar-back" id="topbar-back" onclick="topbarBack()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </div>
+    <div class="topbar-title">
+      <h1 id="topbar-title">Home</h1>
+      <span id="topbar-sub"></span>
+    </div>
+    <div class="topbar-actions" id="topbar-actions">
+      <!-- Dynamic actions injected by each tab -->
+    </div>
+  </header>
 
-    <!-- Topbar -->
-    <header id="topbar">
-      <button class="topbar-back" id="topbar-back">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <div class="topbar-title">
-        <h1 id="topbar-title">HomeBull</h1>
-        <span id="topbar-sub"></span>
-      </div>
-      <div class="topbar-actions" id="topbar-actions">
-        <button class="topbar-btn" onclick="toggleTheme()" title="Tema">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>
-        </button>
-      </div>
-    </header>
+  <!-- Tab panels -->
+  <div id="tab-container">
 
-    <!-- Tab container -->
-    <div id="tab-container">
-
-      <div class="tab-panel active" id="panel-home">
+    <!-- HOME -->
+    <!-- HOME — layout tile v11-style 3 colonne -->
+    <!-- HOME -->
+    <div class="tab-panel active" id="panel-home">
       <div class="tab-inner">
 
         <div style="margin-bottom:2px;">
@@ -2029,7 +1547,7 @@ body { display: flex; flex-direction: column; }
           <div id="home-alerts">
             <div class="alert-item">
               <div class="alert-dot yellow"></div>
-              <div class="alert-text">Benvenuto in HomeBull v13</div>
+              <div class="alert-text">Benvenuto in HomeBull Pro v12</div>
               <div class="alert-time">Ora</div>
             </div>
           </div>
@@ -2039,8 +1557,667 @@ body { display: flex; flex-direction: column; }
     </div>
 
     <!-- PASSWORD -->
+    <div class="tab-panel" id="panel-passwords">
 
-      <div class="tab-panel" id="panel-shopping">
+      <!-- Vista: Lista categorie -->
+      <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 14px 8px;flex-shrink:0;">
+          <div class="pw-search-bar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+          </div>
+        </div>
+        <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+      </div>
+
+      <!-- Vista: Lista password di una categoria -->
+      <div id="pw-view-items" style="display:none;flex-direction:column;height:100%;">
+        <div style="padding:12px 14px 8px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <button onclick="pwBack()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="flex:1;min-width:0;">
+              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;"></div>
+              <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
+            </div>
+            <button onclick="pwToggleSearch()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+          </div>
+          <div id="pw-item-search-wrap" style="display:none;">
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input id="pw-item-search" type="text" placeholder="Cerca password..." oninput="pwFilterItems(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            </div>
+          </div>
+        </div>
+        <div id="pw-items-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 100px;"></div>
+      </div>
+
+      <!-- Vista: Dettaglio password -->
+      <div id="pw-view-detail" style="display:none;flex-direction:column;height:100%;">
+        <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+          <button onclick="pwBackToItems()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div id="pw-detail-title" style="flex:1;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+        </div>
+        <div id="pw-detail-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;"></div>
+      </div>
+
+      <!-- Import banner (mostrato se vault vuoto) -->
+      <div id="pw-import-banner" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg);z-index:10;">
+        <div style="text-align:center;padding:32px 24px;max-width:320px;">
+          <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
+          <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
+          <button onclick="pwImportBackup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
+          <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
+          <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTI -->
+    <!-- DOCUMENTI -->
+    <div class="tab-panel" id="panel-documents">
+      <div style="padding:14px 14px 100px;">
+
+        <!-- Lista documenti -->
+        <div id="docs-view-list">
+          <div id="docs-list"></div>
+        </div>
+
+        <!-- Aggiungi documento -->
+        <div id="docs-view-add" style="display:none;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Documento</div>
+          </div>
+
+          <!-- Tipo documento -->
+          <div style="margin-bottom:14px;">
+            <div class="pw-field-label" style="margin-bottom:8px;">Tipo documento</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <button class="finance-type-btn active" data-dtype="ci" onclick="docsSelectType(this,'ci','🪪','Carta d\'Identità')">🪪<br>C. Identità</button>
+              <button class="finance-type-btn" data-dtype="passaporto" onclick="docsSelectType(this,'passaporto','📘','Passaporto')">📘<br>Passaporto</button>
+              <button class="finance-type-btn" data-dtype="patente" onclick="docsSelectType(this,'patente','🚗','Patente')">🚗<br>Patente</button>
+              <button class="finance-type-btn" data-dtype="tessera" onclick="docsSelectType(this,'tessera','🏥','Tessera Sanitaria')">🏥<br>Tessera San.</button>
+              <button class="finance-type-btn" data-dtype="altro" onclick="docsSelectType(this,'cf','📋','Cod. Fiscale')">📋<br>CF</button>
+              <button class="finance-type-btn" data-dtype="altro" onclick="docsSelectType(this,'altro','📄','Altro')">📄<br>Altro</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Intestatario *</div>
+            <input id="doc-holder" type="text" placeholder="Nome Cognome"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Numero documento</div>
+              <input id="doc-number" type="text" placeholder="AX0000000"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;text-transform:uppercase;">
+            </div>
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Scadenza</div>
+              <input id="doc-expiry" type="date"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Data rilascio</div>
+              <input id="doc-issued" type="date"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Rilasciato da</div>
+              <input id="doc-issuer" type="text" placeholder="Comune, Questura..."
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Note</div>
+            <textarea id="doc-notes" placeholder="Informazioni aggiuntive..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
+          </div>
+
+          <!-- Sezione Codice Fiscale (visibile solo per tipo CF) -->
+          <div id="cf-section" style="display:none;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;">
+            <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;" id="cf-section-title">🏥 Dati per Tessera Sanitaria / Codice Fiscale</div>
+            <div style="margin-bottom:10px;">
+              <div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div>
+              <input id="cf-cognome" type="text" placeholder="ROSSI" oninput="this.value=this.value.toUpperCase()"
+                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:10px;">
+              <div class="pw-field-label" style="margin-bottom:5px;">Nome *</div>
+              <input id="cf-nome" type="text" placeholder="MARIO" oninput="this.value=this.value.toUpperCase()"
+                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <div class="pw-field-label" style="margin-bottom:5px;">Data di nascita *</div>
+                <input id="cf-nascita" type="date"
+                  style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+              </div>
+              <div>
+                <div class="pw-field-label" style="margin-bottom:5px;">Sesso</div>
+                <div style="display:flex;gap:8px;padding-top:4px;">
+                  <button id="cf-sesso-m" onclick="cfSetSesso('M')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit;">M</button>
+                  <button id="cf-sesso-f" onclick="cfSetSesso('F')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:800;cursor:pointer;font-family:inherit;">F</button>
+                </div>
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="pw-field-label" style="margin-bottom:5px;">Comune di nascita *</div>
+              <input id="cf-comune-search" type="text" placeholder="Cerca comune..." oninput="cfSearchComune(this.value)"
+                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:6px;">
+              <div id="cf-comune-results" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;max-height:160px;overflow-y:auto;"></div>
+              <div id="cf-comune-selected" style="font-size:12px;color:var(--accent);font-weight:700;margin-top:4px;"></div>
+            </div>
+            <button onclick="cfCalcola()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🧮 Calcola Codice Fiscale</button>
+            <!-- Risultato CF -->
+            <div id="cf-result-section" style="display:none;margin-top:14px;">
+              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;">Codice Fiscale</div>
+                <div id="cf-result-text" style="font-family:'DM Sans',monospace;font-size:22px;font-weight:900;letter-spacing:0.15em;color:var(--accent);"></div>
+                <button onclick="cfCopyResult()" style="margin-top:8px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button>
+              </div>
+              <!-- Barcode -->
+              <div style="background:white;border-radius:10px;padding:14px;text-align:center;">
+                <canvas id="cf-barcode" style="max-width:100%;cursor:zoom-in;" onclick="cfZoomBarcode()"></canvas>
+                <div style="font-size:11px;color:#666;margin-top:6px;font-family:monospace;" id="cf-barcode-label"></div>
+                <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
+                  <button onclick="cfBarcodeZoom(-1)" style="width:32px;height:32px;border-radius:8px;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;font-size:16px;">−</button>
+                  <button onclick="cfBarcodeZoom(1)" style="width:32px;height:32px;border-radius:8px;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;font-size:16px;">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Foto documento -->
+          <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
+            <div id="doc-photos-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;"></div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="docPhotoCapture('camera')" style="flex:1;padding:11px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Fotocamera</button>
+              <button onclick="docPhotoCapture('gallery')" style="flex:1;padding:11px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🖼️ Galleria</button>
+            </div>
+            <input type="file" id="doc-photo-input" accept="image/*" style="display:none;" onchange="docPhotoSelected(this)">
+          </div>
+
+          <button onclick="docsSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Documento</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-notes">
+      <div style="display:flex;flex-direction:column;height:100%;">
+
+        <!-- Vista lista -->
+        <div id="note-view-list" style="display:flex;flex-direction:column;height:100%;">
+          <div style="padding:12px 14px 8px;flex-shrink:0;">
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            </div>
+          </div>
+          <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+        </div>
+
+        <!-- Vista editor -->
+        <div id="note-view-editor" style="display:none;flex-direction:column;height:100%;">
+          <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <button onclick="noteCloseEditor()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <input id="note-title-inp" type="text" placeholder="Titolo nota..." maxlength="100"
+              style="flex:1;background:none;border:none;outline:none;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);">
+            <button onclick="noteSave()" style="padding:8px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Salva</button>
+          </div>
+          <div style="padding:6px 14px;flex-shrink:0;">
+            <span id="note-editor-date" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
+          </div>
+          <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..."
+            style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CALENDARIO -->
+    <!-- CALENDARIO -->
+    <div class="tab-panel" id="panel-calendar">
+      <div style="padding:14px 14px 100px;max-width:600px;margin:0 auto;">
+
+        <!-- Mini calendario -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <button onclick="calPrevMonth()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
+            <div id="cal-month-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;"></div>
+            <button onclick="calNextMonth()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">›</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
+            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Lu</div>
+            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Ma</div>
+            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Me</div>
+            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Gi</div>
+            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Ve</div>
+            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);">Sa</div>
+            <div style="text-align:center;font-size:10px;font-weight:800;color:#ef4444;">Do</div>
+          </div>
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
+        </div>
+
+        <!-- Evento selezionato / form nuovo evento -->
+        <div id="cal-event-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:12px;" id="cal-form-title">Nuovo evento</div>
+          <div style="margin-bottom:10px;">
+            <input id="cal-ev-title" type="text" placeholder="Titolo evento *"
+              style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div>
+              <div class="pw-field-label" style="margin-bottom:5px;">Data</div>
+              <input id="cal-ev-date" type="date" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div>
+              <div class="pw-field-label" style="margin-bottom:5px;">Ora</div>
+              <input id="cal-ev-time" type="time" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="cal-cat-btns">
+              <button class="cal-cat-btn active" data-cat="personale" data-color="#6366f1" onclick="calSelectCat(this)">💼 Personale</button>
+              <button class="cal-cat-btn" data-cat="lavoro" data-color="#10b981" onclick="calSelectCat(this)">💼 Lavoro</button>
+              <button class="cal-cat-btn" data-cat="salute" data-color="#ef4444" onclick="calSelectCat(this)">❤️ Salute</button>
+              <button class="cal-cat-btn" data-cat="famiglia" data-color="#f59e0b" onclick="calSelectCat(this)">👨‍👩‍👧 Famiglia</button>
+              <button class="cal-cat-btn" data-cat="scadenza" data-color="#8b5cf6" onclick="calSelectCat(this)">⏰ Scadenza</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button onclick="calCloseForm()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
+            <button onclick="calSaveEvent()" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Salva evento</button>
+          </div>
+        </div>
+
+        <!-- Lista eventi del mese -->
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:10px;" id="cal-events-label">Prossimi eventi</div>
+        <div id="cal-events-list"></div>
+
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-otp">
+      <div style="display:flex;flex-direction:column;height:100%;">
+
+        <!-- Vista lista OTP -->
+        <div id="otp-view-list" style="display:flex;flex-direction:column;height:100%;">
+          <div style="padding:12px 14px 8px;flex-shrink:0;">
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            </div>
+          </div>
+          <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+        </div>
+
+        <!-- Vista aggiungi account -->
+        <div id="otp-view-add" style="display:none;flex-direction:column;height:100%;">
+          <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <button onclick="otpShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Account 2FA</div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Nome account *</div>
+              <input id="otp-add-name" type="text" placeholder="es. Google, GitHub, Amazon..."
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Email / Username</div>
+              <input id="otp-add-user" type="text" placeholder="es. nome@email.com"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:14px;">
+              <button onclick="otpScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">📷 Scansiona QR Code 2FA</button>
+              <div class="pw-field-label" style="margin-bottom:6px;">Oppure inserisci manualmente — Chiave segreta *</div>
+              <input id="otp-add-secret" type="text" placeholder="es. JBSWY3DPEHPK3PXP"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;text-transform:uppercase;"
+                oninput="this.value=this.value.toUpperCase().replace(/[^A-Z2-7=]/g,'')">
+            </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Icona</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;" id="otp-icon-picker">
+                <button class="otp-icon-btn selected" data-icon="🔐" onclick="otpSelectIcon(this,'🔐')">🔐</button>
+                <button class="otp-icon-btn" data-icon="📧" onclick="otpSelectIcon(this,'📧')">📧</button>
+                <button class="otp-icon-btn" data-icon="💼" onclick="otpSelectIcon(this,'💼')">💼</button>
+                <button class="otp-icon-btn" data-icon="🏦" onclick="otpSelectIcon(this,'🏦')">🏦</button>
+                <button class="otp-icon-btn" data-icon="☁️" onclick="otpSelectIcon(this,'☁️')">☁️</button>
+                <button class="otp-icon-btn" data-icon="🛒" onclick="otpSelectIcon(this,'🛒')">🛒</button>
+                <button class="otp-icon-btn" data-icon="🎮" onclick="otpSelectIcon(this,'🎮')">🎮</button>
+                <button class="otp-icon-btn" data-icon="📱" onclick="otpSelectIcon(this,'📱')">📱</button>
+                <button class="otp-icon-btn" data-icon="🔑" onclick="otpSelectIcon(this,'🔑')">🔑</button>
+                <button class="otp-icon-btn" data-icon="🌐" onclick="otpSelectIcon(this,'🌐')">🌐</button>
+              </div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px;">
+              <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">💡 Come trovare la chiave segreta</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.6;">Vai nelle impostazioni sicurezza del sito → Attiva autenticazione a due fattori → Scegli "Non puoi scansionare?" o "Codice manuale". Copia la stringa di lettere e numeri mostrata.</div>
+            </div>
+            <button onclick="otpSaveAccount()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Aggiungi Account</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CARTE -->
+    <div class="tab-panel" id="panel-cards">
+      <div>
+
+        <!-- Lista carte -->
+        <div id="cards-view-list" style="display:flex;flex-direction:column;height:100%;">
+          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 100px;"></div>
+        </div>
+
+        <!-- Aggiungi carta -->
+        <div id="cards-view-add" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+          <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <button onclick="cardsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Carta</div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
+
+            <!-- Preview carta -->
+            <div id="card-preview" style="border-radius:18px;padding:22px 20px;margin-bottom:20px;min-height:160px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,#6366f1,#8b5cf6);position:relative;overflow:hidden;">
+              <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);"></div>
+              <div style="position:absolute;bottom:-30px;left:-10px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.1em;" id="preview-label">Nome carta</div>
+                <div style="font-size:24px;" id="preview-circuit">💳</div>
+              </div>
+              <div>
+                <div style="font-family:'DM Sans',monospace;font-size:18px;font-weight:700;color:white;letter-spacing:0.12em;margin-bottom:12px;font-variant-numeric:tabular-nums;" id="preview-number">•••• •••• •••• ••••</div>
+                <div style="display:flex;gap:24px;">
+                  <div>
+                    <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
+                    <div style="font-size:14px;font-weight:700;color:white;font-variant-numeric:tabular-nums;" id="preview-exp">MM/AA</div>
+                  </div>
+                  <div>
+                    <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
+                    <div style="font-size:14px;font-weight:700;color:white;" id="preview-holder">NOME COGNOME</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
+              <input id="card-add-label" type="text" placeholder="es. Visa Principale, Mastercard Lavoro"
+                oninput="cardUpdatePreview()"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Numero carta *</div>
+              <input id="card-add-number" type="text" inputmode="numeric" maxlength="19" placeholder="•••• •••• •••• ••••"
+                oninput="cardFormatNumber(this);cardUpdatePreview()"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;letter-spacing:0.1em;font-variant-numeric:tabular-nums;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+              <div>
+                <div class="pw-field-label" style="margin-bottom:6px;">Scadenza *</div>
+                <input id="card-add-exp" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA"
+                  oninput="cardFormatExp(this);cardUpdatePreview()"
+                  style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;font-variant-numeric:tabular-nums;">
+              </div>
+              <div>
+                <div class="pw-field-label" style="margin-bottom:6px;">CVV</div>
+                <input id="card-add-cvv" type="password" inputmode="numeric" maxlength="4" placeholder="•••"
+                  style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;">
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
+              <input id="card-add-holder" type="text" placeholder="NOME COGNOME"
+                oninput="cardUpdatePreview()"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;text-transform:uppercase;">
+            </div>
+            <div style="margin-bottom:20px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <div class="card-color-btn active" data-color="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#6366f1,#8b5cf6)')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="cardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e3a5f)')" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#065f46,#10b981)" onclick="cardSelectColor(this,'linear-gradient(135deg,#065f46,#10b981)')" style="background:linear-gradient(135deg,#065f46,#10b981);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#7c2d12,#f97316)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7c2d12,#f97316)')" style="background:linear-gradient(135deg,#7c2d12,#f97316);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#1a1a1a,#374151)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1a1a1a,#374151)')" style="background:linear-gradient(135deg,#1a1a1a,#374151);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#92400e,#d97706)" onclick="cardSelectColor(this,'linear-gradient(135deg,#92400e,#d97706)')" style="background:linear-gradient(135deg,#92400e,#d97706);"></div>
+              </div>
+            </div>
+            <button onclick="cardSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Carta</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-wifi">
+      <div>
+
+        <!-- Lista reti -->
+        <div id="wifi-view-list" style="display:flex;flex-direction:column;height:100%;">
+          <div id="wifi-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 100px;"></div>
+        </div>
+
+        <!-- Aggiungi rete -->
+        <div id="wifi-view-add" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+          <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <button onclick="wifiShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Rete Wi-Fi</div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
+            <div style="margin-bottom:12px;">
+              <button onclick="wifiScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Scansiona QR Wi-Fi</button>
+            </div>
+            <div style="margin-bottom:10px;text-align:center;font-size:11px;color:var(--text3);font-weight:600;">— oppure inserisci manualmente —</div>
+          <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Nome rete (SSID) *</div>
+              <input id="wifi-add-ssid" type="text" placeholder="es. Casa-5G"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
+              <div style="position:relative;">
+                <input id="wifi-add-pw" type="password" placeholder="Password rete"
+                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                <button onclick="wifiToggleAddPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;" id="wifi-add-pw-eye">👁</button>
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Sicurezza</div>
+              <div style="display:flex;gap:8px;">
+                <button class="wifi-sec-btn active" data-sec="WPA" onclick="wifiSelectSec(this,'WPA')">WPA/WPA2</button>
+                <button class="wifi-sec-btn" data-sec="WEP" onclick="wifiSelectSec(this,'WEP')">WEP</button>
+                <button class="wifi-sec-btn" data-sec="nopass" onclick="wifiSelectSec(this,'nopass')">Aperta</button>
+              </div>
+            </div>
+            <button onclick="wifiSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;">Salva Rete</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FINANZE -->
+    <div class="tab-panel" id="panel-finance">
+      <div style="padding:14px 14px 100px;">
+
+        <!-- Lista conti -->
+        <div id="finance-view-list">
+          <div id="finance-list"></div>
+        </div>
+
+        <!-- Aggiungi conto -->
+        <div id="finance-view-add" style="display:none;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            <button onclick="financeShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Conto</div>
+          </div>
+
+          <!-- Tipo conto -->
+          <div style="margin-bottom:14px;">
+            <div class="pw-field-label" style="margin-bottom:8px;">Tipo</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-type-grid">
+              <button class="finance-type-btn active" data-type="conto" onclick="financeSelectType(this,'conto','🏦','Conto Corrente')">🏦<br>Corrente</button>
+              <button class="finance-type-btn" data-type="risparmio" onclick="financeSelectType(this,'risparmio','💰','Conto Risparmio')">💰<br>Risparmio</button>
+              <button class="finance-type-btn" data-type="investimento" onclick="financeSelectType(this,'investimento','📈','Investimento')">📈<br>Investimento</button>
+              <button class="finance-type-btn" data-type="paypal" onclick="financeSelectType(this,'paypal','🅿️','PayPal')">🅿️<br>PayPal</button>
+              <button class="finance-type-btn" data-type="crypto" onclick="financeSelectType(this,'crypto','₿','Crypto')">₿<br>Crypto</button>
+              <button class="finance-type-btn" data-type="altro" onclick="financeSelectType(this,'altro','💼','Altro')">💼<br>Altro</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
+            <input id="fin-label" type="text" placeholder="es. Intesa, Fineco, Revolut..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">IBAN</div>
+            <input id="fin-iban" type="text" placeholder="IT60 X054 2811 1010 0000 0123 456"
+              oninput="financeFormatIBAN(this)"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;letter-spacing:0.05em;text-transform:uppercase;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">BIC / SWIFT</div>
+              <input id="fin-bic" type="text" placeholder="BCITITMM"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;text-transform:uppercase;">
+            </div>
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
+              <input id="fin-holder" type="text" placeholder="Nome Cognome"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Username / Email accesso</div>
+            <input id="fin-user" type="text" placeholder="Username home banking"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Password accesso</div>
+            <div style="position:relative;">
+              <input id="fin-pw" type="password" placeholder="Password home banking"
+                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <button onclick="financeTogglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Note aggiuntive</div>
+            <textarea id="fin-notes" placeholder="PIN, informazioni aggiuntive..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
+          </div>
+          <button onclick="financeSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Conto</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SERVER / IT -->
+    <div class="tab-panel" id="panel-server">
+      <div style="padding:14px 14px 100px;">
+
+        <!-- Vista lista -->
+        <div id="server-view-list">
+          <div id="server-list"></div>
+        </div>
+
+        <!-- Vista aggiungi -->
+        <div id="server-view-add" style="display:none;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            <button onclick="serverShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Credenziale</div>
+          </div>
+
+          <!-- Tipo -->
+          <div style="margin-bottom:14px;">
+            <div class="pw-field-label" style="margin-bottom:8px;">Tipo</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+              <button class="finance-type-btn active" data-type="ssh" onclick="serverSelectType(this,'ssh','🔐','SSH')">🔐<br>SSH</button>
+              <button class="finance-type-btn" data-type="api" onclick="serverSelectType(this,'api','🔑','API Key')">🔑<br>API Key</button>
+              <button class="finance-type-btn" data-type="db" onclick="serverSelectType(this,'db','🗄️','Database')">🗄️<br>Database</button>
+              <button class="finance-type-btn" data-type="ftp" onclick="serverSelectType(this,'ftp','📁','FTP/SFTP')">📁<br>FTP</button>
+              <button class="finance-type-btn" data-type="vpn" onclick="serverSelectType(this,'vpn','🛡️','VPN')">🛡️<br>VPN</button>
+              <button class="finance-type-btn" data-type="altro" onclick="serverSelectType(this,'altro','💻','Altro')">💻<br>Altro</button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
+            <input id="srv-label" type="text" placeholder="es. Server produzione, AWS, GitHub..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Host / URL / Endpoint</div>
+            <input id="srv-host" type="text" placeholder="es. 192.168.1.1 o api.example.com"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Porta</div>
+              <input id="srv-port" type="text" inputmode="numeric" placeholder="22"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+            </div>
+            <div>
+              <div class="pw-field-label" style="margin-bottom:6px;">Username</div>
+              <input id="srv-user" type="text" placeholder="root, admin..."
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Password / Token / API Key</div>
+            <div style="position:relative;">
+              <input id="srv-pw" type="password" placeholder="Password, token o chiave API"
+                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+              <button onclick="serverTogglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Note / Connection String</div>
+            <textarea id="srv-notes" placeholder="Comandi, connection string, note..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;resize:none;height:100px;line-height:1.6;"></textarea>
+          </div>
+          <button onclick="serverSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Credenziale</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FAMIGLIA -->
+    <div class="tab-panel" id="panel-family">
+      <div style="padding:14px 14px 100px;">
+        <div id="family-list"></div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="panel-shopping">
       <div style="padding:12px 14px 100px;">
 
         <!-- Selettore liste multiple -->
@@ -2079,187 +2256,172 @@ body { display: flex; flex-direction: column; }
       </div>
     </div>
 
-      <!-- PASSWORDS -->
-      <div class="tab-panel" id="panel-passwords">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">🔐</div>
-            <div class="empty-title">Password</div>
-            <div class="empty-sub">Prossimamente</div>
+    <div class="tab-panel" id="panel-shopping">
+      <div style="display:grid;grid-template-rows:auto 1fr;height:100%;overflow:hidden;">
+
+        <!-- Lista attiva (items selezionati) -->
+        <div style="background:var(--bg);padding:10px 14px 6px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="flex:1;display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;" id="shop-active-list"></div>
+            <button onclick="shopClearAll()" id="shop-clear-btn" style="display:none;padding:5px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;font-family:inherit;">Svuota</button>
+          </div>
+          <!-- Ricerca prodotto -->
+          <div class="pw-search-bar" style="padding:8px 12px;">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="shop-search" placeholder="Cerca prodotto..." oninput="shopSearchProducts(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:13px;color:var(--text);font-family:inherit;">
+            <button id="shop-add-custom" onclick="shopAddCustom()" style="display:none;padding:4px 10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi</button>
           </div>
         </div>
-      </div>
 
-      <!-- NOTES -->
-      <div class="tab-panel" id="panel-notes">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">📝</div>
-            <div class="empty-title">Note</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- OTP -->
-      <div class="tab-panel" id="panel-otp">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">🔑</div>
-            <div class="empty-title">OTP / 2FA</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- WIFI -->
-      <div class="tab-panel" id="panel-wifi">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">🌐</div>
-            <div class="empty-title">Wi-Fi</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARDS -->
-      <div class="tab-panel" id="panel-cards">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">💳</div>
-            <div class="empty-title">Carte</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FINANCE -->
-      <div class="tab-panel" id="panel-finance">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">📊</div>
-            <div class="empty-title">Finanze</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SERVER -->
-      <div class="tab-panel" id="panel-server">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">📡</div>
-            <div class="empty-title">Server / IT</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- DOCUMENTS -->
-      <div class="tab-panel" id="panel-documents">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">📄</div>
-            <div class="empty-title">Documenti</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CALENDAR -->
-      <div class="tab-panel" id="panel-calendar">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">📅</div>
-            <div class="empty-title">Calendario</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAMILY -->
-      <div class="tab-panel" id="panel-family">
-        <div class="tab-inner">
-          <div class="empty-state">
-            <div class="empty-icon">👨‍👩‍👧</div>
-            <div class="empty-title">Famiglia</div>
-            <div class="empty-sub">Prossimamente</div>
-          </div>
-        </div>
-      </div>
-
-    </div><!-- /tab-container -->
-
-    <!-- ── Bottombar (mobile) ──────────────────────────── -->
-    <nav id="bottombar">
-      <button class="bottom-btn active" data-tab="home" onclick="switchTab('home')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Home
-      </button>
-      <button class="bottom-btn" data-tab="shopping" onclick="switchTab('shopping')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        Spesa
-      </button>
-      <button class="bottom-btn" data-tab="passwords" onclick="switchTab('passwords')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Password
-      </button>
-      <button class="bottom-btn" data-tab="notes" onclick="switchTab('notes')">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Note
-      </button>
-      <button class="bottom-btn" onclick="toggleBottomMore()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
-        Altro
-      </button>
-    </nav>
-
-    <!-- Popup "Altro" -->
-    <div id="bottom-more-popup">
-      <div class="more-popup-grid">
-        <button class="more-popup-btn" onclick="switchTab('calendar');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Calendario
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('cards');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          Carte
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('documents');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Documenti
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('finance');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Finanze
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('otp');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          OTP/2FA
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('wifi');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-          Wi-Fi
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('server');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-          Server/IT
-        </button>
-        <button class="more-popup-btn" onclick="switchTab('family');toggleBottomMore()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Famiglia
-        </button>
+        <!-- Catalogo prodotti per categoria -->
+        <div id="shop-catalog" style="overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 14px 100px;"></div>
       </div>
     </div>
 
-  </div><!-- /app-main -->
+<!-- More Drawer -->
+<div id="more-drawer" onclick="handleDrawerClick(event)">
+  <div class="drawer-backdrop"></div>
+  <div class="drawer-sheet">
+    <div class="drawer-handle"></div>
+    <div class="drawer-title">Altre schede</div>
+    <div class="drawer-grid">
+      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
+        <div class="drawer-item-icon">📄</div>
+        <div class="drawer-item-label">Documenti</div>
+      </div>
+      <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
+        <div class="drawer-item-icon">📝</div>
+        <div class="drawer-item-label">Note</div>
+      </div>
+      <div class="drawer-item" data-tab="cards" onclick="switchTabFromDrawer('cards')">
+        <div class="drawer-item-icon">💳</div>
+        <div class="drawer-item-label">Carte</div>
+      </div>
+      <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer('wifi')">
+        <div class="drawer-item-icon">🌐</div>
+        <div class="drawer-item-label">Wi-Fi</div>
+      </div>
+      <div class="drawer-item" data-tab="finance" onclick="switchTabFromDrawer('finance')">
+        <div class="drawer-item-icon">📊</div>
+        <div class="drawer-item-label">Finanze</div>
+      </div>
+      <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
+        <div class="drawer-item-icon">📡</div>
+        <div class="drawer-item-label">Server/IT</div>
+      </div>
+      <div class="drawer-item" data-tab="shopping" onclick="switchTabFromDrawer('shopping')">
+        <div class="drawer-item-icon">🛒</div>
+        <div class="drawer-item-label">Lista Spesa</div>
+      </div>
+      <div class="drawer-item" data-tab="family" onclick="switchTabFromDrawer('family')">
+        <div class="drawer-item-icon">👨‍👩‍👧</div>
+        <div class="drawer-item-label">Famiglia</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+      <button onclick="openSettings();closeMoreDrawer()" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        ⚙️ Impostazioni
+      </button>
+      <button onclick="closeMoreDrawer();setTimeout(logout,200)" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+        → Esci
+      </button>
+    </div>
+  </div>
+</div>
 
-</div><!-- /app-layout -->
+<!-- Modal specifica prodotto (lista spesa) -->
+<div id="shop-detail-modal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)shopCloseDetail()">
+  <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="font-size:36px;" id="shop-detail-icon">🧴</div>
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:4px;">Aggiungi alla lista</div>
+        <input id="shop-detail-name" type="text" style="width:100%;background:none;border:none;outline:none;font-size:17px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:8px;">Varianti rapide</div>
+    <div id="shop-detail-variants" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="shopCloseDetail()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
+      <button onclick="shopConfirmDetail()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi</button>
+    </div>
+  </div>
+</div>
 
+<!-- QR Code Modal (Wi-Fi) -->
+<div id="wifi-qr-modal" onclick="wifiCloseQR()">
+  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;" onclick="event.stopPropagation()">
+    <div id="wifi-qr-ssid-label" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;"></div>
+    <div style="font-size:12px;color:#9090b0;margin-bottom:16px;">Scansiona per connetterti</div>
+    <canvas id="wifi-qr-canvas" style="border-radius:12px;"></canvas>
+    <div style="margin-top:16px;">
+      <button onclick="wifiCloseQR()" style="padding:12px 28px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Scanner Modal (OTP + WiFi) -->
+<div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:12px;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));background:rgba(0,0,0,0.8);">
+    <button onclick="qrScannerClose()" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:20px;cursor:pointer;">✕</button>
+    <div style="color:white;font-weight:700;font-size:15px;" id="qr-scanner-label">Scansiona QR Code</div>
+  </div>
+  <div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;">
+    <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline autoplay muted></video>
+    <div style="position:absolute;width:220px;height:220px;border:3px solid #6366f1;border-radius:20px;box-shadow:0 0 0 2000px rgba(0,0,0,0.5);"></div>
+    <div style="position:absolute;bottom:40px;color:white;font-size:13px;text-align:center;padding:0 20px;">Inquadra il QR code all'interno del riquadro</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Home Customization Modal -->
+<div id="home-custom-modal" onclick="if(event.target===this)closeHomeCustom()" style="position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;">
+  <div style="width:100%;max-width:540px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(24px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">✨ Personalizza Home</div>
+      <button onclick="closeHomeCustom()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">✕</button>
+    </div>
+
+    <!-- Sezioni visibili -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Sezioni visibili</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;" id="home-sections-list">
+      <label style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:12px;cursor:pointer;">
+        <input type="checkbox" id="hc-search" checked style="width:18px;height:18px;accent-color:var(--accent);">
+        <span>🔍</span>
+        <div><div style="font-size:14px;font-weight:600;">Barra di ricerca</div><div style="font-size:11px;color:var(--text3);">Ricerca globale in cima</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:12px;cursor:pointer;">
+        <input type="checkbox" id="hc-quick" checked style="width:18px;height:18px;accent-color:var(--accent);">
+        <span>⚡</span>
+        <div><div style="font-size:14px;font-weight:600;">Accesso rapido</div><div style="font-size:11px;color:var(--text3);">4 schede personalizzabili</div></div>
+      </label>
+
+      <label style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:12px;cursor:pointer;">
+        <input type="checkbox" id="hc-alerts" checked style="width:18px;height:18px;accent-color:var(--accent);">
+        <span>🔔</span>
+        <div><div style="font-size:14px;font-weight:600;">Alert e notifiche</div><div style="font-size:11px;color:var(--text3);">Scadenze e avvisi</div></div>
+      </label>
+    </div>
+
+    <!-- Accesso rapido -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Accesso rapido — scegli fino a 6</div>
+    <div class="qa-all-tabs" id="qa-all-tabs-home" style="margin-bottom:24px;"></div>
+
+    <!-- Tema -->
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Tema</div>
+    <div style="display:flex;gap:10px;margin-bottom:24px;">
+      <button onclick="setTheme('dark')" id="theme-dark-btn" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--accent);background:var(--surface2);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🌙 Scuro</button>
+      <button onclick="setTheme('light')" id="theme-light-btn" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">☀️ Chiaro</button>
+    </div>
+
+    <button onclick="saveHomeCustom()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva personalizzazione</button>
+  </div>
+</div>
 
 <!-- Ricerca globale -->
-<div id="search-overlay">
+<div id="search-overlay" onclick="handleSearchOverlayClick(event)">
   <div class="search-box">
     <div class="search-input-row">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -2274,23 +2436,23 @@ body { display: flex; flex-direction: column; }
 </div>
 
 <!-- Quick Access Edit Modal -->
-<div id="qa-edit-modal">
+<div id="qa-edit-modal" onclick="if(event.target===this)closeQaEdit()">
   <div class="qa-edit-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:18px;font-weight:800;">Personalizza accesso rapido</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">Personalizza accesso rapido</div>
       <button onclick="closeQaEdit()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;">✕</button>
     </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Seleziona fino a 6 schede</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Seleziona fino a 6 schede da mostrare nella home</div>
     <div class="qa-all-tabs" id="qa-all-tabs"></div>
     <button onclick="saveQaEdit()" style="width:100%;margin-top:16px;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva</button>
   </div>
 </div>
 
-<!-- Toast -->
-<div id="toast"></div>
-
-<!-- JS — ordine importante -->
 <script>
+// ═══════════════════════════════════════════════════════════
+//  HOMEBULL PRO v12 — Core JS
+// ═══════════════════════════════════════════════════════════
+
 'use strict';
 
 // ── State ──────────────────────────────────────────────────
@@ -2575,11 +2737,7 @@ function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')
 // ── Unlock ─────────────────────────────────────────────────
 function unlockApp() {
   document.getElementById('auth-screen').style.display = 'none';
-  // v20: mostra #app; v13: mostra .app-layout
-  const appEl = document.getElementById('app');
-  if (appEl) appEl.classList.add('visible');
-  const layoutEl = document.querySelector('.app-layout');
-  if (layoutEl) layoutEl.style.display = 'flex';
+  document.getElementById('app').classList.add('visible');
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
@@ -6151,43 +6309,6 @@ async function tryBiometric() {
     showToast('Biometrico non riuscito — usa il PIN');
   }
 }
-
-
-// ── Fix layout v13: switchTab aggiorna sidebar e bottombar ──
-const _origSwitch = window.switchTab;
-if (_origSwitch) {
-  window.switchTab = function(tab) {
-    _origSwitch(tab);
-    // Aggiorna sidebar v13
-    document.querySelectorAll('#sidebar .sidebar-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.tab === tab);
-    });
-    // Aggiorna bottombar v13
-    document.querySelectorAll('#bottombar .bottom-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tab);
-    });
-  };
-}
-
 </script>
-
-<div id="shop-detail-modal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)shopCloseDetail()">
-  <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="font-size:36px;" id="shop-detail-icon">🧴</div>
-      <div style="flex:1;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:4px;">Aggiungi alla lista</div>
-        <input id="shop-detail-name" type="text" style="width:100%;background:none;border:none;outline:none;font-size:17px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">
-      </div>
-    </div>
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:8px;">Varianti rapide</div>
-    <div id="shop-detail-variants" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <div style="display:flex;gap:10px;">
-      <button onclick="shopCloseDetail()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
-      <button onclick="shopConfirmDetail()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
