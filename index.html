@@ -25,34 +25,113 @@
      AUTH SCREEN
 ═══════════════════════════════════════════════════════════ -->
 <div id="auth-screen">
-  <div class="auth-logo">🏠</div>
-  <div>
-    <h1 class="auth-title" id="auth-title">HomeBull</h1>
-    <p class="auth-subtitle" id="auth-subtitle">Inserisci il PIN</p>
+  <div class="auth-logo">
+    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="8" y="12" width="20" height="16" rx="3"/>
+      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
+      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
+    </svg>
   </div>
-  <div class="pin-display">
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
-    <div class="pin-dot"></div>
+  <h1 class="auth-title">HomeBull Pro</h1>
+  <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
+  <div style="background:#1e1e2e;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:5px 14px;margin-bottom:20px;font-size:11px;font-weight:700;color:#6366f1;letter-spacing:0.08em;">
+    v12.5.1-alpha · build 28/05/2025
   </div>
-  <div class="pin-grid">
-    <button class="pin-key" onclick="pinTap(1)">1</button>
-    <button class="pin-key" onclick="pinTap(2)">2</button>
-    <button class="pin-key" onclick="pinTap(3)">3</button>
-    <button class="pin-key" onclick="pinTap(4)">4</button>
-    <button class="pin-key" onclick="pinTap(5)">5</button>
-    <button class="pin-key" onclick="pinTap(6)">6</button>
-    <button class="pin-key" onclick="pinTap(7)">7</button>
-    <button class="pin-key" onclick="pinTap(8)">8</button>
-    <button class="pin-key" onclick="pinTap(9)">9</button>
-    <button class="pin-key ghost"></button>
-    <button class="pin-key" onclick="pinTap(0)">0</button>
-    <button class="pin-key ghost" onclick="pinDelete()">⌫</button>
+
+  <div class="auth-card">
+
+    <!-- Step 1: Email -->
+    <div class="auth-step active" id="step-email">
+      <div class="auth-progress">
+        <div class="step-dot done" id="pdot-1"></div>
+        <div class="step-dot" id="pdot-2"></div>
+        <div class="step-dot" id="pdot-3"></div>
+      </div>
+      <div class="auth-label">La tua email</div>
+      <input type="email" class="auth-input" id="auth-email"
+             placeholder="nome@email.com"
+             autocomplete="email" inputmode="email">
+      <button class="auth-btn" id="btn-send-otp" onclick="sendOTP()">
+        Invia codice di accesso
+      </button>
+      <p class="auth-hint">
+        Riceverai un codice OTP a 6 cifre.<br>
+        Nessun dato viene inviato senza il tuo consenso.
+      </p>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div class="auth-step" id="step-otp">
+      <div class="auth-progress">
+        <div class="step-dot done" id="pdot-1b"></div>
+        <div class="step-dot done" id="pdot-2b"></div>
+        <div class="step-dot" id="pdot-3b"></div>
+      </div>
+      <div class="auth-label">Codice ricevuto via email</div>
+      <div class="otp-grid">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+      </div>
+      <div class="auth-error" id="otp-error"></div>
+      <!-- Hint codice demo -->
+      <div id="otp-demo-hint" style="display:none;background:linear-gradient(135deg,#1e1e3a,#1a1a2e);border:2px solid #6366f1;border-radius:14px;padding:16px;text-align:center;margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6366f1;margin-bottom:8px;">🔑 Codice demo (pre-compilato)</div>
+        <div id="otp-demo-code" style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#818cf8;letter-spacing:0.15em;"></div>
+        <div style="font-size:11px;color:#5a5a7a;margin-top:6px;">Clicca "Verifica codice" per continuare</div>
+      </div>
+      <button class="auth-btn" id="btn-verify-otp" onclick="verifyOTP()">
+        Verifica codice
+      </button>
+      <p class="auth-hint">
+        Non hai ricevuto il codice?
+        <span class="auth-link" onclick="goToStep('email')">Riprova</span>
+      </p>
+    </div>
+
+    <!-- Step 3: PIN setup / PIN login -->
+    <div class="auth-step" id="step-pin">
+      <div class="auth-progress">
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+        <div class="step-dot done"></div>
+      </div>
+      <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
+      <div class="pin-row" id="pin-dots">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+        <div class="pin-dot" id="pd4"></div>
+        <div class="pin-dot" id="pd5"></div>
+        <div class="pin-dot" id="pd6"></div>
+        <div class="pin-dot" id="pd7"></div>
+      </div>
+      <div class="auth-error" id="pin-error"></div>
+      <div class="pin-pad" id="pin-pad">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key danger" id="pin-key-left" onclick="pinKeyLeftAction()">✕</button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
+        <button class="pin-key" onclick="pinClear()" style="font-size:22px;">⌫</button>
+      </div>
+      <div style="margin-top:12px;text-align:center;">
+        <span id="bio-register-hint" style="display:none;font-size:12px;color:var(--text3);cursor:pointer;" onclick="registerBiometric()">+ Registra impronta digitale</span>
+        <span id="forgot-pin-btn" style="display:none;font-size:12px;color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="startForgotPin()">Ho dimenticato il PIN</span>
+      </div>
+    </div>
+
   </div>
-  <div class="auth-error" id="auth-error"></div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════

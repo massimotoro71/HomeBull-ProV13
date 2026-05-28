@@ -5,134 +5,404 @@
 
 'use strict';
 
-// ── Costanti storage ─────────────────────────────────────
-const KEY_SALT     = 'hb_salt';
-const KEY_PIN_HASH = 'hb_pin_hash';
-const KEY_USER     = 'hb_user';
-const KEY_THEME    = 'hb_theme';
+// ═══════════════════════════════════════════════════════════
+//  AUTH — portato da v22 (Email → OTP → PIN + Biometrico)
+// ═══════════════════════════════════════════════════════════
 
-// ── Stato globale ────────────────────────────────────────
-let _currentTab = 'home';
-let _pinBuffer  = [];
-let _isSetup    = false; // true = stiamo creando il PIN per la prima volta
+const HB = {
+const HB_BIO_KEY     = 'hb12_bio_credId';
+const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
+const HB_BIO_SALT    = 'hb12-biometric-key-v1';
 
-// ════════════════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  applyTheme();
-  authInit();
-});
-
-// ════════════════════════════════════════════════════════
-//  TEMA
-// ════════════════════════════════════════════════════════
-function applyTheme() {
-  const t = localStorage.getItem(KEY_THEME) || 'dark';
-  document.documentElement.setAttribute('data-theme', t);
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem(KEY_THEME, next);
-}
-
-// ════════════════════════════════════════════════════════
-//  AUTH — PIN
-// ════════════════════════════════════════════════════════
-function authInit() {
-  const hasPIN = !!localStorage.getItem(KEY_PIN_HASH);
-  _isSetup = !hasPIN;
-
-  const title    = document.getElementById('auth-title');
-  const subtitle = document.getElementById('auth-subtitle');
-
-  if (_isSetup) {
-    title.textContent    = 'Crea il tuo PIN';
-    subtitle.textContent = 'Scegli un PIN di 6 cifre';
-  } else {
-    const user = localStorage.getItem(KEY_USER) || 'HomeBull';
-    title.textContent    = 'Bentornato 👋';
-    subtitle.textContent = user;
+function sendOTP() {
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast('Inserisci un\'email valida');
+    return;
   }
+
+  const btn = document.getElementById('btn-send-otp');
+  btn.disabled = true;
+  btn.textContent = 'Invio in corso...';
+
+  // Generate 6-digit OTP and "send" it (in demo: show in console + toast)
+  HB.otpCode = String(Math.floor(100000 + Math.random() * 900000));
+  HB.user = { email };
+
+  console.log('[HB12 Demo] OTP:', HB.otpCode);
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = 'Invia codice di accesso';
+    goToStep('otp');
+    // Mostra il codice direttamente nella pagina OTP (modalità demo)
+    const hint = document.getElementById('otp-demo-hint');
+    const codeEl = document.getElementById('otp-demo-code');
+    if (hint) hint.style.display = 'block';
+    if (codeEl) codeEl.textContent = HB.otpCode;
+    // Pre-compila i campi con il codice demo
+    const digits = document.querySelectorAll('.otp-digit');
+    HB.otpCode.split('').forEach((d, i) => { if (digits[i]) digits[i].value = d; });
+    showToast('📧 Codice demo: ' + HB.otpCode, 8000);
+  }, 800);
 }
 
-function pinTap(digit) {
-  if (_pinBuffer.length >= 6) return;
-  _pinBuffer.push(digit);
-  pinUpdateDots();
-  if (_pinBuffer.length === 6) {
-    setTimeout(pinSubmit, 120);
+function verifyOTP() {
+  const digits = [...document.querySelectorAll('.otp-digit')].map(d => d.value).join('');
+  if (digits.length !== 6) {
+    document.getElementById('otp-error').textContent = 'Inserisci tutte le 6 cifre';
+    return;
   }
-}
 
-function pinDelete() {
-  if (!_pinBuffer.length) return;
-  _pinBuffer.pop();
-  pinUpdateDots();
-  document.getElementById('auth-error').textContent = '';
-}
-
-function pinUpdateDots() {
-  document.querySelectorAll('.pin-dot').forEach((dot, i) => {
-    dot.classList.toggle('filled', i < _pinBuffer.length);
-  });
-}
-
-async function pinSubmit() {
-  const pin = _pinBuffer.join('');
-  _pinBuffer = [];
-  pinUpdateDots();
-
-  if (_isSetup) {
-    // Salva hash PIN
-    const hash = await sha256(pin);
-    localStorage.setItem(KEY_PIN_HASH, hash);
-    authSuccess();
-  } else {
-    const stored = localStorage.getItem(KEY_PIN_HASH);
-    const hash   = await sha256(pin);
-    if (hash === stored) {
-      authSuccess();
+  if (digits === HB.otpCode) {
+    document.getElementById('otp-error').textContent = '';
+    saveUser(HB.user);
+    const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+    if (hasPIN) {
+      HB.authState = 'pin-login';
+      document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
     } else {
-      document.getElementById('auth-error').textContent = 'PIN errato, riprova';
+      HB.authState = 'pin-setup';
+      HB.pinMode = 'setup';
+      document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master (6-8 cifre)';
+    }
+    goToStep('pin');
+    showToast('✅ Email verificata');
+  } else {
+    document.getElementById('otp-error').textContent = 'Codice non corretto — riprova';
+    document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
+    document.querySelectorAll('.otp-digit')[0].focus();
+  }
+}
+
+function goToStep(step) {
+  document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + step)?.classList.add('active');
+  if (step === 'email') setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
+}
+
+function pinPress(digit) {
+  if (HB.pinBuffer.length >= 8) return;
+  HB.pinBuffer += digit;
+  updatePinDots();
+  if (HB.pinBuffer.length === 8) {
+    setTimeout(() => pinConfirm(), 100);
+  }
+}
+
+function pinClear() {
+  HB.pinBuffer = HB.pinBuffer.slice(0, -1);
+  updatePinDots();
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 8; i++) {
+    const dot = document.getElementById('pd' + i);
+    if (dot) dot.classList.toggle('filled', i < HB.pinBuffer.length);
+  }
+}
+
+function pinConfirm() {
+  if (HB.pinBuffer.length < 6) {
+    showPinError('Minimo 6 cifre');
+    return;
+  }
+
+  const mode = HB.authState;
+
+  if (mode === 'pin-setup') {
+    if (HB.pinMode === 'setup') {
+      HB.pinFirst = HB.pinBuffer;
+      HB.pinBuffer = '';
+      HB.pinMode = 'confirm';
+      updatePinDots();
+      document.getElementById('pin-label').textContent = 'Conferma il PIN';
+      document.getElementById('pin-error').textContent = '';
+      return;
+    }
+    if (HB.pinMode === 'confirm') {
+      if (HB.pinBuffer !== HB.pinFirst) {
+        HB.pinBuffer = '';
+        HB.pinFirst = '';
+        HB.pinMode = 'setup';
+        updatePinDots();
+        showPinError('I PIN non coincidono — riprova');
+        document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
+        return;
+      }
+      HB._lastPin = HB.pinBuffer; // salva per registrazione biometrica
+      await setupPIN(HB.pinBuffer);
+      unlockApp();
+    }
+  }
+
+  if (mode === 'pin-login') {
+    const ok = await verifyPIN(HB.pinBuffer);
+    if (ok) {
+      HB._lastPin = HB.pinBuffer; // salva per registrazione biometrica
+      unlockApp();
+    } else {
+      HB.pinBuffer = '';
+      updatePinDots();
+      showPinError('PIN errato — riprova');
     }
   }
 }
 
-function authSuccess() {
-  const screen = document.getElementById('auth-screen');
-  screen.style.opacity = '0';
-  screen.style.transition = 'opacity 0.3s';
-  setTimeout(() => {
-    screen.style.display = 'none';
-    appStart();
-  }, 300);
+function showPinError(msg) {
+  document.getElementById('pin-error').textContent = msg;
+  setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
 }
 
-async function sha256(text) {
-  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+function setupPIN(pin) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
+  HB.sessionKey = await deriveKey(pin, salt);
+  // Save PIN hash (PBKDF2 output — not the PIN itself)
+  const hashBuf = await crypto.subtle.exportKey('raw', HB.sessionKey);
+  const hashArr = new Uint8Array(hashBuf).slice(0, 16);
+  let h = '';
+  hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
+  localStorage.setItem('hb12_pin_hash', h);
 }
 
-function authLogout() {
-  localStorage.removeItem(KEY_PIN_HASH);
-  localStorage.removeItem(KEY_SALT);
+function verifyPIN(pin) {
+  try {
+    const saltB64 = localStorage.getItem('hb12_salt');
+    if (!saltB64) return false;
+    const salt = new Uint8Array(atob(saltB64).split('').map(c => c.charCodeAt(0)));
+    const key = await deriveKey(pin, salt);
+    const hashBuf = await crypto.subtle.exportKey('raw', key);
+    const hashArr = new Uint8Array(hashBuf).slice(0, 16);
+    let h = '';
+    hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
+    if (h === localStorage.getItem('hb12_pin_hash')) {
+      HB.sessionKey = key;
+      return true;
+    }
+    return false;
+  } catch(e) { return false; }
+}
+
+function deriveKey(pin, salt) {
+  const km = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt, iterations: 200000, hash: 'SHA-256' },
+    km, { name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']
+  );
+}
+
+function unlockApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  updateHomeStats();
+  initBackHandler();
+  applyHomePrefs();
+  // Ripristina tema
+  const savedTheme = localStorage.getItem('hb12_theme');
+  if (savedTheme) setTheme(savedTheme);
+  // Dopo unlock mostra opzione registra impronta se non già fatto
+  if (!localStorage.getItem(HB_BIO_KEY) && window.PublicKeyCredential) {
+    const hint = document.getElementById('bio-register-hint');
+    if (hint) hint.style.display = 'block';
+  }
+  showToast('🔓 Vault aperto');
+  // Init app v13
+  applyHomePrefs();
+  updateHomeDate();
+  renderQuickAccess();
+  switchTab('home');
+  if (typeof shopInit === 'function') shopInit();
+}
+
+function logout() {
+  HB.sessionKey = null;
+  HB.user = null;
   location.reload();
+}
+
+function checkBiometricAvailable() {
+  if (!window.PublicKeyCredential) return;
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  const key = document.getElementById('pin-key-left');
+  const hint = document.getElementById('bio-register-hint');
+  if (credId) {
+    // Mostra icona impronta al posto della X
+    if (key) {
+      key.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+        <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
+        <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
+        <path d="M2 12a10 10 0 0 1 18-6"/>
+        <path d="M2 16h.01"/>
+        <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
+        <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/>
+        <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
+        <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+      </svg>`;
+      key.className = 'pin-key';
+      key.style.color = 'var(--accent)';
+    }
+    if (hint) hint.style.display = 'none';
+  } else {
+    // X normale
+    if (key) {
+      key.innerHTML = '✕';
+      key.className = 'pin-key danger';
+      key.style.color = '';
+    }
+    if (hint) hint.style.display = 'block';
+  }
+}
+
+function pinKeyLeftAction() {
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  if (credId && HB.authState === 'pin-login') {
+    tryBiometric();
+  } else {
+    pinClear();
+  }
+}
+
+function registerBiometric() {
+  if (!window.PublicKeyCredential) {
+    showToast('⚠️ Biometrico non supportato'); return;
+  }
+  const currentPin = HB._lastPin || HB.pinBuffer || HB.pinFirst || '';
+  if (!currentPin) { showToast('Inserisci prima il PIN per registrare l\'impronta'); return; }
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId    = crypto.getRandomValues(new Uint8Array(16));
+    const credential = await navigator.credentials.create({ publicKey: {
+      challenge,
+      rp: { name:'HomeBull Pro', id: location.hostname },
+      user: { id:userId, name: HB.user?.email||'user', displayName:'HomeBull' },
+      pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection: { userVerification:'required', residentKey:'preferred' },
+      timeout: 60000
+    }});
+    if (!credential) return;
+    // Salva credId
+    const rawId = new Uint8Array(credential.rawId);
+    let bin=''; rawId.forEach(b => bin+=String.fromCharCode(b));
+    localStorage.setItem(HB_BIO_KEY, btoa(bin));
+    // Cifra il PIN con chiave derivata dal rawId (stessa ogni volta → recuperabile)
+    const bioKey = await _deriveBioKey(rawId);
+    const encPin = await _bioEncrypt(bioKey, currentPin);
+    localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+    showToast('✅ Impronta registrata! Al prossimo avvio premi 👆 per entrare.');
+    checkBiometricAvailable();
+  } catch(e) {
+    console.warn('[Bio register]', e);
+    showToast('⚠️ Registrazione annullata o non riuscita');
+  }
+}
+
+function tryBiometric() {
+  const credIdB64 = localStorage.getItem(HB_BIO_KEY);
+  const encPin    = localStorage.getItem(HB_BIO_PIN_KEY);
+  if (!credIdB64 || !encPin || !window.PublicKeyCredential) {
+    showToast('Biometrico non disponibile'); return;
+  }
+  try {
+    const credIdBytes = new Uint8Array(atob(credIdB64).split('').map(c=>c.charCodeAt(0)));
+    const assertion   = await navigator.credentials.get({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{type:'public-key', id:credIdBytes}],
+      userVerification: 'required', timeout: 60000
+    }});
+    if (!assertion) return;
+    // Recupera PIN usando chiave derivata dal rawId
+    const rawId  = new Uint8Array(assertion.rawId);
+    const bioKey = await _deriveBioKey(rawId);
+    const pin    = await _bioDecrypt(bioKey, encPin);
+    if (!pin) { showToast('Biometrico non riuscito — usa il PIN'); return; }
+    // Verifica PIN e sblocca
+    const ok = await verifyPIN(pin);
+    if (ok) {
+      showToast('🔑 Identità verificata');
+      unlockApp();
+    } else {
+      showToast('⚠️ Errore verifica — usa il PIN');
+    }
+  } catch(e) {
+    console.warn('[Bio auth]', e);
+    showToast('Biometrico non riuscito — usa il PIN');
+  }
+}
+
+function startForgotPin() {
+  const user = loadUser();
+  if (!user || !user.email) {
+    showToast('Nessun account trovato — accedi prima con email');
+    return;
+  }
+  // Genera OTP reset
+  HB._resetOtp = String(Math.floor(100000 + Math.random() * 900000));
+  HB._resetEmail = user.email;
+  console.log('[HB12 Reset OTP]', HB._resetOtp);
+  // TODO: Firebase sendSignInLinkToEmail — per ora demo
+  alert('📧 Codice di reset inviato a ' + user.email + '\n\n[Demo] Codice: ' + HB._resetOtp);
+  promptResetOtp();
+}
+
+function promptResetOtp() {
+  const code = prompt('Inserisci il codice a 6 cifre ricevuto via email:');
+  if (!code) return;
+  if (code.trim() !== HB._resetOtp) {
+    alert('Codice non corretto. Riprova.');
+    return;
+  }
+  // OTP corretto → imposta nuovo PIN
+  HB.authState = 'pin-setup';
+  HB.pinMode = 'setup';
+  HB.pinBuffer = '';
+  HB.pinFirst = '';
+  // Cancella PIN e chiave vecchi
+  localStorage.removeItem('hb12_pin_hash');
+  localStorage.removeItem('hb12_salt');
+  localStorage.removeItem(HB_BIO_KEY);
+  localStorage.removeItem(HB_BIO_PIN_KEY);
+  updatePinDots();
+  document.getElementById('pin-label').textContent = 'Scegli il nuovo PIN (6-8 cifre)';
+  const fp = document.getElementById('forgot-pin-btn');
+  if (fp) fp.style.display = 'none';
+  showToast('✅ Codice verificato — scegli un nuovo PIN');
+}
+
+function hbEncrypt(text) {
+  if (!HB.sessionKey) return text;
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv }, HB.sessionKey, new TextEncoder().encode(text)
+  );
+  const combined = new Uint8Array(12 + enc.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(enc), 12);
+  let bin = '';
+  for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
+  return 'hb12:' + btoa(bin);
+}
+
+function hbDecrypt(data) {
+  if (!HB.sessionKey || !data.startsWith('hb12:')) return data;
+  try {
+    const combined = new Uint8Array(atob(data.slice(5)).split('').map(c => c.charCodeAt(0)));
+    const dec = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: combined.slice(0, 12) },
+      HB.sessionKey, combined.slice(12)
+    );
+    return new TextDecoder().decode(dec);
+  } catch(e) { return null; }
 }
 
 // ════════════════════════════════════════════════════════
 //  APP START
 // ════════════════════════════════════════════════════════
 function appStart() {
-  applyTheme();
-  applyHomePrefs();
-  updateHomeDate();
-  renderQuickAccess();
-  switchTab('home');
-  if (typeof shopInit === 'function') shopInit();
+  // alias per compatibilità v22
 }
 
 // ════════════════════════════════════════════════════════
@@ -499,4 +769,78 @@ function editDisplayName() {
 function getDisplayName() {
   return localStorage.getItem(HB_NAME_KEY) ||
          (HB.user?.email?.split('@')[0] || 'Utente');
+}
+// ── Service Worker ──────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// ── Keyboard shortcuts ──────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault(); openGlobalSearch(); return;
+  }
+  if (e.key === 'Escape') {
+    if (document.getElementById('search-overlay')?.classList.contains('open')) {
+      closeGlobalSearch(); return;
+    }
+  }
+  // PIN keyboard
+  const pinScreen = document.getElementById('step-pin');
+  if (pinScreen?.classList.contains('active')) {
+    if (e.key >= '0' && e.key <= '9') { pinPress(e.key); return; }
+    if (e.key === 'Backspace') { pinClear(); return; }
+    if (e.key === 'Enter') { pinConfirm(); return; }
+  }
+  // OTP keyboard
+  const otpScreen = document.getElementById('step-otp');
+  if (otpScreen?.classList.contains('active') && e.key === 'Enter') {
+    verifyOTP(); return;
+  }
+});
+
+
+// ── Missing auth helpers ──
+function saveUser(u) { localStorage.setItem('hb12_user', JSON.stringify(u)); }
+
+function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')); } catch { return null; } }
+
+function checkAuthStatus() {
+  const user = loadUser();
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+
+  if (user && hasPIN) {
+    // Returning user → go to PIN login
+    HB.user = user;
+    HB.authState = 'pin-login';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
+    const fp = document.getElementById('forgot-pin-btn');
+    if (fp) fp.style.display = 'block';
+    setTimeout(() => {
+      checkBiometricAvailable();
+      // Mobile: avvia biometrico automaticamente se già registrato
+      if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
+        setTimeout(tryBiometric, 700);
+      }
+    }, 300);
+  } else {
+    // New user → start from email
+    HB.authState = 'email';
+    goToStep('email');
+  }
+}
+
+function saveHomePrefs(prefs) {
+  localStorage.setItem(HOME_PREFS_KEY, JSON.stringify(prefs));
+}
+
+function loadHomePrefs() {
+  try { return JSON.parse(localStorage.getItem(HOME_PREFS_KEY)) || {}; } catch { return {}; }
+}
+
+function handleSearchOverlayClick(e) {
+  if (e.target === document.getElementById('search-overlay')) closeGlobalSearch();
 }
