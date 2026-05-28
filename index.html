@@ -2029,10 +2029,43 @@ body { display: flex; flex-direction: column; }
     <!-- PASSWORD -->
 
       <div class="tab-panel" id="panel-shopping">
-        <div class="tab-inner" id="shop-content">
-          <!-- Renderizzato da shopping.js -->
+      <div style="padding:12px 14px 100px;">
+
+        <!-- Selettore liste multiple -->
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:8px;overflow-x:auto;padding-bottom:4px;" id="shop-list-tabs"></div>
         </div>
+
+        <!-- Sezione: Lista corrente -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);">🛒 <span id="shop-list-name-label">Lista</span></div>
+            <button onclick="shopClearAll()" id="shop-clear-btn" style="display:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
+          </div>
+          <div id="shop-active-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;min-height:60px;">
+            <div style="grid-column:1/-1;text-align:center;padding:16px 0;color:var(--text3);font-size:12px;">Tocca i prodotti qui sotto per aggiungerli</div>
+          </div>
+        </div>
+
+        <!-- Sezione: Usati di recente -->
+        <div id="shop-recent-section" style="display:none;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:10px;">🕐 Usati di recente</div>
+          <div id="shop-recent-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+        </div>
+
+        <!-- Ricerca -->
+        <div style="margin-bottom:12px;">
+          <div class="pw-search-bar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="shop-search" placeholder="Cerca prodotto..." oninput="shopSearchProducts(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+          </div>
+        </div>
+
+        <!-- Categorie accordion -->
+        <div id="shop-categories"></div>
+
       </div>
+    </div>
 
       <!-- PASSWORDS -->
       <div class="tab-panel" id="panel-passwords">
@@ -6125,6 +6158,24 @@ if (_origSwitch) {
 }
 
 </script>
+
+<div id="shop-detail-modal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)shopCloseDetail()">
+  <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div style="font-size:36px;" id="shop-detail-icon">🧴</div>
+      <div style="flex:1;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:4px;">Aggiungi alla lista</div>
+        <input id="shop-detail-name" type="text" style="width:100%;background:none;border:none;outline:none;font-size:17px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:8px;">Varianti rapide</div>
+    <div id="shop-detail-variants" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="shopCloseDetail()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
+      <button onclick="shopConfirmDetail()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
