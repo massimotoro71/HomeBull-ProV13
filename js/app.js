@@ -1,9 +1,16 @@
+'use strict';
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
+  checkAuthStatus();
+});
+
 /* ═══════════════════════════════════════════════════════════
    HomeBull — app.js
    Core: auth, routing, toast, helpers
 ═══════════════════════════════════════════════════════════ */
 
-'use strict';
 
 // ═══════════════════════════════════════════════════════════
 //  AUTH — portato da v22 (Email → OTP → PIN + Biometrico)
