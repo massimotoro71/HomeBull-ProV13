@@ -1515,6 +1515,31 @@ function pwStrength(pwd) {
   el.textContent=labels[s]||''; el.style.color=colors[s]||'';
 }
 
+
+function pwFabInit() {
+  const btn  = document.getElementById('pw-fab-btn');
+  const menu = document.getElementById('pw-fab-menu');
+  const np   = document.getElementById('pw-fab-newpw');
+  const nc   = document.getElementById('pw-fab-newcat');
+  if (!btn || btn._pwFabReady) return;
+  btn._pwFabReady = true;
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    const open = menu.style.display !== 'none';
+    menu.style.display = open ? 'none' : 'block';
+    if (!open) {
+      setTimeout(() => document.addEventListener('click', function h(ev) {
+        if (!document.getElementById('pw-fab')?.contains(ev.target)) {
+          menu.style.display = 'none';
+          document.removeEventListener('click', h);
+        }
+      }), 100);
+    }
+  };
+  np.onclick = () => { menu.style.display='none'; pwNewItem(); };
+  nc.onclick = () => { menu.style.display='none'; pwNewCategory(); };
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
@@ -1828,7 +1853,17 @@ function pwStrength(pwd) {
             <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
-        <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+        <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 100px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-content:start;"></div>
+
+        <!-- FAB Aggiungi (stile v11) -->
+        <div id="pw-fab" style="position:absolute;bottom:24px;right:20px;z-index:20;">
+          <div id="pw-fab-menu" style="display:none;position:absolute;bottom:64px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);min-width:200px;">
+            <button id="pw-fab-newpw" style="width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;font-family:inherit;">🔐 Nuova Password</button>
+            <div style="height:1px;background:var(--border);margin:0 12px;"></div>
+            <button id="pw-fab-newcat" style="width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;font-family:inherit;">📁 Nuova Categoria</button>
+          </div>
+          <button id="pw-fab-btn" style="width:54px;height:54px;border-radius:18px;border:none;background:var(--accent);color:white;font-size:32px;font-weight:300;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;line-height:1;">+</button>
+        </div>
       </div>
 
       <!-- Vista: Lista password di una categoria -->
@@ -3137,8 +3172,7 @@ function switchTab(tab) {
   };
   moduleOpeners[tab]?.();
   // Nascondi FAB password se non siamo in passwords
-  const fab = document.getElementById('pw-fab');
-  if (fab) fab.style.display = tab === 'passwords' ? 'block' : 'none';
+  // FAB password — gestito da CSS visibility basata su panel attivo
 }
 
 function switchTabFromDrawer(tab) {
@@ -3465,36 +3499,8 @@ function pwShowCats(q='') {
   const acts = document.getElementById('topbar-actions');
   if (acts) acts.innerHTML = '';
   // FAB in basso a destra (come v11)
-  let pwFab = document.getElementById('pw-fab');
-  if (!pwFab) {
-    pwFab = document.createElement('div');
-    pwFab.id = 'pw-fab';
-    pwFab.style.cssText = 'position:absolute;bottom:24px;right:20px;z-index:10;';
-    // Menu dropdown
-    const menu = document.createElement('div');
-    menu.id = 'pw-fab-menu';
-    menu.style.cssText = 'display:none;position:absolute;bottom:64px;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.3);min-width:190px;';
-    menu.innerHTML = '<button id="pw-fab-newpw" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;">🔐 Nuova Password</button><div style="height:1px;background:var(--border);margin:0 12px;"></div><button id="pw-fab-newcat" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;">📁 Nuova Categoria</button>';
-    // FAB button
-    const btn = document.createElement('button');
-    btn.style.cssText = 'width:54px;height:54px;border-radius:18px;border:none;background:var(--accent);color:white;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.4);display:flex;align-items:center;justify-content:center;line-height:1;';
-    btn.textContent = '+';
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-      if (menu.style.display === 'block') {
-        setTimeout(() => document.addEventListener('click', function h(ev) {
-          if (!pwFab.contains(ev.target)) { menu.style.display='none'; document.removeEventListener('click',h); }
-        }), 100);
-      }
-    };
-    pwFab.appendChild(menu);
-    pwFab.appendChild(btn);
-    document.getElementById('tab-container').appendChild(pwFab);
-    document.getElementById('pw-fab-newpw').onclick = () => { menu.style.display='none'; pwNewItem(); };
-    document.getElementById('pw-fab-newcat').onclick = () => { menu.style.display='none'; pwNewCategory(); };
-  }
-  pwFab.style.display = 'block';
+  // Inizializza FAB (già nell'HTML statico)
+  pwFabInit();
   pwRenderCats(q);
 }
 
