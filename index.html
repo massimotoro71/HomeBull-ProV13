@@ -308,10 +308,12 @@ html, body {
 
 /* ── Tab content area ── */
 #tab-container {
-  flex: 1;
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--bottombar-h));
+  left: 0; right: 0;
   overflow: hidden;
-  position: relative;
-  min-height: 0;
+  z-index: 1;
 }
 @media (min-width: 1024px) {
   #tab-container {
@@ -350,23 +352,20 @@ html, body {
 
 /* On desktop: sidebar replaces bottombar */
 @media (min-width: 1024px) {
-  body {
-    flex-direction: row;
-  }
   #sidebar {
     display: flex !important;
-    flex-shrink: 0;
-    height: 100vh;
-    position: relative;
   }
-  .app-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    height: 100vh;
+  #topbar {
+    left: 220px;
   }
-  #bottombar { display: none !important; }
+  #tab-container {
+    top: calc(var(--safe-top) + var(--topbar-h));
+    bottom: 0;
+    left: 220px;
+    right: 0;
+    overflow: hidden;
+  }
+  #bottombar { display: none; }
 }
 
 .tab-panel {
@@ -387,15 +386,18 @@ html, body {
 
 /* ── Bottom Navigation (mobile) ── */
 #bottombar {
-  position: relative;
+  position: fixed !important;
+  bottom: 0; left: 0; right: 0;
   height: calc(var(--bottombar-h) + env(safe-area-inset-bottom, 0px));
   padding-bottom: env(safe-area-inset-bottom, 0px);
   background: var(--bg);
   border-top: 1px solid var(--border);
   display: flex; align-items: flex-start; justify-content: space-around;
   padding-top: 8px;
-  flex-shrink: 0;
-  z-index: 100;
+  z-index: 4000 !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  will-change: transform;
 }
 
 @media (min-width: 1024px) {
@@ -439,7 +441,7 @@ html, body {
 .nav-badge {
   position: absolute; top: -2px; right: 4px;
   background: #ef4444; color: white;
-  font-size: 11px; font-weight: 800;
+  font-size: 9px; font-weight: 800;
   padding: 1px 5px; border-radius: 99px;
   min-width: 16px; text-align: center;
   display: none;
@@ -530,7 +532,7 @@ html, body {
 ═══════════════════════════════════════════════════════════ */
 .tab-inner {
   padding: 16px 16px 24px;
-  max-width: 500px; margin: 0 auto;
+  max-width: 600px; margin: 0 auto;
   box-sizing: border-box;
   width: 100%;
 }
@@ -785,7 +787,7 @@ html, body {
   white-space: nowrap; max-width: 100%;
 }
 .h12-tile-count {
-  font-size: 11px; font-weight: 700;
+  font-size: 9px; font-weight: 700;
   color: var(--text3); text-align: center; margin: 0;
 }
 
@@ -1094,7 +1096,7 @@ html, body {
 .shop-product-btn.selected { border-color: var(--accent); background: var(--accent-bg); }
 .shop-product-icon { font-size: 22px; line-height: 1; }
 .shop-product-name {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.04em; color: var(--text2); text-align: center;
   line-height: 1.2; max-width: 100%;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -1109,7 +1111,7 @@ html, body {
 }
 .shop-list-item-icon { font-size: 20px; line-height: 1; }
 .shop-list-item-name {
-  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  font-size: 8px; font-weight: 800; text-transform: uppercase;
   color: var(--accent); text-align: center; max-width: 100%;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
@@ -1117,7 +1119,7 @@ html, body {
   position: absolute; top: -5px; right: -5px;
   width: 16px; height: 16px; border-radius: 50%;
   background: #ef4444; color: white; border: none;
-  font-size: 11px; cursor: pointer; display: flex;
+  font-size: 9px; cursor: pointer; display: flex;
   align-items: center; justify-content: center; font-weight: 900;
 }
 /* Accordion categoria */
@@ -1132,11 +1134,10 @@ html, body {
 }
 .shop-accordion-header:active { background: var(--surface2); }
 .shop-accordion-body {
-  display: grid; grid-template-columns: repeat(2,1fr);
+  display: grid; grid-template-columns: repeat(4,1fr);
   gap: 8px; padding: 10px 10px 12px;
   background: var(--bg);
 }
-@media (min-width: 400px) { .shop-accordion-body { grid-template-columns: repeat(4,1fr); } }
 @media (min-width: 500px) { .shop-accordion-body { grid-template-columns: repeat(5,1fr); } }
 @media (min-width: 1024px) { .shop-accordion-body { grid-template-columns: repeat(8,1fr); } }
 
@@ -1282,7 +1283,7 @@ html, body {
   <h1 class="auth-title">HomeBull Pro</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
   <div style="background:#1e1e2e;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:5px 14px;margin-bottom:20px;font-size:11px;font-weight:700;color:#6366f1;letter-spacing:0.08em;">
-    v12.5.1-alpha · build 28/05/2025
+    v12.4.9-alpha · build 28/05/2025
   </div>
 
   <div class="auth-card">
@@ -1497,7 +1498,6 @@ html, body {
   </header>
 
   <!-- Tab panels -->
-  <div class="app-main">
   <div id="tab-container">
 
     <!-- HOME -->
@@ -1654,7 +1654,7 @@ html, body {
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Intestatario *</div>
             <input id="doc-holder" type="text" placeholder="Nome Cognome"
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
@@ -1665,25 +1665,25 @@ html, body {
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Scadenza</div>
               <input id="doc-expiry" type="date"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Data rilascio</div>
               <input id="doc-issued" type="date"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Rilasciato da</div>
               <input id="doc-issuer" type="text" placeholder="Comune, Questura..."
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Note</div>
             <textarea id="doc-notes" placeholder="Informazioni aggiuntive..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
           </div>
 
           <!-- Sezione Codice Fiscale (visibile solo per tipo CF) -->
@@ -1692,12 +1692,12 @@ html, body {
             <div style="margin-bottom:10px;">
               <div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div>
               <input id="cf-cognome" type="text" placeholder="ROSSI" oninput="this.value=this.value.toUpperCase()"
-                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:10px;">
               <div class="pw-field-label" style="margin-bottom:5px;">Nome *</div>
               <input id="cf-nome" type="text" placeholder="MARIO" oninput="this.value=this.value.toUpperCase()"
-                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
               <div>
@@ -1716,7 +1716,7 @@ html, body {
             <div style="margin-bottom:12px;">
               <div class="pw-field-label" style="margin-bottom:5px;">Comune di nascita *</div>
               <input id="cf-comune-search" type="text" placeholder="Cerca comune..." oninput="cfSearchComune(this.value)"
-                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:6px;">
+                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:6px;">
               <div id="cf-comune-results" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;max-height:160px;overflow-y:auto;"></div>
               <div id="cf-comune-selected" style="font-size:12px;color:var(--accent);font-weight:700;margin-top:4px;"></div>
             </div>
@@ -1820,7 +1820,7 @@ html, body {
           <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:12px;" id="cal-form-title">Nuovo evento</div>
           <div style="margin-bottom:10px;">
             <input id="cal-ev-title" type="text" placeholder="Titolo evento *"
-              style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+              style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
             <div>
@@ -1880,12 +1880,12 @@ html, body {
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Nome account *</div>
               <input id="otp-add-name" type="text" placeholder="es. Google, GitHub, Amazon..."
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Email / Username</div>
               <input id="otp-add-user" type="text" placeholder="es. nome@email.com"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:14px;">
               <button onclick="otpScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">📷 Scansiona QR Code 2FA</button>
@@ -1966,7 +1966,7 @@ html, body {
               <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
               <input id="card-add-label" type="text" placeholder="es. Visa Principale, Mastercard Lavoro"
                 oninput="cardUpdatePreview()"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:12px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Numero carta *</div>
@@ -1991,7 +1991,7 @@ html, body {
               <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
               <input id="card-add-holder" type="text" placeholder="NOME COGNOME"
                 oninput="cardUpdatePreview()"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;text-transform:uppercase;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;text-transform:uppercase;">
             </div>
             <div style="margin-bottom:20px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
@@ -2035,13 +2035,13 @@ html, body {
           <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Nome rete (SSID) *</div>
               <input id="wifi-add-ssid" type="text" placeholder="es. Casa-5G"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
               <div style="position:relative;">
                 <input id="wifi-add-pw" type="password" placeholder="Password rete"
-                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
                 <button onclick="wifiToggleAddPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;" id="wifi-add-pw-eye">👁</button>
               </div>
             </div>
@@ -2094,7 +2094,7 @@ html, body {
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
             <input id="fin-label" type="text" placeholder="es. Intesa, Fineco, Revolut..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">IBAN</div>
@@ -2111,26 +2111,26 @@ html, body {
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
               <input id="fin-holder" type="text" placeholder="Nome Cognome"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Username / Email accesso</div>
             <input id="fin-user" type="text" placeholder="Username home banking"
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Password accesso</div>
             <div style="position:relative;">
               <input id="fin-pw" type="password" placeholder="Password home banking"
-                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
               <button onclick="financeTogglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
             </div>
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Note aggiuntive</div>
             <textarea id="fin-notes" placeholder="PIN, informazioni aggiuntive..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
           </div>
           <button onclick="financeSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Conto</button>
         </div>
@@ -2172,7 +2172,7 @@ html, body {
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
             <input id="srv-label" type="text" placeholder="es. Server produzione, AWS, GitHub..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;">
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Host / URL / Endpoint</div>
@@ -2331,7 +2331,7 @@ html, body {
 
 <!-- Modal specifica prodotto (lista spesa) -->
 <div id="shop-detail-modal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)shopCloseDetail()">
-  <div style="width:min(100%,500px);max-width:100%;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));">
+  <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
       <div style="font-size:36px;" id="shop-detail-icon">🧴</div>
       <div style="flex:1;">
@@ -4001,7 +4001,7 @@ function cardsShowDetail(id) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;';
   overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
   overlay.innerHTML = `
-    <div style="width:min(100%,500px);max-width:100%;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+    <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
       <div style="${card.color.includes('gradient')?`background:${card.color};`:'background:var(--accent);'}border-radius:24px 24px 0 0;padding:20px 16px 16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
           <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:white;">${card.label}</div>
@@ -4213,7 +4213,7 @@ function financeShowDetail(id) {
     acc.pw ? `<div class="pw-field-row"><div class="pw-field-label">Password</div><div class="pw-field-value" id="fin-pw-${acc.id}" style="font-family:monospace;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="financeToggleDetailPw('${acc.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="financeCopy('${acc.id}','pw')">📋 Copia</button></div></div>` : '',
     acc.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="font-size:13px;white-space:pre-wrap;">${acc.notes}</div></div>` : '',
   ].filter(Boolean).join('');
-  overlay.innerHTML = `<div style="width:min(100%,500px);max-width:100%;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+  overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="background:rgba(234,179,8,0.15);border-radius:24px 24px 0 0;padding:18px 16px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-size:28px;">${acc.icon||'🏦'}</div>
@@ -4964,8 +4964,8 @@ function familyAddMember() {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
   overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
     <div style="font-size:16px;font-weight:800;margin-bottom:16px;">Aggiungi membro</div>
-    <input id="fam-name-inp" type="text" placeholder="Nome *" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;">
-    <input id="fam-role-inp" type="text" placeholder="Ruolo (es. Papà, Mamma, Figlio)" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;">
+    <input id="fam-name-inp" type="text" placeholder="Nome *" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <input id="fam-role-inp" type="text" placeholder="Ruolo (es. Papà, Mamma, Figlio)" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;">
     <div style="display:flex;gap:10px;">
       <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button onclick="familyDoAdd(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi</button>
@@ -5086,7 +5086,7 @@ function docsShowDetail(id) {
     doc.notes  ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value">${doc.notes}</div></div>` : '',
     doc.photos?.length ? `<div class="pw-field-row"><div class="pw-field-label">Foto (${doc.photos.length})</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">${doc.photos.map(p=>`<img src="${p}" style="width:90px;height:90px;object-fit:cover;border-radius:10px;cursor:pointer;" onclick="docPhotoFullscreen('${p}')">`).join('')}</div></div>` : '',
   ].filter(Boolean).join('');
-  overlay.innerHTML = `<div style="width:min(100%,500px);max-width:100%;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+  overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="background:rgba(99,102,241,0.1);border-radius:24px 24px 0 0;padding:18px 16px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-size:32px;">${doc.icon||'📄'}</div>
@@ -5317,7 +5317,7 @@ function serverShowDetail(id) {
     item.pw   ? `<div class="pw-field-row"><div class="pw-field-label">Password / Token</div><div class="pw-field-value" id="srv-pw-detail-${item.id}" style="font-family:monospace;font-size:12px;word-break:break-all;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverToggleDetailPw('${item.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','pw')">📋 Copia</button></div></div>` : '',
     item.notes? `<div class="pw-field-row"><div class="pw-field-label">Note / Connection String</div><div class="pw-field-value" style="font-family:monospace;font-size:12px;white-space:pre-wrap;">${item.notes}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','notes')">📋 Copia</button></div></div>` : '',
   ].filter(Boolean).join('');
-  overlay.innerHTML = `<div style="width:min(100%,500px);max-width:100%;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+  overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
     <div style="background:rgba(100,116,139,0.12);border-radius:24px 24px 0 0;padding:16px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-size:26px;">${item.icon||'💻'}</div>
@@ -5766,7 +5766,7 @@ function shopNewList() {
     <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista della spesa</div>
     <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata, ne crei una nuova.</div>
     <input id="shop-new-name" type="text" placeholder="Nome lista (es. Settimana, Festa...)" value="Spesa"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
       <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button onclick="shopCreateList(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
@@ -5795,7 +5795,7 @@ function shopRenameList(id) {
   overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
     <div style="font-size:16px;font-weight:800;margin-bottom:14px;">Rinomina lista</div>
     <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name||''}"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:max(16px,14px);font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
       <button onclick="shopDeleteList('${id}');this.closest('[style]').remove()" style="padding:13px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
       <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
