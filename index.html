@@ -1006,9 +1006,16 @@ html, body {
 }
 /* QR Modal */
 #wifi-qr-modal {
-  position: fixed; inset: 0; z-index: 9000;
-  background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-  display: none; align-items: center; justify-content: center;
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  right: 0 !important; bottom: 0 !important;
+  width: 100vw; height: 100dvh;
+  z-index: 9500;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
 }
 #wifi-qr-modal.open { display: flex; }
 
@@ -1127,7 +1134,7 @@ html, body {
   justify-content: center;
   padding-top: 60px;
 }
-#search-overlay.open { display: flex; }
+#search-overlay.open { display: flex !important; }
 .search-box {
   width: 100%; max-width: 580px;
   background: var(--bg2);
@@ -1231,46 +1238,158 @@ html, body {
   .section-title { font-size: 32px; }
 }
 
-/* ══ v13 layout fix ══════════════════════════════════ */
-html, body { height:100%; margin:0; padding:0; overflow:hidden; }
-.app-layout { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
-.app-main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
-#topbar {
-  position:sticky !important; top:0 !important;
-  left:auto !important; right:auto !important;
-  width:100% !important; flex-shrink:0; z-index:10 !important;
-}
-#tab-container { flex:1; overflow:hidden; position:relative; min-height:0; }
-.tab-panel {
-  position:absolute !important; inset:0 !important;
-  overflow-y:auto !important; opacity:0;
-  pointer-events:none; transition:opacity 0.18s; background:var(--bg);
-}
-.tab-panel.active { opacity:1 !important; pointer-events:auto !important; }
-#bottombar { position:relative !important; flex-shrink:0; }
+/* ── v13: Solo desktop — mobile da aggiungere dopo ── */
+#bottombar, #bottom-more-popup, .nav-item, #more-drawer { display: none !important; }
 
-@media (min-width:900px) {
-  .app-layout { flex-direction:row !important; }
-  #sidebar {
-    display:flex !important; width:220px !important; flex-shrink:0;
-    height:100dvh; overflow-y:auto; flex-direction:column;
-  }
-  .app-main { flex:1; min-width:0; height:100dvh; }
-  #bottombar, #bottom-more-popup { display:none !important; }
+/* Sidebar sempre visibile */
+#sidebar { display: flex !important; }
+
+/* Layout flex row */
+.app-layout, #app { display: flex !important; flex-direction: row !important; height: 100dvh !important; }
+.app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
+#tab-container { flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; }
+
+/* Tab panel: block su desktop */
+.tab-panel { position: absolute !important; inset: 0 !important; overflow-y: auto !important;
+  opacity: 0; pointer-events: none; transition: opacity 0.18s; background: var(--bg); }
+.tab-panel.active { opacity: 1 !important; pointer-events: auto !important; }
+
+/* Topbar sticky */
+#topbar { position: sticky !important; top: 0 !important; left: auto !important;
+  right: auto !important; width: 100% !important; flex-shrink: 0; }
+
+/* Accordion testo visibile */
+.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
+
+/* ── Fix topbar: NON fixed, dentro app-main ── */
+#topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  z-index: 10 !important;
 }
-@media (max-width:899px) {
-  #sidebar { display:none !important; }
-  #bottombar { display:flex !important; }
-}
-/* Fix scanner QR */
-#qr-scanner-modal {
-  position:fixed !important; inset:0; z-index:9500;
-  background:rgba(0,0,0,0.75); align-items:center; justify-content:center;
-  backdrop-filter:blur(6px);
-}
-#search-overlay.open { display:flex !important; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
+function shopAddCustom() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+  overlay.innerHTML = `
+    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
+      <div style="font-size:17px;font-weight:800;margin-bottom:16px;">➕ Aggiungi prodotto</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Nome prodotto</div>
+        <input id="shop-custom-name" type="text" placeholder="es. Prosciutto crudo, Latte intero..." autocomplete="off"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Emoji (opzionale)</div>
+        <input id="shop-custom-icon" type="text" placeholder="🛍️" maxlength="2"
+          style="width:80px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;outline:none;text-align:center;">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="this.closest('[style]').remove()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+        <button onclick="shopConfirmCustom(this)" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi alla lista</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('shop-custom-name')?.focus(), 100);
+  document.getElementById('shop-custom-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') overlay.querySelector('button:last-child').click();
+  });
+}
+
+function shopConfirmCustom(btn) {
+  const name = document.getElementById('shop-custom-name')?.value.trim();
+  const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
+  if (!name) { showToast('Inserisci il nome del prodotto'); return; }
+  const id = 'custom_' + Date.now();
+  _shopList[id] = { name, icon, qty: 1 };
+  shopSave();
+  btn.closest('[style]').remove();
+  shopRenderAll();
+  showToast('✅ ' + name + ' aggiunto!');
+}
+
+function wifiShowAdd() {
+  document.getElementById('wifi-view-list').style.display = 'none';
+  document.getElementById('wifi-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuova Rete';
+  document.getElementById('wifi-add-ssid').value = '';
+  document.getElementById('wifi-add-pw').value = '';
+  _wifiSec = 'WPA';
+  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sec === 'WPA');
+  });
+}
+function wifiDelete(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
+  _wifiNets = _wifiNets.filter(n => n.id !== id);
+  wifiSaveAll(); wifiRender();
+  showToast('Rete rimossa');
+}
+function otpShowAdd() {
+  document.getElementById('otp-view-list').style.display = 'none';
+  document.getElementById('otp-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuovo Account';
+  if (_otpTimer) clearInterval(_otpTimer);
+  // Reset form
+  document.getElementById('otp-add-name').value = '';
+  document.getElementById('otp-add-user').value = '';
+  document.getElementById('otp-add-secret').value = '';
+  _otpIcon = '🔐';
+  document.querySelectorAll('.otp-icon-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.icon === '🔐');
+  });
+}
+function otpShowList(q='') {
+  document.getElementById('otp-view-list').style.display = 'flex';
+  document.getElementById('otp-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
+  otpRenderList(q);
+  otpStartUpdater();
+}
+function otpCopy(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
+  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+function otpScanQR() {
+  qrScannerOpen('Scansiona QR 2FA', (data) => {
+    const parsed = qrParseOTP(data);
+    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
+    document.getElementById('otp-add-name').value   = parsed.name;
+    document.getElementById('otp-add-user').value   = parsed.user;
+    document.getElementById('otp-add-secret').value = parsed.secret;
+    showToast('✅ QR letto — verifica i dati e salva');
+  });
+}
+
+function cardsSearch(q) {
+  const list = document.getElementById('cards-list');
+  if (!list) return;
+  if (!q.trim()) { cardsRender(); return; }
+  const ql = q.toLowerCase();
+  const filtered = _cards.filter(c =>
+    (c.holder||'').toLowerCase().includes(ql) ||
+    (c.number||'').replace(/\s/g,'').includes(ql) ||
+    (c.bank||'').toLowerCase().includes(ql) ||
+    (c.type||'').toLowerCase().includes(ql)
+  );
+  const orig = _cards;
+  _cards = filtered;
+  cardsRender();
+  _cards = orig;
+}
+
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
 <body>
@@ -1534,7 +1653,7 @@ html, body { height:100%; margin:0; padding:0; overflow:hidden; }
         <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 0;"></div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v12.1.1-alpha</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.0.0-beta</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -1779,9 +1898,15 @@ html, body { height:100%; margin:0; padding:0; overflow:hidden; }
         <!-- Vista lista -->
         <div id="note-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="pw-search-bar" style="flex:1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              </div>
+              <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nuova
+              </button>
             </div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -1876,9 +2001,15 @@ html, body { height:100%; margin:0; padding:0; overflow:hidden; }
         <!-- Vista lista OTP -->
         <div id="otp-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="pw-search-bar" style="flex:1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              </div>
+              <button onclick="otpShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Aggiungi
+              </button>
             </div>
           </div>
           <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -1942,7 +2073,19 @@ html, body { height:100%; margin:0; padding:0; overflow:hidden; }
 
         <!-- Lista carte -->
         <div id="cards-view-list" style="display:flex;flex-direction:column;height:100%;">
-          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 100px;"></div>
+          <div style="padding:12px 14px 8px;flex-shrink:0;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="pw-search-bar" style="flex:1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              </div>
+              <button onclick="cardsShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Aggiungi
+              </button>
+            </div>
+          </div>
+          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
         </div>
 
         <!-- Aggiungi carta -->
@@ -2366,10 +2509,11 @@ html, body { height:100%; margin:0; padding:0; overflow:hidden; }
 
 <!-- QR Code Modal (Wi-Fi) -->
 <div id="wifi-qr-modal" onclick="wifiCloseQR()">
-  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;" onclick="event.stopPropagation()">
-    <div id="wifi-qr-ssid-label" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;"></div>
+  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;position:relative;" onclick="event.stopPropagation()">
+    <button onclick="wifiCloseQR()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f5;color:#333;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+    <div id="wifi-qr-ssid-label" style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;margin-right:20px;"></div>
     <div style="font-size:12px;color:#9090b0;margin-bottom:16px;">Scansiona per connetterti</div>
-    <canvas id="wifi-qr-canvas" style="border-radius:12px;"></canvas>
+    <canvas id="wifi-qr-canvas" style="border-radius:12px;max-width:100%;"></canvas>
     <div style="margin-top:16px;">
       <button onclick="wifiCloseQR()" style="padding:12px 28px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
     </div>
@@ -2377,15 +2521,25 @@ html, body { height:100%; margin:0; padding:0; overflow:hidden; }
 </div>
 
 <!-- QR Scanner Modal (OTP + WiFi) -->
-<div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:#000;flex-direction:column;">
-  <div style="display:flex;align-items:center;gap:12px;padding:16px;padding-top:calc(16px + env(safe-area-inset-top,0px));background:rgba(0,0,0,0.8);">
-    <button onclick="qrScannerClose()" style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:20px;cursor:pointer;">✕</button>
-    <div style="color:white;font-weight:700;font-size:15px;" id="qr-scanner-label">Scansiona QR Code</div>
-  </div>
-  <div style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;">
-    <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline autoplay muted></video>
-    <div style="position:absolute;width:220px;height:220px;border:3px solid #6366f1;border-radius:20px;box-shadow:0 0 0 2000px rgba(0,0,0,0.5);"></div>
-    <div style="position:absolute;bottom:40px;color:white;font-size:13px;text-align:center;padding:0 20px;">Inquadra il QR code all'interno del riquadro</div>
+<div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.75);flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:#111;border-radius:24px;overflow:hidden;width:360px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:#1a1a1a;">
+      <div style="color:white;font-weight:700;font-size:15px;" id="qr-scanner-label">Scansiona QR Code</div>
+      <button onclick="qrScannerClose()" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <!-- Camera -->
+    <div style="position:relative;width:360px;max-width:95vw;height:300px;overflow:hidden;background:#000;">
+      <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline autoplay muted></video>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+        <div style="width:160px;height:160px;border:3px solid #6366f1;border-radius:16px;box-shadow:0 0 0 1000px rgba(0,0,0,0.45);"></div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="padding:14px 18px;text-align:center;">
+      <div style="color:rgba(255,255,255,0.5);font-size:12px;margin-bottom:12px;">Inquadra il QR code nel riquadro</div>
+      <button onclick="qrScannerClose()" style="width:100%;padding:11px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+    </div>
   </div>
 </div>
 
@@ -2776,18 +2930,18 @@ function logout() {
 
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
-  home:      { title: 'Home',       sub: '', actions: ['customize'] },
-  passwords: { title: 'Password',   sub: '', actions: ['search','add'] },
-  documents: { title: 'Documenti',  sub: '', actions: ['add'] },
-  notes:     { title: 'Note',       sub: '', actions: ['search','add'] },
-  calendar:  { title: 'Calendario', sub: '', actions: ['add'] },
-  otp:       { title: 'OTP / 2FA',  sub: 'Codici TOTP', actions: ['add'] },
-  cards:     { title: 'Carte',      sub: '', actions: ['add'] },
-  wifi:      { title: 'Wi-Fi',      sub: 'Reti salvate', actions: ['add'] },
-  finance:   { title: 'Finanze',    sub: 'IBAN e conti', actions: ['add'] },
-  server:    { title: 'Server / IT',sub: 'SSH, API, credenziali', actions: ['add'] },
-  family:    { title: 'Famiglia',   sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: 'Spesa e acquisti', actions: ['add'] },
+  home:      { title: 'Home',        sub: '', actions: ['customize'] },
+  passwords: { title: 'Password',    sub: '', actions: ['search'] },
+  documents: { title: 'Documenti',   sub: '', actions: [] },
+  notes:     { title: 'Note',        sub: '', actions: ['search'] },
+  calendar:  { title: 'Calendario',  sub: '', actions: [] },
+  otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
+  cards:     { title: 'Carte',       sub: '', actions: [] },
+  wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
+  finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
+  server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
+  family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
 };
 
 function switchTab(tab) {
@@ -2839,6 +2993,23 @@ function switchTab(tab) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item.more-btn')?.classList.add('active');
   }
+
+  // Chiama onOpen del modulo
+  const moduleOpeners = {
+    otp:       () => typeof otpOpen === 'function' && otpOpen(),
+    shopping:  () => typeof shopOpen === 'function' && shopOpen(),
+    wifi:      () => typeof wifiOpen === 'function' && wifiOpen(),
+    passwords: () => typeof pwOpen === 'function' && pwOpen(),
+    notes:     () => typeof noteOpen === 'function' && noteOpen(),
+    cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
+    finance:   () => typeof financeOpen === 'function' && financeOpen(),
+    server:    () => typeof serverOpen === 'function' && serverOpen(),
+    documents: () => typeof docsOpen === 'function' && docsOpen(),
+    calendar:  () => typeof calOpen === 'function' && calOpen(),
+    family:    () => typeof familyOpen === 'function' && familyOpen(),
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+  };
+  moduleOpeners[tab]?.();
 }
 
 function switchTabFromDrawer(tab) {
@@ -2850,12 +3021,20 @@ function renderTopbarActions(actions) {
   const container = document.getElementById('topbar-actions');
   container.innerHTML = '';
 
+  if (HB.currentTab === 'passwords' && actions.includes('search')) {
+    const newBtn = document.createElement('div');
+    newBtn.className = 'topbar-btn accent-btn';
+    newBtn.title = 'Nuova password';
+    newBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    newBtn.onclick = () => pwNewItem();
+    container.appendChild(newBtn);
+  }
   if (actions.includes('search')) {
     const btn = document.createElement('div');
     btn.className = 'topbar-btn';
     btn.title = 'Cerca';
     btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
-    btn.onclick = () => showToast('Ricerca — in arrivo');
+    btn.onclick = () => openGlobalSearch();
     container.appendChild(btn);
   }
   if (actions.includes('customize')) {
@@ -2909,6 +3088,7 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
+  if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
@@ -3300,11 +3480,28 @@ function pdTogglePin(itemId) {
 }
 
 function pwDeleteConfirm(itemId) {
-  if (!confirm('Eliminare questa password?')) return;
-  _pwItems = _pwItems.filter(i => i.id !== itemId);
-  pwSave();
-  pwBackToItems();
-  showToast('Password eliminata');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">🔐</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa password?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_pwd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_pwd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_pwd_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwd_ok').onclick = () => {
+    overlay.remove();
+    _pwItems = _pwItems.filter(i => i.id !== itemId);
+    pwSave();
+    pwBackToItems();
+    showToast('Password eliminata');
+  };
 }
 
 // Copia
@@ -3411,7 +3608,63 @@ async function pwHandleImport(event) {
   event.target.value = '';
 }
 
-function pwNewItem() { showToast('Nuova password — in arrivo'); }
+function pwNewItem() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:90dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = `
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div>
+    <div style="margin-bottom:12px;">
+      <div class="pw-field-label" style="margin-bottom:5px;">Sito / Servizio *</div>
+      <input id="_pw_new_site" type="text" placeholder="es. Google, Amazon, Netflix..." class="pw-field-input" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:12px;">
+      <div class="pw-field-label" style="margin-bottom:5px;">Email / Username</div>
+      <input id="_pw_new_user" type="text" placeholder="es. mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
+    </div>
+    <div style="margin-bottom:12px;">
+      <div class="pw-field-label" style="margin-bottom:5px;">Password *</div>
+      <div style="display:flex;gap:8px;">
+        <input id="_pw_new_pass" type="password" placeholder="Inserisci o genera..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">
+        <button id="_pw_gen_btn" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:18px;cursor:pointer;flex-shrink:0;" title="Genera password">🎲</button>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div class="pw-field-label" style="margin-bottom:5px;">Note</div>
+      <textarea id="_pw_new_note" placeholder="Note opzionali..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button id="_pw_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_pw_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  const siteInp = document.getElementById('_pw_new_site');
+  setTimeout(() => siteInp?.focus(), 100);
+  document.getElementById('_pw_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pw_gen_btn').onclick = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+    let pwd = '';
+    for (let i = 0; i < 16; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+    const inp = document.getElementById('_pw_new_pass');
+    inp.value = pwd; inp.type = 'text';
+  };
+  document.getElementById('_pw_save').onclick = () => {
+    const site = document.getElementById('_pw_new_site')?.value.trim();
+    const user = document.getElementById('_pw_new_user')?.value.trim();
+    const pass = document.getElementById('_pw_new_pass')?.value;
+    const note = document.getElementById('_pw_new_note')?.value.trim();
+    if (!site || !pass) { showToast('Inserisci sito e password'); return; }
+    const newItem = { id: 'pw_' + Date.now(), site, user, pass, note, createdAt: new Date().toISOString() };
+    _pwItems.push(newItem);
+    pwSave();
+    overlay.remove();
+    pwOpen();
+    showToast('✅ Password salvata!');
+  };
+}
 
 // ── AI icon lookup per categorie ────────────────────────────
 const _iconCache = {};
@@ -3821,7 +4074,7 @@ function noteRenderList(q='') {
       ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}</span>
-        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')">🗑</button>
+        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;">🗑</button>
       </div>`;
     list.appendChild(card);
   });
@@ -3880,11 +4133,28 @@ function noteCloseEditor() {
 }
 
 function noteDelete(id) {
-  if (!confirm('Eliminare questa nota?')) return;
-  _notes = _notes.filter(n => n.id !== id);
-  noteSaveAll();
-  noteRenderList('');
-  showToast('Nota eliminata');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">🗑</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_nd_cancel').onclick = () => overlay.remove();
+  document.getElementById('_nd_ok').onclick = () => {
+    overlay.remove();
+    _notes = _notes.filter(n => n.id !== id);
+    noteSaveAll();
+    noteRenderList('');
+    showToast('Nota eliminata');
+  };
 }
 
 // Import note dal backup v11
@@ -4052,9 +4322,29 @@ async function cardsCopyNumber(id) {
 }
 
 function cardsDelete(id) {
-  _cards = _cards.filter(c => c.id !== id);
-  cardsSaveAll(); cardsRender();
-  showToast('Carta rimossa');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">💳</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_cd_cancel').onclick = () => overlay.remove();
+  document.getElementById('_cd_ok').onclick = () => {
+    overlay.remove();
+    // Chiudi il dettaglio se aperto
+    document.getElementById('card-detail-overlay')?.remove();
+    _cards = _cards.filter(c => c.id !== id);
+    cardsSaveAll(); cardsRender();
+    showToast('Carta rimossa');
+  };
 }
 
 // ── Riconoscimento circuito ───────────────────────────────
@@ -5582,7 +5872,21 @@ function shopRenderListTabs() {
     // Tieni premuto per rinominare
     let pt; btn.addEventListener('touchstart', () => { pt = setTimeout(() => shopRenameList(id), 600); });
     btn.addEventListener('touchend', () => clearTimeout(pt));
-    container.appendChild(btn);
+    // Tasto 🗑 accanto alla lista attiva (solo se ci sono più liste)
+    if (id === _shopCurId && Object.keys(_shopLists).length > 1) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:3px;flex-shrink:0;';
+      wrap.appendChild(btn);
+      const del = document.createElement('button');
+      del.textContent = '🗑';
+      del.title = 'Elimina lista';
+      del.style.cssText = 'padding:4px 7px;border-radius:99px;font-size:11px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;';
+      del.onclick = (e) => { e.stopPropagation(); shopDeleteList(id); };
+      wrap.appendChild(del);
+      container.appendChild(wrap);
+    } else {
+      container.appendChild(btn);
+    }
   });
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
@@ -5763,63 +6067,91 @@ function shopRemove(id) {
 function shopClearAll() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);">
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">🗑</div>
     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Svuota lista?</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tutti i prodotti selezionati verranno rimossi.</div>
     <div style="display:flex;gap:8px;">
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="_shopList={};shopSave();shopRenderAll();this.closest('[style]').remove();showToast('Lista svuotata')" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
-    </div>
-  </div>`;
+      <button id="_shop_clear_cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_shop_clear_ok" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
+  document.getElementById('_shop_clear_cancel').onclick = () => overlay.remove();
+  document.getElementById('_shop_clear_ok').onclick = () => {
+    overlay.remove();
+    _shopList = {};
+    if (_shopLists[_shopCurId]) _shopLists[_shopCurId].items = {};
+    shopSave();
+    shopRenderAll();
+    showToast('Lista svuotata');
+  };
 }
 
 function shopNewList() {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
-    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista della spesa</div>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata, ne crei una nuova.</div>
-    <input id="shop-new-name" type="text" placeholder="Nome lista (es. Settimana, Festa...)" value="Spesa"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata.</div>
+    <input id="shop-new-name" type="text" placeholder="es. Settimana, Festa, Farmacia..." value="Spesa"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="shopCreateList(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
-    </div>
-  </div>`;
+      <button id="_snl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_snl_ok" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => { const inp = document.getElementById('shop-new-name'); inp?.focus(); inp?.select(); }, 200);
+  const inp = document.getElementById('shop-new-name');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_snl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_snl_ok').onclick = () => {
+    const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
+    shopSave();
+    const id = 'lst_' + Date.now();
+    _shopLists[id] = { name, items: {} };
+    _shopCurId = id;
+    _shopList = _shopLists[id].items;
+    shopSave();
+    overlay.remove();
+    shopRenderAll();
+    showToast('✅ Lista "' + name + '" creata');
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_snl_ok').click(); });
 }
 
-function shopCreateList(btn) {
-  const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
-  shopSave(); // salva lista corrente
-  const id = 'lst_' + Date.now();
-  _shopLists[id] = { name, items:{} };
-  _shopCurId = id;
-  _shopList  = _shopLists[id].items;
-  shopSave();
-  btn.closest('[style]').remove();
-  shopRenderAll();
-  showToast('✅ Lista "' + name + '" creata');
-}
+function shopCreateList() {} // legacy — non usato
 
 function shopRenameList(id) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
     <div style="font-size:16px;font-weight:800;margin-bottom:14px;">Rinomina lista</div>
-    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name||''}"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name || ''}"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button onclick="shopDeleteList('${id}');this.closest('[style]').remove()" style="padding:13px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="_shopLists['${id}'].name=document.getElementById('shop-rename-inp').value.trim()||_shopLists['${id}'].name;shopSave();shopRenderAll();this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>
-  </div>`;
+      <button id="_srl_del" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑</button>
+      <button id="_srl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_srl_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => { const inp = document.getElementById('shop-rename-inp'); inp?.focus(); inp?.select(); }, 200);
+  const inp = document.getElementById('shop-rename-inp');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_srl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_srl_del').onclick = () => { overlay.remove(); shopDeleteList(id); };
+  document.getElementById('_srl_ok').onclick = () => {
+    const newName = inp?.value.trim();
+    if (newName && _shopLists[id]) _shopLists[id].name = newName;
+    shopSave(); shopRenderAll(); overlay.remove();
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_srl_ok').click(); });
 }
 
 function shopDeleteList(id) {
