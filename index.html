@@ -3608,60 +3608,73 @@ async function pwHandleImport(event) {
 }
 
 function pwNewItem() {
+  if (!_pwCats.length) { showToast('Crea prima una categoria 📁'); return; }
+  const catOpts = _pwCats.map(c =>
+    '<option value="'+c.id+'">'+(c.icon||'📁')+' '+c.name+'</option>'
+  ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
   const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:90dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  box.innerHTML = `
-    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>
-    <div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div>
-    <div style="margin-bottom:12px;">
-      <div class="pw-field-label" style="margin-bottom:5px;">Sito / Servizio *</div>
-      <input id="_pw_new_site" type="text" placeholder="es. Google, Amazon, Netflix..." class="pw-field-input" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
-    </div>
-    <div style="margin-bottom:12px;">
-      <div class="pw-field-label" style="margin-bottom:5px;">Email / Username</div>
-      <input id="_pw_new_user" type="text" placeholder="es. mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
-    </div>
-    <div style="margin-bottom:12px;">
-      <div class="pw-field-label" style="margin-bottom:5px;">Password *</div>
-      <div style="display:flex;gap:8px;">
-        <input id="_pw_new_pass" type="password" placeholder="Inserisci o genera..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">
-        <button id="_pw_gen_btn" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:18px;cursor:pointer;flex-shrink:0;" title="Genera password">🎲</button>
-      </div>
-    </div>
-    <div style="margin-bottom:12px;">
-      <div class="pw-field-label" style="margin-bottom:5px;">Note</div>
-      <textarea id="_pw_new_note" placeholder="Note opzionali..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button id="_pw_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_pw_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>`;
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
+    '<select id="_pwn_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
+    '<input id="_pwn_title" type="text" placeholder="es. Google, Amazon, Netflix..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
+    '<input id="_pwn_url" type="url" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
+    '<input id="_pwn_user" type="text" placeholder="es. mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div>',
+    '<div style="display:flex;gap:8px;">',
+    '<input id="_pwn_pass" type="password" placeholder="Inserisci o genera..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwn_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button>',
+    '<button id="_pwn_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">🎲</button>',
+    '</div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
+    '<input id="_pwn_pin" type="password" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
+    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
+    '<textarea id="_pwn_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_pwn_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_pwn_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>',
+    '</div>'
+  ].join('');
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  const siteInp = document.getElementById('_pw_new_site');
-  setTimeout(() => siteInp?.focus(), 100);
-  document.getElementById('_pw_cancel').onclick = () => overlay.remove();
-  document.getElementById('_pw_gen_btn').onclick = () => {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-    let pwd = '';
-    for (let i = 0; i < 16; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
-    const inp = document.getElementById('_pw_new_pass');
-    inp.value = pwd; inp.type = 'text';
+  setTimeout(() => document.getElementById('_pwn_title')?.focus(), 100);
+  document.getElementById('_pwn_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwn_eye').onclick = () => {
+    const i = document.getElementById('_pwn_pass');
+    i.type = i.type === 'password' ? 'text' : 'password';
   };
-  document.getElementById('_pw_save').onclick = () => {
-    const site = document.getElementById('_pw_new_site')?.value.trim();
-    const user = document.getElementById('_pw_new_user')?.value.trim();
-    const pass = document.getElementById('_pw_new_pass')?.value;
-    const note = document.getElementById('_pw_new_note')?.value.trim();
-    if (!site || !pass) { showToast('Inserisci sito e password'); return; }
-    const newItem = { id: 'pw_' + Date.now(), site, user, pass, note, createdAt: new Date().toISOString() };
-    _pwItems.push(newItem);
+  document.getElementById('_pwn_dice').onclick = () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let p = ''; a.forEach(b => p += c[b % c.length]);
+    const i = document.getElementById('_pwn_pass'); i.value = p; i.type = 'text';
+  };
+  document.getElementById('_pwn_save').onclick = () => {
+    const title = document.getElementById('_pwn_title')?.value.trim();
+    const pass  = document.getElementById('_pwn_pass')?.value;
+    if (!title || !pass) { showToast('Inserisci titolo e password'); return; }
+    _pwItems.push({
+      id: 'pw_' + Date.now(),
+      title,
+      password:  pass,
+      username:  document.getElementById('_pwn_user')?.value.trim() || '',
+      url:       document.getElementById('_pwn_url')?.value.trim() || '',
+      pin:       document.getElementById('_pwn_pin')?.value.trim() || '',
+      notes:     document.getElementById('_pwn_note')?.value.trim() || '',
+      categoryId: document.getElementById('_pwn_cat')?.value,
+      createdAt: new Date().toISOString()
+    });
     pwSave();
     overlay.remove();
-    pwOpen();
-    showToast('✅ Password salvata!');
+    pwShowItems(document.getElementById('_pwn_cat')?.value);
+    showToast('✅ Password salvata');
   };
 }
 
