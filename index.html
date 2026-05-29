@@ -3367,7 +3367,9 @@ function pwShowCats(q='') {
 
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
-  const cats = _pwCats.filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()));
+  const cats = _pwCats
+    .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, 'it'));
   if (!cats.length) {
     grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna categoria trovata</div>';
     return;
@@ -3386,14 +3388,13 @@ function pwRenderCats(q='') {
       <div class="pw-cat-name">${cat.name}</div>
       <div class="pw-cat-badge">${count}</div>
     `;
-    // Tasto elimina categoria
+    // Tasto elimina — sempre visibile, piccolo in alto a destra
     const delBtn = document.createElement('button');
-    delBtn.textContent = '✕';
+    delBtn.innerHTML = '✕';
     delBtn.title = 'Elimina categoria';
-    delBtn.style.cssText = 'position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(239,68,68,0.15);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;opacity:0;transition:opacity 0.15s;';
-    delBtn.onclick = (e) => { e.stopPropagation(); pwDeleteCategory(cat.id, cat.name, count); };
-    div.addEventListener('mouseenter', () => delBtn.style.opacity = '1');
-    div.addEventListener('mouseleave', () => delBtn.style.opacity = '0');
+    delBtn.style.cssText = 'position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(239,68,68,0.18);color:#ef4444;font-size:10px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;';
+    const catId = cat.id; const catName = cat.name; const catCount = count;
+    delBtn.addEventListener('click', function(e) { e.stopPropagation(); e.preventDefault(); pwDeleteCategory(catId, catName, catCount); });
     div.appendChild(delBtn);
     grid.appendChild(div);
   });
