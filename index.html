@@ -775,21 +775,12 @@ html, body {
   border-radius: 12px; padding: 10px 14px;
 }
 .pw-cat-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 14px 8px;
-  border-radius: 14px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.15s;
-  min-height: 90px;
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.15s; margin-bottom: 8px;
+  -webkit-tap-highlight-color: transparent;
 }
-.pw-cat-tile:hover { background: var(--bg3); }
 .pw-cat-tile:active { transform: scale(0.98); }
 .pw-cat-icon {
   width: 44px; height: 44px; border-radius: 14px;
@@ -1015,16 +1006,9 @@ html, body {
 }
 /* QR Modal */
 #wifi-qr-modal {
-  position: fixed !important;
-  top: 0 !important; left: 0 !important;
-  right: 0 !important; bottom: 0 !important;
-  width: 100vw; height: 100dvh;
-  z-index: 9500;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(10px);
-  display: none;
-  align-items: center !important;
-  justify-content: center !important;
+  position: fixed; inset: 0; z-index: 9000;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  display: none; align-items: center; justify-content: center;
 }
 #wifi-qr-modal.open { display: flex; }
 
@@ -1247,639 +1231,42 @@ html, body {
   .section-title { font-size: 32px; }
 }
 
-/* ── v13: Solo desktop — mobile da aggiungere dopo ── */
-#bottombar, #bottom-more-popup, .nav-item, #more-drawer { display: none !important; }
+/* ══════════════════════════════════════════════════════
+   LAYOUT OVERRIDE v13
+══════════════════════════════════════════════════════ */
+html, body { height:100%; margin:0; padding:0; overflow:hidden; }
+.app-layout { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
+.app-main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
+#topbar { position:sticky !important; top:0 !important; left:auto !important;
+  right:auto !important; width:100% !important; flex-shrink:0; z-index:10 !important; }
+#tab-container { flex:1; overflow:hidden; position:relative; min-height:0; }
+.tab-panel { position:absolute !important; inset:0 !important; overflow-y:auto !important;
+  opacity:0; pointer-events:none; transition:opacity 0.18s; background:var(--bg); }
+.tab-panel.active { opacity:1 !important; pointer-events:auto !important; }
+#bottombar { position:relative !important; flex-shrink:0; }
 
-/* Sidebar sempre visibile */
-#sidebar { display: flex !important; }
-
-/* Layout flex row */
-.app-layout, #app { display: flex !important; flex-direction: row !important; height: 100dvh !important; }
-.app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
-#tab-container { flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; }
-
-/* Tab panel: block su desktop */
-.tab-panel { position: absolute !important; inset: 0 !important; overflow-y: auto !important;
-  opacity: 0; pointer-events: none; transition: opacity 0.18s; background: var(--bg); }
-.tab-panel.active { opacity: 1 !important; pointer-events: auto !important; }
-
-/* Topbar sticky */
-#topbar { position: sticky !important; top: 0 !important; left: auto !important;
-  right: auto !important; width: 100% !important; flex-shrink: 0; }
-
-/* Accordion testo visibile */
-.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
-
-/* ── Fix topbar: NON fixed, dentro app-main ── */
-#topbar {
-  position: sticky !important;
-  top: 0 !important;
-  left: auto !important;
-  right: auto !important;
-  width: 100% !important;
-  z-index: 10 !important;
+@media (min-width:900px) {
+  .app-layout { flex-direction:row !important; }
+  #sidebar { display:flex !important; width:220px !important; flex-shrink:0;
+    height:100dvh; overflow-y:auto; flex-direction:column; }
+  .app-main { flex:1; min-width:0; height:100dvh; }
+  #topbar { position:sticky !important; top:0 !important; }
+  #bottombar, #bottom-more-popup { display:none !important; }
+  .tab-inner { padding:24px 28px 40px; }
+}
+@media (max-width:899px) {
+  #sidebar { display:none !important; }
+  #bottombar { display:flex !important; }
 }
 
-.pw-cats-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, 1fr) !important;
-  gap: 10px;
-  padding: 12px 14px;
-}
-@media (max-width: 480px) {
-  .pw-cats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-}
-
-/* Colori ciclici categorie password */
-.pw-cat-tile:nth-child(6n+1) .pw-cat-icon-wrap { background: rgba(99,102,241,0.12); border-color: rgba(99,102,241,0.25); }
-.pw-cat-tile:nth-child(6n+2) .pw-cat-icon-wrap { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.25); }
-.pw-cat-tile:nth-child(6n+3) .pw-cat-icon-wrap { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.25); }
-.pw-cat-tile:nth-child(6n+4) .pw-cat-icon-wrap { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.25); }
-.pw-cat-tile:nth-child(6n+5) .pw-cat-icon-wrap { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.25); }
-.pw-cat-tile:nth-child(6n+6) .pw-cat-icon-wrap { background: rgba(6,182,212,0.12); border-color: rgba(6,182,212,0.25); }
-
-/* ══ v9.1 — Category Grid ══════════════════════════════════ */
-        #hb-cat-grid {
-            position: fixed; inset: 0; z-index: 750;
-            background: var(--viewer-bg);
-            display: none; flex-direction: column;
-        }
-        #hb-cat-grid.open { display: flex; }
-
-        .cat-tile {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            gap: 10px; padding: 20px 12px;
-            border-radius: 20px; cursor: pointer;
-            border: 1px solid var(--border-color);
-            background: var(--card-bg);
-            transition: all 0.15s;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 120px;
-        }
-        .cat-tile:active { transform: scale(0.95); }
-
-        
+/* Fix accordion testo */
+.shop-accordion-header, .shop-accordion-header * { color:var(--text) !important; }
+/* Fix scanner QR */
+#qr-scanner-modal { position:fixed !important; inset:0; z-index:9500; }
+#wifi-qr-modal { position:fixed !important; inset:0; z-index:9500; }
+#search-overlay.open { display:flex !important; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
-function shopAddCustom() {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
-  overlay.innerHTML = `
-    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
-      <div style="font-size:17px;font-weight:800;margin-bottom:16px;">➕ Aggiungi prodotto</div>
-      <div style="margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Nome prodotto</div>
-        <input id="shop-custom-name" type="text" placeholder="es. Prosciutto crudo, Latte intero..." autocomplete="off"
-          style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
-      </div>
-      <div style="margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Emoji (opzionale)</div>
-        <input id="shop-custom-icon" type="text" placeholder="🛍️" maxlength="2"
-          style="width:80px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;outline:none;text-align:center;">
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('[style]').remove()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-        <button onclick="shopConfirmCustom(this)" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi alla lista</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('shop-custom-name')?.focus(), 100);
-  document.getElementById('shop-custom-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') overlay.querySelector('button:last-child').click();
-  });
-}
-
-function shopConfirmCustom(btn) {
-  const name = document.getElementById('shop-custom-name')?.value.trim();
-  const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
-  if (!name) { showToast('Inserisci il nome del prodotto'); return; }
-  const id = 'custom_' + Date.now();
-  _shopList[id] = { name, icon, qty: 1 };
-  shopSave();
-  btn.closest('[style]').remove();
-  shopRenderAll();
-  showToast('✅ ' + name + ' aggiunto!');
-}
-
-function wifiShowAdd() {
-  document.getElementById('wifi-view-list').style.display = 'none';
-  document.getElementById('wifi-view-add').style.display  = 'flex';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuova Rete';
-  document.getElementById('wifi-add-ssid').value = '';
-  document.getElementById('wifi-add-pw').value = '';
-  _wifiSec = 'WPA';
-  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.sec === 'WPA');
-  });
-}
-function wifiDelete(id) {
-  const net = _wifiNets.find(n => n.id === id);
-  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
-  _wifiNets = _wifiNets.filter(n => n.id !== id);
-  wifiSaveAll(); wifiRender();
-  showToast('Rete rimossa');
-}
-function otpShowAdd() {
-  document.getElementById('otp-view-list').style.display = 'none';
-  document.getElementById('otp-view-add').style.display  = 'flex';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuovo Account';
-  if (_otpTimer) clearInterval(_otpTimer);
-  // Reset form
-  document.getElementById('otp-add-name').value = '';
-  document.getElementById('otp-add-user').value = '';
-  document.getElementById('otp-add-secret').value = '';
-  _otpIcon = '🔐';
-  document.querySelectorAll('.otp-icon-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.icon === '🔐');
-  });
-}
-function otpShowList(q='') {
-  document.getElementById('otp-view-list').style.display = 'flex';
-  document.getElementById('otp-view-add').style.display  = 'none';
-  document.getElementById('topbar-back').classList.remove('visible');
-  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
-  otpRenderList(q);
-  otpStartUpdater();
-}
-function otpCopy(id) {
-  const acc = _otpAccounts.find(a => a.id === id);
-  if (!acc) return;
-  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
-  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
-  catch(e) { showToast('Copia non disponibile'); }
-}
-function otpScanQR() {
-  qrScannerOpen('Scansiona QR 2FA', (data) => {
-    const parsed = qrParseOTP(data);
-    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
-    document.getElementById('otp-add-name').value   = parsed.name;
-    document.getElementById('otp-add-user').value   = parsed.user;
-    document.getElementById('otp-add-secret').value = parsed.secret;
-    showToast('✅ QR letto — verifica i dati e salva');
-  });
-}
-
-function cardsSearch(q) {
-  const list = document.getElementById('cards-list');
-  if (!list) return;
-  if (!q.trim()) { cardsRender(); return; }
-  const ql = q.toLowerCase();
-  const filtered = _cards.filter(c =>
-    (c.holder||'').toLowerCase().includes(ql) ||
-    (c.number||'').replace(/\s/g,'').includes(ql) ||
-    (c.bank||'').toLowerCase().includes(ql) ||
-    (c.type||'').toLowerCase().includes(ql)
-  );
-  const orig = _cards;
-  _cards = filtered;
-  cardsRender();
-  _cards = orig;
-}
-
-
-// ═══════════════════════════════════════════════════════════
-//  PASSWORD — Nuova Categoria + Form Aggiungi/Modifica
-// ═══════════════════════════════════════════════════════════
-
-function pwNewCategory() {
-  const ICONS = ['folder','lock','credit-card','bank','mail','cloud','home','laptop',
-                 'globe','shield','phone','key','user','building','server','scroll',
-                 'heart','graduation','briefcase','tv'];
-  const EMO   = ['📁','🔐','💳','🏦','📧','☁️','🏠','💻','🌐','🛡️',
-                 '📱','🔑','👤','🏢','🖥️','📜','❤️','🎓','💼','📺',
-                 '🍽️','📹','🔔','🔗','💾','🎮','✈️','🎵','⚙️','🛒'];
-  window._pwNewCatIcon = '📁';
-
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  const iconBtns = EMO.map(ic =>
-    '<button data-ic="'+ic+'" onclick="pwPickCatIcon(this,''+ic+'')" style="width:40px;height:40px;border-radius:10px;border:2px solid '+(ic==='📁'?'var(--accent)':'var(--border)')+';background:'+(ic==='📁'?'var(--accent-bg)':'var(--surface)')+';font-size:20px;cursor:pointer;">'+ic+'</button>'
-  ).join('');
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="font-size:18px;font-weight:800;margin-bottom:18px;">Nuova Categoria</div><div style="margin-bottom:14px;"><div class="pw-field-label" style="margin-bottom:6px;">Nome *</div><input id="_cat_name" type="text" placeholder="es. Banca, Lavoro, Social..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:16px;"><div class="pw-field-label" style="margin-bottom:8px;">Icona</div><div id="_cat_icons" style="display:flex;flex-wrap:wrap;gap:8px;">'+iconBtns+'</div></div><div style="display:flex;gap:10px;"><button id="_cat_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_cat_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button></div>';
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('_cat_name')?.focus(), 100);
-  document.getElementById('_cat_cancel').onclick = () => overlay.remove();
-  document.getElementById('_cat_save').onclick = () => {
-    const name = document.getElementById('_cat_name')?.value.trim();
-    if (!name) { showToast('Inserisci il nome'); return; }
-    _pwCats.push({ id: 'cat_'+Date.now(), name, icon: window._pwNewCatIcon });
-    pwSave(); overlay.remove(); pwShowCats();
-    showToast('Categoria creata');
-  };
-  document.getElementById('_cat_name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('_cat_save').click(); });
-}
-
-function pwPickCatIcon(btn, icon) {
-  window._pwNewCatIcon = icon;
-  document.querySelectorAll('#_cat_icons button').forEach(b => {
-    const a = b.dataset.ic === icon;
-    b.style.border = a ? '2px solid var(--accent)' : '2px solid var(--border)';
-    b.style.background = a ? 'var(--accent-bg)' : 'var(--surface)';
-  });
-}
-
-function pwEditItem(itemId) { pwShowAddForm(_pwItems.find(i=>i.id===itemId)); }
-
-function pwShowAddForm(editItem) {
-  const isEdit = !!editItem;
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  const catOpts = _pwCats.map(c=>'<option value="'+c.id+'"'+((editItem?.categoryId||_pwCurCat)===c.id?' selected':'')+'>'+c.icon+' '+c.name+'</option>').join('');
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;"><div style="font-size:18px;font-weight:800;">'+(isEdit?'Modifica Password':'Nuova Password')+'</div>'+(isEdit?'<button id="_pw_del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>':'')+'</div><div style="margin-bottom:12px;"><div class="pw-field-label" style="margin-bottom:5px;">Categoria</div><select id="_pw_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;">'+catOpts+'</select></div><div style="margin-bottom:12px;"><div class="pw-field-label" style="margin-bottom:5px;">Titolo / Sito *</div><input id="_pw_title" type="text" value="'+(editItem?.title||'')+'" placeholder="es. Google, Amazon..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div class="pw-field-label" style="margin-bottom:5px;">URL</div><input id="_pw_url" type="url" value="'+(editItem?.url||'')+'" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div class="pw-field-label" style="margin-bottom:5px;">Email / Username</div><input id="_pw_user" type="text" value="'+(editItem?.username||'')+'" placeholder="es. mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div class="pw-field-label" style="margin-bottom:5px;">Password *</div><div style="display:flex;gap:8px;"><input id="_pw_pass" type="password" value="'+(editItem?.password||'')+'" placeholder="Password..." autocomplete="new-password" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"><button id="_pw_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button><button id="_pw_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div><div id="_pw_str" style="margin-top:5px;font-size:11px;"></div></div><div style="margin-bottom:16px;"><div class="pw-field-label" style="margin-bottom:5px;">Note</div><textarea id="_pw_note" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;">'+(editItem?.notes||'')+'</textarea></div><div style="display:flex;gap:10px;"><button id="_pw_fc" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pw_fs" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">'+(isEdit?'Salva Modifiche':'Salva')+'</button></div>';
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('_pw_title')?.focus(), 100);
-  if (isEdit) document.getElementById('_pw_del').onclick = () => { overlay.remove(); pwDeleteConfirm(editItem.id); };
-  document.getElementById('_pw_fc').onclick = () => overlay.remove();
-  document.getElementById('_pw_eye').onclick = () => { const i=document.getElementById('_pw_pass'); i.type=i.type==='password'?'text':'password'; };
-  document.getElementById('_pw_dice').onclick = () => {
-    const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
-    const a=new Uint8Array(16); crypto.getRandomValues(a);
-    let p=''; a.forEach(b=>p+=c[b%c.length]);
-    const i=document.getElementById('_pw_pass'); i.value=p; i.type='text'; pwStrength(p);
-  };
-  document.getElementById('_pw_pass').addEventListener('input', e => pwStrength(e.target.value));
-  if (editItem?.password) pwStrength(editItem.password);
-  document.getElementById('_pw_fs').onclick = () => {
-    const title=document.getElementById('_pw_title')?.value.trim();
-    const pass=document.getElementById('_pw_pass')?.value;
-    const catId=document.getElementById('_pw_cat')?.value;
-    if (!title||!pass) { showToast('Inserisci titolo e password'); return; }
-    const obj = { id: isEdit?editItem.id:'pw_'+Date.now(), title, password:pass,
-      username: document.getElementById('_pw_user')?.value.trim(),
-      url: document.getElementById('_pw_url')?.value.trim(),
-      notes: document.getElementById('_pw_note')?.value.trim(),
-      categoryId: catId||_pwCurCat,
-      createdAt: editItem?.createdAt||new Date().toISOString(),
-      updatedAt: new Date().toISOString() };
-    if (isEdit) { const i=_pwItems.findIndex(x=>x.id===editItem.id); if(i>-1) _pwItems[i]=obj; }
-    else _pwItems.push(obj);
-    pwSave(); overlay.remove();
-    pwShowItems(catId||_pwCurCat);
-    showToast(isEdit?'Password aggiornata':'Password salvata');
-  };
-}
-
-function pwStrength(pwd) {
-  const el=document.getElementById('_pw_str'); if(!el||!pwd) return;
-  let s=0;
-  if(pwd.length>=8)s++; if(pwd.length>=12)s++;
-  if(/[A-Z]/.test(pwd))s++; if(/[0-9]/.test(pwd))s++; if(/[^a-zA-Z0-9]/.test(pwd))s++;
-  const labels=['','Debole','Debole','Media','Forte','Molto forte'];
-  const colors=['','#ef4444','#f97316','#eab308','#22c55e','#16a34a'];
-  el.textContent=labels[s]||''; el.style.color=colors[s]||'';
-}
-
-
-function pwFabInit() {
-  const btn  = document.getElementById('pw-fab-btn');
-  const menu = document.getElementById('pw-fab-menu');
-  const np   = document.getElementById('pw-fab-newpw');
-  const nc   = document.getElementById('pw-fab-newcat');
-  if (!btn || btn._pwFabReady) return;
-  btn._pwFabReady = true;
-  btn.onclick = (e) => {
-    e.stopPropagation();
-    const open = menu.style.display !== 'none';
-    menu.style.display = open ? 'none' : 'block';
-    if (!open) {
-      setTimeout(() => document.addEventListener('click', function h(ev) {
-        if (!document.getElementById('pw-fab')?.contains(ev.target)) {
-          menu.style.display = 'none';
-          document.removeEventListener('click', h);
-        }
-      }), 100);
-    }
-  };
-  np.onclick = () => { menu.style.display='none'; pwNewItem(); };
-  nc.onclick = () => { menu.style.display='none'; pwNewCategory(); };
-}
-
-
-
-// ── Password v11 ──
-function hbCatGridOpen() {
-            if (typeof hbV11Init === 'function') hbV11Init();
-            const el = document.getElementById('hb-cat-grid');
-            if (el) el.classList.add('open');
-            HB_NAV.push('catgrid', hbCatGridClose);
-            // Reset ricerca
-            const si = document.getElementById('hb-cat-search-inp');
-            if (si) si.value = '';
-            hbRenderCatGrid();
-        }
-
-function hbCatGridClose(fromPopstate) {
-            const el = document.getElementById('hb-cat-grid');
-            if (el) el.classList.remove('open');
-            if (!fromPopstate) { history.back(); return; }
-            hbHomeOpen();
-            hbV11Init();
-        }
-
-function hbFilterCatGrid(query) {
-            const tiles = document.querySelectorAll('#hb-cat-inner .cat-tile');
-            const q = (query||'').toLowerCase().trim();
-            tiles.forEach(tile => {
-                const name = tile.querySelector('p')?.textContent?.toLowerCase() || '';
-                tile.style.display = (!q || name.includes(q)) ? '' : 'none';
-            });
-        }
-
-function renderCategories() {
-            const nav = document.getElementById('sidebar-nav');
-            nav.innerHTML = '';
-            const catQuery = (document.getElementById('search-input')?.value || '').toLowerCase();
-            const sortedCats = [...state.categories]
-                .filter(cat => {
-                    if (!catQuery) return true;
-                    if (cat.name.toLowerCase().includes(catQuery)) return true;
-                    return state.items.some(item => item.categoryId === cat.id && (
-                        item.title.toLowerCase().includes(catQuery) ||
-                        item.username.toLowerCase().includes(catQuery) ||
-                        (item.notes && item.notes.toLowerCase().includes(catQuery))
-                    ));
-                })
-                .sort((a, b) => a.name.localeCompare(b.name));
-            if (sortedCats.length === 0) {
-                nav.innerHTML = '<div class="text-center py-6 opacity-30 text-[9px] font-black uppercase tracking-widest" style="color:var(--sidebar-text);">Nessuna categoria</div>';
-                lucide.createIcons(); return;
-            }
-
-            sortedCats.forEach(cat => {
-                const isActive = state.currentCategoryId === cat.id;
-                const div = document.createElement('div');
-                div.className = `group flex items-center justify-between px-5 py-4 rounded-2xl cursor-pointer transition-all ${isActive ? 'sidebar-item-active shadow-sm' : 'hover:bg-black/5'}`;
-                div.style.color = isActive ? 'var(--primary)' : 'var(--sidebar-text)';
-                div.onclick = (e) => { if(!e.target.closest('.ctx-trigger')) selectCategory(cat.id); };
-                const catCount = state.items.filter(i => i.categoryId === cat.id).length;
-                const catSynced = typeof isCatSynced === 'function' ? isCatSynced(cat.id) : true;
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3 overflow-hidden" style="min-width:0;flex:1;">
-                        <i data-lucide="${cat.icon || 'folder'}" class="w-4 h-4 opacity-70" style="flex-shrink:0;"></i>
-                        <span class="font-black uppercase tracking-widest truncate" style="flex:1;min-width:0;">${cat.name}</span>
-                        ${!catSynced ? '<span style="font-size:8px;font-weight:900;text-transform:uppercase;padding:2px 5px;border-radius:4px;background:#fee2e2;color:#dc2626;flex-shrink:0;">No Sync</span>' : ''}
-                        ${catCount > 0 ? `<span style="
-                            flex-shrink:0;
-                            min-width:20px;
-                            height:20px;
-                            padding:0 6px;
-                            border-radius:999px;
-                            background:${isActive ? 'var(--primary)' : 'color-mix(in srgb, var(--sidebar-text), transparent 78%)'};
-                            color:${isActive ? 'white' : 'var(--sidebar-text)'};
-                            font-size:10px;
-                            font-weight:900;
-                            display:inline-flex;
-                            align-items:center;
-                            justify-content:center;
-                            letter-spacing:0;
-                            transition:all 0.2s;
-                        ">${catCount}</span>` : ''}
-                    </div>
-                    <button class="ctx-trigger opacity-0 group-hover:opacity-100 p-1.5 hover:bg-black/10 rounded-lg transition-all" style="flex-shrink:0;" onclick="openCtxMenu(event, '${cat.id}')">
-                        <i data-lucide="more-horizontal" class="w-4 h-4"></i>
-                    </button>
-                `;
-                nav.appendChild(div);
-            });
-            lucide.createIcons();
-        }
-
-function hbOpenCatItems(catId, catName) {
-            state.currentCategoryId = catId;
-            _currentHbCatId = catId;
-            // Assicura nav v11 visibile
-            if (typeof hbV11Init === 'function') hbV11Init();
-            // Su mobile con viewport stretto → 1 colonna
-            if (window.innerWidth <= 420) {
-                setTimeout(() => {
-                    const g = document.getElementById('hb-pw-cards-grid');
-                    if (g) g.style.gridTemplateColumns = '1fr';
-                }, 30);
-            }
-            const pw = document.getElementById('hb-pw-cards');
-            if (!pw) return;
-            // Reset search
-            const searchBar = document.getElementById('hb-pw-search-bar');
-            const searchInp = document.getElementById('hb-pw-search-inp');
-            if (searchBar) searchBar.style.display = 'none';
-            if (searchInp) searchInp.value = '';
-            // Titolo
-            const titleEl = document.getElementById('hb-pw-cards-title');
-            if (titleEl) titleEl.textContent = catName;
-            // Mostra panel sopra tutto
-            pw.style.cssText = 'display:flex;position:fixed;inset:0;z-index:900;background:var(--viewer-bg);flex-direction:column;';
-            HB_NAV.push('pwcards', hbPwCardsClose);
-            hbRenderPwCards(catId, '');
-        }
-
-function hbOpenPasswordGrid() { hbHomeGo('cats'); }
-
-function hbPwCardOpen(itemId) {
-            if (typeof hbV11Init === 'function') hbV11Init();
-            // Chiudi TUTTI gli overlay — inclusa la home che copre il viewer
-            hbHomeClose();
-            const pw = document.getElementById('hb-pw-cards');
-            if (pw) pw.style.display = 'none';
-            const cg = document.getElementById('hb-cat-grid');
-            if (cg) cg.classList.remove('open');
-            HB_NAV.clear();
-
-            // Ripristina nav mobile
-            const nav = document.getElementById('hb-nav');
-            if (nav) nav.style.display = '';
-
-            // Seleziona e mostra il dettaglio
-            if (typeof selectItem === 'function') selectItem(itemId);
-            if (hbIsMobile() && typeof hbShowPanel === 'function') {
-                hbShowPanel('detail');
-            }
-        }
-
-function hbPwCardsClose(fromPopstate) {
-            const pw = document.getElementById('hb-pw-cards');
-            if (pw) {
-                pw.style.display = 'none';
-                pw.style.cssText = 'display:none;position:fixed;inset:0;z-index:900;background:var(--viewer-bg);flex-direction:column;';
-            }
-            if (!fromPopstate) { history.back(); return; }
-        }
-
-function hbEditCat(catId, catName, catIcon) {
-            _hbEditingCatId = catId;
-            const modal   = document.getElementById('hb-cat-edit-modal');
-            const nameInp = document.getElementById('cat-edit-name-inp');
-            const iconInp = document.getElementById('cat-edit-icon-inp');
-            const preview = document.getElementById('cat-edit-icon-preview');
-            if (!modal) { showToast('Ricarica la pagina', false); return; }
-            if (nameInp) nameInp.value = catName || '';
-            if (iconInp) iconInp.value = catIcon || '📁';
-            if (preview) preview.textContent = catIcon || '📁';
-            modal.style.display = 'flex';
-        }
-
-function hbDeleteCat(catId, catName, evt) {
-            if (evt) evt.stopPropagation();
-            const count = state.items.filter(i => i.categoryId === catId).length;
-            const msg = count > 0
-                ? 'Eliminare la categoria "' + catName + '" e le sue ' + count + ' password?'
-                : 'Eliminare la categoria "' + catName + '"?';
-            if (!confirm(msg)) return;
-            state.items      = state.items.filter(i => i.categoryId !== catId);
-            state.categories = state.categories.filter(c => c.id !== catId);
-            if (state.currentCategoryId === catId) state.currentCategoryId = state.categories[0]?.id || null;
-            saveState();
-            renderCategories();
-            renderItems();
-            hbRenderCatGrid();
-            showToast('Categoria eliminata');
-        }
-
-function addCategory() { openCatModal('add'); }
-
-function deleteCategory(id) {
-            if(state.categories.length === 1) return;
-            if(confirm("Eliminare definitivamente questa categoria e le relative password?")) {
-                state.categories = state.categories.filter(c => c.id !== id);
-                state.items = state.items.filter(i => i.categoryId !== id);
-                if(state.currentCategoryId === id) state.currentCategoryId = state.categories[0].id;
-                saveState(); renderCategories(); renderItems(); resetViewer();
-            }
-        }
-
-function deleteItem(id) {
-            if(confirm("Eliminare questa password definitivamente?")) {
-                state.items = state.items.filter(i => i.id !== id);
-                state.activeItemId = null;
-                saveState();
-                renderItems();
-                resetViewer();
-            }
-        }
-
-function generatePassword(length = 16, useUpper = true, useNumbers = true, useSymbols = true) {
-            const lower   = 'abcdefghijkmnopqrstuvwxyz';
-            const upper   = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-            const numbers = '23456789';
-            const symbols = '!@#$%&*?+=-_';
-            let charset = lower;
-            if (useUpper)   charset += upper;
-            if (useNumbers) charset += numbers;
-            if (useSymbols) charset += symbols;
-            const arr = new Uint32Array(length);
-            crypto.getRandomValues(arr);
-            return Array.from(arr).map(n => charset[n % charset.length]).join('');
-        }
-
-function getCatSvgIcon(catName, color, lucideIcon) {
-            // Prima prova con l icona Lucide della categoria (quella vera)
-            if (lucideIcon && lucideIcon !== 'folder') {
-                const svgPath = LUCIDE_TO_SVG[lucideIcon] || LUCIDE_TO_SVG['default'];
-                return '<svg viewBox="0 0 24 24" style="width:34px;height:34px;stroke:'+color+';fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;">'+svgPath+'</svg>';
-            }
-            // Poi prova per keyword nel nome
-            const name = (catName||'').toLowerCase();
-            for (const entry of CAT_SVG_MAP) {
-                if (entry.keys.some(k => name.includes(k))) {
-                    return '<svg viewBox="0 0 24 24" style="width:34px;height:34px;stroke:'+color+';fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;">'+entry.svg+'</svg>';
-                }
-            }
-            // Fallback: lettera iniziale
-            const letter = (catName||'?')[0].toUpperCase();
-            return '<span style="font-size:30px;font-weight:900;color:'+color+';font-style:italic;line-height:1;font-family:system-ui,sans-serif;">'+letter+'</span>';
-        }
-
-function encryptVault(pin) {
-            try {
-                const payload = JSON.stringify({ categories: state.categories, items: state.items, settings: state.settings });
-                const salt = crypto.getRandomValues(new Uint8Array(16));
-                const iv   = crypto.getRandomValues(new Uint8Array(12));
-                const key  = await deriveKey(pin, salt);
-                const enc  = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(payload));
-                const buf  = new Uint8Array(16 + 12 + enc.byteLength);
-                buf.set(salt,0); buf.set(iv,16); buf.set(new Uint8Array(enc),28);
-                localStorage.setItem('hb_enc_v6', btoa(String.fromCharCode(...buf)));
-            } catch(e) { console.warn('encryptVault:', e); }
-        }
-
-function decryptVault(pin) {
-            const b64 = localStorage.getItem('hb_enc_v6');
-            if (!b64) return null;
-            try {
-                const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-                const key = await deriveKey(pin, raw.slice(0,16));
-                const dec = await crypto.subtle.decrypt({ name:'AES-GCM', iv:raw.slice(16,28) }, key, raw.slice(28));
-                return JSON.parse(new TextDecoder().decode(dec));
-            } catch(e) { return null; }
-        }
-
-function renderCategories() {
-            const nav = document.getElementById('sidebar-nav');
-            nav.innerHTML = '';
-            const catQuery = (document.getElementById('search-input')?.value || '').toLowerCase();
-            const sortedCats = [...state.categories]
-                .filter(cat => {
-                    if (!catQuery) return true;
-                    if (cat.name.toLowerCase().includes(catQuery)) return true;
-                    return state.items.some(item => item.categoryId === cat.id && (
-                        item.title.toLowerCase().includes(catQuery) ||
-                        item.username.toLowerCase().includes(catQuery) ||
-                        (item.notes && item.notes.toLowerCase().includes(catQuery))
-                    ));
-                })
-                .sort((a, b) => a.name.localeCompare(b.name));
-            if (sortedCats.length === 0) {
-                nav.innerHTML = '<div class="text-center py-6 opacity-30 text-[9px] font-black uppercase tracking-widest" style="color:var(--sidebar-text);">Nessuna categoria</div>';
-                lucide.createIcons(); return;
-            }
-
-            sortedCats.forEach(cat => {
-                const isActive = state.currentCategoryId === cat.id;
-                const div = document.createElement('div');
-                div.className = `group flex items-center justify-between px-5 py-4 rounded-2xl cursor-pointer transition-all ${isActive ? 'sidebar-item-active shadow-sm' : 'hover:bg-black/5'}`;
-                div.style.color = isActive ? 'var(--primary)' : 'var(--sidebar-text)';
-                div.onclick = (e) => { if(!e.target.closest('.ctx-trigger')) selectCategory(cat.id); };
-                const catCount = state.items.filter(i => i.categoryId === cat.id).length;
-                const catSynced = typeof isCatSynced === 'function' ? isCatSynced(cat.id) : true;
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3 overflow-hidden" style="min-width:0;flex:1;">
-                        <i data-lucide="${cat.icon || 'folder'}" class="w-4 h-4 opacity-70" style="flex-shrink:0;"></i>
-                        <span class="font-black uppercase tracking-widest truncate" style="flex:1;min-width:0;">${cat.name}</span>
-                        ${!catSynced ? '<span style="font-size:8px;font-weight:900;text-transform:uppercase;padding:2px 5px;border-radius:4px;background:#fee2e2;color:#dc2626;flex-shrink:0;">No Sync</span>' : ''}
-                        ${catCount > 0 ? `<span style="
-                            flex-shrink:0;
-                            min-width:20px;
-                            height:20px;
-                            padding:0 6px;
-                            border-radius:999px;
-                            background:${isActive ? 'var(--primary)' : 'color-mix(in srgb, var(--sidebar-text), transparent 78%)'};
-                            color:${isActive ? 'white' : 'var(--sidebar-text)'};
-                            font-size:10px;
-                            font-weight:900;
-                            display:inline-flex;
-                            align-items:center;
-                            justify-content:center;
-                            letter-spacing:0;
-                            transition:all 0.2s;
-                        ">${catCount}</span>` : ''}
-                    </div>
-                    <button class="ctx-trigger opacity-0 group-hover:opacity-100 p-1.5 hover:bg-black/10 rounded-lg transition-all" style="flex-shrink:0;" onclick="openCtxMenu(event, '${cat.id}')">
-                        <i data-lucide="more-horizontal" class="w-4 h-4"></i>
-                    </button>
-                `;
-                nav.appendChild(div);
-            });
-            lucide.createIcons();
-        }
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
 <body>
@@ -2172,7 +1559,7 @@ function renderCategories() {
           <div id="home-alerts">
             <div class="alert-item">
               <div class="alert-dot yellow"></div>
-              <div class="alert-text">Benvenuto in HomeBull Pro v12</div>
+              <div class="alert-text">Benvenuto in HomeBull v13</div>
               <div class="alert-time">Ora</div>
             </div>
           </div>
@@ -2183,69 +1570,66 @@ function renderCategories() {
 
     <!-- PASSWORD -->
     <div class="tab-panel" id="panel-passwords">
-<div id="hb-cat-grid">
 
-        <!-- Header -->
-        <div style="padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:1px solid var(--border-color);">
-            <button onclick="hbCatGridClose()" class="hb-cat-back-btn" style="width:40px;height:40px;border-radius:13px;border:1px solid var(--border-color);background:var(--card-bg);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-                <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--main-text);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;"><polyline points="15 18 9 12 15 6"/></svg>
+      <!-- Vista: Lista categorie -->
+      <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 14px 8px;flex-shrink:0;">
+          <div class="pw-search-bar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+          </div>
+        </div>
+        <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+      </div>
+
+      <!-- Vista: Lista password di una categoria -->
+      <div id="pw-view-items" style="display:none;flex-direction:column;height:100%;">
+        <div style="padding:12px 14px 8px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <button onclick="pwBack()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-
-            <div style="flex:1;">
-    <h2 style="font-size:18px;font-weight:900;font-style:italic;text-transform:uppercase;color:var(--main-text);margin:0;">Password</h2>
-                <p id="hb-cat-subtitle" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);margin:2px 0 0;"></p>
+            <div style="flex:1;min-width:0;">
+              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;"></div>
+              <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
             </div>
-
-        </div>
-
-        <!-- Form nuova categoria inline (collassato di default) -->
-        <div id="hb-inline-cat-form" style="display:none;padding:12px 16px;border-bottom:1px solid var(--border-color);background:var(--surface);">
-            <p style="font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin:0 0 8px;">Nuova Categoria</p>
-            <div style="display:flex;gap:6px;margin-bottom:6px;">
-                <input id="hb-new-cat-icon" type="text" maxlength="4" placeholder="📁" value="📁"
-                    style="width:48px;flex-shrink:0;background:var(--input-bg);border:1px solid var(--border-color);border-radius:11px;padding:10px 6px;font-size:18px;text-align:center;color:var(--main-text);outline:none;">
-                <button onclick="hbOpenEmojiPicker(function(e){document.getElementById('hb-new-cat-icon').value=e;})" style="width:38px;flex-shrink:0;border-radius:11px;border:1px solid var(--border-color);background:var(--card-bg);font-size:16px;cursor:pointer;" title="Scegli emoji">😀</button>
-                <input id="hb-new-cat-name" type="text" placeholder="Nome categoria..."
-                    style="flex:1;background:var(--input-bg);border:1px solid var(--border-color);border-radius:11px;padding:10px 13px;font-size:13px;font-weight:700;color:var(--main-text);outline:none;font-family:inherit;"
-                    onkeydown="if(event.key==='Enter')hbSaveInlineCat()">
-                <button onclick="hbSaveInlineCat()" style="padding:10px 14px;border-radius:11px;border:none;background:var(--primary);color:white;font-size:11px;font-weight:900;text-transform:uppercase;cursor:pointer;flex-shrink:0;">Salva</button>
-                <button onclick="document.getElementById('hb-inline-cat-form').style.display='none'" style="width:38px;border-radius:11px;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-muted);font-size:16px;cursor:pointer;flex-shrink:0;">✕</button>
+            <button onclick="pwToggleSearch()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+          </div>
+          <div id="pw-item-search-wrap" style="display:none;">
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input id="pw-item-search" type="text" placeholder="Cerca password..." oninput="pwFilterItems(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
+          </div>
         </div>
+        <div id="pw-items-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 100px;"></div>
+      </div>
 
-        <!-- Cerca nella griglia categorie -->
-        <div style="padding:8px 16px 0;flex-shrink:0;">
-            <div style="position:relative;max-width:600px;margin:0 auto;">
-                <svg viewBox="0 0 24 24" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--text-muted);fill:none;stroke-width:2;pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input id="hb-cat-search-inp" type="text" placeholder="Cerca categoria..."
-                    oninput="hbFilterCatGrid(this.value)"
-                    style="width:100%;box-sizing:border-box;background:var(--input-bg);border:1px solid var(--border-color);border-radius:13px;padding:9px 12px 9px 34px;font-size:13px;font-weight:600;color:var(--main-text);outline:none;font-family:inherit;">
-            </div>
+      <!-- Vista: Dettaglio password -->
+      <div id="pw-view-detail" style="display:none;flex-direction:column;height:100%;">
+        <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+          <button onclick="pwBackToItems()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div id="pw-detail-title" style="flex:1;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
         </div>
+        <div id="pw-detail-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;"></div>
+      </div>
 
-        <!-- Griglia categorie -->
-        <div id="hb-cat-grid-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px 80px;"><div style="max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;" id="hb-cat-inner">
-            <!-- popolato da hbRenderCatGrid() --></div>
+      <!-- Import banner (mostrato se vault vuoto) -->
+      <div id="pw-import-banner" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg);z-index:10;">
+        <div style="text-align:center;padding:32px 24px;max-width:320px;">
+          <div style="font-size:48px;margin-bottom:16px;">🔐</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
+          <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
+          <button onclick="pwImportBackup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
+          <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
+          <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
         </div>
-
-        <!-- FAB Aggiungi con mini dropdown -->
-        <div class="hb-cat-fab" style="position:absolute;bottom:24px;right:20px;z-index:10;">
-            <div id="cat-fab-menu" style="display:none;position:absolute;bottom:64px;right:0;background:var(--modal-bg);border:1px solid var(--border-color);border-radius:16px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.15);min-width:190px;">
-                <button onclick="document.getElementById('cat-fab-menu').style.display='none';hbHomeAdd()" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--main-text);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;">
-                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--primary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Nuova Password
-                </button>
-                <div style="height:1px;background:var(--border-color);margin:0 12px;"></div>
-                <button onclick="document.getElementById('cat-fab-menu').style.display='none';hbShowInlineCatForm()" style="width:100%;display:flex;align-items:center;gap:10px;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--main-text);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:0.06em;">
-                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#10b981;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                    Nuova Categoria
-                </button>
-            </div>
-            <button onclick="var m=document.getElementById('cat-fab-menu');m.style.display=m.style.display==='none'?'block':'none';setTimeout(()=>document.addEventListener('click',function h(e){if(!e.target.closest('#cat-fab-menu')&&!e.target.closest('button[onclick*=cat-fab-menu]')){m.style.display='none';document.removeEventListener('click',h);}},{once:false}),100)"
-                style="width:54px;height:54px;border-radius:18px;border:none;background:var(--primary);color:white;font-size:26px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(79,70,229,0.4);display:flex;align-items:center;justify-content:center;">+</button>
-        </div>
+      </div>
     </div>
-</div>
 
     <!-- DOCUMENTI -->
     <!-- DOCUMENTI -->
@@ -2391,15 +1775,9 @@ function renderCategories() {
         <!-- Vista lista -->
         <div id="note-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-              </div>
-              <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuova
-              </button>
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -2494,15 +1872,9 @@ function renderCategories() {
         <!-- Vista lista OTP -->
         <div id="otp-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-              </div>
-              <button onclick="otpShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Aggiungi
-              </button>
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
           </div>
           <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -2566,19 +1938,7 @@ function renderCategories() {
 
         <!-- Lista carte -->
         <div id="cards-view-list" style="display:flex;flex-direction:column;height:100%;">
-          <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-              </div>
-              <button onclick="cardsShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Aggiungi
-              </button>
-            </div>
-          </div>
-          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 100px;"></div>
         </div>
 
         <!-- Aggiungi carta -->
@@ -3002,11 +2362,10 @@ function renderCategories() {
 
 <!-- QR Code Modal (Wi-Fi) -->
 <div id="wifi-qr-modal" onclick="wifiCloseQR()">
-  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;position:relative;" onclick="event.stopPropagation()">
-    <button onclick="wifiCloseQR()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f5;color:#333;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
-    <div id="wifi-qr-ssid-label" style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;margin-right:20px;"></div>
+  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;" onclick="event.stopPropagation()">
+    <div id="wifi-qr-ssid-label" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;"></div>
     <div style="font-size:12px;color:#9090b0;margin-bottom:16px;">Scansiona per connetterti</div>
-    <canvas id="wifi-qr-canvas" style="border-radius:12px;max-width:100%;"></canvas>
+    <canvas id="wifi-qr-canvas" style="border-radius:12px;"></canvas>
     <div style="margin-top:16px;">
       <button onclick="wifiCloseQR()" style="padding:12px 28px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
     </div>
@@ -3016,19 +2375,16 @@ function renderCategories() {
 <!-- QR Scanner Modal (OTP + WiFi) -->
 <div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.75);flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#111;border-radius:24px;overflow:hidden;width:360px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);">
-    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:#1a1a1a;">
       <div style="color:white;font-weight:700;font-size:15px;" id="qr-scanner-label">Scansiona QR Code</div>
       <button onclick="qrScannerClose()" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
-    <!-- Camera -->
     <div style="position:relative;width:360px;max-width:95vw;height:300px;overflow:hidden;background:#000;">
       <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline autoplay muted></video>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
         <div style="width:160px;height:160px;border:3px solid #6366f1;border-radius:16px;box-shadow:0 0 0 1000px rgba(0,0,0,0.45);"></div>
       </div>
     </div>
-    <!-- Footer -->
     <div style="padding:14px 18px;text-align:center;">
       <div style="color:rgba(255,255,255,0.5);font-size:12px;margin-bottom:12px;">Inquadra il QR code nel riquadro</div>
       <button onclick="qrScannerClose()" style="width:100%;padding:11px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
@@ -3423,18 +2779,18 @@ function logout() {
 
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
-  home:      { title: 'Home',        sub: '', actions: ['customize'] },
-  passwords: { title: 'Password',    sub: '', actions: ['search'] },
-  documents: { title: 'Documenti',   sub: '', actions: [] },
-  notes:     { title: 'Note',        sub: '', actions: ['search'] },
-  calendar:  { title: 'Calendario',  sub: '', actions: [] },
-  otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
-  cards:     { title: 'Carte',       sub: '', actions: [] },
-  wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
-  finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
-  server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
-  family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
+  home:      { title: 'Home',       sub: '', actions: ['customize'] },
+  passwords: { title: 'Password',   sub: '', actions: ['search','add'] },
+  documents: { title: 'Documenti',  sub: '', actions: ['add'] },
+  notes:     { title: 'Note',       sub: '', actions: ['search','add'] },
+  calendar:  { title: 'Calendario', sub: '', actions: ['add'] },
+  otp:       { title: 'OTP / 2FA',  sub: 'Codici TOTP', actions: ['add'] },
+  cards:     { title: 'Carte',      sub: '', actions: ['add'] },
+  wifi:      { title: 'Wi-Fi',      sub: 'Reti salvate', actions: ['add'] },
+  finance:   { title: 'Finanze',    sub: 'IBAN e conti', actions: ['add'] },
+  server:    { title: 'Server / IT',sub: 'SSH, API, credenziali', actions: ['add'] },
+  family:    { title: 'Famiglia',   sub: 'Vault condiviso', actions: [] },
+  shopping:  { title: 'Lista Spesa', sub: 'Spesa e acquisti', actions: ['add'] },
 };
 
 function switchTab(tab) {
@@ -3486,25 +2842,6 @@ function switchTab(tab) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item.more-btn')?.classList.add('active');
   }
-
-  // Chiama onOpen del modulo
-  const moduleOpeners = {
-    otp:       () => typeof otpOpen === 'function' && otpOpen(),
-    shopping:  () => typeof shopOpen === 'function' && shopOpen(),
-    wifi:      () => typeof wifiOpen === 'function' && wifiOpen(),
-    passwords: () => typeof pwOpen === 'function' && pwOpen(),
-    notes:     () => typeof noteOpen === 'function' && noteOpen(),
-    cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
-    finance:   () => typeof financeOpen === 'function' && financeOpen(),
-    server:    () => typeof serverOpen === 'function' && serverOpen(),
-    documents: () => typeof docsOpen === 'function' && docsOpen(),
-    calendar:  () => typeof calOpen === 'function' && calOpen(),
-    family:    () => typeof familyOpen === 'function' && familyOpen(),
-    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
-  };
-  moduleOpeners[tab]?.();
-  // Nascondi FAB password se non siamo in passwords
-  // FAB password — gestito da CSS visibility basata su panel attivo
 }
 
 function switchTabFromDrawer(tab) {
@@ -3517,12 +2854,12 @@ function renderTopbarActions(actions) {
   container.innerHTML = '';
 
   if (HB.currentTab === 'passwords' && actions.includes('search')) {
-    const newBtn = document.createElement('div');
-    newBtn.className = 'topbar-btn accent-btn';
-    newBtn.title = 'Nuova password';
-    newBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-    newBtn.onclick = () => pwNewItem();
-    container.appendChild(newBtn);
+    const nb = document.createElement('button');
+    nb.className = 'topbar-btn accent-btn';
+    nb.title = 'Nuova password';
+    nb.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+    nb.onclick = ()=>pwNewItem();
+    container.appendChild(nb);
   }
   if (actions.includes('search')) {
     const btn = document.createElement('div');
@@ -3583,8 +2920,7 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
-  if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
-      showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
+      if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
     };
     container.appendChild(btn);
   }
@@ -3807,24 +3143,26 @@ function pwSave() {
 
 // Apri scheda Password
 function pwOpen() {
-  // Usa il sistema password v11
-  if (typeof hbCatGridOpen === 'function') {
-    hbCatGridOpen();
+  pwLoad();
+  if (_pwCats.length === 0 && _pwItems.length === 0) {
+    document.getElementById('pw-import-banner').style.display = 'flex';
+    document.getElementById('pw-view-cats').style.display = 'none';
+  } else {
+    document.getElementById('pw-import-banner').style.display = 'none';
+    pwShowCats();
+    setTimeout(pwEnrichIcons, 500);
   }
+  // Update topbar
   document.getElementById('topbar-title').textContent = 'Password';
+  document.getElementById('topbar-sub').textContent = _pwItems.length + ' password';
 }
+
 // Vista categorie
 function pwShowCats(q='') {
   document.getElementById('pw-view-cats').style.display = 'flex';
   document.getElementById('pw-view-items').style.display = 'none';
   document.getElementById('pw-view-detail').style.display = 'none';
   document.getElementById('topbar-back').classList.remove('visible');
-  // Tasti topbar: + Cartella e + Password
-  const acts = document.getElementById('topbar-actions');
-  if (acts) acts.innerHTML = '';
-  // FAB in basso a destra (come v11)
-  // Inizializza FAB (già nell'HTML statico)
-  pwFabInit();
   pwRenderCats(q);
 }
 
@@ -3838,18 +3176,15 @@ function pwRenderCats(q='') {
   grid.innerHTML = '';
   cats.forEach(cat => {
     const count = _pwItems.filter(i => i.categoryId === cat.id).length;
-    // mostra sempre tutte le categorie
+    if (count === 0 && q === '') return; // nascondi categorie vuote
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
     const div = document.createElement('div');
     div.className = 'pw-cat-tile';
     div.onclick = () => pwShowItems(cat.id, cat.name);
-    const CAT_COLORS=['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4'];
-    const ci = _pwCats.indexOf(cat);
-    const color = CAT_COLORS[ci >= 0 ? ci % CAT_COLORS.length : 0];
     div.innerHTML = `
-      <div class="pw-cat-icon-wrap" style="width:60px;height:60px;border-radius:18px;border:1.5px solid ${color}40;background:${color}18;display:flex;align-items:center;justify-content:center;font-size:28px;">${icon}</div>
-      <div style="font-size:11px;font-weight:800;color:var(--text);text-align:center;word-break:break-word;padding:0 4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${cat.name}</div>
-      <div style="font-size:10px;font-weight:700;color:${color};">${count > 0 ? count + ' pw' : '—'}</div>
+      <div class="pw-cat-icon" style="background:${cat.color||'rgba(99,102,241,0.12)'}20;">${icon}</div>
+      <div class="pw-cat-name">${cat.name}</div>
+      <div class="pw-cat-badge">${count}</div>
     `;
     grid.appendChild(div);
   });
@@ -3938,7 +3273,7 @@ function pwShowDetail(itemId) {
       <div class="pw-field-value" id="pd-pw" style="font-family:monospace;letter-spacing:0.05em;">${pw}</div>
       <div class="pw-field-actions">
         <button class="pw-field-btn" onclick="pdTogglePw('${item.id}')">👁 Mostra</button>
-        <button class="pw-field-btn" onclick="pwCopy('${item.id}','password')">📋 Copia</button><button class="pw-field-btn" onclick="pwEditItem('${item.id}')">Modifica</button>
+        <button class="pw-field-btn" onclick="pwCopy('${item.id}','password')">📋 Copia</button>
       </div>
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
@@ -3980,26 +3315,11 @@ function pwDeleteConfirm(itemId) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = `
-    <div style="font-size:28px;margin-bottom:10px;">🔐</div>
-    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa password?</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
-    <div style="display:flex;gap:10px;">
-      <button id="_pwd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_pwd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
-    </div>`;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">🔐</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa password?</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L\'operazione non è reversibile.</div><div style="display:flex;gap:10px;"><button id="_pwd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pwd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button></div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
   document.getElementById('_pwd_cancel').onclick = () => overlay.remove();
-  document.getElementById('_pwd_ok').onclick = () => {
-    overlay.remove();
-    _pwItems = _pwItems.filter(i => i.id !== itemId);
-    pwSave();
-    pwBackToItems();
-    showToast('Password eliminata');
-  };
+  document.getElementById('_pwd_ok').onclick = () => { overlay.remove(); _pwItems=_pwItems.filter(i=>i.id!==itemId); pwSave(); pwBackToItems(); showToast('Password eliminata'); };
 }
-
 // Copia
 async function pwCopy(itemId, field) {
   const item = _pwItems.find(i => i.id === itemId);
@@ -4087,30 +3407,15 @@ async function pwHandleImport(event) {
     }
 
     if (!data.categories) throw new Error('Formato non riconosciuto');
-
-    // Mappa icone v11 (nome) → emoji
-    const iconMap = {
-      'bell':'🔔','credit-card':'💳','activity':'📊','shield-alert':'🛡️',
-      'building':'🏢','cloud':'☁️','graduation-cap':'🎓','user-check':'👤',
-      'file-digit':'📄','home':'🏠','terminal':'💻','microscope':'🔬',
-      'certificate':'📜','landmark':'🏦','link':'🔗','cpu':'💾',
-      'mail':'📧','shield':'🛡️','shield-check':'✅','server':'🖥️',
-      'heart-pulse':'❤️','globe':'🌐','layers':'📑','fingerprint':'🔐',
-      'tv':'📺','briefcase':'💼','utensils':'🍽️','video':'📹',
-      'ghost':'👻','layout-grid':'📱','lock':'🔒','key':'🔑'
-    };
-    _pwCats = (data.categories||[]).map(c => ({
-      ...c, icon: iconMap[c.icon] || c.icon || '📁'
-    }));
+    const iconMap = {'bell':'🔔','credit-card':'💳','activity':'📊','shield-alert':'🛡️','building':'🏢','cloud':'☁️','graduation-cap':'🎓','user-check':'👤','file-digit':'📄','home':'🏠','terminal':'💻','microscope':'🔬','certificate':'📜','landmark':'🏦','link':'🔗','cpu':'💾','mail':'📧','shield':'🛡️','shield-check':'✅','server':'🖥️','heart-pulse':'❤️','globe':'🌐','layers':'📑','fingerprint':'🔐','tv':'📺','briefcase':'💼','utensils':'🍽️','video':'📹','ghost':'👻','layout-grid':'📱','lock':'🔒','key':'🔑'};
+    _pwCats = (data.categories||[]).map(c=>({...c, icon: iconMap[c.icon]||c.icon||'📁'}));
     _pwItems = (data.items||[]);
     pwSave();
 
     document.getElementById('pw-import-banner').style.display = 'none';
     pwShowCats();
     setTimeout(pwEnrichIcons, 500);
-    const nItems = (data.items||[]).length;
-    const nCats  = (data.categories||[]).length;
-    showToast(`✅ ${nItems} password in ${nCats} categorie importate`);
+    showToast(`✅ Importate ${data.items.length} password in ${data.categories.length} categorie`);
     // Importa anche le note se presenti nel backup
     if (data.notes && data.notes.length) { noteLoad(); noteImportFromBackup(data.notes); showToast('+ ' + data.notes.length + ' note importate'); }
   } catch(e) {
@@ -4120,7 +3425,24 @@ async function pwHandleImport(event) {
 }
 
 function pwNewItem() {
-  pwShowAddForm(null);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:90dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  const catOpts = _pwCats.map(c=>'<option value="'+c.id+'">'+( c.icon||'📁')+' '+c.name+'</option>').join('');
+  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div><select id="_pw_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;">'+catOpts+'</select></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div><input id="_pw_title" type="text" placeholder="es. Google, Amazon..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div><input id="_pw_user" type="text" placeholder="mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div><div style="display:flex;gap:8px;"><input id="_pw_pass" type="password" placeholder="Password..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"><button id="_pw_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button><button id="_pw_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div><div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div><textarea id="_pw_note" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;"></textarea></div><div style="display:flex;gap:10px;"><button id="_pw_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pw_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button></div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
+  setTimeout(()=>document.getElementById('_pw_title')?.focus(),100);
+  document.getElementById('_pw_cancel').onclick = ()=>overlay.remove();
+  document.getElementById('_pw_eye').onclick = ()=>{ const i=document.getElementById('_pw_pass'); i.type=i.type==='password'?'text':'password'; };
+  document.getElementById('_pw_dice').onclick = ()=>{ const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*'; const a=new Uint8Array(16); crypto.getRandomValues(a); let p=''; a.forEach(b=>p+=c[b%c.length]); const i=document.getElementById('_pw_pass'); i.value=p; i.type='text'; };
+  document.getElementById('_pw_save').onclick = ()=>{
+    const title=document.getElementById('_pw_title')?.value.trim();
+    const pass=document.getElementById('_pw_pass')?.value;
+    if (!title||!pass){ showToast('Inserisci titolo e password'); return; }
+    _pwItems.push({ id:'pw_'+Date.now(), title, password:pass, username:document.getElementById('_pw_user')?.value.trim(), notes:document.getElementById('_pw_note')?.value.trim(), categoryId:document.getElementById('_pw_cat')?.value, createdAt:new Date().toISOString() });
+    pwSave(); overlay.remove(); pwOpen(); showToast('Password salvata');
+  };
 }
 
 // ── AI icon lookup per categorie ────────────────────────────
@@ -4531,7 +3853,7 @@ function noteRenderList(q='') {
       ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}</span>
-        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;">🗑</button>
+        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')">🗑</button>
       </div>`;
     list.appendChild(card);
   });
@@ -4594,26 +3916,11 @@ function noteDelete(id) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = `
-    <div style="font-size:28px;margin-bottom:10px;">🗑</div>
-    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
-    <div style="display:flex;gap:10px;">
-      <button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
-    </div>`;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">🗑</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L\'operazione non è reversibile.</div><div style="display:flex;gap:10px;"><button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button></div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
   document.getElementById('_nd_cancel').onclick = () => overlay.remove();
-  document.getElementById('_nd_ok').onclick = () => {
-    overlay.remove();
-    _notes = _notes.filter(n => n.id !== id);
-    noteSaveAll();
-    noteRenderList('');
-    showToast('Nota eliminata');
-  };
+  document.getElementById('_nd_ok').onclick = () => { overlay.remove(); _notes=_notes.filter(n=>n.id!==id); noteSaveAll(); noteRenderList(''); showToast('Nota eliminata'); };
 }
-
 // Import note dal backup v11
 function noteImportFromBackup(notesArr) {
   if (!Array.isArray(notesArr)) return;
@@ -4783,27 +4090,11 @@ function cardsDelete(id) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = `
-    <div style="font-size:28px;margin-bottom:10px;">💳</div>
-    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
-    <div style="display:flex;gap:10px;">
-      <button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
-    </div>`;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">💳</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L\'operazione non è reversibile.</div><div style="display:flex;gap:10px;"><button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button></div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
   document.getElementById('_cd_cancel').onclick = () => overlay.remove();
-  document.getElementById('_cd_ok').onclick = () => {
-    overlay.remove();
-    // Chiudi il dettaglio se aperto
-    document.getElementById('card-detail-overlay')?.remove();
-    _cards = _cards.filter(c => c.id !== id);
-    cardsSaveAll(); cardsRender();
-    showToast('Carta rimossa');
-  };
+  document.getElementById('_cd_ok').onclick = () => { overlay.remove(); document.getElementById('card-detail-overlay')?.remove(); _cards=_cards.filter(c=>c.id!==id); cardsSaveAll(); cardsRender(); showToast('Carta rimossa'); };
 }
-
 // ── Riconoscimento circuito ───────────────────────────────
 function cardCircuit(number) {
   if (!number) return '💳';
@@ -6329,21 +5620,7 @@ function shopRenderListTabs() {
     // Tieni premuto per rinominare
     let pt; btn.addEventListener('touchstart', () => { pt = setTimeout(() => shopRenameList(id), 600); });
     btn.addEventListener('touchend', () => clearTimeout(pt));
-    // Tasto 🗑 accanto alla lista attiva (solo se ci sono più liste)
-    if (id === _shopCurId && Object.keys(_shopLists).length > 1) {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'display:flex;align-items:center;gap:3px;flex-shrink:0;';
-      wrap.appendChild(btn);
-      const del = document.createElement('button');
-      del.textContent = '🗑';
-      del.title = 'Elimina lista';
-      del.style.cssText = 'padding:4px 7px;border-radius:99px;font-size:11px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;';
-      del.onclick = (e) => { e.stopPropagation(); shopDeleteList(id); };
-      wrap.appendChild(del);
-      container.appendChild(wrap);
-    } else {
-      container.appendChild(btn);
-    }
+    container.appendChild(btn);
   });
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
@@ -6524,91 +5801,63 @@ function shopRemove(id) {
 function shopClearAll() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = `
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);">
     <div style="font-size:28px;margin-bottom:10px;">🗑</div>
     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Svuota lista?</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tutti i prodotti selezionati verranno rimossi.</div>
     <div style="display:flex;gap:8px;">
-      <button id="_shop_clear_cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_shop_clear_ok" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
-    </div>`;
-  overlay.appendChild(box);
+      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button onclick="_shopList={};shopSave();shopRenderAll();this.closest('[style]').remove();showToast('Lista svuotata')" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
+    </div>
+  </div>`;
   document.body.appendChild(overlay);
-  document.getElementById('_shop_clear_cancel').onclick = () => overlay.remove();
-  document.getElementById('_shop_clear_ok').onclick = () => {
-    overlay.remove();
-    _shopList = {};
-    if (_shopLists[_shopCurId]) _shopLists[_shopCurId].items = {};
-    shopSave();
-    shopRenderAll();
-    showToast('Lista svuotata');
-  };
 }
 
 function shopNewList() {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
-  box.innerHTML = `
-    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista</div>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata.</div>
-    <input id="shop-new-name" type="text" placeholder="es. Settimana, Festa, Farmacia..." value="Spesa"
-      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
+    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista della spesa</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata, ne crei una nuova.</div>
+    <input id="shop-new-name" type="text" placeholder="Nome lista (es. Settimana, Festa...)" value="Spesa"
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button id="_snl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_snl_ok" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
-    </div>`;
-  overlay.appendChild(box);
+      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button onclick="shopCreateList(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
+    </div>
+  </div>`;
   document.body.appendChild(overlay);
-  const inp = document.getElementById('shop-new-name');
-  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
-  document.getElementById('_snl_cancel').onclick = () => overlay.remove();
-  document.getElementById('_snl_ok').onclick = () => {
-    const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
-    shopSave();
-    const id = 'lst_' + Date.now();
-    _shopLists[id] = { name, items: {} };
-    _shopCurId = id;
-    _shopList = _shopLists[id].items;
-    shopSave();
-    overlay.remove();
-    shopRenderAll();
-    showToast('✅ Lista "' + name + '" creata');
-  };
-  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_snl_ok').click(); });
+  setTimeout(() => { const inp = document.getElementById('shop-new-name'); inp?.focus(); inp?.select(); }, 200);
 }
 
-function shopCreateList() {} // legacy — non usato
+function shopCreateList(btn) {
+  const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
+  shopSave(); // salva lista corrente
+  const id = 'lst_' + Date.now();
+  _shopLists[id] = { name, items:{} };
+  _shopCurId = id;
+  _shopList  = _shopLists[id].items;
+  shopSave();
+  btn.closest('[style]').remove();
+  shopRenderAll();
+  showToast('✅ Lista "' + name + '" creata');
+}
 
 function shopRenameList(id) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
-  box.innerHTML = `
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
     <div style="font-size:16px;font-weight:800;margin-bottom:14px;">Rinomina lista</div>
-    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name || ''}"
-      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name||''}"
+      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button id="_srl_del" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑</button>
-      <button id="_srl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_srl_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>`;
-  overlay.appendChild(box);
+      <button onclick="shopDeleteList('${id}');this.closest('[style]').remove()" style="padding:13px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
+      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button onclick="_shopLists['${id}'].name=document.getElementById('shop-rename-inp').value.trim()||_shopLists['${id}'].name;shopSave();shopRenderAll();this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
   document.body.appendChild(overlay);
-  const inp = document.getElementById('shop-rename-inp');
-  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
-  document.getElementById('_srl_cancel').onclick = () => overlay.remove();
-  document.getElementById('_srl_del').onclick = () => { overlay.remove(); shopDeleteList(id); };
-  document.getElementById('_srl_ok').onclick = () => {
-    const newName = inp?.value.trim();
-    if (newName && _shopLists[id]) _shopLists[id].name = newName;
-    shopSave(); shopRenderAll(); overlay.remove();
-  };
-  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_srl_ok').click(); });
+  setTimeout(() => { const inp = document.getElementById('shop-rename-inp'); inp?.focus(); inp?.select(); }, 200);
 }
 
 function shopDeleteList(id) {
