@@ -1762,6 +1762,7 @@ function cardsSearch(q) {
 
         <!-- LISTA DOCUMENTI -->
         <div id="docs-view-list" style="flex:1;overflow-y:auto;padding:14px 14px 100px;">
+          <button onclick="docsShowAdd()" style="width:100%;padding:13px;border-radius:14px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:14px;">+ Nuovo Documento</button>
           <div id="docs-list"></div>
           <div id="docs-empty" style="display:none;text-align:center;padding:48px 20px;">
             <div style="font-size:48px;margin-bottom:12px;">📄</div>
@@ -2930,7 +2931,7 @@ function logout() {
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: ['customize'] },
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
-  documents: { title: 'Documenti',   sub: '', actions: [] },
+  documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
   calendar:  { title: 'Calendario',  sub: '', actions: [] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
@@ -3125,6 +3126,7 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
+  if (HB.currentTab === 'documents') { docsShowAdd(); return; }
   if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
