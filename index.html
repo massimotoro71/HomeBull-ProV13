@@ -1301,6 +1301,34 @@ function pwPickIcon(btn, icon) {
   });
 }
 
+
+function pwDetailAddExtras(item) {
+  const cont = document.getElementById('pw-detail-content');
+  if (!cont) return;
+  if (item.url) {
+    const r = document.createElement('div');
+    r.className = 'pw-field-row';
+    const lbl = document.createElement('div'); lbl.className = 'pw-field-label'; lbl.textContent = 'URL';
+    const val = document.createElement('div'); val.className = 'pw-field-value'; val.style.wordBreak = 'break-all'; val.textContent = item.url;
+    const act = document.createElement('div'); act.className = 'pw-field-actions';
+    const btn = document.createElement('button'); btn.className = 'pw-field-btn'; btn.textContent = '📋 Copia';
+    btn.onclick = () => pwCopy(item.id, 'url');
+    act.appendChild(btn); r.appendChild(lbl); r.appendChild(val); r.appendChild(act);
+    cont.insertBefore(r, cont.children[1] || null);
+  }
+  if (item.pin) {
+    const r = document.createElement('div');
+    r.className = 'pw-field-row';
+    const lbl = document.createElement('div'); lbl.className = 'pw-field-label'; lbl.textContent = 'PIN';
+    const val = document.createElement('div'); val.className = 'pw-field-value'; val.textContent = '••••';
+    const act = document.createElement('div'); act.className = 'pw-field-actions';
+    const btn = document.createElement('button'); btn.className = 'pw-field-btn'; btn.textContent = '📋 Copia';
+    btn.onclick = () => pwCopy(item.id, 'pin');
+    act.appendChild(btn); r.appendChild(lbl); r.appendChild(val); r.appendChild(act);
+    cont.appendChild(r);
+  }
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
@@ -1610,11 +1638,11 @@ function pwPickIcon(btn, icon) {
       <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
           <div style="display:flex;gap:8px;align-items:center;">
-            <div class="pw-search-bar" style="flex:1;">
+            <div class="pw-search-bar">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
               <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
-            <button id="pw-new-cat-btn" style="flex-shrink:0;padding:9px 13px;border-radius:12px;border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Cartella</button>
+
           </div>
         </div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -3315,6 +3343,7 @@ function pwShowDetail(itemId) {
   document.getElementById('topbar-title').textContent = item.title || '—';
 
   const pw = item.password ? '••••••••' : '—';
+
   const content = document.getElementById('pw-detail-content');
   content.innerHTML = `
     ${item.username ? `<div class="pw-field-row"><div class="pw-field-label">Email / Username</div><div class="pw-field-value">${item.username}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
@@ -3492,17 +3521,18 @@ function pwNewItem() {
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:90dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
   const catOpts = _pwCats.map(c=>'<option value="'+c.id+'">'+( c.icon||'📁')+' '+c.name+'</option>').join('');
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div><select id="_pw_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;">'+catOpts+'</select></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div><input id="_pw_title" type="text" placeholder="es. Google, Amazon..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div><input id="_pw_user" type="text" placeholder="mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div><div style="display:flex;gap:8px;"><input id="_pw_pass" type="password" placeholder="Password..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"><button id="_pw_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button><button id="_pw_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div><div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div><textarea id="_pw_note" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;"></textarea></div><div style="display:flex;gap:10px;"><button id="_pw_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pw_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button></div>';
+  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div><select id="_pw_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;">'+catOpts+'</select></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div><input id="_pw_title" type="text" placeholder="es. Google, Amazon..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div><input id="_pw_url" type="url" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div><input id="_pw_user" type="text" placeholder="mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div><div style="display:flex;gap:8px;"><input id="_pw_pass" type="password" placeholder="Password..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"><button id="_pw_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button><button id="_pw_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN (opzionale)</div><div style="display:flex;gap:8px;"><input id="_pw_pin" type="password" placeholder="PIN numerico..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"><button id="_pw_pin_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button></div></div><div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div><textarea id="_pw_note" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;"></textarea></div><div style="display:flex;gap:10px;"><button id="_pw_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pw_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button></div>';
   overlay.appendChild(box); document.body.appendChild(overlay);
   setTimeout(()=>document.getElementById('_pw_title')?.focus(),100);
   document.getElementById('_pw_cancel').onclick = ()=>overlay.remove();
   document.getElementById('_pw_eye').onclick = ()=>{ const i=document.getElementById('_pw_pass'); i.type=i.type==='password'?'text':'password'; };
+  document.getElementById('_pw_pin_eye').onclick = ()=>{ const i=document.getElementById('_pw_pin'); i.type=i.type==='password'?'text':'password'; };
   document.getElementById('_pw_dice').onclick = ()=>{ const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*'; const a=new Uint8Array(16); crypto.getRandomValues(a); let p=''; a.forEach(b=>p+=c[b%c.length]); const i=document.getElementById('_pw_pass'); i.value=p; i.type='text'; };
   document.getElementById('_pw_save').onclick = ()=>{
     const title=document.getElementById('_pw_title')?.value.trim();
     const pass=document.getElementById('_pw_pass')?.value;
     if (!title||!pass){ showToast('Inserisci titolo e password'); return; }
-    _pwItems.push({ id:'pw_'+Date.now(), title, password:pass, username:document.getElementById('_pw_user')?.value.trim(), notes:document.getElementById('_pw_note')?.value.trim(), categoryId:document.getElementById('_pw_cat')?.value, createdAt:new Date().toISOString() });
+    _pwItems.push({ id:'pw_'+Date.now(), title, password:pass, username:document.getElementById('_pw_user')?.value.trim(), url:document.getElementById('_pw_url')?.value.trim(), pin:document.getElementById('_pw_pin')?.value.trim(), notes:document.getElementById('_pw_note')?.value.trim(), categoryId:document.getElementById('_pw_cat')?.value, createdAt:new Date().toISOString() });
     pwSave(); overlay.remove(); pwOpen(); showToast('Password salvata');
   };
 }
