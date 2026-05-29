@@ -6784,6 +6784,62 @@ function pwEditItem(itemId) {
   };
 }
 
+
+// ── Nuova Categoria Password ──────────────────────────────
+function pwNewCategory() {
+  const EMO = ['📁','🔐','💳','🏦','📧','☁️','🏠','💻','🌐','🛡️',
+               '📱','🔑','👤','🏢','🖥️','📜','❤️','🎓','💼','📺',
+               '🍽️','📹','🔔','🔗','💾','🎮','✈️','🎵','⚙️','🛒'];
+  window._pwNewCatIcon = '📁';
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  const iconBtns = EMO.map(ic =>
+    '<button data-ic="'+ic+'" style="width:42px;height:42px;border-radius:10px;border:2px solid '+(ic==='📁'?'var(--accent)':'var(--border)')+';background:'+(ic==='📁'?'var(--accent-bg)':'var(--surface)')+';font-size:20px;cursor:pointer;">'+ic+'</button>'
+  ).join('');
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">📁 Nuova Categoria</div>',
+    '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Nome *</div>',
+    '<input id="_nc_name" type="text" placeholder="es. Banca, Lavoro, Social..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Icona</div>',
+    '<div id="_nc_icons" style="display:flex;flex-wrap:wrap;gap:6px;">'+iconBtns+'</div></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_nc_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_nc_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea Categoria</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('_nc_name')?.focus(), 100);
+
+  // Selezione icona
+  box.querySelectorAll('#_nc_icons button').forEach(btn => {
+    btn.onclick = () => {
+      window._pwNewCatIcon = btn.dataset.ic || btn.textContent;
+      box.querySelectorAll('#_nc_icons button').forEach(b => {
+        const active = b === btn;
+        b.style.border = active ? '2px solid var(--accent)' : '2px solid var(--border)';
+        b.style.background = active ? 'var(--accent-bg)' : 'var(--surface)';
+      });
+    };
+  });
+
+  document.getElementById('_nc_cancel').onclick = () => overlay.remove();
+  document.getElementById('_nc_name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('_nc_save').click();
+  });
+  document.getElementById('_nc_save').onclick = () => {
+    const name = document.getElementById('_nc_name')?.value.trim();
+    if (!name) { showToast('Inserisci il nome della categoria'); return; }
+    _pwCats.push({ id: 'cat_' + Date.now(), name, icon: window._pwNewCatIcon || '📁' });
+    pwSave();
+    overlay.remove();
+    pwShowCats();
+    showToast('✅ Categoria "' + name + '" creata');
+  };
+}
 </script>
 </body>
 </html>
