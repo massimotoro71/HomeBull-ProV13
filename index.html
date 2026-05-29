@@ -1389,6 +1389,84 @@ function cardsSearch(q) {
   _cards = orig;
 }
 
+
+// ── Modifica Password ────────────────────────────────────
+function pwEditItem(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+  const catOpts = _pwCats.map(c =>
+    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+( c.icon||'📁')+' '+c.name+'</option>'
+  ).join('');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">',
+    '<div style="font-size:18px;font-weight:800;">✏️ Modifica Password</div>',
+    '<button id="_pwe_del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>',
+    '</div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
+    '<select id="_pwe_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
+    '<input id="_pwe_title" type="text" value="'+(item.title||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
+    '<input id="_pwe_url" type="url" value="'+(item.url||'')+'" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
+    '<input id="_pwe_user" type="text" value="'+(item.username||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password</div>',
+    '<div style="display:flex;gap:8px;"><input id="_pwe_pass" type="password" value="'+(item.password||'')+'" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwe_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button>',
+    '<button id="_pwe_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
+    '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
+    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
+    '<textarea id="_pwe_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;">'+(item.notes||'')+'</textarea></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_pwe_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_pwe_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva Modifiche</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_pwe_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwe_del').onclick = () => { overlay.remove(); pwDeleteConfirm(itemId); };
+  document.getElementById('_pwe_eye').onclick = () => {
+    const i = document.getElementById('_pwe_pass');
+    i.type = i.type === 'password' ? 'text' : 'password';
+  };
+  document.getElementById('_pwe_dice').onclick = () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let p = ''; a.forEach(b => p += c[b % c.length]);
+    const i = document.getElementById('_pwe_pass'); i.value = p; i.type = 'text';
+  };
+  document.getElementById('_pwe_save').onclick = () => {
+    const title = document.getElementById('_pwe_title')?.value.trim();
+    const pass  = document.getElementById('_pwe_pass')?.value;
+    if (!title) { showToast('Inserisci il titolo'); return; }
+    const idx = _pwItems.findIndex(i => i.id === itemId);
+    if (idx > -1) {
+      _pwItems[idx] = {
+        ...item,
+        title,
+        password: pass,
+        username: document.getElementById('_pwe_user')?.value.trim() || '',
+        url:      document.getElementById('_pwe_url')?.value.trim() || '',
+        pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
+        notes:    document.getElementById('_pwe_note')?.value.trim() || '',
+        categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
+        updatedAt: new Date().toISOString()
+      };
+      pwSave();
+    }
+    overlay.remove();
+    pwShowDetail(itemId);
+    showToast('✅ Password aggiornata');
+  };
+}
+
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 </head>
@@ -3449,7 +3527,7 @@ function pwShowDetail(itemId) {
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
-      <button onclick="showToast('Modifica — in arrivo')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
+      <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
       <button onclick="pwDeleteConfirm('${item.id}')" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
     </div>`;
 }
