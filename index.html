@@ -3238,16 +3238,16 @@ function updateHomeDate() {
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
-  // Aggiorna contatori password
+  // Aggiorna contatori
   pwLoad();
   const el = document.getElementById('stat-passwords');
-  if (el) el.textContent = _pwItems.length || '—';
-  noteLoad(); const nel = document.getElementById('stat-notes'); if (nel) nel.textContent = _notes.length || '—';
-  otpLoad(); const oel = document.getElementById('stat-otp'); if (oel) oel.textContent = _otpAccounts.length || '—';
-  document.getElementById('stat-passwords').textContent = '—';
-  document.getElementById('stat-docs').textContent = '—';
-  document.getElementById('stat-notes').textContent = '—';
-  document.getElementById('stat-otp').textContent = '—';
+  if (el) el.textContent = _pwItems.length > 0 ? _pwItems.length : '0';
+  noteLoad();
+  const nel = document.getElementById('stat-notes');
+  if (nel) nel.textContent = _notes.length > 0 ? _notes.length : '0';
+  otpLoad();
+  const oel = document.getElementById('stat-otp');
+  if (oel) oel.textContent = _otpAccounts.length > 0 ? _otpAccounts.length : '0';
 }
 
 function openSettings() {
