@@ -1006,9 +1006,16 @@ html, body {
 }
 /* QR Modal */
 #wifi-qr-modal {
-  position: fixed; inset: 0; z-index: 9000;
-  background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-  display: none; align-items: center; justify-content: center;
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  right: 0 !important; bottom: 0 !important;
+  width: 100vw; height: 100dvh;
+  z-index: 9500;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
 }
 #wifi-qr-modal.open { display: flex; }
 
@@ -1231,78 +1238,160 @@ html, body {
   .section-title { font-size: 32px; }
 }
 
-/* ══════════════════════════════════════════════════════
-   LAYOUT OVERRIDE v13
-══════════════════════════════════════════════════════ */
-html, body { height:100%; margin:0; padding:0; overflow:hidden; }
-.app-layout { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
-.app-main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; }
-#topbar { position:sticky !important; top:0 !important; left:auto !important;
-  right:auto !important; width:100% !important; flex-shrink:0; z-index:10 !important; }
-#tab-container { flex:1; overflow:hidden; position:relative; min-height:0; }
-.tab-panel { position:absolute !important; inset:0 !important; overflow-y:auto !important;
-  opacity:0; pointer-events:none; transition:opacity 0.18s; background:var(--bg); }
-.tab-panel.active { opacity:1 !important; pointer-events:auto !important; }
-#bottombar { position:relative !important; flex-shrink:0; }
+/* ── v13: Solo desktop — mobile da aggiungere dopo ── */
+#bottombar, #bottom-more-popup, .nav-item, #more-drawer { display: none !important; }
 
-@media (min-width:900px) {
-  .app-layout { flex-direction:row !important; }
-  #sidebar { display:flex !important; width:220px !important; flex-shrink:0;
-    height:100dvh; overflow-y:auto; flex-direction:column; }
-  .app-main { flex:1; min-width:0; height:100dvh; }
-  #topbar { position:sticky !important; top:0 !important; }
-  #bottombar, #bottom-more-popup { display:none !important; }
-  .tab-inner { padding:24px 28px 40px; }
-}
-@media (max-width:899px) {
-  #sidebar { display:none !important; }
-  #bottombar { display:flex !important; }
-}
+/* Sidebar sempre visibile */
+#sidebar { display: flex !important; }
 
-/* Fix accordion testo */
-.shop-accordion-header, .shop-accordion-header * { color:var(--text) !important; }
-/* Fix scanner QR */
-#qr-scanner-modal { position:fixed !important; inset:0; z-index:9500; }
-#wifi-qr-modal { position:fixed !important; inset:0; z-index:9500; }
-#search-overlay.open { display:flex !important; }
+/* Layout flex row */
+.app-layout, #app { display: flex !important; flex-direction: row !important; height: 100dvh !important; }
+.app-main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100%; }
+#tab-container { flex: 1; overflow-y: auto; overflow-x: hidden; min-height: 0; }
+
+/* Tab panel: block su desktop */
+.tab-panel { position: absolute !important; inset: 0 !important; overflow-y: auto !important;
+  opacity: 0; pointer-events: none; transition: opacity 0.18s; background: var(--bg); }
+.tab-panel.active { opacity: 1 !important; pointer-events: auto !important; }
+
+/* Topbar sticky */
+#topbar { position: sticky !important; top: 0 !important; left: auto !important;
+  right: auto !important; width: 100% !important; flex-shrink: 0; }
+
+/* Accordion testo visibile */
+.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
+
+/* ── Fix topbar: NON fixed, dentro app-main ── */
+#topbar {
+  position: sticky !important;
+  top: 0 !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  z-index: 10 !important;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
-function pwNewCategory() {
-  const EMO = ['📁','🔐','💳','🏦','📧','☁️','🏠','💻','🌐','🛡️','📱','🔑','👤','🏢','🖥️','📜','❤️','🎓','💼','📺','🍽️','📹','🔔','🔗','💾','🎮','✈️','🎵','⚙️','🛒'];
-  window._pwNewCatIcon = '📁';
+function shopAddCustom() {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  const iconBtns = EMO.map(ic => {
-    const active = ic === '📁';
-    return '<button data-ic="'+ic+'" onclick="pwPickIcon(this,\''+ic+'\')" style="width:40px;height:40px;border-radius:10px;border:2px solid '+(active?'var(--accent)':'var(--border)')+';background:'+(active?'var(--accent-bg)':'var(--surface)')+';font-size:20px;cursor:pointer;">'+ic+'</button>';
-  }).join('');
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="font-size:18px;font-weight:800;margin-bottom:16px;">📁 Nuova Categoria</div><div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Nome *</div><input id="_nc_name" type="text" placeholder="es. Banca, Lavoro..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Icona</div><div id="_nc_icons" style="display:flex;flex-wrap:wrap;gap:6px;">'+iconBtns+'</div></div><div style="display:flex;gap:10px;"><button id="_nc_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_nc_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button></div>';
-  overlay.appendChild(box);
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
+  overlay.innerHTML = `
+    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
+      <div style="font-size:17px;font-weight:800;margin-bottom:16px;">➕ Aggiungi prodotto</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Nome prodotto</div>
+        <input id="shop-custom-name" type="text" placeholder="es. Prosciutto crudo, Latte intero..." autocomplete="off"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Emoji (opzionale)</div>
+        <input id="shop-custom-icon" type="text" placeholder="🛍️" maxlength="2"
+          style="width:80px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;outline:none;text-align:center;">
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="this.closest('[style]').remove()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+        <button onclick="shopConfirmCustom(this)" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi alla lista</button>
+      </div>
+    </div>`;
   document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('_nc_name')?.focus(), 100);
-  document.getElementById('_nc_cancel').onclick = () => overlay.remove();
-  document.getElementById('_nc_save').onclick = () => {
-    const name = document.getElementById('_nc_name')?.value.trim();
-    if (!name) { showToast('Inserisci il nome'); return; }
-    _pwCats.push({ id: 'cat_'+Date.now(), name, icon: window._pwNewCatIcon });
-    pwSave(); overlay.remove(); pwShowCats(); showToast('Categoria creata');
-  };
-  document.getElementById('_nc_name').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('_nc_save').click(); });
+  setTimeout(() => document.getElementById('shop-custom-name')?.focus(), 100);
+  document.getElementById('shop-custom-name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') overlay.querySelector('button:last-child').click();
+  });
 }
 
-function pwPickIcon(btn, icon) {
-  window._pwNewCatIcon = icon;
-  document.querySelectorAll('#_nc_icons button').forEach(b => {
-    const a = b.dataset.ic === icon;
-    b.style.border = a ? '2px solid var(--accent)' : '2px solid var(--border)';
-    b.style.background = a ? 'var(--accent-bg)' : 'var(--surface)';
+function shopConfirmCustom(btn) {
+  const name = document.getElementById('shop-custom-name')?.value.trim();
+  const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
+  if (!name) { showToast('Inserisci il nome del prodotto'); return; }
+  const id = 'custom_' + Date.now();
+  _shopList[id] = { name, icon, qty: 1 };
+  shopSave();
+  btn.closest('[style]').remove();
+  shopRenderAll();
+  showToast('✅ ' + name + ' aggiunto!');
+}
+
+function wifiShowAdd() {
+  document.getElementById('wifi-view-list').style.display = 'none';
+  document.getElementById('wifi-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuova Rete';
+  document.getElementById('wifi-add-ssid').value = '';
+  document.getElementById('wifi-add-pw').value = '';
+  _wifiSec = 'WPA';
+  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sec === 'WPA');
   });
+}
+function wifiDelete(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
+  _wifiNets = _wifiNets.filter(n => n.id !== id);
+  wifiSaveAll(); wifiRender();
+  showToast('Rete rimossa');
+}
+function otpShowAdd() {
+  document.getElementById('otp-view-list').style.display = 'none';
+  document.getElementById('otp-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuovo Account';
+  if (_otpTimer) clearInterval(_otpTimer);
+  // Reset form
+  document.getElementById('otp-add-name').value = '';
+  document.getElementById('otp-add-user').value = '';
+  document.getElementById('otp-add-secret').value = '';
+  _otpIcon = '🔐';
+  document.querySelectorAll('.otp-icon-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.icon === '🔐');
+  });
+}
+function otpShowList(q='') {
+  document.getElementById('otp-view-list').style.display = 'flex';
+  document.getElementById('otp-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
+  otpRenderList(q);
+  otpStartUpdater();
+}
+function otpCopy(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
+  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+function otpScanQR() {
+  qrScannerOpen('Scansiona QR 2FA', (data) => {
+    const parsed = qrParseOTP(data);
+    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
+    document.getElementById('otp-add-name').value   = parsed.name;
+    document.getElementById('otp-add-user').value   = parsed.user;
+    document.getElementById('otp-add-secret').value = parsed.secret;
+    showToast('✅ QR letto — verifica i dati e salva');
+  });
+}
+
+function cardsSearch(q) {
+  const list = document.getElementById('cards-list');
+  if (!list) return;
+  if (!q.trim()) { cardsRender(); return; }
+  const ql = q.toLowerCase();
+  const filtered = _cards.filter(c =>
+    (c.holder||'').toLowerCase().includes(ql) ||
+    (c.number||'').replace(/\s/g,'').includes(ql) ||
+    (c.bank||'').toLowerCase().includes(ql) ||
+    (c.type||'').toLowerCase().includes(ql)
+  );
+  const orig = _cards;
+  _cards = filtered;
+  cardsRender();
+  _cards = orig;
 }
 
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 </head>
 <body>
 
@@ -1594,7 +1683,7 @@ function pwPickIcon(btn, icon) {
           <div id="home-alerts">
             <div class="alert-item">
               <div class="alert-dot yellow"></div>
-              <div class="alert-text">Benvenuto in HomeBull v13</div>
+              <div class="alert-text">Benvenuto in HomeBull Pro v12</div>
               <div class="alert-time">Ora</div>
             </div>
           </div>
@@ -1609,12 +1698,9 @@ function pwPickIcon(btn, icon) {
       <!-- Vista: Lista categorie -->
       <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <div class="pw-search-bar" style="flex:1;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-            </div>
-            <button id="pw-new-cat-btn" style="flex-shrink:0;padding:9px 13px;border-radius:12px;border:1px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Cartella</button>
+          <div class="pw-search-bar">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -1672,136 +1758,122 @@ function pwPickIcon(btn, icon) {
     <!-- DOCUMENTI -->
     <!-- DOCUMENTI -->
     <div class="tab-panel" id="panel-documents">
-      <div style="padding:14px 14px 100px;">
+      <div style="height:100%;display:flex;flex-direction:column;">
 
-        <!-- Lista documenti -->
-        <div id="docs-view-list">
+        <!-- LISTA DOCUMENTI -->
+        <div id="docs-view-list" style="flex:1;overflow-y:auto;padding:14px 14px 100px;">
           <div id="docs-list"></div>
+          <div id="docs-empty" style="display:none;text-align:center;padding:48px 20px;">
+            <div style="font-size:48px;margin-bottom:12px;">📄</div>
+            <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun documento</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i tuoi documenti personali.</div>
+            <button onclick="docsShowAdd()" style="padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Nuovo Documento</button>
+          </div>
         </div>
 
-        <!-- Aggiungi documento -->
-        <div id="docs-view-add" style="display:none;">
+        <!-- FORM NUOVO DOCUMENTO -->
+        <div id="docs-view-add" style="display:none;flex:1;overflow-y:auto;padding:14px 14px 100px;">
+
+          <!-- Header -->
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
             <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Documento</div>
+            <div style="font-size:17px;font-weight:800;">Nuovo Documento</div>
           </div>
 
           <!-- Tipo documento -->
-          <div style="margin-bottom:14px;">
-            <div class="pw-field-label" style="margin-bottom:8px;">Tipo documento</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-              <button class="finance-type-btn active" data-dtype="ci" onclick="docsSelectType(this,'ci','🪪','Carta d\'Identità')">🪪<br>C. Identità</button>
-              <button class="finance-type-btn" data-dtype="passaporto" onclick="docsSelectType(this,'passaporto','📘','Passaporto')">📘<br>Passaporto</button>
-              <button class="finance-type-btn" data-dtype="patente" onclick="docsSelectType(this,'patente','🚗','Patente')">🚗<br>Patente</button>
-              <button class="finance-type-btn" data-dtype="tessera" onclick="docsSelectType(this,'tessera','🏥','Tessera Sanitaria')">🏥<br>Tessera San.</button>
-              <button class="finance-type-btn" data-dtype="altro" onclick="docsSelectType(this,'cf','📋','Cod. Fiscale')">📋<br>CF</button>
-              <button class="finance-type-btn" data-dtype="altro" onclick="docsSelectType(this,'altro','📄','Altro')">📄<br>Altro</button>
+          <div style="margin-bottom:18px;">
+            <div class="pw-field-label" style="margin-bottom:10px;">Tipo documento</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="docs-type-grid">
+              <button class="doc-type-btn active" data-type="ci"   onclick="docsPickType(this,'ci','🪪','C. Identità')"   style="padding:12px 8px;border-radius:12px;border:2px solid var(--accent);background:var(--accent-bg);cursor:pointer;font-size:11px;font-weight:800;color:var(--accent);font-family:inherit;text-align:center;">🪪<br>C. Identità</button>
+              <button class="doc-type-btn"        data-type="pass" onclick="docsPickType(this,'pass','🛂','Passaporto')"  style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🛂<br>Passaporto</button>
+              <button class="doc-type-btn"        data-type="pat"  onclick="docsPickType(this,'pat','🚗','Patente')"      style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🚗<br>Patente</button>
+              <button class="doc-type-btn"        data-type="ts"   onclick="docsPickType(this,'ts','🏥','Tessera San.')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🏥<br>Tessera San.</button>
+              <button class="doc-type-btn"        data-type="cf"   onclick="docsPickType(this,'cf','📋','Cod. Fiscale')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📋<br>Cod. Fiscale</button>
+              <button class="doc-type-btn"        data-type="alt"  onclick="docsPickType(this,'alt','📄','Altro')"       style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📄<br>Altro</button>
             </div>
           </div>
 
-          <div style="margin-bottom:12px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">Intestatario *</div>
-            <input id="doc-holder" type="text" placeholder="Nome Cognome"
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          <!-- Dati anagrafici (comuni a tutti) -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div><input id="dnew_cognome" type="text" placeholder="Rossi" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Nome *</div><input id="dnew_nome" type="text" placeholder="Mario" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div>
-              <div class="pw-field-label" style="margin-bottom:6px;">Numero documento</div>
-              <input id="doc-number" type="text" placeholder="AX0000000"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;text-transform:uppercase;">
-            </div>
-            <div>
-              <div class="pw-field-label" style="margin-bottom:6px;">Scadenza</div>
-              <input id="doc-expiry" type="date"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-            </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:10px;">
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Data di nascita</div><input id="dnew_nascita" type="date" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Luogo di nascita</div><input id="dnew_luogo" type="text" placeholder="Roma" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Sesso</div><select id="dnew_sesso" onchange="cfCalcAuto()" style="width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;"><option value="M">M</option><option value="F">F</option></select></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div>
-              <div class="pw-field-label" style="margin-bottom:6px;">Data rilascio</div>
-              <input id="doc-issued" type="date"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-            </div>
-            <div>
-              <div class="pw-field-label" style="margin-bottom:6px;">Rilasciato da</div>
-              <input id="doc-issuer" type="text" placeholder="Comune, Questura..."
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-            </div>
-          </div>
-          <div style="margin-bottom:20px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">Note</div>
-            <textarea id="doc-notes" placeholder="Informazioni aggiuntive..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:14px;">
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Residenza</div><input id="dnew_residenza" type="text" placeholder="Milano" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Via</div><input id="dnew_via" type="text" placeholder="Via Roma" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+            <div><div class="pw-field-label" style="margin-bottom:5px;">Nr.</div><input id="dnew_nr" type="text" placeholder="1" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
           </div>
 
-          <!-- Sezione Codice Fiscale (visibile solo per tipo CF) -->
-          <div id="cf-section" style="display:none;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;">
-            <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;" id="cf-section-title">🏥 Dati per Tessera Sanitaria / Codice Fiscale</div>
-            <div style="margin-bottom:10px;">
-              <div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div>
-              <input id="cf-cognome" type="text" placeholder="ROSSI" oninput="this.value=this.value.toUpperCase()"
-                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-            </div>
-            <div style="margin-bottom:10px;">
-              <div class="pw-field-label" style="margin-bottom:5px;">Nome *</div>
-              <input id="cf-nome" type="text" placeholder="MARIO" oninput="this.value=this.value.toUpperCase()"
-                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          <!-- Dati documento (nascosti per CF) -->
+          <div id="docs-doc-fields">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Numero documento</div><input id="dnew_number" type="text" placeholder="AX0000000" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;text-transform:uppercase;"></div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Data di rilascio</div><input id="dnew_issue" type="date" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-              <div>
-                <div class="pw-field-label" style="margin-bottom:5px;">Data di nascita *</div>
-                <input id="cf-nascita" type="date"
-                  style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
-              </div>
-              <div>
-                <div class="pw-field-label" style="margin-bottom:5px;">Sesso</div>
-                <div style="display:flex;gap:8px;padding-top:4px;">
-                  <button id="cf-sesso-m" onclick="cfSetSesso('M')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit;">M</button>
-                  <button id="cf-sesso-f" onclick="cfSetSesso('F')" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:800;cursor:pointer;font-family:inherit;">F</button>
-                </div>
-              </div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Ente rilasciante</div><input id="dnew_issuer" type="text" placeholder="Comune, Questura..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Scadenza</div><input id="dnew_expiry" type="date" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
             </div>
-            <div style="margin-bottom:12px;">
-              <div class="pw-field-label" style="margin-bottom:5px;">Comune di nascita *</div>
-              <input id="cf-comune-search" type="text" placeholder="Cerca comune..." oninput="cfSearchComune(this.value)"
-                style="width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:6px;">
-              <div id="cf-comune-results" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;max-height:160px;overflow-y:auto;"></div>
-              <div id="cf-comune-selected" style="font-size:12px;color:var(--accent);font-weight:700;margin-top:4px;"></div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:5px;">Informazioni aggiuntive</div>
+              <textarea id="dnew_notes" rows="2" placeholder="Note..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
             </div>
-            <button onclick="cfCalcola()" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🧮 Calcola Codice Fiscale</button>
-            <!-- Risultato CF -->
-            <div id="cf-result-section" style="display:none;margin-top:14px;">
-              <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
-                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:6px;">Codice Fiscale</div>
-                <div id="cf-result-text" style="font-family:'DM Sans',monospace;font-size:22px;font-weight:900;letter-spacing:0.15em;color:var(--accent);"></div>
-                <button onclick="cfCopyResult()" style="margin-top:8px;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button>
+            <!-- Foto -->
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
+                  📸 Fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
+                </label>
+                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
+                  📸 Retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
+                </label>
               </div>
-              <!-- Barcode -->
-              <div style="background:white;border-radius:10px;padding:14px;text-align:center;">
-                <canvas id="cf-barcode" style="max-width:100%;cursor:zoom-in;" onclick="cfZoomBarcode()"></canvas>
-                <div style="font-size:11px;color:#666;margin-top:6px;font-family:monospace;" id="cf-barcode-label"></div>
-                <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;">
-                  <button onclick="cfBarcodeZoom(-1)" style="width:32px;height:32px;border-radius:8px;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;font-size:16px;">−</button>
-                  <button onclick="cfBarcodeZoom(1)" style="width:32px;height:32px;border-radius:8px;border:1px solid #ddd;background:#f5f5f5;cursor:pointer;font-size:16px;">+</button>
-                </div>
-              </div>
+              <div id="dnew_photos_preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
             </div>
           </div>
 
-          <!-- Foto documento -->
-          <div style="margin-bottom:20px;">
-            <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
-            <div id="doc-photos-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;"></div>
-            <div style="display:flex;gap:8px;">
-              <button onclick="docPhotoCapture('camera')" style="flex:1;padding:11px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Fotocamera</button>
-              <button onclick="docPhotoCapture('gallery')" style="flex:1;padding:11px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🖼️ Galleria</button>
+          <!-- Sezione CF: barcode (visibile solo per tipo CF) -->
+          <div id="docs-cf-section" style="display:none;margin-bottom:14px;">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;">
+              <div class="pw-field-label" style="margin-bottom:8px;">Codice Fiscale calcolato</div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div id="cf_result" style="font-size:20px;font-weight:800;letter-spacing:3px;color:var(--accent);font-family:monospace;flex:1;">—</div>
+                <button onclick="cfCopy()" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;">📋</button>
+              </div>
+              <div class="pw-field-label" style="margin-bottom:5px;">Inserisci manualmente (comuni piccoli):</div>
+              <input id="cf_manual" type="text" placeholder="RSSMRA80A01H501U" maxlength="16" oninput="this.value=this.value.toUpperCase();cfGenBarcode(this.value)" style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:monospace;letter-spacing:2px;">
             </div>
-            <input type="file" id="doc-photo-input" accept="image/*" style="display:none;" onchange="docPhotoSelected(this)">
+            <div id="cf_barcode_wrap" style="display:none;background:white;border-radius:14px;padding:16px;text-align:center;margin-top:12px;">
+              <svg id="cf_barcode"></svg>
+              <div id="cf_barcode_label" style="font-size:13px;font-weight:700;letter-spacing:2px;color:#333;margin-top:8px;font-family:monospace;"></div>
+            </div>
           </div>
 
-          <button onclick="docsSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Documento</button>
+          <!-- Tasti azione -->
+          <div style="display:flex;gap:10px;">
+            <button onclick="docsNewSave()" style="flex:2;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
+            <button id="docs-print-btn" onclick="cfPrint()" style="display:none;flex:1;padding:14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🖨 Stampa CF</button>
+          </div>
+        </div>
+
+        <!-- DETTAGLIO DOCUMENTO -->
+        <div id="docs-view-detail" style="display:none;flex:1;overflow-y:auto;padding:14px 14px 100px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+            <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div id="docs-detail-title" style="font-size:17px;font-weight:800;flex:1;"></div>
+            <button id="docs-detail-del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">🗑</button>
+          </div>
+          <div id="docs-detail-content"></div>
         </div>
 
       </div>
@@ -1813,9 +1885,15 @@ function pwPickIcon(btn, icon) {
         <!-- Vista lista -->
         <div id="note-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="pw-search-bar" style="flex:1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              </div>
+              <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nuova
+              </button>
             </div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -1910,9 +1988,15 @@ function pwPickIcon(btn, icon) {
         <!-- Vista lista OTP -->
         <div id="otp-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="pw-search-bar" style="flex:1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              </div>
+              <button onclick="otpShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Aggiungi
+              </button>
             </div>
           </div>
           <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -1976,7 +2060,19 @@ function pwPickIcon(btn, icon) {
 
         <!-- Lista carte -->
         <div id="cards-view-list" style="display:flex;flex-direction:column;height:100%;">
-          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 100px;"></div>
+          <div style="padding:12px 14px 8px;flex-shrink:0;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="pw-search-bar" style="flex:1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              </div>
+              <button onclick="cardsShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Aggiungi
+              </button>
+            </div>
+          </div>
+          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
         </div>
 
         <!-- Aggiungi carta -->
@@ -2263,7 +2359,18 @@ function pwPickIcon(btn, icon) {
     <!-- FAMIGLIA -->
     <div class="tab-panel" id="panel-family">
       <div style="padding:14px 14px 100px;">
+        <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+          <div style="font-size:22px;flex-shrink:0;">👨‍👩‍👧</div>
+          <div><div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;">Vault Famiglia</div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.5;">Aggiungi i tuoi familiari e scegli cosa condividere. La condivisione reale arriverà con Firebase.</div></div>
+        </div>
         <div id="family-list"></div>
+        <div id="family-empty" style="display:none;text-align:center;padding:40px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">👨‍👩‍👧</div>
+          <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nessun familiare</div>
+          <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i membri della tua famiglia per condividere dati selezionati.</div>
+          <button onclick="familyAdd()" style="padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi familiare</button>
+        </div>
       </div>
     </div>
 
@@ -2400,10 +2507,11 @@ function pwPickIcon(btn, icon) {
 
 <!-- QR Code Modal (Wi-Fi) -->
 <div id="wifi-qr-modal" onclick="wifiCloseQR()">
-  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;" onclick="event.stopPropagation()">
-    <div id="wifi-qr-ssid-label" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;"></div>
+  <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;position:relative;" onclick="event.stopPropagation()">
+    <button onclick="wifiCloseQR()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f5;color:#333;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
+    <div id="wifi-qr-ssid-label" style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;margin-right:20px;"></div>
     <div style="font-size:12px;color:#9090b0;margin-bottom:16px;">Scansiona per connetterti</div>
-    <canvas id="wifi-qr-canvas" style="border-radius:12px;"></canvas>
+    <canvas id="wifi-qr-canvas" style="border-radius:12px;max-width:100%;"></canvas>
     <div style="margin-top:16px;">
       <button onclick="wifiCloseQR()" style="padding:12px 28px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
     </div>
@@ -2413,16 +2521,19 @@ function pwPickIcon(btn, icon) {
 <!-- QR Scanner Modal (OTP + WiFi) -->
 <div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.75);flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#111;border-radius:24px;overflow:hidden;width:360px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);">
+    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:#1a1a1a;">
       <div style="color:white;font-weight:700;font-size:15px;" id="qr-scanner-label">Scansiona QR Code</div>
       <button onclick="qrScannerClose()" style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:none;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
+    <!-- Camera -->
     <div style="position:relative;width:360px;max-width:95vw;height:300px;overflow:hidden;background:#000;">
       <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline autoplay muted></video>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
         <div style="width:160px;height:160px;border:3px solid #6366f1;border-radius:16px;box-shadow:0 0 0 1000px rgba(0,0,0,0.45);"></div>
       </div>
     </div>
+    <!-- Footer -->
     <div style="padding:14px 18px;text-align:center;">
       <div style="color:rgba(255,255,255,0.5);font-size:12px;margin-bottom:12px;">Inquadra il QR code nel riquadro</div>
       <button onclick="qrScannerClose()" style="width:100%;padding:11px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
@@ -2817,18 +2928,18 @@ function logout() {
 
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
-  home:      { title: 'Home',       sub: '', actions: ['customize'] },
-  passwords: { title: 'Password',   sub: '', actions: ['search','add'] },
-  documents: { title: 'Documenti',  sub: '', actions: ['add'] },
-  notes:     { title: 'Note',       sub: '', actions: ['search','add'] },
-  calendar:  { title: 'Calendario', sub: '', actions: ['add'] },
-  otp:       { title: 'OTP / 2FA',  sub: 'Codici TOTP', actions: ['add'] },
-  cards:     { title: 'Carte',      sub: '', actions: ['add'] },
-  wifi:      { title: 'Wi-Fi',      sub: 'Reti salvate', actions: ['add'] },
-  finance:   { title: 'Finanze',    sub: 'IBAN e conti', actions: ['add'] },
-  server:    { title: 'Server / IT',sub: 'SSH, API, credenziali', actions: ['add'] },
-  family:    { title: 'Famiglia',   sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: 'Spesa e acquisti', actions: ['add'] },
+  home:      { title: 'Home',        sub: '', actions: ['customize'] },
+  passwords: { title: 'Password',    sub: '', actions: ['search'] },
+  documents: { title: 'Documenti',   sub: '', actions: [] },
+  notes:     { title: 'Note',        sub: '', actions: ['search'] },
+  calendar:  { title: 'Calendario',  sub: '', actions: [] },
+  otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
+  cards:     { title: 'Carte',       sub: '', actions: [] },
+  wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
+  finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
+  server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
+  family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
 };
 
 function switchTab(tab) {
@@ -2855,6 +2966,7 @@ function switchTab(tab) {
   if (drawerItem) drawerItem.classList.add('active');
 
   // Update topbar
+  HB.currentTab = tab;  // ← deve essere prima di renderTopbarActions
   const cfg = TAB_CONFIG[tab] || { title: tab, sub: '', actions: [] };
   document.getElementById('topbar-title').textContent = cfg.title;
   document.getElementById('topbar-sub').textContent = cfg.sub;
@@ -2872,14 +2984,29 @@ function switchTab(tab) {
   document.documentElement.style.setProperty('--accent-bg', accent + '20');
   document.documentElement.style.setProperty('--accent2', accent);
 
-  HB.currentTab = tab;
-
   // If tab is in drawer, activate the more button
   const inBottombar = ['home','passwords','otp','calendar'].includes(tab);
   if (!inBottombar) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.querySelector('.nav-item.more-btn')?.classList.add('active');
   }
+
+  // Chiama onOpen del modulo
+  const moduleOpeners = {
+    otp:       () => typeof otpOpen === 'function' && otpOpen(),
+    shopping:  () => typeof shopOpen === 'function' && shopOpen(),
+    wifi:      () => typeof wifiOpen === 'function' && wifiOpen(),
+    passwords: () => typeof pwOpen === 'function' && pwOpen(),
+    notes:     () => typeof noteOpen === 'function' && noteOpen(),
+    cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
+    finance:   () => typeof financeOpen === 'function' && financeOpen(),
+    server:    () => typeof serverOpen === 'function' && serverOpen(),
+    documents: () => typeof docsOpen === 'function' && docsOpen(),
+    calendar:  () => typeof calOpen === 'function' && calOpen(),
+    family:    () => typeof familyOpen === 'function' && familyOpen(),
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+  };
+  moduleOpeners[tab]?.();
 }
 
 function switchTabFromDrawer(tab) {
@@ -2892,12 +3019,52 @@ function renderTopbarActions(actions) {
   container.innerHTML = '';
 
   if (HB.currentTab === 'passwords' && actions.includes('search')) {
-    const nb = document.createElement('button');
-    nb.className = 'topbar-btn accent-btn';
-    nb.title = 'Nuova password';
-    nb.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-    nb.onclick = ()=>pwNewItem();
-    container.appendChild(nb);
+    // Dropdown + per password
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;display:inline-block;';
+    const newBtn = document.createElement('div');
+    newBtn.className = 'topbar-btn accent-btn';
+    newBtn.title = 'Nuova password';
+    newBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+    newBtn.onclick = () => pwNewItem();
+    const dropdown = document.createElement('div');
+    dropdown.style.cssText = 'display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.3);min-width:190px;z-index:100;';
+    const optPw = document.createElement('button');
+    optPw.style.cssText = 'width:100%;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:13px;font-weight:700;text-align:left;font-family:inherit;display:flex;align-items:center;gap:10px;';
+    optPw.innerHTML = '🔐 Nuova Password';
+    optPw.onclick = () => { dropdown.style.display='none'; pwNewItem(); };
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:0 12px;';
+    const optCat = document.createElement('button');
+    optCat.style.cssText = 'width:100%;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:13px;font-weight:700;text-align:left;font-family:inherit;display:flex;align-items:center;gap:10px;';
+    optCat.innerHTML = '📁 Nuova Categoria';
+    optCat.onclick = () => { dropdown.style.display='none'; pwNewCategory(); };
+    // Separatore + Elimina Categoria
+    const sep2 = document.createElement('div');
+    sep2.style.cssText = 'height:1px;background:var(--border);margin:0 12px;';
+    const optDel = document.createElement('button');
+    optDel.style.cssText = 'width:100%;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:#ef4444;font-size:13px;font-weight:700;text-align:left;font-family:inherit;display:flex;align-items:center;gap:10px;';
+    optDel.innerHTML = '🗑 Elimina Categoria';
+    optDel.onclick = () => { dropdown.style.display='none'; pwPickCategoryToDelete(); };
+    dropdown.appendChild(optPw);
+    dropdown.appendChild(sep);
+    dropdown.appendChild(optCat);
+    dropdown.appendChild(sep2);
+    dropdown.appendChild(optDel);
+    newBtn.onclick = (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.style.display !== 'none';
+      dropdown.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) {
+        setTimeout(() => document.addEventListener('click', function h() {
+          dropdown.style.display = 'none';
+          document.removeEventListener('click', h);
+        }), 10);
+      }
+    };
+    wrap.appendChild(dropdown);
+    wrap.appendChild(newBtn);
+    container.appendChild(wrap);
   }
   if (actions.includes('search')) {
     const btn = document.createElement('div');
@@ -2958,7 +3125,8 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
-      if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
+  if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
+      showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
   }
@@ -3068,16 +3236,16 @@ function updateHomeDate() {
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
-  // Aggiorna contatori password
+  // Aggiorna contatori
   pwLoad();
   const el = document.getElementById('stat-passwords');
-  if (el) el.textContent = _pwItems.length || '—';
-  noteLoad(); const nel = document.getElementById('stat-notes'); if (nel) nel.textContent = _notes.length || '—';
-  otpLoad(); const oel = document.getElementById('stat-otp'); if (oel) oel.textContent = _otpAccounts.length || '—';
-  document.getElementById('stat-passwords').textContent = '—';
-  document.getElementById('stat-docs').textContent = '—';
-  document.getElementById('stat-notes').textContent = '—';
-  document.getElementById('stat-otp').textContent = '—';
+  if (el) el.textContent = _pwItems.length > 0 ? _pwItems.length : '0';
+  noteLoad();
+  const nel = document.getElementById('stat-notes');
+  if (nel) nel.textContent = _notes.length > 0 ? _notes.length : '0';
+  otpLoad();
+  const oel = document.getElementById('stat-otp');
+  if (oel) oel.textContent = _otpAccounts.length > 0 ? _otpAccounts.length : '0';
 }
 
 function openSettings() {
@@ -3197,11 +3365,6 @@ function pwOpen() {
 
 // Vista categorie
 function pwShowCats(q='') {
-  // Collega tasto nuova categoria
-  setTimeout(() => {
-    const btn = document.getElementById('pw-new-cat-btn');
-    if (btn && !btn._ready) { btn._ready=true; btn.onclick = () => pwNewCategory(); }
-  }, 50);
   document.getElementById('pw-view-cats').style.display = 'flex';
   document.getElementById('pw-view-items').style.display = 'none';
   document.getElementById('pw-view-detail').style.display = 'none';
@@ -3211,7 +3374,9 @@ function pwShowCats(q='') {
 
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
-  const cats = _pwCats.filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()));
+  const cats = _pwCats
+    .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name, 'it'));
   if (!cats.length) {
     grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna categoria trovata</div>';
     return;
@@ -3219,10 +3384,11 @@ function pwRenderCats(q='') {
   grid.innerHTML = '';
   cats.forEach(cat => {
     const count = _pwItems.filter(i => i.categoryId === cat.id).length;
-    // mostra sempre le categorie
+    // mostra sempre tutte le categorie
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
     const div = document.createElement('div');
     div.className = 'pw-cat-tile';
+    div.style.cssText = 'position:relative;';
     div.onclick = () => pwShowItems(cat.id, cat.name);
     div.innerHTML = `
       <div class="pw-cat-icon" style="background:${cat.color||'rgba(99,102,241,0.12)'}20;">${icon}</div>
@@ -3323,7 +3489,7 @@ function pwShowDetail(itemId) {
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
-      <button onclick="showToast('Modifica — in arrivo')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
+      <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
       <button onclick="pwDeleteConfirm('${item.id}')" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
     </div>`;
 }
@@ -3358,11 +3524,26 @@ function pwDeleteConfirm(itemId) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">🔐</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa password?</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L\'operazione non è reversibile.</div><div style="display:flex;gap:10px;"><button id="_pwd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pwd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button></div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">🔐</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa password?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_pwd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_pwd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
   document.getElementById('_pwd_cancel').onclick = () => overlay.remove();
-  document.getElementById('_pwd_ok').onclick = () => { overlay.remove(); _pwItems=_pwItems.filter(i=>i.id!==itemId); pwSave(); pwBackToItems(); showToast('Password eliminata'); };
+  document.getElementById('_pwd_ok').onclick = () => {
+    overlay.remove();
+    _pwItems = _pwItems.filter(i => i.id !== itemId);
+    pwSave();
+    pwBackToItems();
+    showToast('Password eliminata');
+  };
 }
+
 // Copia
 async function pwCopy(itemId, field) {
   const item = _pwItems.find(i => i.id === itemId);
@@ -3413,20 +3594,7 @@ async function pwHandleImport(event) {
 
     // Backup cifrato .hbb
     if (raw.hb_backup && raw.enc) {
-      // Dialog PIN senza prompt()
-      const pin = await new Promise(resolve => {
-        const ov = document.createElement('div');
-        ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
-        const bx = document.createElement('div');
-        bx.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);';
-        bx.innerHTML = '<div style="font-size:17px;font-weight:800;margin-bottom:8px;">🔐 Backup cifrato</div><div style="font-size:13px;color:var(--text3);margin-bottom:16px;">Inserisci il PIN Master che usavi nella v11 per decifrare il backup.</div><input id="_hbb_pin" type="password" placeholder="PIN Master v11..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;outline:none;box-sizing:border-box;margin-bottom:14px;font-family:monospace;letter-spacing:4px;"><div style="display:flex;gap:10px;"><button id="_hbb_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_hbb_ok" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Decifra</button></div>';
-        ov.appendChild(bx); document.body.appendChild(ov);
-        const inp = document.getElementById('_hbb_pin');
-        setTimeout(() => inp?.focus(), 100);
-        document.getElementById('_hbb_cancel').onclick = () => { ov.remove(); resolve(null); };
-        document.getElementById('_hbb_ok').onclick = () => { const p=inp?.value?.trim(); ov.remove(); resolve(p||null); };
-        inp.addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('_hbb_ok').click(); });
-      });
+      const pin = prompt('Inserisci il PIN Master della v11 per decriptare il backup:');
       if (!pin) return;
       // Decifra con stesso algoritmo v11
       const saltHex = (() => {
@@ -3435,6 +3603,7 @@ async function pwHandleImport(event) {
         return null;
       })();
 
+      // Approccio: derivo chiave direttamente con PIN e tentiamo decryption
       try {
         const encStr = raw.enc;
         if (!encStr.startsWith('hb_enc_v11:')) throw new Error('Formato non valido');
@@ -3461,10 +3630,10 @@ async function pwHandleImport(event) {
       }
     }
 
-    if (!data.categories) throw new Error('Formato non riconosciuto');
-    const iconMap = {'bell':'🔔','credit-card':'💳','activity':'📊','shield-alert':'🛡️','building':'🏢','cloud':'☁️','graduation-cap':'🎓','user-check':'👤','file-digit':'📄','home':'🏠','terminal':'💻','microscope':'🔬','certificate':'📜','landmark':'🏦','link':'🔗','cpu':'💾','mail':'📧','shield':'🛡️','shield-check':'✅','server':'🖥️','heart-pulse':'❤️','globe':'🌐','layers':'📑','fingerprint':'🔐','tv':'📺','briefcase':'💼','utensils':'🍽️','video':'📹','ghost':'👻','layout-grid':'📱','lock':'🔒','key':'🔑'};
-    _pwCats = (data.categories||[]).map(c=>({...c, icon: iconMap[c.icon]||c.icon||'📁'}));
-    _pwItems = (data.items||[]);
+    if (!data.categories || !data.items) throw new Error('Formato non riconosciuto');
+
+    _pwCats  = data.categories;
+    _pwItems = data.items;
     pwSave();
 
     document.getElementById('pw-import-banner').style.display = 'none';
@@ -3480,23 +3649,78 @@ async function pwHandleImport(event) {
 }
 
 function pwNewItem() {
+  if (!_pwCats.length) { showToast('Crea prima una categoria 📁'); return; }
+  const catOpts = _pwCats.map(c =>
+    '<option value="'+c.id+'">'+(c.icon||'📁')+' '+c.name+'</option>'
+  ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
   const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:90dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  const catOpts = _pwCats.map(c=>'<option value="'+c.id+'">'+( c.icon||'📁')+' '+c.name+'</option>').join('');
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div><div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div><select id="_pw_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;">'+catOpts+'</select></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div><input id="_pw_title" type="text" placeholder="es. Google, Amazon..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div><input id="_pw_user" type="text" placeholder="mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div><div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div><div style="display:flex;gap:8px;"><input id="_pw_pass" type="password" placeholder="Password..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"><button id="_pw_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button><button id="_pw_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div><div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div><textarea id="_pw_note" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;height:70px;font-family:inherit;"></textarea></div><div style="display:flex;gap:10px;"><button id="_pw_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_pw_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button></div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
-  setTimeout(()=>document.getElementById('_pw_title')?.focus(),100);
-  document.getElementById('_pw_cancel').onclick = ()=>overlay.remove();
-  document.getElementById('_pw_eye').onclick = ()=>{ const i=document.getElementById('_pw_pass'); i.type=i.type==='password'?'text':'password'; };
-  document.getElementById('_pw_dice').onclick = ()=>{ const c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*'; const a=new Uint8Array(16); crypto.getRandomValues(a); let p=''; a.forEach(b=>p+=c[b%c.length]); const i=document.getElementById('_pw_pass'); i.value=p; i.type='text'; };
-  document.getElementById('_pw_save').onclick = ()=>{
-    const title=document.getElementById('_pw_title')?.value.trim();
-    const pass=document.getElementById('_pw_pass')?.value;
-    if (!title||!pass){ showToast('Inserisci titolo e password'); return; }
-    _pwItems.push({ id:'pw_'+Date.now(), title, password:pass, username:document.getElementById('_pw_user')?.value.trim(), notes:document.getElementById('_pw_note')?.value.trim(), categoryId:document.getElementById('_pw_cat')?.value, createdAt:new Date().toISOString() });
-    pwSave(); overlay.remove(); pwOpen(); showToast('Password salvata');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
+    '<select id="_pwn_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
+    '<input id="_pwn_title" type="text" placeholder="es. Google, Amazon, Netflix..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
+    '<input id="_pwn_url" type="url" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
+    '<input id="_pwn_user" type="text" placeholder="es. mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div>',
+    '<div style="display:flex;gap:8px;">',
+    '<input id="_pwn_pass" type="password" placeholder="Inserisci o genera..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwn_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button>',
+    '<button id="_pwn_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">🎲</button>',
+    '</div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
+    '<div style="display:flex;gap:8px;"><input id="_pwn_pin" type="password" placeholder="PIN numerico..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwn_pin_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button></div></div>',
+    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
+    '<textarea id="_pwn_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_pwn_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_pwn_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('_pwn_title')?.focus(), 100);
+  document.getElementById('_pwn_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwn_pin_eye').onclick = () => {
+    const i = document.getElementById('_pwn_pin');
+    i.type = i.type === 'password' ? 'text' : 'password';
+  };
+  document.getElementById('_pwn_eye').onclick = () => {
+    const i = document.getElementById('_pwn_pass');
+    i.type = i.type === 'password' ? 'text' : 'password';
+  };
+  document.getElementById('_pwn_dice').onclick = () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let p = ''; a.forEach(b => p += c[b % c.length]);
+    const i = document.getElementById('_pwn_pass'); i.value = p; i.type = 'text';
+  };
+  document.getElementById('_pwn_save').onclick = () => {
+    const title = document.getElementById('_pwn_title')?.value.trim();
+    const pass  = document.getElementById('_pwn_pass')?.value;
+    if (!title || !pass) { showToast('Inserisci titolo e password'); return; }
+    _pwItems.push({
+      id: 'pw_' + Date.now(),
+      title,
+      password:  pass,
+      username:  document.getElementById('_pwn_user')?.value.trim() || '',
+      url:       document.getElementById('_pwn_url')?.value.trim() || '',
+      pin:       document.getElementById('_pwn_pin')?.value.trim() || '',
+      notes:     document.getElementById('_pwn_note')?.value.trim() || '',
+      categoryId: document.getElementById('_pwn_cat')?.value,
+      createdAt: new Date().toISOString()
+    });
+    pwSave();
+    overlay.remove();
+    pwShowItems(document.getElementById('_pwn_cat')?.value);
+    showToast('✅ Password salvata');
   };
 }
 
@@ -3908,7 +4132,7 @@ function noteRenderList(q='') {
       ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}</span>
-        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')">🗑</button>
+        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;">🗑</button>
       </div>`;
     list.appendChild(card);
   });
@@ -3971,11 +4195,26 @@ function noteDelete(id) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">🗑</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L\'operazione non è reversibile.</div><div style="display:flex;gap:10px;"><button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button></div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">🗑</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
   document.getElementById('_nd_cancel').onclick = () => overlay.remove();
-  document.getElementById('_nd_ok').onclick = () => { overlay.remove(); _notes=_notes.filter(n=>n.id!==id); noteSaveAll(); noteRenderList(''); showToast('Nota eliminata'); };
+  document.getElementById('_nd_ok').onclick = () => {
+    overlay.remove();
+    _notes = _notes.filter(n => n.id !== id);
+    noteSaveAll();
+    noteRenderList('');
+    showToast('Nota eliminata');
+  };
 }
+
 // Import note dal backup v11
 function noteImportFromBackup(notesArr) {
   if (!Array.isArray(notesArr)) return;
@@ -4145,11 +4384,27 @@ function cardsDelete(id) {
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">💳</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div><div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L\'operazione non è reversibile.</div><div style="display:flex;gap:10px;"><button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button></div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">💳</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
   document.getElementById('_cd_cancel').onclick = () => overlay.remove();
-  document.getElementById('_cd_ok').onclick = () => { overlay.remove(); document.getElementById('card-detail-overlay')?.remove(); _cards=_cards.filter(c=>c.id!==id); cardsSaveAll(); cardsRender(); showToast('Carta rimossa'); };
+  document.getElementById('_cd_ok').onclick = () => {
+    overlay.remove();
+    // Chiudi il dettaglio se aperto
+    document.getElementById('card-detail-overlay')?.remove();
+    _cards = _cards.filter(c => c.id !== id);
+    cardsSaveAll(); cardsRender();
+    showToast('Carta rimossa');
+  };
 }
+
 // ── Riconoscimento circuito ───────────────────────────────
 function cardCircuit(number) {
   if (!number) return '💳';
@@ -5011,98 +5266,129 @@ function calDeleteEvent(id) {
 // ═══════════════════════════════════════════════════════════
 //  FAMIGLIA
 // ═══════════════════════════════════════════════════════════
-const FAMILY_KEY = 'hb12_family';
-let _familyMembers = [];
+const FAMILY_KEY = 'hb13_family';
+let _family = [];
+
+const SHARE_OPTIONS = [
+  { id: 'passwords', label: 'Password',    icon: '🔐' },
+  { id: 'notes',     label: 'Note',         icon: '📝' },
+  { id: 'shopping',  label: 'Lista Spesa',  icon: '🛒' },
+  { id: 'documents', label: 'Documenti',    icon: '📄' },
+  { id: 'cards',     label: 'Carte',        icon: '💳' },
+  { id: 'wifi',      label: 'Wi-Fi',        icon: '📶' },
+  { id: 'otp',       label: 'OTP / 2FA',   icon: '🔑' },
+  { id: 'calendar',  label: 'Calendario',   icon: '📅' },
+];
 
 function familyLoad() {
-  try { _familyMembers = JSON.parse(localStorage.getItem(FAMILY_KEY)||'[]'); } catch(e) { _familyMembers=[]; }
+  try { _family = JSON.parse(localStorage.getItem(FAMILY_KEY)) || []; }
+  catch(e) { _family = []; }
 }
-function familySaveAll() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_familyMembers)); }
+function familySave() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_family)); }
 
 function familyOpen() {
-  familyLoad(); familyRender();
+  familyLoad();
+  familyRender();
   document.getElementById('topbar-title').textContent = 'Famiglia';
-  document.getElementById('topbar-sub').textContent = _familyMembers.length + ' membri';
-  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-sub').textContent = _family.length + ' membri';
 }
 
 function familyRender() {
-  const list = document.getElementById('family-list');
+  const list  = document.getElementById('family-list');
+  const empty = document.getElementById('family-empty');
   if (!list) return;
-  if (!_familyMembers.length) {
-    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">👨‍👩‍👧</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun membro</div>
-      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i membri della famiglia per condividere il vault</div>
-      <button onclick="familyAddMember()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi membro</button>
-      <div style="margin-top:24px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;text-align:left;">
-        <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">🔮 In arrivo</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7;">
-          • Vault condiviso con PIN separato<br>
-          • Permessi lettura/scrittura per scheda<br>
-          • Notifiche di modifica in tempo reale<br>
-          • Sincronizzazione Firebase
-        </div>
-      </div>
-    </div>`;
-    return;
-  }
+  if (!_family.length) { list.innerHTML = ''; if (empty) empty.style.display='block'; return; }
+  if (empty) empty.style.display = 'none';
   list.innerHTML = '';
-  _familyMembers.forEach(m => {
+  _family.forEach((member, idx) => {
     const card = document.createElement('div');
-    card.className = 'family-card';
-    card.innerHTML = `
-      <div class="family-avatar">${m.emoji || '👤'}</div>
-      <div style="flex:1;">
-        <div style="font-size:15px;font-weight:800;">${m.name}</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px;">${m.role || 'Membro'}</div>
-      </div>
-      <button onclick="familyDelete('${m.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>`;
+    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;';
+    const initials = (member.name || member.email || '?').slice(0,2).toUpperCase();
+    const sharedCount = (member.sharing || []).length;
+    const chips = SHARE_OPTIONS.map(opt => {
+      const active = (member.sharing||[]).includes(opt.id);
+      return '<button data-idx="'+idx+'" data-opt="'+opt.id+'" style="padding:6px 11px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid '+(active?'var(--accent)':'var(--border)')+';background:'+(active?'var(--accent-bg)':'var(--surface)')+';color:'+(active?'var(--accent)':'var(--text3)')+';">'+opt.icon+' '+opt.label+'</button>';
+    }).join('');
+    card.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
+      +'<div style="width:44px;height:44px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:white;flex-shrink:0;">'+initials+'</div>'
+      +'<div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(member.name||'Senza nome')+'</div>'
+      +'<div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+member.email+'</div></div>'
+      +'<button data-edit="'+idx+'" style="padding:7px 11px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;">✏️</button>'
+      +'<button data-del="'+idx+'" style="padding:7px 11px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;cursor:pointer;margin-left:6px;">🗑</button>'
+      +'</div>'
+      +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:8px;">Condividi:</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px;">'+chips+'</div>'
+      +'<div style="margin-top:10px;font-size:11px;color:var(--text3);">'+(sharedCount>0?'✅ '+sharedCount+' sezione'+(sharedCount>1?'i':'')+ ' condivisa'+(sharedCount>1?'':''):'Nessuna sezione condivisa')+'</div>';
+    // Event listeners
+    card.querySelectorAll('button[data-opt]').forEach(btn => {
+      btn.onclick = () => familyToggleShare(parseInt(btn.dataset.idx), btn.dataset.opt);
+    });
+    card.querySelector('button[data-edit]').onclick = () => familyShowForm(member, idx);
+    card.querySelector('button[data-del]').onclick  = () => familyDelete(idx);
     list.appendChild(card);
   });
-  const addBtn = document.createElement('button');
-  addBtn.onclick = familyAddMember;
-  addBtn.style.cssText = 'width:100%;padding:14px;border-radius:14px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;';
-  addBtn.textContent = '+ Aggiungi membro';
-  list.appendChild(addBtn);
 }
 
-function familyAddMember() {
-  const emojis = ['👤','👨','👩','👦','👧','👴','👵','🧑'];
+function familyToggleShare(idx, optId) {
+  if (!_family[idx]) return;
+  if (!_family[idx].sharing) _family[idx].sharing = [];
+  const pos = _family[idx].sharing.indexOf(optId);
+  if (pos>-1) _family[idx].sharing.splice(pos,1); else _family[idx].sharing.push(optId);
+  familySave(); familyRender();
+}
+
+function familyAdd() { familyShowForm(null, null); }
+
+function familyShowForm(member, idx) {
+  const isEdit = idx !== null && idx !== undefined;
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
-    <div style="font-size:16px;font-weight:800;margin-bottom:16px;">Aggiungi membro</div>
-    <input id="fam-name-inp" type="text" placeholder="Nome *" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;">
-    <input id="fam-role-inp" type="text" placeholder="Ruolo (es. Papà, Mamma, Figlio)" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;">
-    <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="familyDoAdd(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi</button>
-    </div>
-  </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('fam-name-inp')?.focus(), 200);
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>'
+    +'<div style="font-size:18px;font-weight:800;margin-bottom:18px;">'+(isEdit?'✏️ Modifica familiare':'👤 Nuovo familiare')+'</div>'
+    +'<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Nome</div>'
+    +'<input id="_fm_name" type="text" value="'+(member?.name||'')+'" placeholder="es. Marco, Giusy..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>'
+    +'<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email *</div>'
+    +'<input id="_fm_email" type="email" value="'+(member?.email||'')+'" placeholder="es. marco@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>'
+    +'<div style="display:flex;gap:10px;">'
+    +'<button id="_fm_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    +'<button id="_fm_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">'+(isEdit?'Salva':'Aggiungi')+'</button>'
+    +'</div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('_fm_name')?.focus(), 100);
+  document.getElementById('_fm_cancel').onclick = () => overlay.remove();
+  document.getElementById('_fm_save').onclick = () => {
+    const name  = document.getElementById('_fm_name')?.value.trim();
+    const email = document.getElementById('_fm_email')?.value.trim();
+    if (!email) { showToast('Inserisci una email'); return; }
+    if (isEdit) { _family[idx] = {..._family[idx], name, email}; }
+    else { _family.push({id:'fm_'+Date.now(), name, email, sharing:[]}); }
+    familySave(); overlay.remove(); familyRender();
+    showToast(isEdit ? '✅ Aggiornato' : '✅ '+(name||email)+' aggiunto');
+  };
+  document.getElementById('_fm_email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('_fm_save').click(); });
 }
 
-function familyDoAdd(btn) {
-  const emojis = ['👤','👨','👩','👦','👧','👴','👵','🧑'];
-  const name = document.getElementById('fam-name-inp')?.value.trim();
-  const role = document.getElementById('fam-role-inp')?.value.trim() || 'Membro';
-  if (!name) { showToast('Inserisci un nome'); return; }
-  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-  _familyMembers.push({ id:'fam_'+Date.now(), name, role, emoji });
-  familySaveAll(); familyRender();
-  btn.closest('[style]').remove();
-  showToast('✅ ' + name + ' aggiunto');
+function familyDelete(idx) {
+  const member = _family[idx]; if (!member) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = '<div style="font-size:32px;margin-bottom:10px;">👤</div>'
+    +'<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Rimuovere '+(member.name||member.email)+'?</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Le condivisioni impostate verranno eliminate.</div>'
+    +'<div style="display:flex;gap:10px;">'
+    +'<button id="_fdel_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    +'<button id="_fdel_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Rimuovi</button>'
+    +'</div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
+  document.getElementById('_fdel_cancel').onclick = () => overlay.remove();
+  document.getElementById('_fdel_ok').onclick = () => {
+    _family.splice(idx,1); familySave(); overlay.remove(); familyRender(); showToast('Familiare rimosso');
+  };
 }
-
-function familyDelete(id) {
-  _familyMembers = _familyMembers.filter(m => m.id !== id);
-  familySaveAll(); familyRender();
-}
-
-// ── Fine Famiglia ─────────────────────────────────────────
-
 // ═══════════════════════════════════════════════════════════
 //  DOCUMENTI
 // ═══════════════════════════════════════════════════════════
@@ -5323,6 +5609,18 @@ function docsSelectType(btn, typeId, icon, label) {
   _docType = { id:typeId, icon, label };
   document.querySelectorAll('[data-dtype]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  // Tipo CF: mostra form speciale
+  const cfForm = document.getElementById('docs-cf-form');
+  const stdForm = document.getElementById('docs-standard-form');
+  if (cfForm && stdForm) {
+    if (typeId === 'cf') {
+      cfForm.style.display = 'block';
+      stdForm.style.display = 'none';
+    } else {
+      cfForm.style.display = 'none';
+      stdForm.style.display = 'block';
+    }
+  }
 }
 
 function docsSave() {
@@ -5675,7 +5973,21 @@ function shopRenderListTabs() {
     // Tieni premuto per rinominare
     let pt; btn.addEventListener('touchstart', () => { pt = setTimeout(() => shopRenameList(id), 600); });
     btn.addEventListener('touchend', () => clearTimeout(pt));
-    container.appendChild(btn);
+    // Tasto 🗑 accanto alla lista attiva (solo se ci sono più liste)
+    if (id === _shopCurId && Object.keys(_shopLists).length > 1) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:3px;flex-shrink:0;';
+      wrap.appendChild(btn);
+      const del = document.createElement('button');
+      del.textContent = '🗑';
+      del.title = 'Elimina lista';
+      del.style.cssText = 'padding:4px 7px;border-radius:99px;font-size:11px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;';
+      del.onclick = (e) => { e.stopPropagation(); shopDeleteList(id); };
+      wrap.appendChild(del);
+      container.appendChild(wrap);
+    } else {
+      container.appendChild(btn);
+    }
   });
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
@@ -5856,63 +6168,91 @@ function shopRemove(id) {
 function shopClearAll() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);">
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">🗑</div>
     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Svuota lista?</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tutti i prodotti selezionati verranno rimossi.</div>
     <div style="display:flex;gap:8px;">
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="_shopList={};shopSave();shopRenderAll();this.closest('[style]').remove();showToast('Lista svuotata')" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
-    </div>
-  </div>`;
+      <button id="_shop_clear_cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_shop_clear_ok" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
+  document.getElementById('_shop_clear_cancel').onclick = () => overlay.remove();
+  document.getElementById('_shop_clear_ok').onclick = () => {
+    overlay.remove();
+    _shopList = {};
+    if (_shopLists[_shopCurId]) _shopLists[_shopCurId].items = {};
+    shopSave();
+    shopRenderAll();
+    showToast('Lista svuotata');
+  };
 }
 
 function shopNewList() {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
-    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista della spesa</div>
-    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata, ne crei una nuova.</div>
-    <input id="shop-new-name" type="text" placeholder="Nome lista (es. Settimana, Festa...)" value="Spesa"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata.</div>
+    <input id="shop-new-name" type="text" placeholder="es. Settimana, Festa, Farmacia..." value="Spesa"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="shopCreateList(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
-    </div>
-  </div>`;
+      <button id="_snl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_snl_ok" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => { const inp = document.getElementById('shop-new-name'); inp?.focus(); inp?.select(); }, 200);
+  const inp = document.getElementById('shop-new-name');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_snl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_snl_ok').onclick = () => {
+    const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
+    shopSave();
+    const id = 'lst_' + Date.now();
+    _shopLists[id] = { name, items: {} };
+    _shopCurId = id;
+    _shopList = _shopLists[id].items;
+    shopSave();
+    overlay.remove();
+    shopRenderAll();
+    showToast('✅ Lista "' + name + '" creata');
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_snl_ok').click(); });
 }
 
-function shopCreateList(btn) {
-  const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
-  shopSave(); // salva lista corrente
-  const id = 'lst_' + Date.now();
-  _shopLists[id] = { name, items:{} };
-  _shopCurId = id;
-  _shopList  = _shopLists[id].items;
-  shopSave();
-  btn.closest('[style]').remove();
-  shopRenderAll();
-  showToast('✅ Lista "' + name + '" creata');
-}
+function shopCreateList() {} // legacy — non usato
 
 function shopRenameList(id) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
     <div style="font-size:16px;font-weight:800;margin-bottom:14px;">Rinomina lista</div>
-    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name||''}"
-      style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name || ''}"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
     <div style="display:flex;gap:10px;">
-      <button onclick="shopDeleteList('${id}');this.closest('[style]').remove()" style="padding:13px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
-      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button onclick="_shopLists['${id}'].name=document.getElementById('shop-rename-inp').value.trim()||_shopLists['${id}'].name;shopSave();shopRenderAll();this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>
-  </div>`;
+      <button id="_srl_del" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑</button>
+      <button id="_srl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_srl_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>`;
+  overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => { const inp = document.getElementById('shop-rename-inp'); inp?.focus(); inp?.select(); }, 200);
+  const inp = document.getElementById('shop-rename-inp');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_srl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_srl_del').onclick = () => { overlay.remove(); shopDeleteList(id); };
+  document.getElementById('_srl_ok').onclick = () => {
+    const newName = inp?.value.trim();
+    if (newName && _shopLists[id]) _shopLists[id].name = newName;
+    shopSave(); shopRenderAll(); overlay.remove();
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_srl_ok').click(); });
 }
 
 function shopDeleteList(id) {
@@ -6108,38 +6448,118 @@ function runSearch(q) {
     container.innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
     return;
   }
-  // Cerca nei dati disponibili (espandibile per ogni scheda)
-  const results = [];
   const ql = q.toLowerCase();
+  const results = [];
 
-  // Placeholder: cerca nelle schede registrate
-  ALL_TABS_META.forEach(tab => {
-    if (tab.label.toLowerCase().includes(ql)) {
-      results.push({
-        icon: tab.icon, title: 'Vai a ' + tab.label,
-        sub: 'Sezione ' + tab.label, tab: tab.id, tabLabel: tab.label
-      });
-    }
-  });
+  // ── Password ──────────────────────────────────────────
+  if (typeof _pwItems !== 'undefined') {
+    _pwItems.forEach(item => {
+      if ([item.title, item.username, item.url, item.notes]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        const cat = _pwCats?.find(c => c.id === item.categoryId);
+        results.push({
+          icon: cat?.icon || '🔐', title: item.title,
+          sub: item.username || item.url || 'Password',
+          badge: '🔐 Password',
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
+        });
+      }
+    });
+  }
 
-  // TODO: quando le schede avranno dati reali, cercare lì
-  // results.push(...searchPasswords(q), ...searchNotes(q), ...searchCards(q));
+  // ── Note ──────────────────────────────────────────────
+  if (typeof _notes !== 'undefined') {
+    _notes.forEach(note => {
+      if ([note.title, note.content].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📝', title: note.title || 'Nota senza titolo',
+          sub: (note.content || '').slice(0, 60),
+          badge: '📝 Note',
+          action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── OTP ───────────────────────────────────────────────
+  if (typeof _otpAccounts !== 'undefined') {
+    _otpAccounts.forEach(acc => {
+      if ([acc.name, acc.user, acc.issuer].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: acc.icon || '🔑', title: acc.name,
+          sub: acc.user || acc.issuer || 'OTP / 2FA',
+          badge: '🔑 OTP',
+          action: () => switchTab('otp')
+        });
+      }
+    });
+  }
+
+  // ── Carte ─────────────────────────────────────────────
+  if (typeof _cards !== 'undefined') {
+    _cards.forEach(card => {
+      if ([card.holder, card.bank, card.number, card.type]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '💳', title: card.holder || 'Carta',
+          sub: card.bank || card.type || '•••• ' + (card.number||'').slice(-4),
+          badge: '💳 Carte',
+          action: () => { switchTab('cards'); setTimeout(() => cardsShowDetail(card.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Wi-Fi ─────────────────────────────────────────────
+  if (typeof _wifiNets !== 'undefined') {
+    _wifiNets.forEach(net => {
+      if ([net.ssid, net.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📶', title: net.ssid,
+          sub: net.security || 'Rete Wi-Fi',
+          badge: '📶 Wi-Fi',
+          action: () => switchTab('wifi')
+        });
+      }
+    });
+  }
+
+  // ── Server ────────────────────────────────────────────
+  if (typeof _serverItems !== 'undefined') {
+    _serverItems.forEach(s => {
+      if ([s.name, s.host, s.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '🖥️', title: s.name,
+          sub: s.host || 'Server / IT',
+          badge: '📡 Server',
+          action: () => switchTab('server')
+        });
+      }
+    });
+  }
 
   if (!results.length) {
-    container.innerHTML = `<div class="search-empty">Nessun risultato per "<strong>${q}</strong>"</div>`;
+    container.innerHTML = '<div class="search-empty">Nessun risultato per "<strong>' + q + '</strong>"</div>';
     return;
   }
-  container.innerHTML = results.map(r => `
-    <div class="search-result-item" onclick="closeGlobalSearch();switchTab('${r.tab}')">
-      <div class="search-result-icon">${r.icon}</div>
-      <div style="flex:1;min-width:0;">
-        <div class="search-result-title">${r.title}</div>
-        <div class="search-result-sub">${r.sub}</div>
-      </div>
-      <div class="search-result-tab">${r.tabLabel}</div>
-    </div>
-  `).join('');
+
+  container.innerHTML = '';
+  results.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'search-result-item';
+    el.style.cursor = 'pointer';
+    el.innerHTML =
+      '<div class="search-result-icon">' + r.icon + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="search-result-title">' + r.title + '</div>' +
+        '<div class="search-result-sub">' + r.sub + '</div>' +
+      '</div>' +
+      '<div class="search-result-tab">' + r.badge + '</div>';
+    el.onclick = () => { closeGlobalSearch(); r.action(); };
+    container.appendChild(el);
+  });
 }
+
 
 // ── Home Customization ─────────────────────────────────────
 const HOME_PREFS_KEY = 'hb12_home_prefs';
@@ -6416,6 +6836,561 @@ async function tryBiometric() {
   } catch(e) {
     console.warn('[Bio auth]', e);
     showToast('Biometrico non riuscito — usa il PIN');
+  }
+}
+
+
+// ── Modifica Password ────────────────────────────────────
+function pwEditItem(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+  const catOpts = _pwCats.map(c =>
+    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+( c.icon||'📁')+' '+c.name+'</option>'
+  ).join('');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">',
+    '<div style="font-size:18px;font-weight:800;">✏️ Modifica Password</div>',
+    '<button id="_pwe_del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>',
+    '</div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
+    '<select id="_pwe_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
+    '<input id="_pwe_title" type="text" value="'+(item.title||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
+    '<input id="_pwe_url" type="url" value="'+(item.url||'')+'" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
+    '<input id="_pwe_user" type="text" value="'+(item.username||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password</div>',
+    '<div style="display:flex;gap:8px;"><input id="_pwe_pass" type="password" value="'+(item.password||'')+'" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwe_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button>',
+    '<button id="_pwe_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
+    '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
+    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
+    '<textarea id="_pwe_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;">'+(item.notes||'')+'</textarea></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_pwe_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_pwe_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva Modifiche</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_pwe_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwe_del').onclick = () => { overlay.remove(); pwDeleteConfirm(itemId); };
+  document.getElementById('_pwe_eye').onclick = () => {
+    const i = document.getElementById('_pwe_pass');
+    i.type = i.type === 'password' ? 'text' : 'password';
+  };
+  document.getElementById('_pwe_dice').onclick = () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let p = ''; a.forEach(b => p += c[b % c.length]);
+    const i = document.getElementById('_pwe_pass'); i.value = p; i.type = 'text';
+  };
+  document.getElementById('_pwe_save').onclick = () => {
+    const title = document.getElementById('_pwe_title')?.value.trim();
+    const pass  = document.getElementById('_pwe_pass')?.value;
+    if (!title) { showToast('Inserisci il titolo'); return; }
+    const idx = _pwItems.findIndex(i => i.id === itemId);
+    if (idx > -1) {
+      _pwItems[idx] = {
+        ...item,
+        title,
+        password: pass,
+        username: document.getElementById('_pwe_user')?.value.trim() || '',
+        url:      document.getElementById('_pwe_url')?.value.trim() || '',
+        pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
+        notes:    document.getElementById('_pwe_note')?.value.trim() || '',
+        categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
+        updatedAt: new Date().toISOString()
+      };
+      pwSave();
+    }
+    overlay.remove();
+    pwShowDetail(itemId);
+    showToast('✅ Password aggiornata');
+  };
+}
+
+
+// ── Nuova Categoria Password ──────────────────────────────
+function pwNewCategory() {
+  const EMO = ['📁','🔐','💳','🏦','📧','☁️','🏠','💻','🌐','🛡️',
+               '📱','🔑','👤','🏢','🖥️','📜','❤️','🎓','💼','📺',
+               '🍽️','📹','🔔','🔗','💾','🎮','✈️','🎵','⚙️','🛒'];
+  window._pwNewCatIcon = '📁';
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  const iconBtns = EMO.map(ic =>
+    '<button data-ic="'+ic+'" style="width:42px;height:42px;border-radius:10px;border:2px solid '+(ic==='📁'?'var(--accent)':'var(--border)')+';background:'+(ic==='📁'?'var(--accent-bg)':'var(--surface)')+';font-size:20px;cursor:pointer;">'+ic+'</button>'
+  ).join('');
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">📁 Nuova Categoria</div>',
+    '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Nome *</div>',
+    '<input id="_nc_name" type="text" placeholder="es. Banca, Lavoro, Social..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Icona</div>',
+    '<div id="_nc_icons" style="display:flex;flex-wrap:wrap;gap:6px;">'+iconBtns+'</div></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_nc_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_nc_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea Categoria</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('_nc_name')?.focus(), 100);
+
+  // Selezione icona
+  box.querySelectorAll('#_nc_icons button').forEach(btn => {
+    btn.onclick = () => {
+      window._pwNewCatIcon = btn.dataset.ic || btn.textContent;
+      box.querySelectorAll('#_nc_icons button').forEach(b => {
+        const active = b === btn;
+        b.style.border = active ? '2px solid var(--accent)' : '2px solid var(--border)';
+        b.style.background = active ? 'var(--accent-bg)' : 'var(--surface)';
+      });
+    };
+  });
+
+  document.getElementById('_nc_cancel').onclick = () => overlay.remove();
+  document.getElementById('_nc_name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('_nc_save').click();
+  });
+  document.getElementById('_nc_save').onclick = () => {
+    const name = document.getElementById('_nc_name')?.value.trim();
+    if (!name) { showToast('Inserisci il nome della categoria'); return; }
+    _pwCats.push({ id: 'cat_' + Date.now(), name, icon: window._pwNewCatIcon || '📁' });
+    pwSave();
+    overlay.remove();
+    pwShowCats();
+    showToast('✅ Categoria "' + name + '" creata');
+  };
+}
+
+function pwDeleteCategory(catId, catName, count) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  const warn = count > 0
+    ? '<div style="font-size:12px;color:#f97316;margin-bottom:16px;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px 12px;">⚠️ Contiene '+count+' password che verranno eliminate</div>'
+    : '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">La categoria è vuota.</div>';
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">📁</div>'
+    + '<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Elimina "'+catName+'"?</div>'
+    + warn
+    + '<div style="display:flex;gap:10px;">'
+    + '<button id="_dcat_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '<button id="_dcat_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>'
+    + '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_dcat_cancel').onclick = () => overlay.remove();
+  document.getElementById('_dcat_ok').onclick = () => {
+    // Rimuovi categoria e tutte le sue password
+    _pwCats = _pwCats.filter(c => c.id !== catId);
+    _pwItems = _pwItems.filter(i => i.categoryId !== catId);
+    pwSave();
+    overlay.remove();
+    pwShowCats();
+    showToast('Categoria eliminata');
+  };
+}
+
+function pwPickCategoryToDelete() {
+  if (!_pwCats.length) { showToast('Nessuna categoria da eliminare'); return; }
+  const sorted = [..._pwCats].sort((a,b) => a.name.localeCompare(b.name,'it'));
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:70dvh;display:flex;flex-direction:column;padding:20px 0 calc(16px + env(safe-area-inset-bottom,0px));';
+  const header = '<div style="padding:0 16px 14px;display:flex;align-items:center;justify-content:space-between;">'
+    + '<div style="font-size:17px;font-weight:800;">🗑 Elimina Categoria</div>'
+    + '<button id="_dpick_close" style="padding:6px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '</div>'
+    + '<div style="height:1px;background:var(--border);margin-bottom:8px;"></div>';
+  const listHtml = sorted.map(cat => {
+    const count = _pwItems.filter(i => i.categoryId === cat.id).length;
+    return '<button data-catid="'+cat.id+'" data-catname="'+cat.name.replace(/"/g,'&quot;')+'" data-count="'+count+'" style="width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-family:inherit;text-align:left;">'
+      + '<span style="font-size:22px;">'+(cat.icon||'📁')+'</span>'
+      + '<span style="flex:1;font-size:14px;font-weight:700;">'+cat.name+'</span>'
+      + '<span style="font-size:12px;color:'+(count>0?'#f97316':'var(--text3)')+';">'+(count>0?count+' pw':'vuota')+'</span>'
+      + '</button>';
+  }).join('');
+  box.innerHTML = header + '<div style="overflow-y:auto;flex:1;">' + listHtml + '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_dpick_close').onclick = () => overlay.remove();
+  box.querySelectorAll('button[data-catid]').forEach(btn => {
+    btn.onclick = () => {
+      const catId = btn.dataset.catid;
+      const catName = btn.dataset.catname;
+      const count = parseInt(btn.dataset.count);
+      overlay.remove();
+      pwDeleteCategory(catId, catName, count);
+    };
+  });
+}
+
+// ── Codice Fiscale ───────────────────────────────────────
+const CF_PERSONAL_KEY = 'hb13_personal';
+const CF_MESI_LETTERE = ['A','B','C','D','E','H','L','M','P','R','S','T'];
+const CF_COMUNI_MAP = {'AGRIGENTO':'G273','ALESSANDRIA':'A182','ANCONA':'A271','ANDRIA':'A306','AOSTA':'A326','AREZZO':'A390','ASCOLI PICENO':'A462','ASTI':'A479','AVELLINO':'A509','BARI':'A662','BARLETTA':'A669','BELLUNO':'A757','BENEVENTO':'A783','BERGAMO':'A794','BIELLA':'A859','BOLOGNA':'A944','BOLZANO':'A952','BRESCIA':'B157','BRINDISI':'B180','CAGLIARI':'B354','CALTANISSETTA':'B429','CAMPOBASSO':'B519','CASERTA':'B963','CATANIA':'C351','CATANZARO':'C352','CHIETI':'C469','COMO':'C933','COSENZA':'D086','CREMONA':'D150','CROTONE':'D122','CUNEO':'D205','ENNA':'C342','FERRARA':'D548','FIRENZE':'D612','FOGGIA':'D643','FORLI':'D704','FROSINONE':'D810','GENOVA':'D969','GORIZIA':'E098','GROSSETO':'E202','IMPERIA':'E290','ISERNIA':'E335','LA SPEZIA':'E463','LAQUILA':'A345','LATINA':'E472','LECCE':'E506','LECCO':'E507','LIVORNO':'E625','LODI':'E648','LUCCA':'E715','MACERATA':'E783','MANTOVA':'E897','MASSA':'F023','MATERA':'F052','MESSINA':'F158','MILANO':'F205','MODENA':'F257','MONZA':'F704','NAPOLI':'F839','NOVARA':'F952','NUORO':'F979','ORISTANO':'G113','PADOVA':'G224','PALERMO':'G273','PARMA':'G337','PAVIA':'G388','PERUGIA':'G478','PESARO':'G453','PESCARA':'G482','PIACENZA':'G535','PISA':'G702','PISTOIA':'G713','PORDENONE':'G888','POTENZA':'G942','PRATO':'G999','RAGUSA':'H163','RAVENNA':'H199','REGGIO CALABRIA':'H224','REGGIO EMILIA':'H223','RIETI':'H282','RIMINI':'H294','ROMA':'H501','ROVIGO':'H620','SALERNO':'H703','SASSARI':'I452','SAVONA':'I480','SIENA':'I726','SIRACUSA':'I754','SONDRIO':'I829','TARANTO':'L049','TERAMO':'L103','TERNI':'L117','TORINO':'L219','TRAPANI':'L331','TRENTO':'L378','TREVISO':'L407','TRIESTE':'L424','UDINE':'L483','VARESE':'L682','VENEZIA':'L736','VERBANIA':'L745','VERCELLI':'L750','VERONA':'L781','VICENZA':'L840','VITERBO':'M082'};
+
+function cfCodComune(c){const k=(c||'').toUpperCase().trim().replace(/[^A-Z0-9 ]/g,'');return CF_COMUNI_MAP[k]||'Z000';}
+function cfEstraiCognome(s){s=s.toUpperCase().replace(/[^A-Z]/g,'');const co=s.split('').filter(c=>!'AEIOU'.includes(c));const vo=s.split('').filter(c=>'AEIOU'.includes(c));return(co.join('')+vo.join('')+'XXX').slice(0,3);}
+function cfEstraiNome(s){s=s.toUpperCase().replace(/[^A-Z]/g,'');const co=s.split('').filter(c=>!'AEIOU'.includes(c));const vo=s.split('').filter(c=>'AEIOU'.includes(c));if(co.length>=4)return co[0]+co[2]+co[3];return(co.join('')+vo.join('')+'XXX').slice(0,3);}
+function cfControllo(cf15){const O={0:1,1:0,2:5,3:7,4:9,5:13,6:15,7:17,8:19,9:21,A:1,B:0,C:5,D:7,E:9,F:13,G:15,H:17,I:19,J:21,K:2,L:4,M:18,N:20,O:11,P:3,Q:6,R:8,S:12,T:14,U:16,V:10,W:22,X:25,Y:24,Z:23};const E={0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,A:0,B:1,C:2,D:3,E:4,F:5,G:6,H:7,I:8,J:9,K:10,L:11,M:12,N:13,O:14,P:15,Q:16,R:17,S:18,T:19,U:20,V:21,W:22,X:23,Y:24,Z:25};let s=0;for(let i=0;i<15;i++){const c=cf15[i];s+=(i%2===0)?O[c]:E[c];}return String.fromCharCode(65+(s%26));}
+
+function cfCalcola(cognome,nome,nascita,comune,sesso){
+  if(!cognome||!nome||!nascita||!comune)return'';
+  const p=nascita.split('-');if(p.length!==3)return'';
+  const [aa,mm,gg]=p;
+  const c3=cfEstraiCognome(cognome),n3=cfEstraiNome(nome);
+  const anno=aa.slice(-2),mese=CF_MESI_LETTERE[parseInt(mm)-1];
+  const giorno=sesso==='F'?String(parseInt(gg)+40).padStart(2,'0'):gg.padStart(2,'0');
+  const cod=cfCodComune(comune);
+  const cf15=(c3+n3+anno+mese+giorno+cod).toUpperCase();
+  if(cf15.length!==15)return'';
+  return cf15+cfControllo(cf15);
+}
+
+function cfCalcAuto(){
+  const cf=cfCalcola(
+    document.getElementById('cf_cognome')?.value,
+    document.getElementById('cf_nome')?.value,
+    document.getElementById('cf_nascita')?.value,
+    document.getElementById('cf_comune')?.value,
+    document.getElementById('cf_sesso')?.value
+  );
+  const el=document.getElementById('cf_result');
+  if(el)el.textContent=cf||'—';
+  if(cf&&cf.length===16){document.getElementById('cf_manual').value=cf;cfGenBarcode(cf);}
+}
+
+function cfGenBarcode(cf){
+  if(!cf||cf.length!==16)return;
+  const wrap=document.getElementById('cf_barcode_wrap');
+  const lbl=document.getElementById('cf_barcode_label');
+  if(!wrap)return;
+  try{JsBarcode('#cf_barcode',cf,{format:'CODE128',width:2,height:60,displayValue:false,background:'#ffffff',lineColor:'#000000'});if(lbl)lbl.textContent=cf;wrap.style.display='block';}
+  catch(e){console.warn('Barcode:',e);}
+}
+
+function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
+
+function cfPrint(){
+  const cf=document.getElementById('cf_manual')?.value||document.getElementById('cf_result')?.textContent;
+  if(!cf||cf==='—'||cf.length!==16){showToast('CF non valido');return;}
+  const w=window.open('','_blank');
+  w.document.write('<html><body style="text-align:center;font-family:monospace;padding:40px;"><h2>CODICE FISCALE</h2><div style="font-size:28px;font-weight:bold;letter-spacing:6px;margin:20px 0;">'+cf+'</div><svg id="bc"></svg><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#bc","'+cf+'",{format:"CODE128",width:3,height:80,displayValue:false});<\/script></body></html>');
+  w.document.close();setTimeout(()=>w.print(),800);
+}
+
+function docsTogglePersonal(){
+  const form=document.getElementById('docs-personal-form');
+  const btn=document.getElementById('docs-personal-toggle');
+  if(!form)return;
+  const open=form.style.display!=='none';
+  form.style.display=open?'none':'block';
+  btn.textContent=open?'+ Espandi':'− Chiudi';
+  if(!open){try{const d=JSON.parse(localStorage.getItem(CF_PERSONAL_KEY)||'{}');
+    ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{const el=document.getElementById('cf_'+k);if(el&&d[k])el.value=d[k];});
+    if(d.cf){document.getElementById('cf_manual').value=d.cf;document.getElementById('cf_result').textContent=d.cf;cfGenBarcode(d.cf);}
+  }catch(e){}}
+}
+
+function docsPersonalSave(){
+  const d={};
+  ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{d[k]=document.getElementById('cf_'+k)?.value?.trim()||'';});
+  d.cf=document.getElementById('cf_manual')?.value?.trim()||document.getElementById('cf_result')?.textContent||'';
+  localStorage.setItem(CF_PERSONAL_KEY,JSON.stringify(d));
+  showToast('✅ Dati personali salvati');
+}
+
+function cfSaveAsDoc() {
+  const cognome = document.getElementById('cf_cognome')?.value.trim();
+  const nome    = document.getElementById('cf_nome')?.value.trim();
+  const cf      = document.getElementById('cf_manual')?.value.trim() || document.getElementById('cf_result')?.textContent;
+  if (!cognome || !nome) { showToast('Inserisci cognome e nome'); return; }
+  if (!cf || cf === '—' || cf.length !== 16) { showToast('CF non valido — inseriscilo manualmente'); return; }
+
+  // Salva come documento
+  const doc = {
+    id: 'doc_' + Date.now(),
+    type: 'cf', icon: '📋', label: 'Cod. Fiscale',
+    holder: cognome + ' ' + nome,
+    number: cf,
+    expiry: '', issue: '', issuer: '',
+    notes: [
+      document.getElementById('cf_nascita')?.value ? 'Nato/a il ' + document.getElementById('cf_nascita')?.value : '',
+      document.getElementById('cf_comune')?.value  ? 'a ' + document.getElementById('cf_comune')?.value : '',
+      document.getElementById('cf_residenza')?.value ? 'Res: ' + document.getElementById('cf_residenza')?.value : '',
+      document.getElementById('cf_via')?.value      ? document.getElementById('cf_via')?.value : '',
+    ].filter(Boolean).join(' | '),
+    photos: [],
+    createdAt: new Date().toISOString()
+  };
+  _docs.push(doc);
+  docsSaveAll();
+  docsShowList();
+  showToast('✅ Codice Fiscale salvato nei documenti');
+}
+
+// ════════════════════════════════════════════════════════════
+//  DOCUMENTI — nuovo sistema
+// ════════════════════════════════════════════════════════════
+const DOCS_KEY2 = 'hb13_docs2';
+let _docs2 = [];
+let _docType2 = { id:'ci', icon:'🪪', label:'C. Identità' };
+let _docPhotos2 = { fronte: null, retro: null };
+
+function docsLoad2() {
+  try { _docs2 = JSON.parse(localStorage.getItem(DOCS_KEY2)) || []; }
+  catch(e) { _docs2 = []; }
+}
+function docsSaveAll2() { localStorage.setItem(DOCS_KEY2, JSON.stringify(_docs2)); }
+
+function docsOpen() {
+  docsLoad2();
+  docsShowList();
+  document.getElementById('topbar-title').textContent = 'Documenti';
+  document.getElementById('topbar-sub').textContent = _docs2.length + ' documenti';
+}
+
+function docsShowList() {
+  document.getElementById('docs-view-list').style.display  = 'block';
+  document.getElementById('docs-view-add').style.display   = 'none';
+  document.getElementById('docs-view-detail').style.display= 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  docsRender2();
+}
+
+function docsShowAdd() {
+  document.getElementById('docs-view-list').style.display  = 'none';
+  document.getElementById('docs-view-add').style.display   = 'block';
+  document.getElementById('docs-view-detail').style.display= 'none';
+  document.getElementById('topbar-back').classList.add('visible');
+  // Reset form
+  _docPhotos2 = { fronte: null, retro: null };
+  ['cognome','nome','nascita','luogo','sesso','residenza','via','nr','number','issue','issuer','expiry','notes'].forEach(k => {
+    const el = document.getElementById('dnew_'+k);
+    if (el) el.value = el.tagName==='SELECT' ? 'M' : '';
+  });
+  document.getElementById('dnew_photos_preview').innerHTML = '';
+  document.getElementById('cf_result').textContent = '—';
+  document.getElementById('cf_manual').value = '';
+  document.getElementById('cf_barcode_wrap').style.display = 'none';
+  // Reset tipo → CI
+  docsPickType(document.querySelector('.doc-type-btn[data-type="ci"]'), 'ci', '🪪', 'C. Identità');
+}
+
+function docsPickType(btn, typeId, icon, label) {
+  _docType2 = { id:typeId, icon, label };
+  document.querySelectorAll('.doc-type-btn').forEach(b => {
+    b.style.border = '1px solid var(--border)';
+    b.style.background = 'var(--surface)';
+    b.style.color = 'var(--text2)';
+  });
+  btn.style.border = '2px solid var(--accent)';
+  btn.style.background = 'var(--accent-bg)';
+  btn.style.color = 'var(--accent)';
+  // Mostra/nascondi sezione CF e campi documento
+  const isCF = typeId === 'cf';
+  document.getElementById('docs-cf-section').style.display  = isCF ? 'block' : 'none';
+  document.getElementById('docs-doc-fields').style.display  = isCF ? 'none' : 'block';
+  document.getElementById('docs-print-btn').style.display   = isCF ? 'flex' : 'none';
+  if (isCF) cfCalcAuto();
+}
+
+function docsAddPhoto(input, side) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _docPhotos2[side] = e.target.result;
+    const prev = document.getElementById('dnew_photos_preview');
+    // Rimuovi preview precedente dello stesso lato
+    prev.querySelectorAll('[data-side="'+side+'"]').forEach(el => el.remove());
+    const wrap = document.createElement('div');
+    wrap.dataset.side = side;
+    wrap.style.cssText = 'position:relative;';
+    wrap.innerHTML = '<img src="'+e.target.result+'" style="width:100px;height:70px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">'
+      +'<div style="font-size:10px;font-weight:700;text-align:center;color:var(--text3);margin-top:2px;">'+side+'</div>';
+    prev.appendChild(wrap);
+  };
+  reader.readAsDataURL(file);
+}
+
+function docsNewSave() {
+  const cognome = document.getElementById('dnew_cognome')?.value.trim();
+  const nome    = document.getElementById('dnew_nome')?.value.trim();
+  if (!cognome || !nome) { showToast('Inserisci cognome e nome'); return; }
+
+  const isCF = _docType2.id === 'cf';
+  const cf = document.getElementById('cf_manual')?.value.trim() || document.getElementById('cf_result')?.textContent;
+
+  if (isCF && (!cf || cf === '—' || cf.length !== 16)) {
+    showToast('CF non valido — inseriscilo manualmente'); return;
+  }
+
+  const doc = {
+    id: 'doc2_' + Date.now(),
+    type: _docType2.id, icon: _docType2.icon, label: _docType2.label,
+    cognome, nome,
+    nascita:   document.getElementById('dnew_nascita')?.value || '',
+    luogo:     document.getElementById('dnew_luogo')?.value.trim() || '',
+    sesso:     document.getElementById('dnew_sesso')?.value || 'M',
+    residenza: document.getElementById('dnew_residenza')?.value.trim() || '',
+    via:       document.getElementById('dnew_via')?.value.trim() || '',
+    nr:        document.getElementById('dnew_nr')?.value.trim() || '',
+    number:    isCF ? cf : (document.getElementById('dnew_number')?.value.trim() || ''),
+    issue:     document.getElementById('dnew_issue')?.value || '',
+    issuer:    document.getElementById('dnew_issuer')?.value.trim() || '',
+    expiry:    document.getElementById('dnew_expiry')?.value || '',
+    notes:     document.getElementById('dnew_notes')?.value.trim() || '',
+    photos:    Object.entries(_docPhotos2).filter(([k,v])=>v).map(([k,v])=>({side:k,data:v})),
+    createdAt: new Date().toISOString()
+  };
+  _docs2.push(doc);
+  docsSaveAll2();
+  docsShowList();
+  showToast('✅ Documento salvato');
+}
+
+function docsRender2() {
+  const list  = document.getElementById('docs-list');
+  const empty = document.getElementById('docs-empty');
+  if (!list) return;
+  document.getElementById('topbar-sub').textContent = _docs2.length + ' documenti';
+  if (!_docs2.length) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = '';
+  _docs2.forEach(doc => {
+    const isExpiring = doc.expiry && (new Date(doc.expiry) - new Date()) < 90*24*60*60*1000 && new Date(doc.expiry) > new Date();
+    const isExpired  = doc.expiry && new Date(doc.expiry) < new Date();
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer;';
+    card.innerHTML = '<div style="display:flex;align-items:center;gap:12px;">'
+      +'<div style="font-size:28px;">'+doc.icon+'</div>'
+      +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-size:14px;font-weight:800;">'+doc.cognome+' '+doc.nome+'</div>'
+        +'<div style="font-size:12px;color:var(--text3);">'+doc.label+(doc.number?' · '+doc.number:'')+'</div>'
+        +(isExpired  ? '<div style="font-size:11px;color:#ef4444;font-weight:700;margin-top:2px;">⚠️ Scaduto</div>'  : '')
+        +(isExpiring ? '<div style="font-size:11px;color:#f97316;font-weight:700;margin-top:2px;">⏰ In scadenza</div>':'')
+      +'</div>'
+      +'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'
+      +'</div>';
+    card.onclick = () => docsShowDetail(doc.id);
+    list.appendChild(card);
+  });
+}
+
+function docsShowDetail(docId) {
+  const doc = _docs2.find(d => d.id === docId);
+  if (!doc) return;
+  document.getElementById('docs-view-list').style.display   = 'none';
+  document.getElementById('docs-view-add').style.display    = 'none';
+  document.getElementById('docs-view-detail').style.display = 'block';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('docs-detail-title').textContent  = doc.icon + ' ' + doc.label;
+
+  const fields = [
+    ['Intestatario', doc.cognome + ' ' + doc.nome],
+    doc.nascita  ? ['Data nascita', doc.nascita] : null,
+    doc.luogo    ? ['Luogo nascita', doc.luogo] : null,
+    doc.sesso    ? ['Sesso', doc.sesso] : null,
+    doc.residenza? ['Residenza', doc.residenza + (doc.via?' · '+doc.via:''+(doc.nr?' '+doc.nr:''))] : null,
+    doc.number   ? ['Numero', doc.number] : null,
+    doc.issue    ? ['Rilasciato il', doc.issue] : null,
+    doc.issuer   ? ['Rilasciato da', doc.issuer] : null,
+    doc.expiry   ? ['Scadenza', doc.expiry] : null,
+    doc.notes    ? ['Note', doc.notes] : null,
+  ].filter(Boolean);
+
+  let content = fields.map(([label, value]) =>
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">'
+    +'<div style="font-size:12px;font-weight:700;color:var(--text3);">'+label+'</div>'
+    +'<div style="font-size:14px;font-weight:700;color:var(--text);text-align:right;max-width:60%;">'+value+'</div>'
+    +'</div>'
+  ).join('');
+
+  // Foto
+  if (doc.photos?.length) {
+    content += '<div style="margin-top:14px;"><div class="pw-field-label" style="margin-bottom:8px;">📷 Foto</div>'
+      +'<div style="display:flex;gap:10px;">'+doc.photos.map(p =>
+        '<div><img src="'+p.data+'" style="width:120px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">'
+        +'<div style="font-size:10px;text-align:center;color:var(--text3);margin-top:2px;">'+p.side+'</div></div>'
+      ).join('')+'</div></div>';
+  }
+
+  // Barcode per CF
+  if (doc.type === 'cf' && doc.number?.length === 16) {
+    content += '<div id="doc_detail_bc_wrap" style="background:white;border-radius:12px;padding:14px;text-align:center;margin-top:14px;">'
+      +'<svg id="doc_detail_bc"></svg>'
+      +'<div style="font-size:12px;font-weight:700;letter-spacing:2px;color:#333;margin-top:6px;font-family:monospace;">'+doc.number+'</div>'
+      +'</div>';
+  }
+
+  document.getElementById('docs-detail-content').innerHTML = content;
+
+  // Genera barcode CF nel dettaglio
+  if (doc.type === 'cf' && doc.number?.length === 16) {
+    setTimeout(() => {
+      try { JsBarcode('#doc_detail_bc', doc.number, {format:'CODE128',width:2,height:55,displayValue:false,background:'#fff',lineColor:'#000'}); }
+      catch(e) {}
+    }, 100);
+  }
+
+  // Elimina
+  const delBtn = document.getElementById('docs-detail-del');
+  delBtn.onclick = () => docsDeleteDoc(docId);
+}
+
+function docsDeleteDoc(docId) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">📄</div>'
+    +'<div style="font-size:15px;font-weight:800;margin-bottom:16px;">Eliminare questo documento?</div>'
+    +'<div style="display:flex;gap:10px;">'
+    +'<button id="_ddel_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    +'<button id="_ddel_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>'
+    +'</div>';
+  overlay.appendChild(box); document.body.appendChild(overlay);
+  document.getElementById('_ddel_cancel').onclick = () => overlay.remove();
+  document.getElementById('_ddel_ok').onclick = () => {
+    _docs2 = _docs2.filter(d => d.id !== docId);
+    docsSaveAll2(); overlay.remove(); docsShowList();
+    showToast('Documento eliminato');
+  };
+}
+
+// Aggiorna cfCalcAuto per usare i nuovi ID campi
+function cfCalcAuto() {
+  const cognome = document.getElementById('dnew_cognome')?.value || document.getElementById('cf_cognome')?.value || '';
+  const nome    = document.getElementById('dnew_nome')?.value    || document.getElementById('cf_nome')?.value    || '';
+  const nascita = document.getElementById('dnew_nascita')?.value || document.getElementById('cf_nascita')?.value || '';
+  const comune  = document.getElementById('dnew_luogo')?.value   || document.getElementById('cf_comune')?.value  || '';
+  const sesso   = document.getElementById('dnew_sesso')?.value   || document.getElementById('cf_sesso')?.value   || 'M';
+  const cf = cfCalcola(cognome, nome, nascita, comune, sesso);
+  const el = document.getElementById('cf_result');
+  if (el) el.textContent = cf || '—';
+  if (cf && cf.length === 16) {
+    const man = document.getElementById('cf_manual');
+    if (man) man.value = cf;
+    cfGenBarcode(cf);
   }
 }
 </script>
