@@ -10639,6 +10639,7 @@ function verifyOTP() {
 
 // OTP digit navigation
 document.addEventListener('DOMContentLoaded', () => {
+  settingsApplyOnLoad();
   const digits = document.querySelectorAll('.otp-digit');
   digits.forEach((d, i) => {
     d.addEventListener('input', () => {
@@ -14990,7 +14991,112 @@ function cfPrint(){
   const cf=document.getElementById('cf_manual')?.value||document.getElementById('cf_result')?.textContent;
   if(!cf||cf==='—'||cf.length!==16){showToast('CF non valido');return;}
   const w=window.open('','_blank');
-  w.document.write('<html><body style="text-align:center;font-family:monospace;padding:40px;"><h2>CODICE FISCALE</h2><div style="font-size:28px;font-weight:bold;letter-spacing:6px;margin:20px 0;">'+cf+'</div><svg id="bc"></svg><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#bc","'+cf+'",{format:"CODE128",width:3,height:80,displayValue:false});<\/script></body></html>');
+  w.document.write('<html><body style="text-align:center;font-family:monospace;padding:40px;"><h2>CODICE FISCALE</h2><div style="font-size:28px;font-weight:bold;letter-spacing:6px;margin:20px 0;">'+cf+'</div><svg id="bc"></svg><scr'+'ipt src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></scr'+'ipt><scr'+'ipt>JsBarcode("#bc","'+cf+'",{format:"CODE128",width:3,height:80,displayValue:false});</scr'+'ipt></body></html>');
+  w.document.close();
+  setTimeout(()=>w.print(),800);
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL IMPOSTAZIONI
+════════════════════════════════════════════════════════ -->
+<div id="settings-overlay" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;padding:20px 0 calc(24px + env(safe-area-inset-bottom,0px));">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px;border-bottom:1px solid var(--border);margin-bottom:8px;">
+      <div style="font-size:18px;font-weight:800;">⚙️ Impostazioni</div>
+      <button id="settings-close-btn" style="width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+
+    <!-- Tema -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;">Aspetto</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;">Tema</div>
+          <div style="font-size:12px;color:var(--text3);">Scegli il tema dell'app</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button id="theme-dark-btn" onclick="settingsSetTheme('dark')" style="padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);">🌙 Dark</button>
+          <button id="theme-light-btn" onclick="settingsSetTheme('light')" style="padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">☀️ Light</button>
+        </div>
+      </div>
+
+      <!-- Colore accent -->
+      <div style="margin-bottom:4px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">Colore principale</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Personalizza il colore dell'app</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;" id="accent-colors">
+          <button onclick="settingsSetAccent('#6366f1','indigo')" class="accent-btn" data-color="indigo" style="width:36px;height:36px;border-radius:50%;background:#6366f1;border:3px solid white;cursor:pointer;box-shadow:0 0 0 2px #6366f1;" title="Indaco"></button>
+          <button onclick="settingsSetAccent('#10b981','green')" class="accent-btn" data-color="green" style="width:36px;height:36px;border-radius:50%;background:#10b981;border:3px solid transparent;cursor:pointer;" title="Verde"></button>
+          <button onclick="settingsSetAccent('#f59e0b','amber')" class="accent-btn" data-color="amber" style="width:36px;height:36px;border-radius:50%;background:#f59e0b;border:3px solid transparent;cursor:pointer;" title="Ambra"></button>
+          <button onclick="settingsSetAccent('#ef4444','red')" class="accent-btn" data-color="red" style="width:36px;height:36px;border-radius:50%;background:#ef4444;border:3px solid transparent;cursor:pointer;" title="Rosso"></button>
+          <button onclick="settingsSetAccent('#8b5cf6','purple')" class="accent-btn" data-color="purple" style="width:36px;height:36px;border-radius:50%;background:#8b5cf6;border:3px solid transparent;cursor:pointer;" title="Viola"></button>
+          <button onclick="settingsSetAccent('#06b6d4','cyan')" class="accent-btn" data-color="cyan" style="width:36px;height:36px;border-radius:50%;background:#06b6d4;border:3px solid transparent;cursor:pointer;" title="Ciano"></button>
+          <button onclick="settingsSetAccent('#f97316','orange')" class="accent-btn" data-color="orange" style="width:36px;height:36px;border-radius:50%;background:#f97316;border:3px solid transparent;cursor:pointer;" title="Arancione"></button>
+          <button onclick="settingsSetAccent('#ec4899','pink')" class="accent-btn" data-color="pink" style="width:36px;height:36px;border-radius:50%;background:#ec4899;border:3px solid transparent;cursor:pointer;" title="Rosa"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dimensione carattere -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;">Testo</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:14px;font-weight:700;">Dimensione carattere</div>
+          <div style="font-size:12px;color:var(--text3);">Piccolo · Normale · Grande</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="settingsSetFont('small')" id="font-small" style="padding:8px 14px;border-radius:10px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">A</button>
+          <button onclick="settingsSetFont('normal')" id="font-normal" style="padding:8px 14px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);">A</button>
+          <button onclick="settingsSetFont('large')" id="font-large" style="padding:8px 14px;border-radius:10px;font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">A</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backup & Ripristino -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;">Backup & Ripristino</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="settingsExportBackup()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px;">📤</span>
+          <div style="text-align:left;flex:1;">
+            <div>Esporta backup</div>
+            <div style="font-size:11px;color:var(--text3);font-weight:500;">Salva tutti i dati in un file JSON</div>
+          </div>
+        </button>
+        <label style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:10px;box-sizing:border-box;">
+          <span style="font-size:20px;">📥</span>
+          <div style="text-align:left;flex:1;">
+            <div>Importa backup</div>
+            <div style="font-size:11px;color:var(--text3);font-weight:500;">Ripristina da un file JSON</div>
+          </div>
+          <input type="file" accept=".json" id="settings-import-input" style="display:none;" onchange="settingsImportBackup(event)">
+        </label>
+      </div>
+    </div>
+
+    <!-- Info app -->
+    <div style="padding:16px 20px;">
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:12px;">Info</div>
+      <div style="background:var(--surface);border-radius:14px;padding:14px 16px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <div style="width:44px;height:44px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;">🏠</div>
+          <div>
+            <div style="font-size:15px;font-weight:800;">HomeBull</div>
+            <div style="font-size:12px;color:var(--text3);" id="settings-version">v13.0.0-beta</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.6;">Il tuo vault personale — password, documenti, note e molto altro. Prossimamente con sincronizzazione Firebase e Google Drive.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body></html>');
   w.document.close();setTimeout(()=>w.print(),800);
 }
 
@@ -15327,14 +15433,6 @@ function wifiSearch(q) {
   const list = document.getElementById('wifi-list');
   if (!list) return;
   if (!filtered.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna rete trovata</div>';
-    return;
-  }
-  const backup = _wifiNets;
-  _wifiNets = filtered;
-  wifiRender();
-  _wifiNets = backup;
-}
-</script>
+    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna rete trovata</div>
 </body>
 </html>
