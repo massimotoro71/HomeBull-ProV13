@@ -1795,10 +1795,19 @@ function cardsSearch(q) {
             </div>
           </div>
 
+<<<<<<< HEAD
           <!-- Dati anagrafici (comuni a tutti) -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
             <div><div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div><input id="dnew_cognome" type="text" placeholder="Rossi" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
             <div><div class="pw-field-label" style="margin-bottom:5px;">Nome *</div><input id="dnew_nome" type="text" placeholder="Mario" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+=======
+          <!-- Div wrapper form standard -->
+          <div id="docs-standard-form">
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">Intestatario *</div>
+            <input id="doc-holder" type="text" placeholder="Nome Cognome"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+>>>>>>> 41a9183f2eff45993a7351720eaf8e2fd9a5f1bf
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:10px;">
             <div><div class="pw-field-label" style="margin-bottom:5px;">Data di nascita</div><input id="dnew_nascita" type="date" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
@@ -1840,9 +1849,30 @@ function cardsSearch(q) {
             </div>
           </div>
 
+<<<<<<< HEAD
           <!-- Sezione CF: barcode (visibile solo per tipo CF) -->
           <div id="docs-cf-section" style="display:none;margin-bottom:14px;">
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;">
+=======
+          </div><!-- fine docs-standard-form -->
+
+          <!-- Form CF speciale -->
+          <div id="docs-cf-form" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div><input id="cf_cognome" type="text" placeholder="Rossi" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;text-transform:uppercase;"></div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Nome *</div><input id="cf_nome" type="text" placeholder="Mario" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;text-transform:uppercase;"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:10px;">
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Data nascita</div><input id="cf_nascita" type="date" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Comune nascita</div><input id="cf_comune" type="text" placeholder="Roma" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Sesso</div><select id="cf_sesso" onchange="cfCalcAuto()" style="width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;"><option value="M">M</option><option value="F">F</option></select></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Residenza</div><input id="cf_residenza" type="text" placeholder="Milano" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+              <div><div class="pw-field-label" style="margin-bottom:5px;">Via / Indirizzo</div><input id="cf_via" type="text" placeholder="Via Roma 1" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;">
+>>>>>>> 41a9183f2eff45993a7351720eaf8e2fd9a5f1bf
               <div class="pw-field-label" style="margin-bottom:8px;">Codice Fiscale calcolato</div>
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
                 <div id="cf_result" style="font-size:20px;font-weight:800;letter-spacing:3px;color:var(--accent);font-family:monospace;flex:1;">—</div>
@@ -1851,9 +1881,29 @@ function cardsSearch(q) {
               <div class="pw-field-label" style="margin-bottom:5px;">Inserisci manualmente (comuni piccoli):</div>
               <input id="cf_manual" type="text" placeholder="RSSMRA80A01H501U" maxlength="16" oninput="this.value=this.value.toUpperCase();cfGenBarcode(this.value)" style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:monospace;letter-spacing:2px;">
             </div>
+<<<<<<< HEAD
             <div id="cf_barcode_wrap" style="display:none;background:white;border-radius:14px;padding:16px;text-align:center;margin-top:12px;">
               <svg id="cf_barcode"></svg>
               <div id="cf_barcode_label" style="font-size:13px;font-weight:700;letter-spacing:2px;color:#333;margin-top:8px;font-family:monospace;"></div>
+=======
+            <div id="cf_barcode_wrap" style="display:none;background:white;border-radius:14px;padding:16px;text-align:center;margin-bottom:14px;">
+              <svg id="cf_barcode"></svg>
+              <div id="cf_barcode_label" style="font-size:13px;font-weight:700;letter-spacing:2px;color:#333;margin-top:8px;font-family:monospace;"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:12px;">
+              <button onclick="cfSaveAsDoc()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva nei Documenti</button>
+              <button onclick="cfPrint()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🖨 Stampa</button>
+            </div>
+          </div><!-- fine docs-cf-form -->
+
+          <!-- Foto documento -->
+          <div style="display:none;margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
+            <div id="doc-photos-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;"></div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="docPhotoCapture('camera')" style="flex:1;padding:11px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Fotocamera</button>
+              <button onclick="docPhotoCapture('gallery')" style="flex:1;padding:11px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🖼️ Galleria</button>
+>>>>>>> 41a9183f2eff45993a7351720eaf8e2fd9a5f1bf
             </div>
           </div>
 
@@ -7142,6 +7192,7 @@ function cfSaveAsDoc() {
   docsShowList();
   showToast('✅ Codice Fiscale salvato nei documenti');
 }
+<<<<<<< HEAD
 
 // ════════════════════════════════════════════════════════════
 //  DOCUMENTI — nuovo sistema
@@ -7393,6 +7444,8 @@ function cfCalcAuto() {
     cfGenBarcode(cf);
   }
 }
+=======
+>>>>>>> 41a9183f2eff45993a7351720eaf8e2fd9a5f1bf
 </script>
 </body>
 </html>
