@@ -2372,27 +2372,7 @@ function cardsSearch(q) {
     <!-- FAMIGLIA -->
     <div class="tab-panel" id="panel-family">
       <div style="padding:14px 14px 100px;">
-
-        <!-- Banner info condivisione -->
-        <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
-          <div style="font-size:22px;flex-shrink:0;">👨‍👩‍👧</div>
-          <div>
-            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;">Vault Famiglia</div>
-            <div style="font-size:12px;color:var(--text3);line-height:1.5;">Aggiungi i tuoi familiari e scegli cosa condividere con ciascuno. La condivisione reale sarà attiva nella versione con Firebase.</div>
-          </div>
-        </div>
-
-        <!-- Lista membri -->
         <div id="family-list"></div>
-
-        <!-- Stato vuoto -->
-        <div id="family-empty" style="display:none;text-align:center;padding:48px 20px;">
-          <div style="font-size:48px;margin-bottom:12px;">👨‍👩‍👧</div>
-          <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nessun familiare</div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i membri della tua famiglia per condividere dati selezionati.</div>
-          <button onclick="familyAdd()" style="padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi familiare</button>
-        </div>
-
       </div>
     </div>
 
@@ -5288,169 +5268,1734 @@ function calDeleteEvent(id) {
 // ═══════════════════════════════════════════════════════════
 //  FAMIGLIA
 // ═══════════════════════════════════════════════════════════
-const FAMILY_KEY = 'hb13_family';
-let _family = [];
-
-const SHARE_OPTIONS = [
-  { id: 'passwords',  label: 'Password',      icon: '🔐' },
-  { id: 'notes',      label: 'Note',           icon: '📝' },
-  { id: 'shopping',   label: 'Lista Spesa',    icon: '🛒' },
-  { id: 'documents',  label: 'Documenti',      icon: '📄' },
-  { id: 'cards',      label: 'Carte',          icon: '💳' },
-  { id: 'wifi',       label: 'Wi-Fi',          icon: '📶' },
-  { id: 'otp',        label: 'OTP / 2FA',      icon: '🔑' },
-  { id: 'calendar',   label: 'Calendario',     icon: '📅' },
-];
+const FAMILY_KEY = 'hb12_family';
+let _familyMembers = [];
 
 function familyLoad() {
-  try { _family = JSON.parse(localStorage.getItem(FAMILY_KEY)) || []; }
-  catch(e) { _family = []; }
+  try { _familyMembers = JSON.parse(localStorage.getItem(FAMILY_KEY)||'[]'); } catch(e) { _familyMembers=[]; }
 }
-
-function familySave() {
-  localStorage.setItem(FAMILY_KEY, JSON.stringify(_family));
-}
+function familySaveAll() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_familyMembers)); }
 
 function familyOpen() {
-  familyLoad();
-  familyRender();
+  familyLoad(); familyRender();
   document.getElementById('topbar-title').textContent = 'Famiglia';
-  document.getElementById('topbar-sub').textContent = _family.length + ' membri';
+  document.getElementById('topbar-sub').textContent = _familyMembers.length + ' membri';
+  document.getElementById('topbar-back').classList.remove('visible');
 }
 
 function familyRender() {
   const list = document.getElementById('family-list');
-  const empty = document.getElementById('family-empty');
   if (!list) return;
-
-  if (!_family.length) {
-    list.innerHTML = '';
-    if (empty) empty.style.display = 'block';
+  if (!_familyMembers.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">👨‍👩‍👧</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun membro</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i membri della famiglia per condividere il vault</div>
+      <button onclick="familyAddMember()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi membro</button>
+      <div style="margin-top:24px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;text-align:left;">
+        <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">🔮 In arrivo</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;">
+          • Vault condiviso con PIN separato<br>
+          • Permessi lettura/scrittura per scheda<br>
+          • Notifiche di modifica in tempo reale<br>
+          • Sincronizzazione Firebase
+        </div>
+      </div>
+    </div>`;
     return;
   }
-  if (empty) empty.style.display = 'none';
-
   list.innerHTML = '';
-  _family.forEach((member, idx) => {
+  _familyMembers.forEach(m => {
     const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;';
-
-    // Header membro
-    const initials = (member.name || member.email || '?').slice(0,2).toUpperCase();
-    const sharedCount = (member.sharing || []).length;
-
+    card.className = 'family-card';
     card.innerHTML = `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div style="width:44px;height:44px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:white;flex-shrink:0;">${initials}</div>
+      <div class="family-avatar">${m.emoji || '👤'}</div>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:800;">${m.name}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">${m.role || 'Membro'}</div>
+      </div>
+      <button onclick="familyDelete('${m.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>`;
+    list.appendChild(card);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.onclick = familyAddMember;
+  addBtn.style.cssText = 'width:100%;padding:14px;border-radius:14px;border:1px dashed var(--border2);background:transparent;color:var(--text3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;';
+  addBtn.textContent = '+ Aggiungi membro';
+  list.appendChild(addBtn);
+}
+
+function familyAddMember() {
+  const emojis = ['👤','👨','👩','👦','👧','👴','👵','🧑'];
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));width:100%;max-width:500px;border:1px solid var(--border);border-bottom:none;">
+    <div style="font-size:16px;font-weight:800;margin-bottom:16px;">Aggiungi membro</div>
+    <input id="fam-name-inp" type="text" placeholder="Nome *" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;">
+    <input id="fam-role-inp" type="text" placeholder="Ruolo (es. Papà, Mamma, Figlio)" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:16px;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('[style]').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button onclick="familyDoAdd(this)" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('fam-name-inp')?.focus(), 200);
+}
+
+function familyDoAdd(btn) {
+  const emojis = ['👤','👨','👩','👦','👧','👴','👵','🧑'];
+  const name = document.getElementById('fam-name-inp')?.value.trim();
+  const role = document.getElementById('fam-role-inp')?.value.trim() || 'Membro';
+  if (!name) { showToast('Inserisci un nome'); return; }
+  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+  _familyMembers.push({ id:'fam_'+Date.now(), name, role, emoji });
+  familySaveAll(); familyRender();
+  btn.closest('[style]').remove();
+  showToast('✅ ' + name + ' aggiunto');
+}
+
+function familyDelete(id) {
+  _familyMembers = _familyMembers.filter(m => m.id !== id);
+  familySaveAll(); familyRender();
+}
+
+// ── Fine Famiglia ─────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  DOCUMENTI
+// ═══════════════════════════════════════════════════════════
+const DOCS_KEY = 'hb12_documents';
+let _docs = [];
+let _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
+
+function docsLoad() {
+  try { _docs = JSON.parse(localStorage.getItem(DOCS_KEY)||'[]'); } catch(e) { _docs=[]; }
+}
+function docsSaveAll() { localStorage.setItem(DOCS_KEY, JSON.stringify(_docs)); }
+
+function docsOpen() {
+  docsLoad(); docsShowList();
+  document.getElementById('topbar-title').textContent = 'Documenti';
+  document.getElementById('topbar-sub').textContent = _docs.length + ' documenti';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function docsShowList() {
+  document.getElementById('docs-view-list').style.display = 'block';
+  document.getElementById('docs-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Documenti';
+  docsRender();
+}
+
+function docsRender() {
+  const list = document.getElementById('docs-list');
+  if (!list) return;
+  if (!_docs.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">📄</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun documento</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">CI, passaporto, patente, tessere e altro</div>
+      <button onclick="docsShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi documento</button>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  _docs.forEach(doc => {
+    const expStatus = docsExpStatus(doc.expiry);
+    const card = document.createElement('div');
+    card.className = 'finance-card';
+    card.onclick = () => docsShowDetail(doc.id);
+    card.innerHTML = `
+      <div class="finance-card-header">
+        <div class="finance-icon" style="background:rgba(99,102,241,0.12);">${doc.icon||'📄'}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${member.name || 'Senza nome'}</div>
-          <div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${member.email}</div>
+          <div class="finance-label">${doc.holder}</div>
+          <div style="margin-top:3px;display:flex;gap:6px;align-items:center;">
+            <span class="finance-type-badge" style="background:rgba(99,102,241,0.15);color:#6366f1;">${doc.label}</span>
+            ${expStatus.badge}
+          </div>
         </div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="familyEdit(${idx})" style="padding:7px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✏️</button>
-          <button onclick="familyDelete(${idx})" style="padding:7px 12px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑</button>
-        </div>
+        <button onclick="event.stopPropagation();docsDelete('${doc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>
       </div>
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:8px;">Condividi con ${member.name?.split(' ')[0] || 'lui/lei'}:</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${SHARE_OPTIONS.map(opt => {
-          const active = (member.sharing || []).includes(opt.id);
-          return `<button onclick="familyToggleShare(${idx},'${opt.id}')" style="padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid ${active ? 'var(--accent)' : 'var(--border)'};background:${active ? 'var(--accent-bg)' : 'var(--surface)'};color:${active ? 'var(--accent)' : 'var(--text3)'};">
-          ${opt.icon} ${opt.label}
-        </button>`;
-        }).join('')}
-      </div>
-      ${sharedCount > 0 ? `<div style="margin-top:10px;font-size:11px;color:var(--text3);">✅ ${sharedCount} sezione${sharedCount>1?'i':''} condivisa${sharedCount>1?'':'e'}</div>` : '<div style="margin-top:10px;font-size:11px;color:var(--text3);">Nessuna sezione condivisa</div>'}
-    `;
+      ${doc.number ? `<div style="font-family:monospace;font-size:13px;color:var(--text3);letter-spacing:0.06em;">N° ${doc.number}</div>` : ''}
+      ${doc.expiry ? `<div style="font-size:12px;color:${expStatus.color};margin-top:3px;font-weight:600;">${expStatus.text}</div>` : ''}`;
     list.appendChild(card);
   });
 }
 
-function familyToggleShare(idx, optId) {
-  if (!_family[idx]) return;
-  if (!_family[idx].sharing) _family[idx].sharing = [];
-  const pos = _family[idx].sharing.indexOf(optId);
-  if (pos > -1) _family[idx].sharing.splice(pos, 1);
-  else _family[idx].sharing.push(optId);
-  familySave();
-  familyRender();
+function docsExpStatus(expiry) {
+  if (!expiry) return { badge:'', text:'', color:'var(--text3)' };
+  const exp  = new Date(expiry);
+  const now  = new Date();
+  const days = Math.ceil((exp - now) / 86400000);
+  if (days < 0)   return { badge:'<span style="background:rgba(239,68,68,0.15);color:#ef4444;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">SCADUTO</span>', text:'⚠️ Scaduto il ' + exp.toLocaleDateString('it-IT'), color:'#ef4444' };
+  if (days <= 30)  return { badge:'<span style="background:rgba(251,191,36,0.15);color:#f59e0b;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">IN SCADENZA</span>', text:'⚠️ Scade tra ' + days + ' giorni', color:'#f59e0b' };
+  if (days <= 90)  return { badge:'<span style="background:rgba(251,191,36,0.1);color:#f59e0b;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;">' + days + ' giorni</span>', text:'Scade il ' + exp.toLocaleDateString('it-IT'), color:'var(--text3)' };
+  return { badge:'', text:'Scade il ' + exp.toLocaleDateString('it-IT'), color:'var(--text3)' };
 }
 
-function familyAdd() {
-  familyShowForm(null);
+function docsShowDetail(id) {
+  const doc = _docs.find(d => d.id === id);
+  if (!doc) return;
+  const existing = document.getElementById('docs-detail-overlay');
+  if (existing) existing.remove();
+  const expStatus = docsExpStatus(doc.expiry);
+  const overlay = document.createElement('div');
+  overlay.id = 'docs-detail-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
+  const fields = [
+    doc.number ? `<div class="pw-field-row"><div class="pw-field-label">Numero</div><div class="pw-field-value" style="font-family:monospace;letter-spacing:0.06em;">${doc.number}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="docsCopy('${doc.id}','number')">📋 Copia</button></div></div>` : '',
+    doc.expiry ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${expStatus.color};">${new Date(doc.expiry).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})} ${expStatus.badge}</div></div>` : '',
+    doc.issued ? `<div class="pw-field-row"><div class="pw-field-label">Rilasciato il</div><div class="pw-field-value">${new Date(doc.issued).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}</div></div>` : '',
+    doc.issuer ? `<div class="pw-field-row"><div class="pw-field-label">Rilasciato da</div><div class="pw-field-value">${doc.issuer}</div></div>` : '',
+    doc.notes  ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value">${doc.notes}</div></div>` : '',
+    doc.photos?.length ? `<div class="pw-field-row"><div class="pw-field-label">Foto (${doc.photos.length})</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">${doc.photos.map(p=>`<img src="${p}" style="width:90px;height:90px;object-fit:cover;border-radius:10px;cursor:pointer;" onclick="docPhotoFullscreen('${p}')">`).join('')}</div></div>` : '',
+  ].filter(Boolean).join('');
+  overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+    <div style="background:rgba(99,102,241,0.1);border-radius:24px 24px 0 0;padding:18px 16px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:32px;">${doc.icon||'📄'}</div>
+        <div>
+          <div style="font-size:17px;font-weight:800;">${doc.holder}</div>
+          <div style="font-size:11px;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">${doc.label}</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px;">${fields}
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button onclick="document.getElementById('docs-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
+        <button onclick="docsDelete('${doc.id}');document.getElementById('docs-detail-overlay').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
 }
 
-function familyEdit(idx) {
-  familyShowForm(_family[idx], idx);
+async function docsCopy(id, field) {
+  const doc = _docs.find(d => d.id === id);
+  try { await navigator.clipboard.writeText(doc?.[field]||''); showToast('📋 Copiato!'); }
+  catch(e) { showToast('Copia non disponibile'); }
 }
 
-function familyShowForm(member, idx) {
-  const isEdit = idx !== undefined && idx !== null;
+function docsDelete(id) {
+  const doc = _docs.find(d => d.id === id);
+  if (!confirm('Eliminare documento di ' + doc?.holder + '?')) return;
+  _docs = _docs.filter(d => d.id !== id);
+  docsSaveAll(); docsRender();
+  showToast('Documento rimosso');
+}
+
+// Array temporaneo foto per il documento corrente
+let _docPhotos = []; // array di base64 string
+
+function docPhotoCapture(source) {
+  const inp = document.getElementById('doc-photo-input');
+  if (source === 'camera') {
+    inp.setAttribute('capture', 'environment');
+  } else {
+    inp.removeAttribute('capture');
+  }
+  inp.click();
+}
+
+function docPhotoSelected(input) {
+  const files = input.files;
+  if (!files?.length) return;
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Comprimi l'immagine prima di salvarla
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 800;
+        const ratio = Math.min(MAX/img.width, MAX/img.height, 1);
+        canvas.width  = Math.round(img.width  * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const b64 = canvas.toDataURL('image/jpeg', 0.75);
+        _docPhotos.push(b64);
+        docRenderPhotos();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function docRenderPhotos() {
+  const preview = document.getElementById('doc-photos-preview');
+  if (!preview) return;
+  preview.innerHTML = '';
+  _docPhotos.forEach((b64, idx) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;flex-shrink:0;';
+    const img = document.createElement('img');
+    img.src = b64;
+    img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border);cursor:pointer;';
+    img.onclick = () => docPhotoFullscreen(b64);
+    const del = document.createElement('button');
+    del.textContent = '✕';
+    del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:white;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;padding:0;';
+    del.onclick = () => { _docPhotos.splice(idx,1); docRenderPhotos(); };
+    wrap.appendChild(img);
+    wrap.appendChild(del);
+    preview.appendChild(wrap);
+  });
+}
+
+function docPhotoFullscreen(b64) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9900;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = () => overlay.remove();
+  const img = document.createElement('img');
+  img.src = b64;
+  img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:12px;';
+  overlay.appendChild(img);
+  document.body.appendChild(overlay);
+}
+
+function docsShowAdd() {
+  document.getElementById('docs-view-list').style.display = 'none';
+  document.getElementById('docs-view-add').style.display  = 'block';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuovo Documento';
+  _docPhotos = []; docRenderPhotos();
+  ['doc-holder','doc-number','doc-expiry','doc-issued','doc-issuer','doc-notes'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
+  document.querySelectorAll('[data-dtype]').forEach(b =>
+    b.classList.toggle('active', b.dataset.dtype === 'ci')
+  );
+  // Nascondi sezione CF di default
+  const cfSec = document.getElementById('cf-section');
+  if (cfSec) cfSec.style.display = 'none';
+}
+
+function docsSelectType(btn, typeId, icon, label) {
+  _docType = { id:typeId, icon, label };
+  document.querySelectorAll('[data-dtype]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function docsSave() {
+  const holder = document.getElementById('doc-holder')?.value.trim();
+  if (!holder) { showToast('Inserisci il nome del documento'); return; }
+  if (_docPhotos.length > 3) { showToast('Massimo 3 foto per documento'); return; }
+  _docs.push({
+    id: 'doc_' + Date.now(),
+    type: _docType.id, icon: _docType.icon, label: _docType.label,
+    holder,
+    number: document.getElementById('doc-number')?.value.trim().toUpperCase() || '',
+    expiry: document.getElementById('doc-expiry')?.value || '',
+    issued: document.getElementById('doc-issued')?.value || '',
+    issuer: document.getElementById('doc-issuer')?.value.trim() || '',
+    notes:  document.getElementById('doc-notes')?.value.trim() || '',
+    photos: [..._docPhotos],
+  });
+  docsSaveAll();
+  showToast('✅ Documento salvato');
+  docsShowList();
+}
+
+// ── Fine Documenti ────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  SERVER / IT
+// ═══════════════════════════════════════════════════════════
+const SERVER_KEY = 'hb12_server';
+let _serverItems = [];
+let _serverType  = { id:'ssh', icon:'🔐', label:'SSH' };
+
+function serverLoad() {
+  try { _serverItems = JSON.parse(localStorage.getItem(SERVER_KEY)||'[]'); } catch(e) { _serverItems=[]; }
+}
+function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
+
+function serverOpen() {
+  serverLoad(); serverShowList();
+  document.getElementById('topbar-title').textContent = 'Server / IT';
+  document.getElementById('topbar-sub').textContent = _serverItems.length + ' credenziali';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function serverShowList() {
+  document.getElementById('server-view-list').style.display = 'block';
+  document.getElementById('server-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Server / IT';
+  serverRender();
+}
+
+function serverRender() {
+  const list = document.getElementById('server-list');
+  if (!list) return;
+  if (!_serverItems.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">📡</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna credenziale</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">SSH, API keys, database, VPN e altro</div>
+      <button onclick="serverShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi credenziale</button>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  _serverItems.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'pw-item-card';
+    card.onclick = () => serverShowDetail(item.id);
+    const typeColors = { ssh:'#6366f1', api:'#10b981', db:'#f59e0b', ftp:'#8b5cf6', vpn:'#06b6d4', altro:'#64748b' };
+    const col = typeColors[item.type] || '#64748b';
+    card.innerHTML = `
+      <div class="pw-item-header">
+        <div class="pw-item-icon" style="background:${col}20;font-size:20px;">${item.icon||'💻'}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="pw-item-title">${item.label}</div>
+          <div class="pw-item-user">${item.host || ''}${item.port ? ':'+item.port : ''}${item.user ? ' · '+item.user : ''}</div>
+        </div>
+        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:99px;background:${col}20;color:${col};">${item.label_type||item.type}</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        ${item.host ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverCopy('${item.id}','host')" title="Copia host"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>` : ''}
+        ${item.pw   ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverCopy('${item.id}','pw')" title="Copia password/token"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>` : ''}
+        <button onclick="event.stopPropagation();serverDelete('${item.id}')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function serverShowDetail(id) {
+  const item = _serverItems.find(i => i.id === id);
+  if (!item) return;
+  const existing = document.getElementById('server-detail-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'server-detail-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
+  const fields = [
+    item.host ? `<div class="pw-field-row"><div class="pw-field-label">Host / URL</div><div class="pw-field-value" style="font-family:monospace;">${item.host}${item.port?':'+item.port:''}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','host')">📋 Copia</button></div></div>` : '',
+    item.user ? `<div class="pw-field-row"><div class="pw-field-label">Username</div><div class="pw-field-value" style="font-family:monospace;">${item.user}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','user')">📋 Copia</button></div></div>` : '',
+    item.pw   ? `<div class="pw-field-row"><div class="pw-field-label">Password / Token</div><div class="pw-field-value" id="srv-pw-detail-${item.id}" style="font-family:monospace;font-size:12px;word-break:break-all;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverToggleDetailPw('${item.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','pw')">📋 Copia</button></div></div>` : '',
+    item.notes? `<div class="pw-field-row"><div class="pw-field-label">Note / Connection String</div><div class="pw-field-value" style="font-family:monospace;font-size:12px;white-space:pre-wrap;">${item.notes}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','notes')">📋 Copia</button></div></div>` : '',
+  ].filter(Boolean).join('');
+  overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+    <div style="background:rgba(100,116,139,0.12);border-radius:24px 24px 0 0;padding:16px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="font-size:26px;">${item.icon||'💻'}</div>
+        <div><div style="font-size:16px;font-weight:800;">${item.label}</div><div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">${item.label_type||item.type}</div></div>
+      </div>
+    </div>
+    <div style="padding:14px;">${fields}
+      <div style="display:flex;gap:10px;margin-top:8px;">
+        <button onclick="document.getElementById('server-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
+        <button onclick="serverDelete('${item.id}');document.getElementById('server-detail-overlay').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function serverToggleDetailPw(id) {
+  const item = _serverItems.find(i => i.id === id);
+  const el   = document.getElementById('srv-pw-detail-' + id);
+  if (el && item) el.textContent = el.textContent.includes('•') ? item.pw : '••••••••';
+}
+
+async function serverCopy(id, field) {
+  const item = _serverItems.find(i => i.id === id);
+  if (!item) return;
+  try { await navigator.clipboard.writeText(item[field]||''); showToast('📋 Copiato!'); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+
+function serverDelete(id) {
+  _serverItems = _serverItems.filter(i => i.id !== id);
+  serverSaveAll(); serverRender();
+  showToast('Credenziale rimossa');
+}
+
+function serverShowAdd() {
+  document.getElementById('server-view-list').style.display = 'none';
+  document.getElementById('server-view-add').style.display  = 'block';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuova Credenziale';
+  ['srv-label','srv-host','srv-port','srv-user','srv-notes'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  const pw = document.getElementById('srv-pw'); if(pw) { pw.value=''; pw.type='password'; }
+  _serverType = { id:'ssh', icon:'🔐', label:'SSH' };
+  document.querySelectorAll('[data-type]').forEach(b =>
+    b.classList.toggle('active', b.dataset.type === 'ssh')
+  );
+}
+
+function serverSelectType(btn, typeId, icon, label) {
+  _serverType = { id: typeId, icon, label };
+  document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function serverTogglePw() {
+  const inp = document.getElementById('srv-pw');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function serverSave() {
+  const label = document.getElementById('srv-label')?.value.trim();
+  if (!label) { showToast('Inserisci un nome'); return; }
+  _serverItems.push({
+    id: 'srv_' + Date.now(),
+    type: _serverType.id, icon: _serverType.icon, label_type: _serverType.label,
+    label,
+    host:  document.getElementById('srv-host')?.value.trim() || '',
+    port:  document.getElementById('srv-port')?.value.trim() || '',
+    user:  document.getElementById('srv-user')?.value.trim() || '',
+    pw:    document.getElementById('srv-pw')?.value || '',
+    notes: document.getElementById('srv-notes')?.value.trim() || '',
+  });
+  serverSaveAll();
+  showToast('✅ ' + label + ' salvato');
+  serverShowList();
+}
+
+// ── Fine Server/IT ────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  LISTA SPESA — nuovo layout accordion
+// ═══════════════════════════════════════════════════════════
+const SHOP_LISTS_KEY = 'hb12_shop_lists_v2'; // { listId: {name, items:{id:{name,icon,qty}}} }
+const SHOP_RECENT    = 'hb12_shopping_recent';
+let _shopLists  = {};   // tutte le liste
+let _shopCurId  = null; // lista corrente
+let _shopList   = {};   // items lista corrente (shortcut)
+let _shopRecent = [];   // ultimi 8 prodotti usati
+
+// Catalogo prodotti
+const SHOP_CATALOG = [
+  { cat:'🍎 Frutta e Verdura', products:[
+    {id:'mele',icon:'🍎',name:'Mele'},{id:'banane',icon:'🍌',name:'Banane'},
+    {id:'arance',icon:'🍊',name:'Arance'},{id:'limoni',icon:'🍋',name:'Limoni'},
+    {id:'uva',icon:'🍇',name:'Uva'},{id:'fragole',icon:'🍓',name:'Fragole'},
+    {id:'mirtilli',icon:'🫐',name:'Mirtilli'},{id:'pesche',icon:'🍑',name:'Pesche'},
+    {id:'melone',icon:'🍈',name:'Melone'},{id:'kiwi',icon:'🥝',name:'Kiwi'},
+    {id:'ananas',icon:'🍍',name:'Ananas'},{id:'avocado',icon:'🥑',name:'Avocado'},
+    {id:'carote',icon:'🥕',name:'Carote'},{id:'patate',icon:'🥔',name:'Patate'},
+    {id:'cipolle',icon:'🧅',name:'Cipolle'},{id:'aglio',icon:'🧄',name:'Aglio'},
+    {id:'broccoli',icon:'🥦',name:'Broccoli'},{id:'insalata',icon:'🥬',name:'Insalata'},
+    {id:'pomodori',icon:'🍅',name:'Pomodori'},{id:'cetrioli',icon:'🥒',name:'Cetrioli'},
+    {id:'melanzane',icon:'🍆',name:'Melanzane'},{id:'zucchine',icon:'🫛',name:'Zucchine'},
+    {id:'peperoni',icon:'🫑',name:'Peperoni'},{id:'funghi',icon:'🍄',name:'Funghi'},
+    {id:'spinaci',icon:'🌿',name:'Spinaci'},{id:'mais',icon:'🌽',name:'Mais'},
+  ]},
+  { cat:'🥖 Pane e Panetteria', products:[
+    {id:'pane',icon:'🍞',name:'Pane'},{id:'panini',icon:'🥖',name:'Panini'},
+    {id:'cornetti',icon:'🥐',name:'Cornetti'},{id:'grissini',icon:'🥨',name:'Grissini'},
+    {id:'crackers',icon:'🫙',name:'Crackers'},{id:'cereali',icon:'🌾',name:'Cereali'},
+    {id:'biscotti',icon:'🍪',name:'Biscotti'},{id:'fette',icon:'🍞',name:'Fette biscottate'},
+  ]},
+  { cat:'🧀 Latte e Formaggi', products:[
+    {id:'latte',icon:'🥛',name:'Latte'},{id:'uova',icon:'🥚',name:'Uova'},
+    {id:'burro',icon:'🧈',name:'Burro'},{id:'parmigiano',icon:'🧀',name:'Parmigiano'},
+    {id:'mozzarella',icon:'🧀',name:'Mozzarella'},{id:'yogurt',icon:'🥛',name:'Yogurt'},
+    {id:'panna',icon:'🫙',name:'Panna'},{id:'ricotta',icon:'🧀',name:'Ricotta'},
+    {id:'grana',icon:'🧀',name:'Grana'},{id:'pecorino',icon:'🧀',name:'Pecorino'},
+  ]},
+  { cat:'🥩 Carne e Pesce', products:[
+    {id:'manzo',icon:'🥩',name:'Manzo'},{id:'pollo',icon:'🍗',name:'Pollo'},
+    {id:'pancetta',icon:'🥓',name:'Pancetta'},{id:'salumi',icon:'🌭',name:'Salumi'},
+    {id:'prosciutto',icon:'🍖',name:'Prosciutto'},{id:'wurstel',icon:'🌭',name:'Würstel'},
+    {id:'salmone',icon:'🐟',name:'Salmone'},{id:'tonno',icon:'🐠',name:'Tonno'},
+    {id:'gamberetti',icon:'🦐',name:'Gamberetti'},{id:'merluzzo',icon:'🐡',name:'Merluzzo'},
+  ]},
+  { cat:'🍝 Pasta e Riso', products:[
+    {id:'pasta',icon:'🍝',name:'Pasta'},{id:'riso',icon:'🍚',name:'Riso'},
+    {id:'gnocchi',icon:'🥟',name:'Gnocchi'},{id:'cuscus',icon:'🍚',name:'Cuscus'},
+    {id:'polenta',icon:'🌽',name:'Polenta'},{id:'farro',icon:'🌾',name:'Farro'},
+  ]},
+  { cat:'🧂 Ingredienti e Spezie', products:[
+    {id:'olio',icon:'🫙',name:'Olio EVO'},{id:'sale',icon:'🧂',name:'Sale'},
+    {id:'zucchero',icon:'🍬',name:'Zucchero'},{id:'farina',icon:'🌾',name:'Farina'},
+    {id:'conserve',icon:'🥫',name:'Conserve'},{id:'salsa',icon:'🫙',name:'Salsa'},
+    {id:'miele',icon:'🍯',name:'Miele'},{id:'aceto',icon:'🫙',name:'Aceto'},
+    {id:'dado',icon:'🧊',name:'Dado brodo'},{id:'pelati',icon:'🥫',name:'Pelati'},
+    {id:'ceci',icon:'🥫',name:'Ceci'},{id:'fagioli',icon:'🥫',name:'Fagioli'},
+    {id:'pepe',icon:'🧂',name:'Pepe'},{id:'origano',icon:'🌿',name:'Origano'},
+  ]},
+  { cat:'🍬 Dolci e Snack', products:[
+    {id:'cioccolato',icon:'🍫',name:'Cioccolato'},{id:'nutella',icon:'🫙',name:'Nutella'},
+    {id:'patatine',icon:'🍟',name:'Patatine'},{id:'caramelle',icon:'🍬',name:'Caramelle'},
+    {id:'merendine',icon:'🧁',name:'Merendine'},{id:'gelato',icon:'🍦',name:'Gelato'},
+    {id:'popcorn',icon:'🍿',name:'Popcorn'},{id:'fruttasecca',icon:'🥜',name:'Frutta secca'},
+  ]},
+  { cat:'🧃 Bevande', products:[
+    {id:'acqua',icon:'💧',name:'Acqua'},{id:'acquafrizz',icon:'💧',name:'Frizzante'},
+    {id:'succhi',icon:'🧃',name:'Succhi'},{id:'caffe',icon:'☕',name:'Caffè'},
+    {id:'te',icon:'🍵',name:'Tè'},{id:'cola',icon:'🥤',name:'Cola'},
+    {id:'birra',icon:'🍺',name:'Birra'},{id:'vino',icon:'🍷',name:'Vino'},
+    {id:'aranciata',icon:'🍊',name:'Aranciata'},
+  ]},
+  { cat:'❄️ Surgelati', products:[
+    {id:'pizzasurf',icon:'🍕',name:'Pizza'},{id:'verduresurf',icon:'🥦',name:'Verdure'},
+    {id:'pescesurf',icon:'🐟',name:'Pesce'},{id:'patatesurf',icon:'🍟',name:'Patatine'},
+    {id:'gelato2',icon:'🍨',name:'Gelato'},
+  ]},
+  { cat:'🧹 Pulizia della Casa', products:[
+    {id:'carta',icon:'🧻',name:'Carta ig.'},{id:'scottex',icon:'🧻',name:'Scottex'},
+    {id:'detersivo',icon:'🫧',name:'Detersivo'},{id:'spugne',icon:'🧽',name:'Spugne'},
+    {id:'sacchi',icon:'🗑️',name:'Sacchi'},{id:'ammorbidente',icon:'🫧',name:'Ammorbidente'},
+    {id:'candeggina',icon:'🫙',name:'Candeggina'},
+  ]},
+  { cat:'🧴 Igiene Personale', products:[
+    {id:'shampoo',icon:'🧴',name:'Shampoo'},{id:'sapone',icon:'🧼',name:'Sapone'},
+    {id:'dentifricio',icon:'🪥',name:'Dentifricio'},{id:'rasoio',icon:'🪒',name:'Rasoio'},
+    {id:'deodorante',icon:'🧴',name:'Deodorante'},{id:'farmaci',icon:'💊',name:'Farmaci'},
+    {id:'cerotti',icon:'🩹',name:'Cerotti'},
+  ]},
+];
+
+const SHOP_VARIANTS = {
+  'Detersivo':['Piatti','Lavatrice','Lavastoviglie','Pavimenti'],
+  'Shampoo':['Normale','Secchi','Grassi','Colorati'],
+  'Latte':['Intero','Parzialmente scremato','Scremato'],
+  'Pasta':['Spaghetti','Penne','Fusilli','Rigatoni','Farfalle'],
+  'Pane':['Integrale','Bianco','Senza glutine'],
+  'Yogurt':['Bianco','Greco','Frutta'],
+  'Acqua':['Naturale','Frizzante'],
+  'Birra':['Chiara','Rossa','Analcolica'],
+  'Vino':['Rosso','Bianco','Rosé'],
+  'Formaggio':['Parmigiano','Mozzarella','Ricotta','Pecorino'],
+};
+
+let _shopDetailProduct = null;
+let _shopOpenCats = {}; // { catIndex: bool }
+
+function shopLoad() {
+  try { _shopLists = JSON.parse(localStorage.getItem(SHOP_LISTS_KEY)||'{}'); } catch(e) { _shopLists={}; }
+  try { _shopRecent = JSON.parse(localStorage.getItem(SHOP_RECENT)||'[]'); } catch(e) { _shopRecent=[]; }
+  // Init lista default se vuota
+  if (!Object.keys(_shopLists).length) {
+    const id = 'lst_' + Date.now();
+    _shopLists[id] = { name:'Spesa', items:{} };
+  }
+  // Imposta lista corrente
+  if (!_shopCurId || !_shopLists[_shopCurId]) {
+    _shopCurId = Object.keys(_shopLists)[0];
+  }
+  _shopList = _shopLists[_shopCurId].items;
+}
+function shopSave() {
+  if (_shopCurId && _shopLists[_shopCurId]) {
+    _shopLists[_shopCurId].items = _shopList;
+  }
+  localStorage.setItem(SHOP_LISTS_KEY, JSON.stringify(_shopLists));
+  localStorage.setItem(SHOP_RECENT, JSON.stringify(_shopRecent));
+}
+
+function shopOpen() {
+  shopLoad();
+  shopRenderAll();
+  document.getElementById('topbar-title').textContent = 'Lista Spesa';
+  const count = Object.keys(_shopList).length;
+  document.getElementById('topbar-sub').textContent = count + (count===1?' prodotto':' prodotti');
+}
+
+function shopRenderAll(q='') {
+  shopRenderListTabs();
+  shopRenderActive();
+  shopRenderRecent();
+  shopRenderCategories(q);
+  const count = Object.keys(_shopList).length;
+  const clearBtn = document.getElementById('shop-clear-btn');
+  if (clearBtn) clearBtn.style.display = count > 0 ? 'block' : 'none';
+  const sub = document.getElementById('topbar-sub');
+  if (sub) sub.textContent = count + (count===1?' prodotto':' prodotti');
+  // Aggiorna label nome lista
+  const nameLabel = document.getElementById('shop-list-name-label');
+  if (nameLabel && _shopCurId) nameLabel.textContent = _shopLists[_shopCurId]?.name || 'Lista';
+}
+
+function shopRenderListTabs() {
+  const container = document.getElementById('shop-list-tabs');
+  if (!container) return;
+  container.innerHTML = '';
+  Object.entries(_shopLists).forEach(([id, list]) => {
+    const count = Object.keys(list.items||{}).length;
+    const btn = document.createElement('button');
+    btn.style.cssText = `padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:${id===_shopCurId?'2px solid var(--accent)':'1px solid var(--border)'};background:${id===_shopCurId?'var(--accent-bg)':'var(--surface)'};color:${id===_shopCurId?'var(--accent)':'var(--text2)'};`;
+    btn.textContent = list.name + (count ? ` (${count})` : '');
+    btn.onclick = () => shopSwitchList(id);
+    // Tieni premuto per rinominare
+    let pt; btn.addEventListener('touchstart', () => { pt = setTimeout(() => shopRenameList(id), 600); });
+    btn.addEventListener('touchend', () => clearTimeout(pt));
+    // Tasto 🗑 accanto alla lista attiva (solo se ci sono più liste)
+    if (id === _shopCurId && Object.keys(_shopLists).length > 1) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;align-items:center;gap:3px;flex-shrink:0;';
+      wrap.appendChild(btn);
+      const del = document.createElement('button');
+      del.textContent = '🗑';
+      del.title = 'Elimina lista';
+      del.style.cssText = 'padding:4px 7px;border-radius:99px;font-size:11px;cursor:pointer;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;';
+      del.onclick = (e) => { e.stopPropagation(); shopDeleteList(id); };
+      wrap.appendChild(del);
+      container.appendChild(wrap);
+    } else {
+      container.appendChild(btn);
+    }
+  });
+  // Tasto + nuova lista
+  const addBtn = document.createElement('button');
+  addBtn.style.cssText = 'padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:1px dashed var(--border2);background:transparent;color:var(--text3);';
+  addBtn.textContent = '+ Lista';
+  addBtn.onclick = shopNewList;
+  container.appendChild(addBtn);
+}
+
+function shopSwitchList(id) {
+  shopSave(); // salva corrente
+  _shopCurId = id;
+  _shopList  = _shopLists[id].items;
+  shopRenderAll();
+}
+
+// ── Lista corrente (griglia 4 colonne) ──────────────────
+function shopRenderActive() {
+  const grid = document.getElementById('shop-active-grid');
+  if (!grid) return;
+  const items = Object.entries(_shopList);
+  if (!items.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:16px 0;color:var(--text3);font-size:12px;">Tocca i prodotti qui sotto per aggiungerli</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  items.forEach(([id, item]) => {
+    const el = document.createElement('div');
+    el.className = 'shop-list-item';
+    el.onclick = () => shopRemove(id);
+    el.innerHTML = `<div class="shop-list-item-icon">${item.icon}</div>
+      <div class="shop-list-item-name">${item.name}</div>
+      <button class="shop-list-item-del">✕</button>`;
+    grid.appendChild(el);
+  });
+}
+
+// ── Usati di recente ────────────────────────────────────
+function shopRenderRecent() {
+  const section = document.getElementById('shop-recent-section');
+  const grid    = document.getElementById('shop-recent-grid');
+  if (!section || !grid) return;
+  const recent = _shopRecent.filter(p => !shopIsSelected(p));
+  section.style.display = recent.length ? 'block' : 'none';
+  grid.innerHTML = '';
+  recent.slice(0, 8).forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'shop-product-btn';
+    btn.onclick = () => shopShowDetail(p);
+    btn.innerHTML = `<span class="shop-product-icon">${p.icon}</span><span class="shop-product-name">${p.name}</span>`;
+    grid.appendChild(btn);
+  });
+}
+
+// ── Categorie accordion ─────────────────────────────────
+function shopRenderCategories(q='') {
+  const container = document.getElementById('shop-categories');
+  if (!container) return;
+  container.innerHTML = '';
+  const ql = q.toLowerCase();
+  SHOP_CATALOG.forEach((cat, idx) => {
+    const products = cat.products.filter(p => !q || p.name.toLowerCase().includes(ql));
+    if (!products.length) return;
+    const countSelected = products.filter(p => shopIsSelected(p)).length;
+    const isOpen = _shopOpenCats[idx] === true; // default chiuso
+
+    const accordion = document.createElement('div');
+    accordion.className = 'shop-accordion';
+
+    const header = document.createElement('div');
+    header.className = 'shop-accordion-header';
+    header.onclick = () => {
+      _shopOpenCats[idx] = !isOpen;
+      shopRenderCategories(q);
+    };
+    header.innerHTML = `
+      <span style="font-size:18px;flex-shrink:0;">${cat.cat.split(' ')[0]}</span>
+      <span style="font-size:13px;font-weight:800;flex:1;">${cat.cat.split(' ').slice(1).join(' ')}</span>
+      ${countSelected ? `<span style="background:var(--accent);color:white;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">${countSelected}</span>` : ''}
+      <span style="color:var(--text3);font-size:16px;transition:transform 0.2s;transform:rotate(${isOpen?'90deg':'0deg'})"›</span>
+    `;
+    accordion.appendChild(header);
+
+    if (isOpen) {
+      const body = document.createElement('div');
+      body.className = 'shop-accordion-body';
+      products.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = 'shop-product-btn' + (shopIsSelected(p) ? ' selected' : '');
+        btn.onclick = () => shopToggle(p);
+        btn.innerHTML = `<span class="shop-product-icon">${p.icon}</span><span class="shop-product-name">${p.name}</span>`;
+        body.appendChild(btn);
+      });
+      accordion.appendChild(body);
+    }
+    container.appendChild(accordion);
+  });
+
+  if (!container.children.length) {
+    container.innerHTML = `<div style="text-align:center;padding:24px 0;color:var(--text3);font-size:13px;">
+      Nessun prodotto trovato<br>
+      <button onclick="shopAddCustomFromSearch()" style="margin-top:10px;padding:8px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi</button>
+    </div>`;
+  }
+}
+
+function shopSearchProducts(q) { shopRenderAll(q); }
+
+// ── Toggle / dettaglio prodotto ─────────────────────────
+function shopIsSelected(product) {
+  return Object.keys(_shopList).some(id => id === product.id || id.startsWith(product.id + '_'));
+}
+
+function shopToggle(product) {
+  if (shopIsSelected(product)) {
+    // Rimuovi dalla lista
+    Object.keys(_shopList).forEach(id => {
+      if (id === product.id || id.startsWith(product.id + '_')) delete _shopList[id];
+    });
+    shopSave(); shopRenderAll();
+  } else {
+    const variants = SHOP_VARIANTS[product.name];
+    if (variants && variants.length) {
+      shopShowDetail(product);
+    } else {
+      shopAddDirect(product, product.name);
+    }
+  }
+}
+
+function shopAddDirect(product, name) {
+  const id = product.id + '_' + Date.now();
+  _shopList[id] = { name, icon: product.icon, qty: 1 };
+  // Aggiungi ai recenti
+  _shopRecent = [product, ..._shopRecent.filter(p => p.id !== product.id)].slice(0, 20);
+  shopSave(); shopRenderAll();
+}
+
+function shopShowDetail(product) {
+  _shopDetailProduct = product;
+  const modal = document.getElementById('shop-detail-modal');
+  const iconEl = document.getElementById('shop-detail-icon');
+  const nameEl = document.getElementById('shop-detail-name');
+  const varEl  = document.getElementById('shop-detail-variants');
+  if (!modal) return;
+  iconEl.textContent = product.icon;
+  nameEl.value = product.name;
+  varEl.innerHTML = '';
+  const variants = SHOP_VARIANTS[product.name] || [];
+  variants.forEach(v => {
+    const chip = document.createElement('button');
+    chip.style.cssText = 'padding:6px 12px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+    chip.textContent = v;
+    chip.onclick = () => { nameEl.value = product.name + ' ' + v; };
+    varEl.appendChild(chip);
+  });
+  modal.style.display = 'flex';
+  setTimeout(() => nameEl.focus(), 200);
+}
+
+function shopCloseDetail() {
+  document.getElementById('shop-detail-modal').style.display = 'none';
+  _shopDetailProduct = null;
+}
+
+function shopConfirmDetail() {
+  if (!_shopDetailProduct) return;
+  const name = document.getElementById('shop-detail-name').value.trim() || _shopDetailProduct.name;
+  shopAddDirect(_shopDetailProduct, name);
+  shopCloseDetail();
+}
+
+function shopRemove(id) {
+  delete _shopList[id];
+  shopSave(); shopRenderAll();
+}
+
+function shopClearAll() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">🗑</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Svuota lista?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tutti i prodotti selezionati verranno rimossi.</div>
+    <div style="display:flex;gap:8px;">
+      <button id="_shop_clear_cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_shop_clear_ok" style="flex:1;padding:11px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_shop_clear_cancel').onclick = () => overlay.remove();
+  document.getElementById('_shop_clear_ok').onclick = () => {
+    overlay.remove();
+    _shopList = {};
+    if (_shopLists[_shopCurId]) _shopLists[_shopCurId].items = {};
+    shopSave();
+    shopRenderAll();
+    showToast('Lista svuotata');
+  };
+}
+
+function shopNewList() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nuova lista</div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:14px;">La lista attuale viene conservata.</div>
+    <input id="shop-new-name" type="text" placeholder="es. Settimana, Festa, Farmacia..." value="Spesa"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <div style="display:flex;gap:10px;">
+      <button id="_snl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_snl_ok" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  const inp = document.getElementById('shop-new-name');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_snl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_snl_ok').onclick = () => {
+    const name = document.getElementById('shop-new-name')?.value.trim() || 'Spesa';
+    shopSave();
+    const id = 'lst_' + Date.now();
+    _shopLists[id] = { name, items: {} };
+    _shopCurId = id;
+    _shopList = _shopLists[id].items;
+    shopSave();
+    overlay.remove();
+    shopRenderAll();
+    showToast('✅ Lista "' + name + '" creata');
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_snl_ok').click(); });
+}
+
+function shopCreateList() {} // legacy — non usato
+
+function shopRenameList(id) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:800;margin-bottom:14px;">Rinomina lista</div>
+    <input id="shop-rename-inp" type="text" value="${_shopLists[id]?.name || ''}"
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;margin-bottom:14px;">
+    <div style="display:flex;gap:10px;">
+      <button id="_srl_del" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🗑</button>
+      <button id="_srl_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_srl_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  const inp = document.getElementById('shop-rename-inp');
+  setTimeout(() => { inp?.focus(); inp?.select(); }, 100);
+  document.getElementById('_srl_cancel').onclick = () => overlay.remove();
+  document.getElementById('_srl_del').onclick = () => { overlay.remove(); shopDeleteList(id); };
+  document.getElementById('_srl_ok').onclick = () => {
+    const newName = inp?.value.trim();
+    if (newName && _shopLists[id]) _shopLists[id].name = newName;
+    shopSave(); shopRenderAll(); overlay.remove();
+  };
+  inp?.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('_srl_ok').click(); });
+}
+
+function shopDeleteList(id) {
+  if (Object.keys(_shopLists).length <= 1) { showToast('Almeno una lista deve rimanere'); return; }
+  delete _shopLists[id];
+  if (_shopCurId === id) {
+    _shopCurId = Object.keys(_shopLists)[0];
+    _shopList  = _shopLists[_shopCurId].items;
+  }
+  shopSave(); shopRenderAll();
+  showToast('Lista eliminata');
+}
+
+function shopAddCustomFromSearch() {
+  const inp = document.getElementById('shop-search');
+  const name = inp?.value?.trim();
+  if (!name) return;
+  const id = 'custom_' + Date.now();
+  _shopList[id] = { name, icon: '🛒', qty: 1 };
+  shopSave(); inp.value = ''; shopRenderAll();
+  showToast('✅ ' + name + ' aggiunto');
+}
+
+// ── Fine Lista Spesa ──────────────────────────────────────
+
+// ── Fine Scheda Password ──────────────────────────────────
+let backPressCount = 0;
+let backPressTimer = null;
+let _backHandlerActive = false;
+
+function initBackHandler() {
+  if (_backHandlerActive) return;
+  _backHandlerActive = true;
+  // replaceState + doppio pushState = buffer di 2 voci
+  // → ci vogliono 2 back per uscire, noi le intercettiamo entrambe
+  history.replaceState({ hb: 'root' }, '');
+  history.pushState({ hb: 'app' }, '');
+  history.pushState({ hb: 'app' }, '');
+
+  window.addEventListener('popstate', () => {
+    // Reinserisci subito per mantenere il buffer
+    history.pushState({ hb: 'app' }, '');
+
+    if (document.getElementById('search-overlay')?.classList.contains('open')) {
+      closeGlobalSearch(); return;
+    }
+    if (document.getElementById('more-drawer')?.classList.contains('open')) {
+      closeMoreDrawer(); return;
+    }
+    if (document.getElementById('qa-edit-modal')?.style.display === 'flex') {
+      closeQaEdit(); return;
+    }
+    if (document.getElementById('home-custom-modal')?.style.display === 'flex') {
+      closeHomeCustom(); return;
+    }
+    if (HB.currentTab !== 'home') {
+      switchTab('home'); return;
+    }
+    // Home: doppio tap per uscire
+    backPressCount++;
+    if (backPressCount === 1) {
+      showToast('Premi ancora per uscire', 2000);
+      backPressTimer = setTimeout(() => { backPressCount = 0; }, 2200);
+    } else {
+      clearTimeout(backPressTimer);
+      backPressCount = 0;
+      history.go(-4); // salta tutti i nostri stati e chiude
+    }
+  });
+}
+
+// ── Quick Access personalizzabile ─────────────────────────
+const ALL_TABS_META = [
+  { id:'passwords', icon:'🔐', label:'Password' },
+  { id:'documents', icon:'📄', label:'Documenti' },
+  { id:'notes',     icon:'📝', label:'Note' },
+  { id:'calendar',  icon:'📅', label:'Calendario' },
+  { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
+  { id:'cards',     icon:'💳', label:'Carte' },
+  { id:'wifi',      icon:'🌐', label:'Wi-Fi' },
+  { id:'finance',   icon:'📊', label:'Finanze' },
+  { id:'server',    icon:'📡', label:'Server/IT' },
+  { id:'family',    icon:'👨‍👩‍👧', label:'Famiglia' },
+  { id:'shopping',  icon:'🛒', label:'Lista Spesa' },
+];
+
+const QA_KEY = 'hb12_quick_access';
+let qaSelected = [];
+
+function loadQuickAccess() {
+  const def6 = ['passwords','notes','otp','cards','calendar','shopping'];
+  try {
+    const saved = JSON.parse(localStorage.getItem(QA_KEY));
+    // Se ha meno di 6, completa con quelli del default che mancano
+    if (Array.isArray(saved) && saved.length >= 6) return saved;
+    if (Array.isArray(saved) && saved.length > 0) {
+      const merged = [...saved];
+      for (const d of def6) {
+        if (!merged.includes(d) && merged.length < 6) merged.push(d);
+      }
+      return merged;
+    }
+  } catch(e) {}
+  return def6;
+}
+
+function renderQuickAccess() {
+  const tabs = loadQuickAccess();
+  const grid = document.getElementById('quick-access-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  tabs.forEach(tabId => {
+    const meta = ALL_TABS_META.find(t => t.id === tabId);
+    if (!meta) return;
+    const card = document.createElement('div');
+    card.className = 'qa-card';
+    card.onclick = () => switchTab(tabId);
+    card.innerHTML = `<div class="qa-card-icon">${meta.icon}</div><div class="qa-card-label">${meta.label}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function editQuickAccess() {
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 6) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede nell\'accesso rapido');
+      }
+    };
+    container.appendChild(el);
+  });
+  document.getElementById('qa-edit-modal').classList.add('open');
+}
+
+function closeQaEdit() {
+  document.getElementById('qa-edit-modal').classList.remove('open');
+}
+
+function saveQaEdit() {
+  if (qaSelected.length === 0) { showToast('Seleziona almeno una scheda'); return; }
+  localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
+  renderQuickAccess();
+  closeQaEdit();
+  showToast('✅ Accesso rapido aggiornato');
+}
+
+// ── Ricerca Globale ────────────────────────────────────────
+function openGlobalSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
+}
+
+function handleSearchOverlayClick(e) {
+  if (e.target === document.getElementById('search-overlay')) closeGlobalSearch();
+}
+
+// Ctrl+K / Cmd+K apre la ricerca
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    openGlobalSearch();
+    return;
+  }
+  if (e.key === 'Escape') {
+    if (document.getElementById('search-overlay').classList.contains('open')) {
+      closeGlobalSearch(); return;
+    }
+  }
+});
+
+function runSearch(q) {
+  const container = document.getElementById('search-results');
+  if (!q.trim()) {
+    container.innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
+    return;
+  }
+  const ql = q.toLowerCase();
+  const results = [];
+
+  // ── Password ──────────────────────────────────────────
+  if (typeof _pwItems !== 'undefined') {
+    _pwItems.forEach(item => {
+      if ([item.title, item.username, item.url, item.notes]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        const cat = _pwCats?.find(c => c.id === item.categoryId);
+        results.push({
+          icon: cat?.icon || '🔐', title: item.title,
+          sub: item.username || item.url || 'Password',
+          badge: '🔐 Password',
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Note ──────────────────────────────────────────────
+  if (typeof _notes !== 'undefined') {
+    _notes.forEach(note => {
+      if ([note.title, note.content].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📝', title: note.title || 'Nota senza titolo',
+          sub: (note.content || '').slice(0, 60),
+          badge: '📝 Note',
+          action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── OTP ───────────────────────────────────────────────
+  if (typeof _otpAccounts !== 'undefined') {
+    _otpAccounts.forEach(acc => {
+      if ([acc.name, acc.user, acc.issuer].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: acc.icon || '🔑', title: acc.name,
+          sub: acc.user || acc.issuer || 'OTP / 2FA',
+          badge: '🔑 OTP',
+          action: () => switchTab('otp')
+        });
+      }
+    });
+  }
+
+  // ── Carte ─────────────────────────────────────────────
+  if (typeof _cards !== 'undefined') {
+    _cards.forEach(card => {
+      if ([card.holder, card.bank, card.number, card.type]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '💳', title: card.holder || 'Carta',
+          sub: card.bank || card.type || '•••• ' + (card.number||'').slice(-4),
+          badge: '💳 Carte',
+          action: () => { switchTab('cards'); setTimeout(() => cardsShowDetail(card.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Wi-Fi ─────────────────────────────────────────────
+  if (typeof _wifiNets !== 'undefined') {
+    _wifiNets.forEach(net => {
+      if ([net.ssid, net.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📶', title: net.ssid,
+          sub: net.security || 'Rete Wi-Fi',
+          badge: '📶 Wi-Fi',
+          action: () => switchTab('wifi')
+        });
+      }
+    });
+  }
+
+  // ── Server ────────────────────────────────────────────
+  if (typeof _serverItems !== 'undefined') {
+    _serverItems.forEach(s => {
+      if ([s.name, s.host, s.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '🖥️', title: s.name,
+          sub: s.host || 'Server / IT',
+          badge: '📡 Server',
+          action: () => switchTab('server')
+        });
+      }
+    });
+  }
+
+  if (!results.length) {
+    container.innerHTML = '<div class="search-empty">Nessun risultato per "<strong>' + q + '</strong>"</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  results.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'search-result-item';
+    el.style.cursor = 'pointer';
+    el.innerHTML =
+      '<div class="search-result-icon">' + r.icon + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="search-result-title">' + r.title + '</div>' +
+        '<div class="search-result-sub">' + r.sub + '</div>' +
+      '</div>' +
+      '<div class="search-result-tab">' + r.badge + '</div>';
+    el.onclick = () => { closeGlobalSearch(); r.action(); };
+    container.appendChild(el);
+  });
+}
+
+
+// ── Home Customization ─────────────────────────────────────
+const HOME_PREFS_KEY = 'hb12_home_prefs';
+
+function loadHomePrefs() {
+  try { return JSON.parse(localStorage.getItem(HOME_PREFS_KEY)) || {}; } catch { return {}; }
+}
+function saveHomePrefs(prefs) {
+  localStorage.setItem(HOME_PREFS_KEY, JSON.stringify(prefs));
+}
+
+function openHomeCustom() {
+  const prefs = loadHomePrefs();
+  // Precompila checkbox sezioni
+  const defaults = { search:true, quick:true, stats:true, alerts:true };
+  ['search','quick','stats','alerts'].forEach(k => {
+    const el = document.getElementById('hc-' + k);
+    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
+  });
+  // Precompila quick access
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs-home');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 6) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede');
+      }
+    };
+    container.appendChild(el);
+  });
+  // Tema
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
+  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
+  document.getElementById('home-custom-modal').style.display = 'flex';
+}
+
+function closeHomeCustom() {
+  document.getElementById('home-custom-modal').style.display = 'none';
+}
+
+function saveHomeCustom() {
+  const prefs = {
+    search: document.getElementById('hc-search').checked,
+    quick:  document.getElementById('hc-quick').checked,
+    alerts: document.getElementById('hc-alerts').checked,
+  };
+  saveHomePrefs(prefs);
+  if (qaSelected.length > 0) localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
+  applyHomePrefs();
+  renderQuickAccess();
+  closeHomeCustom();
+  showToast('✅ Home personalizzata');
+}
+
+function applyHomePrefs() {
+  const prefs = loadHomePrefs();
+  const map = {
+    search: 'home-search-bar',
+    quick:  'home-quick-section',
+    alerts: 'home-alerts-section',
+  };
+  Object.entries(map).forEach(([key, elId]) => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = (prefs[key] === false) ? 'none' : '';
+  });
+}
+
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('hb12_theme', t);
+  document.getElementById('theme-dark-btn').style.borderWidth  = t === 'dark'  ? '2px' : '1px';
+  document.getElementById('theme-light-btn').style.borderWidth = t === 'light' ? '2px' : '1px';
+}
+
+// ── Keyboard support per PIN ───────────────────────────────
+document.addEventListener('keydown', (e) => {
+  const pinScreen = document.getElementById('step-pin');
+  if (!pinScreen || !pinScreen.classList.contains('active')) return;
+  if (e.key >= '0' && e.key <= '9') { pinPress(e.key); return; }
+  if (e.key === 'Backspace' || e.key === 'Delete') { pinClear(); return; }
+  if (e.key === 'Enter') { pinConfirm(); return; }
+});
+
+// ── Password dimenticata — Reset via email OTP ────────────
+function startForgotPin() {
+  const user = loadUser();
+  if (!user || !user.email) {
+    showToast('Nessun account trovato — accedi prima con email');
+    return;
+  }
+  // Genera OTP reset
+  HB._resetOtp = String(Math.floor(100000 + Math.random() * 900000));
+  HB._resetEmail = user.email;
+  console.log('[HB12 Reset OTP]', HB._resetOtp);
+  // TODO: Firebase sendSignInLinkToEmail — per ora demo
+  alert('📧 Codice di reset inviato a ' + user.email + '\n\n[Demo] Codice: ' + HB._resetOtp);
+  promptResetOtp();
+}
+
+function promptResetOtp() {
+  const code = prompt('Inserisci il codice a 6 cifre ricevuto via email:');
+  if (!code) return;
+  if (code.trim() !== HB._resetOtp) {
+    alert('Codice non corretto. Riprova.');
+    return;
+  }
+  // OTP corretto → imposta nuovo PIN
+  HB.authState = 'pin-setup';
+  HB.pinMode = 'setup';
+  HB.pinBuffer = '';
+  HB.pinFirst = '';
+  // Cancella PIN e chiave vecchi
+  localStorage.removeItem('hb12_pin_hash');
+  localStorage.removeItem('hb12_salt');
+  localStorage.removeItem(HB_BIO_KEY);
+  localStorage.removeItem(HB_BIO_PIN_KEY);
+  updatePinDots();
+  document.getElementById('pin-label').textContent = 'Scegli il nuovo PIN (6-8 cifre)';
+  const fp = document.getElementById('forgot-pin-btn');
+  if (fp) fp.style.display = 'none';
+  showToast('✅ Codice verificato — scegli un nuovo PIN');
+}
+
+// ── Biometric (WebAuthn) ───────────────────────────────────
+const HB_BIO_KEY     = 'hb12_bio_credId';
+const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
+const HB_BIO_SALT    = 'hb12-biometric-key-v1';
+
+function checkBiometricAvailable() {
+  if (!window.PublicKeyCredential) return;
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  const key = document.getElementById('pin-key-left');
+  const hint = document.getElementById('bio-register-hint');
+  if (credId) {
+    // Mostra icona impronta al posto della X
+    if (key) {
+      key.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/>
+        <path d="M14 13.12c0 2.38 0 6.38-1 8.88"/>
+        <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/>
+        <path d="M2 12a10 10 0 0 1 18-6"/>
+        <path d="M2 16h.01"/>
+        <path d="M21.8 16c.2-2 .131-5.354 0-6"/>
+        <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/>
+        <path d="M8.65 22c.21-.66.45-1.32.57-2"/>
+        <path d="M9 6.8a6 6 0 0 1 9 5.2v2"/>
+      </svg>`;
+      key.className = 'pin-key';
+      key.style.color = 'var(--accent)';
+    }
+    if (hint) hint.style.display = 'none';
+  } else {
+    // X normale
+    if (key) {
+      key.innerHTML = '✕';
+      key.className = 'pin-key danger';
+      key.style.color = '';
+    }
+    if (hint) hint.style.display = 'block';
+  }
+}
+
+function pinKeyLeftAction() {
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  if (credId && HB.authState === 'pin-login') {
+    tryBiometric();
+  } else {
+    pinClear();
+  }
+}
+
+// Deriva una chiave AES dal rawId del credential (stessa chiave ogni volta)
+async function _deriveBioKey(rawId) {
+  const km = await crypto.subtle.importKey('raw', rawId, 'PBKDF2', false, ['deriveKey']);
+  const salt = new TextEncoder().encode(HB_BIO_SALT);
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt, iterations:50000, hash:'SHA-256' },
+    km, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']
+  );
+}
+
+async function _bioEncrypt(key, text) {
+  const iv  = crypto.getRandomValues(new Uint8Array(12));
+  const enc = await crypto.subtle.encrypt(
+    { name:'AES-GCM', iv }, key, new TextEncoder().encode(text)
+  );
+  const combined = new Uint8Array(12 + enc.byteLength);
+  combined.set(iv); combined.set(new Uint8Array(enc), 12);
+  let b = ''; combined.forEach(x => b += String.fromCharCode(x));
+  return btoa(b);
+}
+
+async function _bioDecrypt(key, b64) {
+  const combined = new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0)));
+  const dec = await crypto.subtle.decrypt(
+    { name:'AES-GCM', iv: combined.slice(0,12) }, key, combined.slice(12)
+  );
+  return new TextDecoder().decode(dec);
+}
+
+async function registerBiometric() {
+  if (!window.PublicKeyCredential) {
+    showToast('⚠️ Biometrico non supportato'); return;
+  }
+  const currentPin = HB._lastPin || HB.pinBuffer || HB.pinFirst || '';
+  if (!currentPin) { showToast('Inserisci prima il PIN per registrare l\'impronta'); return; }
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId    = crypto.getRandomValues(new Uint8Array(16));
+    const credential = await navigator.credentials.create({ publicKey: {
+      challenge,
+      rp: { name:'HomeBull Pro', id: location.hostname },
+      user: { id:userId, name: HB.user?.email||'user', displayName:'HomeBull' },
+      pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection: { userVerification:'required', residentKey:'preferred' },
+      timeout: 60000
+    }});
+    if (!credential) return;
+    // Salva credId
+    const rawId = new Uint8Array(credential.rawId);
+    let bin=''; rawId.forEach(b => bin+=String.fromCharCode(b));
+    localStorage.setItem(HB_BIO_KEY, btoa(bin));
+    // Cifra il PIN con chiave derivata dal rawId (stessa ogni volta → recuperabile)
+    const bioKey = await _deriveBioKey(rawId);
+    const encPin = await _bioEncrypt(bioKey, currentPin);
+    localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+    showToast('✅ Impronta registrata! Al prossimo avvio premi 👆 per entrare.');
+    checkBiometricAvailable();
+  } catch(e) {
+    console.warn('[Bio register]', e);
+    showToast('⚠️ Registrazione annullata o non riuscita');
+  }
+}
+
+async function tryBiometric() {
+  const credIdB64 = localStorage.getItem(HB_BIO_KEY);
+  const encPin    = localStorage.getItem(HB_BIO_PIN_KEY);
+  if (!credIdB64 || !encPin || !window.PublicKeyCredential) {
+    showToast('Biometrico non disponibile'); return;
+  }
+  try {
+    const credIdBytes = new Uint8Array(atob(credIdB64).split('').map(c=>c.charCodeAt(0)));
+    const assertion   = await navigator.credentials.get({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{type:'public-key', id:credIdBytes}],
+      userVerification: 'required', timeout: 60000
+    }});
+    if (!assertion) return;
+    // Recupera PIN usando chiave derivata dal rawId
+    const rawId  = new Uint8Array(assertion.rawId);
+    const bioKey = await _deriveBioKey(rawId);
+    const pin    = await _bioDecrypt(bioKey, encPin);
+    if (!pin) { showToast('Biometrico non riuscito — usa il PIN'); return; }
+    // Verifica PIN e sblocca
+    const ok = await verifyPIN(pin);
+    if (ok) {
+      showToast('🔑 Identità verificata');
+      unlockApp();
+    } else {
+      showToast('⚠️ Errore verifica — usa il PIN');
+    }
+  } catch(e) {
+    console.warn('[Bio auth]', e);
+    showToast('Biometrico non riuscito — usa il PIN');
+  }
+}
+
+
+// ── Modifica Password ────────────────────────────────────
+function pwEditItem(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+  const catOpts = _pwCats.map(c =>
+    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+( c.icon||'📁')+' '+c.name+'</option>'
+  ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
   const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
   box.innerHTML = [
     '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
-    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">'+(isEdit ? '✏️ Modifica familiare' : '👤 Nuovo familiare')+'</div>',
-    '<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Nome</div>',
-    '<input id="_fm_name" type="text" value="'+(member?.name||'')+'" placeholder="es. Marco, Giusy, Nonno..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email *</div>',
-    '<input id="_fm_email" type="email" value="'+(member?.email||'')+'" placeholder="es. marco@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">',
+    '<div style="font-size:18px;font-weight:800;">✏️ Modifica Password</div>',
+    '<button id="_pwe_del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>',
+    '</div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
+    '<select id="_pwe_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
+    '<input id="_pwe_title" type="text" value="'+(item.title||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
+    '<input id="_pwe_url" type="url" value="'+(item.url||'')+'" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
+    '<input id="_pwe_user" type="text" value="'+(item.username||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password</div>',
+    '<div style="display:flex;gap:8px;"><input id="_pwe_pass" type="password" value="'+(item.password||'')+'" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwe_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button>',
+    '<button id="_pwe_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
+    '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
+    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
+    '<textarea id="_pwe_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;">'+(item.notes||'')+'</textarea></div>',
     '<div style="display:flex;gap:10px;">',
-    '<button id="_fm_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
-    '<button id="_fm_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">'+(isEdit ? 'Salva' : 'Aggiungi')+'</button>',
+    '<button id="_pwe_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_pwe_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva Modifiche</button>',
     '</div>'
   ].join('');
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('_fm_name')?.focus(), 100);
-  document.getElementById('_fm_cancel').onclick = () => overlay.remove();
-  document.getElementById('_fm_save').onclick = () => {
-    const name  = document.getElementById('_fm_name')?.value.trim();
-    const email = document.getElementById('_fm_email')?.value.trim();
-    if (!email) { showToast('Inserisci una email'); return; }
-    if (isEdit) {
-      _family[idx] = { ..._family[idx], name, email };
-    } else {
-      _family.push({ id: 'fm_'+Date.now(), name, email, sharing: [] });
-    }
-    familySave();
-    overlay.remove();
-    familyRender();
-    showToast(isEdit ? '✅ Familiare aggiornato' : '✅ '+( name||email)+' aggiunto');
+  document.getElementById('_pwe_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwe_del').onclick = () => { overlay.remove(); pwDeleteConfirm(itemId); };
+  document.getElementById('_pwe_eye').onclick = () => {
+    const i = document.getElementById('_pwe_pass');
+    i.type = i.type === 'password' ? 'text' : 'password';
   };
-  document.getElementById('_fm_email').addEventListener('keydown', e => {
-    if (e.key === 'Enter') document.getElementById('_fm_save').click();
-  });
+  document.getElementById('_pwe_dice').onclick = () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let p = ''; a.forEach(b => p += c[b % c.length]);
+    const i = document.getElementById('_pwe_pass'); i.value = p; i.type = 'text';
+  };
+  document.getElementById('_pwe_save').onclick = () => {
+    const title = document.getElementById('_pwe_title')?.value.trim();
+    const pass  = document.getElementById('_pwe_pass')?.value;
+    if (!title) { showToast('Inserisci il titolo'); return; }
+    const idx = _pwItems.findIndex(i => i.id === itemId);
+    if (idx > -1) {
+      _pwItems[idx] = {
+        ...item,
+        title,
+        password: pass,
+        username: document.getElementById('_pwe_user')?.value.trim() || '',
+        url:      document.getElementById('_pwe_url')?.value.trim() || '',
+        pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
+        notes:    document.getElementById('_pwe_note')?.value.trim() || '',
+        categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
+        updatedAt: new Date().toISOString()
+      };
+      pwSave();
+    }
+    overlay.remove();
+    pwShowDetail(itemId);
+    showToast('✅ Password aggiornata');
+  };
 }
 
-function familyDelete(idx) {
-  const member = _family[idx];
-  if (!member) return;
+
+// ── Nuova Categoria Password ──────────────────────────────
+function pwNewCategory() {
+  const EMO = ['📁','🔐','💳','🏦','📧','☁️','🏠','💻','🌐','🛡️',
+               '📱','🔑','👤','🏢','🖥️','📜','❤️','🎓','💼','📺',
+               '🍽️','📹','🔔','🔗','💾','🎮','✈️','🎵','⚙️','🛒'];
+  window._pwNewCatIcon = '📁';
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  const iconBtns = EMO.map(ic =>
+    '<button data-ic="'+ic+'" style="width:42px;height:42px;border-radius:10px;border:2px solid '+(ic==='📁'?'var(--accent)':'var(--border)')+';background:'+(ic==='📁'?'var(--accent-bg)':'var(--surface)')+';font-size:20px;cursor:pointer;">'+ic+'</button>'
+  ).join('');
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">📁 Nuova Categoria</div>',
+    '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Nome *</div>',
+    '<input id="_nc_name" type="text" placeholder="es. Banca, Lavoro, Social..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Icona</div>',
+    '<div id="_nc_icons" style="display:flex;flex-wrap:wrap;gap:6px;">'+iconBtns+'</div></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_nc_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_nc_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea Categoria</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('_nc_name')?.focus(), 100);
+
+  // Selezione icona
+  box.querySelectorAll('#_nc_icons button').forEach(btn => {
+    btn.onclick = () => {
+      window._pwNewCatIcon = btn.dataset.ic || btn.textContent;
+      box.querySelectorAll('#_nc_icons button').forEach(b => {
+        const active = b === btn;
+        b.style.border = active ? '2px solid var(--accent)' : '2px solid var(--border)';
+        b.style.background = active ? 'var(--accent-bg)' : 'var(--surface)';
+      });
+    };
+  });
+
+  document.getElementById('_nc_cancel').onclick = () => overlay.remove();
+  document.getElementById('_nc_name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('_nc_save').click();
+  });
+  document.getElementById('_nc_save').onclick = () => {
+    const name = document.getElementById('_nc_name')?.value.trim();
+    if (!name) { showToast('Inserisci il nome della categoria'); return; }
+    _pwCats.push({ id: 'cat_' + Date.now(), name, icon: window._pwNewCatIcon || '📁' });
+    pwSave();
+    overlay.remove();
+    pwShowCats();
+    showToast('✅ Categoria "' + name + '" creata');
+  };
+}
+
+function pwDeleteCategory(catId, catName, count) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = '<div style="font-size:32px;margin-bottom:10px;">👤</div>'
-    + '<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Rimuovere '+(member.name||member.email)+'?</div>'
-    + '<div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Le condivisioni impostate verranno eliminate.</div>'
+  const warn = count > 0
+    ? '<div style="font-size:12px;color:#f97316;margin-bottom:16px;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px 12px;">⚠️ Contiene '+count+' password che verranno eliminate</div>'
+    : '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">La categoria è vuota.</div>';
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">📁</div>'
+    + '<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Elimina "'+catName+'"?</div>'
+    + warn
     + '<div style="display:flex;gap:10px;">'
-    + '<button id="_fdel_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
-    + '<button id="_fdel_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Rimuovi</button>'
+    + '<button id="_dcat_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '<button id="_dcat_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>'
     + '</div>';
   overlay.appendChild(box);
   document.body.appendChild(overlay);
-  document.getElementById('_fdel_cancel').onclick = () => overlay.remove();
-  document.getElementById('_fdel_ok').onclick = () => {
-    _family.splice(idx, 1);
-    familySave();
+  document.getElementById('_dcat_cancel').onclick = () => overlay.remove();
+  document.getElementById('_dcat_ok').onclick = () => {
+    // Rimuovi categoria e tutte le sue password
+    _pwCats = _pwCats.filter(c => c.id !== catId);
+    _pwItems = _pwItems.filter(i => i.categoryId !== catId);
+    pwSave();
     overlay.remove();
-    familyRender();
-    showToast('Familiare rimosso');
+    pwShowCats();
+    showToast('Categoria eliminata');
   };
 }
 
+function pwPickCategoryToDelete() {
+  if (!_pwCats.length) { showToast('Nessuna categoria da eliminare'); return; }
+  const sorted = [..._pwCats].sort((a,b) => a.name.localeCompare(b.name,'it'));
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:70dvh;display:flex;flex-direction:column;padding:20px 0 calc(16px + env(safe-area-inset-bottom,0px));';
+  const header = '<div style="padding:0 16px 14px;display:flex;align-items:center;justify-content:space-between;">'
+    + '<div style="font-size:17px;font-weight:800;">🗑 Elimina Categoria</div>'
+    + '<button id="_dpick_close" style="padding:6px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '</div>'
+    + '<div style="height:1px;background:var(--border);margin-bottom:8px;"></div>';
+  const listHtml = sorted.map(cat => {
+    const count = _pwItems.filter(i => i.categoryId === cat.id).length;
+    return '<button data-catid="'+cat.id+'" data-catname="'+cat.name.replace(/"/g,'&quot;')+'" data-count="'+count+'" style="width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-family:inherit;text-align:left;">'
+      + '<span style="font-size:22px;">'+(cat.icon||'📁')+'</span>'
+      + '<span style="flex:1;font-size:14px;font-weight:700;">'+cat.name+'</span>'
+      + '<span style="font-size:12px;color:'+(count>0?'#f97316':'var(--text3)')+';">'+(count>0?count+' pw':'vuota')+'</span>'
+      + '</button>';
+  }).join('');
+  box.innerHTML = header + '<div style="overflow-y:auto;flex:1;">' + listHtml + '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_dpick_close').onclick = () => overlay.remove();
+  box.querySelectorAll('button[data-catid]').forEach(btn => {
+    btn.onclick = () => {
+      const catId = btn.dataset.catid;
+      const catName = btn.dataset.catname;
+      const count = parseInt(btn.dataset.count);
+      overlay.remove();
+      pwDeleteCategory(catId, catName, count);
+    };
+  });
+}
 </script>
 </body>
 </html>
