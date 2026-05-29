@@ -1846,14 +1846,14 @@ function pwFabInit() {
     <div class="tab-panel" id="panel-passwords">
 
       <!-- Vista: Lista categorie -->
-      <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
+      <div id="pw-view-cats" style="position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
           <div class="pw-search-bar">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
-        <div id="pw-cats-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 100px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-content:start;"></div>
+        <div id="pw-cats-grid" style="flex:1;min-height:0;overflow-y:auto;padding:12px 14px 100px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-content:start;"></div>
 
         <!-- FAB Aggiungi (stile v11) -->
         <div id="pw-fab" style="position:absolute;bottom:24px;right:20px;z-index:20;">
@@ -1903,7 +1903,7 @@ function pwFabInit() {
       </div>
 
       <!-- Import banner (mostrato se vault vuoto) -->
-      <div id="pw-import-banner" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg);z-index:10;">
+      <div id="pw-import-banner" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg);z-index:5;">
         <div style="text-align:center;padding:32px 24px;max-width:320px;">
           <div style="font-size:48px;margin-bottom:16px;">🔐</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
@@ -3476,12 +3476,12 @@ function pwSave() {
 // Apri scheda Password
 function pwOpen() {
   pwLoad();
+  document.getElementById('pw-import-banner').style.display = 'none';
+  pwShowCats();
   if (_pwCats.length === 0 && _pwItems.length === 0) {
+    // Mostra banner sotto — usa z-index basso
     document.getElementById('pw-import-banner').style.display = 'flex';
-    document.getElementById('pw-view-cats').style.display = 'none';
   } else {
-    document.getElementById('pw-import-banner').style.display = 'none';
-    pwShowCats();
     setTimeout(pwEnrichIcons, 500);
   }
   // Update topbar
