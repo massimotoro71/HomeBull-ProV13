@@ -351,7 +351,7 @@ html, body {
   max-width: 100%;
   overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  opacity: 0; transform: translateX(20px);
+  opacity: 0; visibility: hidden; transform: translateX(20px);
   pointer-events: none;
   transition: opacity 0.2s, transform 0.2s;
 }
@@ -359,6 +359,7 @@ html, body {
 .tab-panel.active {
   opacity: 1; transform: translateX(0);
   pointer-events: auto;
+  visibility: visible !important;
 }
 
 /* ── Bottom Navigation (mobile) ── */
@@ -1251,8 +1252,8 @@ html, body {
 
 /* Tab panel: block su desktop */
 .tab-panel { position: absolute !important; inset: 0 !important; overflow-y: auto !important;
-  opacity: 0; pointer-events: none; transition: opacity 0.18s; background: var(--bg); }
-.tab-panel.active { opacity: 1 !important; pointer-events: auto !important; }
+  opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.18s, visibility 0.18s; background: var(--bg); }
+.tab-panel.active { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
 
 /* Topbar sticky */
 #topbar { position: sticky !important; top: 0 !important; left: auto !important;
