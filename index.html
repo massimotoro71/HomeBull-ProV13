@@ -6407,38 +6407,118 @@ function runSearch(q) {
     container.innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
     return;
   }
-  // Cerca nei dati disponibili (espandibile per ogni scheda)
-  const results = [];
   const ql = q.toLowerCase();
+  const results = [];
 
-  // Placeholder: cerca nelle schede registrate
-  ALL_TABS_META.forEach(tab => {
-    if (tab.label.toLowerCase().includes(ql)) {
-      results.push({
-        icon: tab.icon, title: 'Vai a ' + tab.label,
-        sub: 'Sezione ' + tab.label, tab: tab.id, tabLabel: tab.label
-      });
-    }
-  });
+  // ── Password ──────────────────────────────────────────
+  if (typeof _pwItems !== 'undefined') {
+    _pwItems.forEach(item => {
+      if ([item.title, item.username, item.url, item.notes]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        const cat = _pwCats?.find(c => c.id === item.categoryId);
+        results.push({
+          icon: cat?.icon || '🔐', title: item.title,
+          sub: item.username || item.url || 'Password',
+          badge: '🔐 Password',
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
+        });
+      }
+    });
+  }
 
-  // TODO: quando le schede avranno dati reali, cercare lì
-  // results.push(...searchPasswords(q), ...searchNotes(q), ...searchCards(q));
+  // ── Note ──────────────────────────────────────────────
+  if (typeof _notes !== 'undefined') {
+    _notes.forEach(note => {
+      if ([note.title, note.content].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📝', title: note.title || 'Nota senza titolo',
+          sub: (note.content || '').slice(0, 60),
+          badge: '📝 Note',
+          action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── OTP ───────────────────────────────────────────────
+  if (typeof _otpAccounts !== 'undefined') {
+    _otpAccounts.forEach(acc => {
+      if ([acc.name, acc.user, acc.issuer].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: acc.icon || '🔑', title: acc.name,
+          sub: acc.user || acc.issuer || 'OTP / 2FA',
+          badge: '🔑 OTP',
+          action: () => switchTab('otp')
+        });
+      }
+    });
+  }
+
+  // ── Carte ─────────────────────────────────────────────
+  if (typeof _cards !== 'undefined') {
+    _cards.forEach(card => {
+      if ([card.holder, card.bank, card.number, card.type]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '💳', title: card.holder || 'Carta',
+          sub: card.bank || card.type || '•••• ' + (card.number||'').slice(-4),
+          badge: '💳 Carte',
+          action: () => { switchTab('cards'); setTimeout(() => cardsShowDetail(card.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Wi-Fi ─────────────────────────────────────────────
+  if (typeof _wifiNets !== 'undefined') {
+    _wifiNets.forEach(net => {
+      if ([net.ssid, net.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📶', title: net.ssid,
+          sub: net.security || 'Rete Wi-Fi',
+          badge: '📶 Wi-Fi',
+          action: () => switchTab('wifi')
+        });
+      }
+    });
+  }
+
+  // ── Server ────────────────────────────────────────────
+  if (typeof _serverItems !== 'undefined') {
+    _serverItems.forEach(s => {
+      if ([s.name, s.host, s.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '🖥️', title: s.name,
+          sub: s.host || 'Server / IT',
+          badge: '📡 Server',
+          action: () => switchTab('server')
+        });
+      }
+    });
+  }
 
   if (!results.length) {
-    container.innerHTML = `<div class="search-empty">Nessun risultato per "<strong>${q}</strong>"</div>`;
+    container.innerHTML = '<div class="search-empty">Nessun risultato per "<strong>' + q + '</strong>"</div>';
     return;
   }
-  container.innerHTML = results.map(r => `
-    <div class="search-result-item" onclick="closeGlobalSearch();switchTab('${r.tab}')">
-      <div class="search-result-icon">${r.icon}</div>
-      <div style="flex:1;min-width:0;">
-        <div class="search-result-title">${r.title}</div>
-        <div class="search-result-sub">${r.sub}</div>
-      </div>
-      <div class="search-result-tab">${r.tabLabel}</div>
-    </div>
-  `).join('');
+
+  container.innerHTML = '';
+  results.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'search-result-item';
+    el.style.cursor = 'pointer';
+    el.innerHTML =
+      '<div class="search-result-icon">' + r.icon + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="search-result-title">' + r.title + '</div>' +
+        '<div class="search-result-sub">' + r.sub + '</div>' +
+      '</div>' +
+      '<div class="search-result-tab">' + r.badge + '</div>';
+    el.onclick = () => { closeGlobalSearch(); r.action(); };
+    container.appendChild(el);
+  });
 }
+
 
 // ── Home Customization ─────────────────────────────────────
 const HOME_PREFS_KEY = 'hb12_home_prefs';
