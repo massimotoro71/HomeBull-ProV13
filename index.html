@@ -3375,16 +3375,26 @@ function pwRenderCats(q='') {
   grid.innerHTML = '';
   cats.forEach(cat => {
     const count = _pwItems.filter(i => i.categoryId === cat.id).length;
-    if (count === 0 && q === '') return; // nascondi categorie vuote
+    // mostra sempre tutte le categorie
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
     const div = document.createElement('div');
     div.className = 'pw-cat-tile';
+    div.style.cssText = 'position:relative;';
     div.onclick = () => pwShowItems(cat.id, cat.name);
     div.innerHTML = `
       <div class="pw-cat-icon" style="background:${cat.color||'rgba(99,102,241,0.12)'}20;">${icon}</div>
       <div class="pw-cat-name">${cat.name}</div>
       <div class="pw-cat-badge">${count}</div>
     `;
+    // Tasto elimina categoria
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '✕';
+    delBtn.title = 'Elimina categoria';
+    delBtn.style.cssText = 'position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(239,68,68,0.15);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;opacity:0;transition:opacity 0.15s;';
+    delBtn.onclick = (e) => { e.stopPropagation(); pwDeleteCategory(cat.id, cat.name, count); };
+    div.addEventListener('mouseenter', () => delBtn.style.opacity = '1');
+    div.addEventListener('mouseleave', () => delBtn.style.opacity = '0');
+    div.appendChild(delBtn);
     grid.appendChild(div);
   });
 }
@@ -6838,6 +6848,35 @@ function pwNewCategory() {
     overlay.remove();
     pwShowCats();
     showToast('✅ Categoria "' + name + '" creata');
+  };
+}
+
+function pwDeleteCategory(catId, catName, count) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  const warn = count > 0
+    ? '<div style="font-size:12px;color:#f97316;margin-bottom:16px;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px 12px;">⚠️ Contiene '+count+' password che verranno eliminate</div>'
+    : '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">La categoria è vuota.</div>';
+  box.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">📁</div>'
+    + '<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Elimina "'+catName+'"?</div>'
+    + warn
+    + '<div style="display:flex;gap:10px;">'
+    + '<button id="_dcat_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '<button id="_dcat_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>'
+    + '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_dcat_cancel').onclick = () => overlay.remove();
+  document.getElementById('_dcat_ok').onclick = () => {
+    // Rimuovi categoria e tutte le sue password
+    _pwCats = _pwCats.filter(c => c.id !== catId);
+    _pwItems = _pwItems.filter(i => i.categoryId !== catId);
+    pwSave();
+    overlay.remove();
+    pwShowCats();
+    showToast('Categoria eliminata');
   };
 }
 </script>
