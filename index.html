@@ -3041,9 +3041,18 @@ function renderTopbarActions(actions) {
     optCat.style.cssText = 'width:100%;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-size:13px;font-weight:700;text-align:left;font-family:inherit;display:flex;align-items:center;gap:10px;';
     optCat.innerHTML = '📁 Nuova Categoria';
     optCat.onclick = () => { dropdown.style.display='none'; pwNewCategory(); };
+    // Separatore + Elimina Categoria
+    const sep2 = document.createElement('div');
+    sep2.style.cssText = 'height:1px;background:var(--border);margin:0 12px;';
+    const optDel = document.createElement('button');
+    optDel.style.cssText = 'width:100%;padding:13px 16px;border:none;background:transparent;cursor:pointer;color:#ef4444;font-size:13px;font-weight:700;text-align:left;font-family:inherit;display:flex;align-items:center;gap:10px;';
+    optDel.innerHTML = '🗑 Elimina Categoria';
+    optDel.onclick = () => { dropdown.style.display='none'; pwPickCategoryToDelete(); };
     dropdown.appendChild(optPw);
     dropdown.appendChild(sep);
     dropdown.appendChild(optCat);
+    dropdown.appendChild(sep2);
+    dropdown.appendChild(optDel);
     newBtn.onclick = (e) => {
       e.stopPropagation();
       const isOpen = dropdown.style.display !== 'none';
@@ -3388,14 +3397,6 @@ function pwRenderCats(q='') {
       <div class="pw-cat-name">${cat.name}</div>
       <div class="pw-cat-badge">${count}</div>
     `;
-    // Tasto elimina — sempre visibile, piccolo in alto a destra
-    const delBtn = document.createElement('button');
-    delBtn.innerHTML = '✕';
-    delBtn.title = 'Elimina categoria';
-    delBtn.style.cssText = 'position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(239,68,68,0.18);color:#ef4444;font-size:10px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;';
-    const catId = cat.id; const catName = cat.name; const catCount = count;
-    delBtn.addEventListener('click', function(e) { e.stopPropagation(); e.preventDefault(); pwDeleteCategory(catId, catName, catCount); });
-    div.appendChild(delBtn);
     grid.appendChild(div);
   });
 }
@@ -6879,6 +6880,41 @@ function pwDeleteCategory(catId, catName, count) {
     pwShowCats();
     showToast('Categoria eliminata');
   };
+}
+
+function pwPickCategoryToDelete() {
+  if (!_pwCats.length) { showToast('Nessuna categoria da eliminare'); return; }
+  const sorted = [..._pwCats].sort((a,b) => a.name.localeCompare(b.name,'it'));
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:70dvh;display:flex;flex-direction:column;padding:20px 0 calc(16px + env(safe-area-inset-bottom,0px));';
+  const header = '<div style="padding:0 16px 14px;display:flex;align-items:center;justify-content:space-between;">'
+    + '<div style="font-size:17px;font-weight:800;">🗑 Elimina Categoria</div>'
+    + '<button id="_dpick_close" style="padding:6px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '</div>'
+    + '<div style="height:1px;background:var(--border);margin-bottom:8px;"></div>';
+  const listHtml = sorted.map(cat => {
+    const count = _pwItems.filter(i => i.categoryId === cat.id).length;
+    return '<button data-catid="'+cat.id+'" data-catname="'+cat.name.replace(/"/g,'&quot;')+'" data-count="'+count+'" style="width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-family:inherit;text-align:left;">'
+      + '<span style="font-size:22px;">'+(cat.icon||'📁')+'</span>'
+      + '<span style="flex:1;font-size:14px;font-weight:700;">'+cat.name+'</span>'
+      + '<span style="font-size:12px;color:'+(count>0?'#f97316':'var(--text3)')+';">'+(count>0?count+' pw':'vuota')+'</span>'
+      + '</button>';
+  }).join('');
+  box.innerHTML = header + '<div style="overflow-y:auto;flex:1;">' + listHtml + '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_dpick_close').onclick = () => overlay.remove();
+  box.querySelectorAll('button[data-catid]').forEach(btn => {
+    btn.onclick = () => {
+      const catId = btn.dataset.catid;
+      const catName = btn.dataset.catname;
+      const count = parseInt(btn.dataset.count);
+      overlay.remove();
+      pwDeleteCategory(catId, catName, count);
+    };
+  });
 }
 </script>
 </body>
