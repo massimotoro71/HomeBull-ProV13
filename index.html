@@ -2749,6 +2749,7 @@ function verifyOTP() {
 
 // OTP digit navigation
 document.addEventListener('DOMContentLoaded', () => {
+  settingsApplyOnLoad();
   const digits = document.querySelectorAll('.otp-digit');
   digits.forEach((d, i) => {
     d.addEventListener('input', () => {
@@ -3256,9 +3257,7 @@ function updateHomeStats() {
   if (oel) oel.textContent = _otpAccounts.length > 0 ? _otpAccounts.length : '0';
 }
 
-function openSettings() {
-  showToast('⚙️ Impostazioni — in arrivo');
-}
+
 
 // ── Toast ──────────────────────────────────────────────────
 let toastTimer;
@@ -7445,6 +7444,357 @@ function wifiSearch(q) {
   wifiRender();
   _wifiNets = backup;
 }
+
+// ══════════════════════════════════════════════════════
+//  IMPOSTAZIONI
+// ══════════════════════════════════════════════════════
+
+function openSettings() {
+  const ov = document.getElementById('settings-overlay');
+  if (!ov) return;
+  ov.style.display = 'flex';
+  settingsRefreshUI();
+}
+function closeSettings() {
+  const ov = document.getElementById('settings-overlay');
+  if (ov) ov.style.display = 'none';
+}
+
+function settingsRefreshUI() {
+  const S = {
+    theme:  localStorage.getItem('hb_theme')  || 'dark',
+    accent: localStorage.getItem('hb_accent_name') || 'indigo',
+    bg:     localStorage.getItem('hb_bg')     || 'none',
+    radius: localStorage.getItem('hb_radius') || 'normal',
+    shadow: localStorage.getItem('hb_shadow') || 'off',
+    anim:   localStorage.getItem('hb_anim')   || 'normal',
+    font:   localStorage.getItem('hb_font')   || 'system',
+    fs:     localStorage.getItem('hb_fs')     || '15',
+  };
+  const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
+  const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
+  const setBtn = (id, cond) => {
+    const b = document.getElementById(id);
+    if (b) b.style.cssText = b.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (cond ? active : normal);
+  };
+  // Tema
+  setBtn('set-dark',  S.theme==='dark');
+  setBtn('set-light', S.theme==='light');
+  setBtn('set-auto',  S.theme==='auto');
+  // Accent
+  document.querySelectorAll('[data-ac]').forEach(b => {
+    const on = b.dataset.ac === S.accent;
+    b.style.boxShadow = on ? '0 0 0 3px var(--accent)' : 'none';
+    b.style.transform = on ? 'scale(1.18)' : 'scale(1)';
+  });
+  // Sfondo
+  ['none','grad1','grad2','grad3','dots','grid'].forEach(v => setBtn('bg-'+v, S.bg===v));
+  // Radius
+  ['sharp','normal','round'].forEach(v => setBtn('rd-'+v, S.radius===v));
+  // Shadow
+  setBtn('sh-off', S.shadow==='off');
+  setBtn('sh-on',  S.shadow==='on');
+  // Anim
+  ['off','fast','normal','slow'].forEach(v => setBtn('an-'+v, S.anim===v));
+  // Font
+  ['system','serif','mono','round'].forEach(v => setBtn('ff-'+v, S.font===v));
+  // Font size slider
+  const sl = document.getElementById('fs-slider');
+  if (sl) sl.value = S.fs;
+}
+
+function setTheme(t) {
+  if (t === 'auto') t = window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('hb_theme', t);
+  settingsRefreshUI();
+  showToast(t==='dark'?'🌙 Tema scuro':'☀️ Tema chiaro');
+}
+
+function setAccent(color, name) {
+  document.documentElement.style.setProperty('--accent', color);
+  document.documentElement.style.setProperty('--accent-bg', color+'20');
+  localStorage.setItem('hb_accent', color);
+  localStorage.setItem('hb_accent_name', name);
+  settingsRefreshUI();
+  showToast('🎨 Colore aggiornato');
+}
+
+function setBg(type) {
+  const root = document.documentElement;
+  const bgs = {
+    none:  '',
+    grad1: 'linear-gradient(135deg,rgba(99,102,241,0.15) 0%,rgba(139,92,246,0.15) 100%)',
+    grad2: 'linear-gradient(135deg,rgba(15,23,42,0.8) 0%,rgba(30,58,95,0.8) 100%)',
+    grad3: 'linear-gradient(135deg,rgba(6,78,59,0.5) 0%,rgba(6,95,70,0.5) 100%)',
+    dots:  'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',
+    grid:  'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)',
+  };
+  const bgSizes = { dots:'20px 20px', grid:'20px 20px' };
+  root.style.setProperty('--app-bg-image', bgs[type]||'none');
+  root.style.setProperty('--app-bg-size', bgSizes[type]||'auto');
+  // Applica al tab-container
+  const tc = document.getElementById('tab-container');
+  if (tc) { tc.style.backgroundImage = bgs[type]||''; tc.style.backgroundSize = bgSizes[type]||''; }
+  localStorage.setItem('hb_bg', type);
+  settingsRefreshUI();
+  showToast('🖼 Sfondo aggiornato');
+}
+
+function setRadius(r) {
+  const map = { sharp:'4px', normal:'14px', round:'22px' };
+  document.documentElement.style.setProperty('--card-radius', map[r]);
+  localStorage.setItem('hb_radius', r);
+  settingsRefreshUI();
+  showToast('🔲 Stile bordi aggiornato');
+}
+
+function setShadow(s) {
+  const sh = s==='on' ? '0 4px 16px rgba(0,0,0,0.25)' : 'none';
+  document.documentElement.style.setProperty('--card-shadow', sh);
+  localStorage.setItem('hb_shadow', s);
+  settingsRefreshUI();
+  showToast(s==='on'?'✨ Ombra attivata':'Ombra disattivata');
+}
+
+function setAnim(a) {
+  const speeds = { off:'0s', fast:'0.08s', normal:'0.18s', slow:'0.4s' };
+  document.documentElement.style.setProperty('--anim-speed', speeds[a]);
+  localStorage.setItem('hb_anim', a);
+  settingsRefreshUI();
+  showToast('✨ Animazioni aggiornate');
+}
+
+function setFont(f) {
+  const fonts = {
+    system: "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",
+    serif:  "Georgia,'Times New Roman',serif",
+    mono:   "'SF Mono','Fira Code',Consolas,monospace",
+    round:  "'Nunito','Varela Round',sans-serif",
+  };
+  document.documentElement.style.setProperty('--app-font', fonts[f]);
+  document.body.style.fontFamily = fonts[f];
+  localStorage.setItem('hb_font', f);
+  settingsRefreshUI();
+  showToast('🔡 Font aggiornato');
+}
+
+function setFontSize(px) {
+  document.documentElement.style.fontSize = px+'px';
+  localStorage.setItem('hb_fs', px);
+}
+
+function settingsExport() {
+  const keys = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
+                 'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists'];
+  const data = {};
+  keys.forEach(k => { const v=localStorage.getItem(k); if(v) try{data[k]=JSON.parse(v);}catch(e){data[k]=v;} });
+  const blob = new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'homebull-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  showToast('✅ Backup esportato!');
+}
+
+function settingsImport(event) {
+  const file = event.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const bk = JSON.parse(e.target.result);
+      if(!bk.data){showToast('File non valido');return;}
+      const ov = document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+      const bx = document.createElement('div');
+      bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';
+      bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';
+      ov.appendChild(bx); document.body.appendChild(ov);
+      document.getElementById('_ic').onclick=()=>ov.remove();
+      document.getElementById('_io').onclick=()=>{
+        Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
+        ov.remove(); closeSettings();
+        showToast('✅ Importato! Ricarico...');
+        setTimeout(()=>location.reload(),1200);
+      };
+    } catch(err){showToast('Errore: file non valido');}
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+function settingsApplyOnLoad() {
+  // Tema
+  const t = localStorage.getItem('hb_theme') || localStorage.getItem('hb12_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  // Accent
+  const ac = localStorage.getItem('hb_accent') || localStorage.getItem('hb13_accent');
+  if(ac){ document.documentElement.style.setProperty('--accent',ac); document.documentElement.style.setProperty('--accent-bg',ac+'20'); }
+  // Font family
+  const fonts = { system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif", serif:"Georgia,'Times New Roman',serif", mono:"'SF Mono','Fira Code',Consolas,monospace", round:"'Nunito','Varela Round',sans-serif" };
+  const ff = localStorage.getItem('hb_font')||'system';
+  if(fonts[ff]) document.body.style.fontFamily = fonts[ff];
+  // Font size
+  const fs = localStorage.getItem('hb_fs')||'15';
+  document.documentElement.style.fontSize = fs+'px';
+  // Radius
+  const radMap = {sharp:'4px',normal:'14px',round:'22px'};
+  const rd = localStorage.getItem('hb_radius')||'normal';
+  document.documentElement.style.setProperty('--card-radius', radMap[rd]||'14px');
+  // Shadow
+  const sh = localStorage.getItem('hb_shadow')||'off';
+  document.documentElement.style.setProperty('--card-shadow', sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');
+  // Anim
+  const animMap = {off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};
+  const an = localStorage.getItem('hb_anim')||'normal';
+  document.documentElement.style.setProperty('--anim-speed', animMap[an]||'0.18s');
+  // Sfondo
+  const bgMap = {
+    grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',
+    grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',
+    grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',
+    dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',
+    grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)',
+  };
+  const bg = localStorage.getItem('hb_bg')||'none';
+  if(bg!=='none' && bgMap[bg]){
+    const bgSz = {dots:'20px 20px',grid:'20px 20px'};
+    setTimeout(()=>{
+      const tc=document.getElementById('tab-container');
+      if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=bgSz[bg]||'';}
+    },200);
+  }
+}
+
 </script>
+
+<!-- ══════════════════════════════════════════
+     IMPOSTAZIONI MODAL
+══════════════════════════════════════════ -->
+<div id="settings-overlay" onclick="if(event.target===this)closeSettings()" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;">
+  <div id="settings-sheet" style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));">
+
+    <!-- Handle + Header -->
+    <div style="padding:14px 20px 12px;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:4px;background:var(--border2,var(--border));border-radius:99px;margin:0 auto 14px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:18px;font-weight:800;">⚙️ Impostazioni</div>
+        <button onclick="closeSettings()" style="width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+    </div>
+
+    <!-- TEMA -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">🌙 Tema</div>
+      <div style="display:flex;gap:8px;">
+        <button id="set-dark"  onclick="setTheme('dark')"  style="flex:1;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🌙 Dark</button>
+        <button id="set-light" onclick="setTheme('light')" style="flex:1;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☀️ Light</button>
+        <button id="set-auto"  onclick="setTheme('auto')"  style="flex:1;padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔁 Auto</button>
+      </div>
+    </div>
+
+    <!-- COLORE ACCENT -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">🎨 Colore principale</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;" id="accent-btns">
+        <button onclick="setAccent('#6366f1','indigo')" data-ac="indigo" style="width:36px;height:36px;border-radius:50%;background:#6366f1;cursor:pointer;border:3px solid white;box-shadow:0 0 0 2px #6366f1;"></button>
+        <button onclick="setAccent('#10b981','green')"  data-ac="green"  style="width:36px;height:36px;border-radius:50%;background:#10b981;cursor:pointer;border:3px solid transparent;"></button>
+        <button onclick="setAccent('#f59e0b','amber')"  data-ac="amber"  style="width:36px;height:36px;border-radius:50%;background:#f59e0b;cursor:pointer;border:3px solid transparent;"></button>
+        <button onclick="setAccent('#ef4444','red')"    data-ac="red"    style="width:36px;height:36px;border-radius:50%;background:#ef4444;cursor:pointer;border:3px solid transparent;"></button>
+        <button onclick="setAccent('#8b5cf6','purple')" data-ac="purple" style="width:36px;height:36px;border-radius:50%;background:#8b5cf6;cursor:pointer;border:3px solid transparent;"></button>
+        <button onclick="setAccent('#06b6d4','cyan')"   data-ac="cyan"   style="width:36px;height:36px;border-radius:50%;background:#06b6d4;cursor:pointer;border:3px solid transparent;"></button>
+        <button onclick="setAccent('#f97316','orange')" data-ac="orange" style="width:36px;height:36px;border-radius:50%;background:#f97316;cursor:pointer;border:3px solid transparent;"></button>
+        <button onclick="setAccent('#ec4899','pink')"   data-ac="pink"   style="width:36px;height:36px;border-radius:50%;background:#ec4899;cursor:pointer;border:3px solid transparent;"></button>
+      </div>
+    </div>
+
+    <!-- SFONDO -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">🖼 Sfondo</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="bg-none"  onclick="setBg('none')"  style="padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◻ Nessuno</button>
+        <button id="bg-grad1" onclick="setBg('grad1')" style="padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;">🌅 Tramonto</button>
+        <button id="bg-grad2" onclick="setBg('grad2')" style="padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:white;border:none;">🌊 Oceano</button>
+        <button id="bg-grad3" onclick="setBg('grad3')" style="padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#064e3b,#065f46);color:white;border:none;">🌿 Foresta</button>
+        <button id="bg-dots"  onclick="setBg('dots')"  style="padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚫ Punti</button>
+        <button id="bg-grid"  onclick="setBg('grid')"  style="padding:10px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▦ Griglia</button>
+      </div>
+    </div>
+
+    <!-- STILE CARD -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">🔲 Stile Card</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Bordi</div>
+        <div style="display:flex;gap:8px;">
+          <button id="rd-sharp"  onclick="setRadius('sharp')"  style="flex:1;padding:10px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">■ Sharp</button>
+          <button id="rd-normal" onclick="setRadius('normal')" style="flex:1;padding:10px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▢ Normal</button>
+          <button id="rd-round"  onclick="setRadius('round')"  style="flex:1;padding:10px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◯ Round</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;color:var(--text3);">Ombra card</div>
+        <div style="display:flex;gap:8px;">
+          <button id="sh-off" onclick="setShadow('off')" style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Off</button>
+          <button id="sh-on"  onclick="setShadow('on')"  style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">On</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANIMAZIONI -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">✨ Animazioni</div>
+      <div style="display:flex;gap:8px;">
+        <button id="an-off"    onclick="setAnim('off')"    style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚡ Off</button>
+        <button id="an-fast"   onclick="setAnim('fast')"   style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🚀 Veloci</button>
+        <button id="an-normal" onclick="setAnim('normal')" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✨ Normali</button>
+        <button id="an-slow"   onclick="setAnim('slow')"   style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🌊 Lente</button>
+      </div>
+    </div>
+
+    <!-- FONT -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">🔡 Font</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button id="ff-system" onclick="setFont('system')" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;">Sistema</button>
+        <button id="ff-serif"  onclick="setFont('serif')"  style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">Serif</button>
+        <button id="ff-mono"   onclick="setFont('mono')"   style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:monospace;">Mono</button>
+        <button id="ff-round"  onclick="setFont('round')"  style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Comic Sans MS',cursive;">Round</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:11px;color:var(--text3);">A</span>
+        <input type="range" id="fs-slider" min="12" max="18" value="15" oninput="setFontSize(this.value)" style="flex:1;accent-color:var(--accent);">
+        <span style="font-size:17px;color:var(--text3);">A</span>
+      </div>
+    </div>
+
+    <!-- BACKUP -->
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">💾 Backup</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="settingsExport()" style="width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:20px;">📤</span>
+          <div style="text-align:left;"><div>Esporta backup</div><div style="font-size:11px;color:var(--text3);font-weight:500;">Salva tutti i dati in JSON</div></div>
+        </button>
+        <label style="width:100%;padding:13px 16px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:10px;box-sizing:border-box;">
+          <span style="font-size:20px;">📥</span>
+          <div style="text-align:left;"><div>Importa backup</div><div style="font-size:11px;color:var(--text3);font-weight:500;">Ripristina da JSON</div></div>
+          <input type="file" accept=".json" style="display:none;" onchange="settingsImport(event)">
+        </label>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div style="padding:16px 20px;">
+      <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;">ℹ️ Info</div>
+      <div style="background:var(--surface);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:22px;">🏠</div>
+        <div><div style="font-size:15px;font-weight:800;">HomeBull v13</div><div style="font-size:12px;color:var(--text3);">Prossimamente con Firebase + Google Drive</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
