@@ -1270,6 +1270,166 @@ html, body {
   width: 100% !important;
   z-index: 10 !important;
 }
+
+/* ══════════════════════════════════════════════════════════
+   CSS MOBILE — Samsung Galaxy S26 Ultra + iPhone 13 Pro
+   Breakpoint: max-width 899px
+══════════════════════════════════════════════════════════ */
+@media (max-width: 899px) {
+
+  /* ── Root override mobile ─────────────────────────────── */
+  :root {
+    --topbar-h:    56px;
+    --bottombar-h: calc(64px + env(safe-area-inset-bottom, 0px));
+    --radius:      14px;
+  }
+
+  /* ── Topbar ───────────────────────────────────────────── */
+  #topbar {
+    padding-top: env(safe-area-inset-top, 0px);
+    height: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+  }
+  .topbar-title-wrap { gap: 2px; }
+  #topbar-title { font-size: 17px; }
+  #topbar-sub   { font-size: 11px; }
+
+  /* ── Tab container ────────────────────────────────────── */
+  #tab-container {
+    top: calc(var(--topbar-h) + env(safe-area-inset-top, 0px));
+    bottom: var(--bottombar-h);
+  }
+
+  /* ── Bottombar ────────────────────────────────────────── */
+  #bottombar {
+    height: var(--bottombar-h);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left:  env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  .nav-item {
+    min-height: 48px;
+    padding: 6px 4px 2px;
+    gap: 3px;
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item span { font-size: 10px; }
+
+  /* ── Input/Select — no zoom su iOS (min 16px) ─────────── */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="url"],
+  input[type="number"],
+  input[type="date"],
+  input[type="tel"],
+  select, textarea {
+    font-size: 16px !important;
+    border-radius: var(--radius) !important;
+  }
+
+  /* ── Tab panels padding ───────────────────────────────── */
+  .tab-inner,
+  .tab-panel > div {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  /* ── Cards ────────────────────────────────────────────── */
+  .pw-cat-tile,
+  .note-card,
+  .otp-card,
+  .card-item,
+  .wifi-item,
+  .server-item {
+    border-radius: var(--radius) !important;
+  }
+
+  /* ── Password categorie ───────────────────────────────── */
+  .pw-cat-tile {
+    padding: 13px 14px;
+    gap: 12px;
+  }
+  .pw-cat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 20px;
+  }
+  .pw-cat-name { font-size: 14px; }
+
+  /* ── Griglie 2 colonne → 1 colonna su schermi molto stretti */
+  @media (max-width: 360px) {
+    .home-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .docs-type-grid  { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+
+  /* ── Modali bottom sheet ──────────────────────────────── */
+  [style*="align-items:flex-end"] > div,
+  [style*="align-items: flex-end"] > div {
+    border-radius: 22px 22px 0 0 !important;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* ── Topbar tasti ─────────────────────────────────────── */
+  .topbar-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+  .topbar-btn svg { width: 20px; height: 20px; }
+
+  /* ── Settings modal ───────────────────────────────────── */
+  #settings-sheet {
+    border-radius: 22px 22px 0 0;
+  }
+
+  /* ── Home tile ────────────────────────────────────────── */
+  .home-tile {
+    padding: 14px;
+    border-radius: var(--radius);
+  }
+  .home-tile-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 20px;
+  }
+
+  /* ── OTP timer ────────────────────────────────────────── */
+  .otp-code { font-size: 26px; letter-spacing: 4px; }
+
+  /* ── Scroll momentum ──────────────────────────────────── */
+  .tab-panel,
+  #docs-view-list,
+  #docs-view-add,
+  #pw-cats-grid,
+  #pw-items-list {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* ── Elimina outline blu su tap iOS ──────────────────── */
+  * { -webkit-tap-highlight-color: transparent; }
+  button:focus, input:focus, select:focus, textarea:focus {
+    outline: none;
+  }
+}
+
+/* ── iPhone: safe area extra per notch ────────────────────
+   (iPhone 13 Pro: safe-area-inset-top ~47px) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  #topbar {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  #bottombar {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* ── Samsung Galaxy: niente notch, schermo alto 19.3:9 ───── */
+@media (max-width: 430px) and (min-aspect-ratio: 18/9) {
+  :root { --bottombar-h: calc(62px + env(safe-area-inset-bottom, 0px)); }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
