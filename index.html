@@ -22845,16 +22845,20 @@ function cfCodComune(c) {
 }
 
 function cfCalcAuto(){
-  const cf=cfCalcola(
-    document.getElementById('cf_cognome')?.value,
-    document.getElementById('cf_nome')?.value,
-    document.getElementById('cf_nascita')?.value,
-    document.getElementById('cf_comune')?.value,
-    document.getElementById('cf_sesso')?.value
-  );
-  const el=document.getElementById('cf_result');
-  if(el)el.textContent=cf||'—';
-  if(cf&&cf.length===16){document.getElementById('cf_manual').value=cf;cfGenBarcode(cf);}
+  const g = id => (document.getElementById(id)||{}).value||'';
+  const cognome = g('dnew_cognome') || g('cf_cognome');
+  const nome    = g('dnew_nome')    || g('cf_nome');
+  const nascita = g('dnew_nascita') || g('cf_nascita');
+  const comune  = g('dnew_luogo')   || g('cf_comune');
+  const sesso   = g('dnew_sesso')   || g('cf_sesso') || 'M';
+  const cf = cfCalcola(cognome, nome, nascita, comune, sesso);
+  const el = document.getElementById('cf_result');
+  if(el) el.textContent = cf || '—';
+  if(cf && cf.length===16){
+    const man = document.getElementById('cf_manual');
+    if(man) man.value = cf;
+    cfGenBarcode(cf);
+  }
 }
 
 function cfGenBarcode(cf){
