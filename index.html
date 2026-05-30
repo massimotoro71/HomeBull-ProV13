@@ -1574,25 +1574,70 @@ html, body {
   }
 }
 
-/* ══ MOBILE ═══════════════════════════════════════════════ */
+/* ══ MOBILE UNICO BLOCCO ═══════════════════════════════════
+   Samsung Galaxy S26 Ultra + iPhone 13 Pro
+   max-width: 899px
+═══════════════════════════════════════════════════════════ */
 @media (max-width: 899px) {
+
+  /* Sidebar: nascosta di default, drawer quando aperta */
   #sidebar { display: none !important; }
-  #sidebar.drawer-open { display: flex !important; position: fixed !important; top:0; left:0; bottom:0; width:82vw; max-width:300px; z-index:2000; }
-  #sidebar-overlay { display:none; position:fixed; inset:0; z-index:1999; background:rgba(0,0,0,0.5); }
-  #sidebar-overlay.visible { display:block !important; }
-  .app-main { width:100vw !important; margin-left:0 !important; }
-  #bottombar { display:flex !important; }
-  .topbar-title { flex:1 1 0 !important; min-width:0 !important; overflow:hidden; }
-  #topbar-title { font-size:15px !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  #topbar-sub { font-size:10px !important; }
-  .topbar-actions { flex-shrink:0 !important; gap:4px !important; }
-  .topbar-btn { width:32px !important; height:32px !important; flex-shrink:0 !important; }
-  input, select, textarea { font-size:16px !important; }
-  #cf_result { font-size:15px !important; letter-spacing:2px !important; }
-  #cf_barcode_wrap svg { max-width:100% !important; }
-  * { -webkit-tap-highlight-color:transparent; }
-  #topbar { padding-top:env(safe-area-inset-top,0px) !important; }
-  #bottombar { padding-bottom:env(safe-area-inset-bottom,0px) !important; }
+  #sidebar.drawer-open {
+    display: flex !important;
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    width: 82vw;
+    max-width: 300px;
+    z-index: 2000;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+  }
+
+  /* Overlay dietro sidebar */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1999;
+    background: rgba(0,0,0,0.55);
+  }
+  #sidebar-overlay.visible { display: block !important; }
+
+  /* Layout base */
+  .app-layout { flex-direction: column !important; }
+  .app-main   { width: 100vw !important; margin-left: 0 !important; }
+  #bottombar  { display: flex !important; }
+
+  /* Safe area iPhone */
+  #topbar    { padding-top: env(safe-area-inset-top, 0px) !important; }
+  #bottombar { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
+
+  /* Topbar: titolo flex, tasti non escono */
+  #topbar {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: var(--topbar-h) !important;
+  }
+  .topbar-title { flex: 1 1 0 !important; min-width: 0 !important; overflow: hidden; }
+  #topbar-title { font-size: 15px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  #topbar-sub   { font-size: 10px !important; white-space: nowrap !important; }
+  .topbar-actions { flex-shrink: 0 !important; gap: 4px !important; }
+  .topbar-btn { width: 32px !important; height: 32px !important; flex-shrink: 0 !important; }
+
+  /* Input: no zoom su iOS */
+  input, select, textarea { font-size: 16px !important; }
+
+  /* CF barcode */
+  #cf_result { font-size: 15px !important; letter-spacing: 2px !important; }
+  #cf_barcode_wrap { padding: 10px 8px !important; }
+  #cf_barcode_wrap svg { max-width: 100% !important; }
+  #cf_barcode_label { font-size: 11px !important; }
+
+  /* Touch */
+  * { -webkit-tap-highlight-color: transparent; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
@@ -3339,8 +3384,8 @@ function switchTab(tab) {
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
-  if(window.innerWidth<900){
-    if(tab==='home') setTimeout(openSidebar,80);
+  if (window.innerWidth < 900) {
+    if (tab === 'home') setTimeout(openSidebar, 80);
     else closeSidebar();
   }
 }
@@ -7889,16 +7934,19 @@ function settingsApplyOnLoad() {
 }
 
 
-function openSidebar(){
-  if(window.innerWidth>=900)return;
+// ── Sidebar Drawer (mobile) ───────────────────────────────
+function openSidebar() {
+  if (window.innerWidth >= 900) return;
   document.getElementById('sidebar').classList.add('drawer-open');
-  document.getElementById('sidebar-overlay').classList.add('visible');
-  document.body.style.overflow='hidden';
+  const ov = document.getElementById('sidebar-overlay');
+  if (ov) ov.classList.add('visible');
+  document.body.style.overflow = 'hidden';
 }
-function closeSidebar(){
+function closeSidebar() {
   document.getElementById('sidebar').classList.remove('drawer-open');
-  document.getElementById('sidebar-overlay').classList.remove('visible');
-  document.body.style.overflow='';
+  const ov = document.getElementById('sidebar-overlay');
+  if (ov) ov.classList.remove('visible');
+  document.body.style.overflow = '';
 }
 </script>
 
