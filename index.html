@@ -1574,30 +1574,9 @@ html, body {
   }
 }
 
-.mob-item {
-  display:flex;align-items:center;gap:12px;
-  padding:13px 20px;font-size:15px;font-weight:700;
-  color:var(--text);cursor:pointer;
-}
-.mob-item:active { background:var(--surface); }
-
-#cf_barcode_wrap {
-  max-width: min(360px, 95vw) !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding: 14px !important;
-  box-sizing: border-box !important;
-}
-#cf_barcode_wrap svg {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  display: block !important;
-}
-
-@media (max-width: 899px) {
-  .tab-panel { padding-bottom: 0 !important; }
-}
+.mob-item{display:flex;align-items:center;gap:12px;padding:13px 20px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;}
+.mob-item:active{background:var(--surface);}
+#cf_barcode_wrap svg{width:100%!important;height:auto!important;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -3340,7 +3319,7 @@ function switchTab(tab) {
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
     family:    () => typeof familyOpen === 'function' && familyOpen(),
-    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); if (window.innerWidth < 900) setTimeout(openMobileMenu, 120); }
   };
   moduleOpeners[tab]?.();
 }
@@ -7420,25 +7399,13 @@ function cfGenBarcode(cf){
   wrap.style.display='block';
   setTimeout(()=>{
     try{
-      // Calcola width proporzionale come il QR scanner (max 95vw - 28px padding)
-      const availW = Math.min(360, window.innerWidth * 0.95) - 28;
-      // CODE128 per CF 16 char: ~143 bars → barWidth = availW/143
-      const barW = Math.max(1, Math.floor(availW / 143));
-      const barH = Math.round(barW * 30); // proporzione altezza
-      JsBarcode('#cf_barcode',cf,{
-        format:'CODE128',
-        width:barW,
-        height:Math.min(barH,60),
-        displayValue:false,
-        background:'#ffffff',
-        lineColor:'#000000',
-        margin:4
-      });
-      // Forza SVG a larghezza 100%
+      const availW = Math.min(360, window.innerWidth*0.95) - 28;
+      const barW = Math.max(1, Math.floor(availW/143));
+      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:Math.min(barW*30,60),displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
       const svg=wrap.querySelector('svg');
       if(svg){svg.style.width='100%';svg.style.height='auto';}
       if(lbl)lbl.textContent=cf;
-    }catch(e){console.warn('Barcode:',e);}
+    }catch(e){console.warn(e);}
   },50);
 }
 
@@ -7906,10 +7873,6 @@ function settingsApplyOnLoad() {
 
 function openMobileMenu(){
   if(window.innerWidth>=900)return;
-  // Aggiorna item attivo
-  document.querySelectorAll('.mob-item[data-tab]').forEach(el=>{
-    el.style.color = el.dataset.tab===HB.currentTab ? 'var(--accent)' : 'var(--text)';
-  });
   document.getElementById('mob-menu').style.display='flex';
   document.getElementById('mob-overlay').style.display='block';
 }
@@ -7917,22 +7880,6 @@ function closeMobileMenu(){
   document.getElementById('mob-menu').style.display='none';
   document.getElementById('mob-overlay').style.display='none';
 }
-
-// Apri menu mobile al click/touch su Home nav
-document.addEventListener('touchend', function(e){
-  const el = e.target.closest('[data-tab="home"]');
-  if(el && el.classList.contains('nav-item') && window.innerWidth<900){
-    e.preventDefault();
-    openMobileMenu();
-  }
-}, {capture:true, passive:false});
-document.addEventListener('click', function(e){
-  const el = e.target.closest('[data-tab="home"]');
-  if(el && el.classList.contains('nav-item') && window.innerWidth<900){
-    e.preventDefault();
-    openMobileMenu();
-  }
-}, true);
 </script>
 
 
@@ -8154,7 +8101,7 @@ document.addEventListener('click', function(e){
   </div>
 </div>
 
-<div id="mob-overlay" style="display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);" onclick="closeMobileMenu()"></div>
+<div id="mob-overlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);"></div>
 <div id="mob-menu" style="display:none;position:fixed;top:0;left:0;bottom:0;width:82vw;max-width:300px;z-index:8600;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;flex-direction:column;">
   <div style="padding:20px 16px 12px;border-bottom:1px solid var(--border);">
     <div style="display:flex;align-items:center;gap:10px;">
@@ -8176,7 +8123,7 @@ document.addEventListener('click', function(e){
     <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
     <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
   </div>
-  <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;">
+  <div style="padding:10px 14px;border-top:1px solid var(--border);">
     <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
     <div class="mob-item" style="color:#ef4444;" onclick="logout()">🚪 Esci</div>
   </div>
