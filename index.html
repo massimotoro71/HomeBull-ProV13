@@ -1437,6 +1437,10 @@ html, body {
   .app-main   { width: 100% !important; }
 }
 
+/* ── Force sidebar hidden on mobile ─────────────────────── */
+@media screen and (max-width: 899px) {
+  #sidebar,
+  #sidebar * { visibility: hidden !important; }
   #sidebar { 
     display: none !important; 
     width: 0 !important; 
@@ -1568,123 +1572,6 @@ html, body {
     font-size: 11px !important;
     white-space: nowrap;
   }
-}
-
-/* ── CF Result — dimensioni mobile ──────────────────────── */
-@media (max-width: 899px) {
-  #cf_result {
-    font-size: 15px !important;
-    letter-spacing: 2px !important;
-    word-break: break-all !important;
-  }
-  #cf_barcode_wrap {
-    padding: 10px 8px !important;
-    border-radius: 10px !important;
-  }
-  #cf_barcode_wrap svg {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-  #cf_barcode_label {
-    font-size: 11px !important;
-    letter-spacing: 1px !important;
-  }
-  #cf_manual {
-    font-size: 13px !important;
-    letter-spacing: 1px !important;
-  }
-
-  /* ── Topbar: cerca + aggiungi su riga separata ────────── */
-  #topbar {
-    flex-wrap: wrap !important;
-    height: auto !important;
-    min-height: var(--topbar-h) !important;
-    padding-bottom: 4px !important;
-  }
-  .topbar-title {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    order: 1;
-  }
-  .topbar-actions {
-    order: 2;
-    flex-shrink: 0 !important;
-  }
-  /* Se la riga è stretta, manda azioni a capo */
-  @supports (container-type: inline-size) {
-    .topbar-actions {
-      flex-basis: auto;
-    }
-  }
-}
-
-@media (max-width: 899px) {
-  #sidebar {
-    display: flex !important;
-    position: fixed !important;
-    top: 0; left: 0; bottom: 0;
-    width: 280px !important;
-    max-width: 80vw !important;
-    z-index: 2000 !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1) !important;
-    box-shadow: none !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
-  #sidebar.drawer-open {
-    transform: translateX(0) !important;
-    box-shadow: 4px 0 32px rgba(0,0,0,0.5) !important;
-  }
-  /* Overlay scuro dietro la sidebar */
-  #sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1999;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(2px);
-  }
-  #sidebar-overlay.active { display: block; }
-}
-
-/* ── Sidebar Drawer Mobile (SAFE) ────────────────────────── */
-@media (max-width: 899px) {
-  /* Default: sidebar nascosta */
-  #sidebar {
-    display: flex !important;
-    position: fixed !important;
-    top: 0; left: 0; bottom: 0;
-    width: 280px !important;
-    max-width: 82vw !important;
-    z-index: 2000 !important;
-    transform: translateX(-100%);
-    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
-    visibility: visible !important;
-    opacity: 1 !important;
-    pointer-events: none;
-    overflow-y: auto;
-  }
-  /* Aperta */
-  #sidebar.drawer-open {
-    transform: translateX(0);
-    pointer-events: auto;
-    box-shadow: 6px 0 40px rgba(0,0,0,0.6);
-  }
-  /* Overlay */
-  #sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1999;
-    background: rgba(0,0,0,0.55);
-  }
-  #sidebar-overlay.active { display: block; }
-  /* Assicura che app-main occupi tutto */
-  .app-layout { flex-direction: column !important; }
-  .app-main { width: 100vw !important; margin-left: 0 !important; }
-  #bottombar { display: flex !important; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
@@ -1962,59 +1849,59 @@ function cardsSearch(q) {
         <span class="sidebar-item-label">Home</span>
       </div>
 
-      <div class="sidebar-item" data-tab="calendar" onclick="closeSidebar();switchTab('calendar')">
+      <div class="sidebar-item" data-tab="calendar" onclick="switchTab('calendar')">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span class="sidebar-item-label">Calendario</span>
       </div>
 
-      <div class="sidebar-item" data-tab="cards" onclick="closeSidebar();switchTab('cards')">
+      <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <span class="sidebar-item-label">Carte</span>
       </div>
 
-      <div class="sidebar-item" data-tab="documents" onclick="closeSidebar();switchTab('documents')">
+      <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span class="sidebar-item-label">Documenti</span>
       </div>
 
-      <div class="sidebar-item" data-tab="family" onclick="closeSidebar();switchTab('family')">
+      <div class="sidebar-item" data-tab="family" onclick="switchTab('family')">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span class="sidebar-item-label">Famiglia</span>
       </div>
 
-      <div class="sidebar-item" data-tab="finance" onclick="closeSidebar();switchTab('finance')">
+      <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span class="sidebar-item-label">Finanze</span>
       </div>
 
-      <div class="sidebar-item" data-tab="shopping" onclick="closeSidebar();switchTab('shopping')">
+      <div class="sidebar-item" data-tab="shopping" onclick="switchTab('shopping')">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="sidebar-item-label">Lista Spesa</span>
       </div>
 
-      <div class="sidebar-item" data-tab="notes" onclick="closeSidebar();switchTab('notes')">
+      <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <span class="sidebar-item-label">Note</span>
       </div>
 
-      <div class="sidebar-item" data-tab="otp" onclick="closeSidebar();switchTab('otp')">
+      <div class="sidebar-item" data-tab="otp" onclick="switchTab('otp')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="sidebar-item-label">OTP / 2FA</span>
       </div>
 
 
-      <div class="sidebar-item" data-tab="passwords" onclick="closeSidebar();switchTab('passwords')">
+      <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
         <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="sidebar-item-label">Password</span>
         <span class="sidebar-item-badge" id="sb-pass-count">0</span>
       </div>
 
-      <div class="sidebar-item" data-tab="server" onclick="closeSidebar();switchTab('server')">
+      <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Server / IT</span>
       </div>
 
-      <div class="sidebar-item" data-tab="wifi" onclick="closeSidebar();switchTab('wifi')">
+      <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
         <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
         <span class="sidebar-item-label">Wi-Fi</span>
       </div>
@@ -3431,12 +3318,6 @@ function switchTab(tab) {
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
-  // Su mobile: Home apre la sidebar
-  if (tab === 'home' && window.innerWidth < 900) {
-    setTimeout(openSidebar, 50);
-  } else {
-    closeSidebar();
-  }
 }
 
 function switchTabFromDrawer(tab) {
@@ -7511,22 +7392,8 @@ function cfGenBarcode(cf){
   const wrap=document.getElementById('cf_barcode_wrap');
   const lbl=document.getElementById('cf_barcode_label');
   if(!wrap)return;
-  wrap.style.display='block';
-  setTimeout(()=>{
-    try{
-      const mob=window.innerWidth<900;
-      JsBarcode('#cf_barcode',cf,{
-        format:'CODE128',
-        width:mob?1.2:2,
-        height:mob?48:60,
-        displayValue:false,
-        background:'#ffffff',
-        lineColor:'#000000',
-        margin:6
-      });
-      if(lbl)lbl.textContent=cf;
-    }catch(e){console.warn('Barcode:',e);}
-  },50);
+  try{JsBarcode('#cf_barcode',cf,{format:'CODE128',width:2,height:60,displayValue:false,background:'#ffffff',lineColor:'#000000'});if(lbl)lbl.textContent=cf;wrap.style.display='block';}
+  catch(e){console.warn('Barcode:',e);}
 }
 
 function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
@@ -7990,19 +7857,6 @@ function settingsApplyOnLoad() {
   }
 }
 
-
-// ── Sidebar Drawer ────────────────────────────────────────
-function openSidebar() {
-  if (window.innerWidth >= 900) return; // solo mobile
-  document.getElementById('sidebar').classList.add('drawer-open');
-  document.getElementById('sidebar-overlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('drawer-open');
-  document.getElementById('sidebar-overlay').classList.remove('active');
-  document.body.style.overflow = '';
-}
 </script>
 
 
