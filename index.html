@@ -1242,7 +1242,6 @@ html, body {
 #bottombar, #bottom-more-popup, .nav-item, #more-drawer { display: none !important; }
 
 /* Sidebar sempre visibile */
-#sidebar { display: flex !important; }
 
 /* Layout flex row */
 .app-layout, #app { display: flex !important; flex-direction: row !important; height: 100dvh !important; }
@@ -1429,6 +1428,31 @@ html, body {
 /* ── Samsung Galaxy: niente notch, schermo alto 19.3:9 ───── */
 @media (max-width: 430px) and (min-aspect-ratio: 18/9) {
   :root { --bottombar-h: calc(62px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (max-width: 899px) {
+  #sidebar    { display: none !important; }
+  #bottombar  { display: flex !important; }
+  .app-layout { flex-direction: column !important; }
+  .app-main   { width: 100% !important; }
+}
+
+/* ── Force sidebar hidden on mobile ─────────────────────── */
+@media screen and (max-width: 899px) {
+  #sidebar,
+  #sidebar * { visibility: hidden !important; }
+  #sidebar { 
+    display: none !important; 
+    width: 0 !important; 
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  /* Assicura che app-main occupi tutto lo schermo */
+  .app-main {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: 0 !important;
+  }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
