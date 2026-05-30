@@ -1623,6 +1623,39 @@ html, body {
     height: auto !important;
   }
 }
+
+/* ══ TASTO MENU MOBILE ═══════════════════════════════════ */
+@media (max-width: 899px) {
+  #mob-fab {
+    position: fixed;
+    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 12px);
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--accent);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1500;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  /* Fix spazio bianco sotto */
+  #app {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .app-main {
+    padding-bottom: 0 !important;
+  }
+}
+@media (min-width: 900px) {
+  #mob-fab { display: none !important; }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -8181,5 +8214,7 @@ document.addEventListener('click', function(e){
     <div class="mob-item" style="color:#ef4444;" onclick="logout()">🚪 Esci</div>
   </div>
 </div>
+
+<button id="mob-fab" onclick="openMobileMenu()" title="Menu">☰</button>
 </body>
 </html>
