@@ -1588,6 +1588,39 @@ html, body {
 }
 .mm-item:active { background: var(--surface); }
 .mm-item.active { color: var(--accent); background: var(--accent-bg); }
+
+/* ── Search + Aggiungi nelle schede ─────────────────────── */
+@media (max-width: 899px) {
+  /* Contenitore search+aggiungi */
+  .pw-search-bar { min-width: 0; }
+  
+  /* Bottoni "+ Aggiungi" nelle schede — solo icona su mobile */
+  [onclick*="ShowAdd"], [onclick*="showAdd"],
+  [onclick*="otpShowAdd"], [onclick*="wifiShowAdd"],
+  [onclick*="noteNew"], [onclick*="cardsNew"] {
+    padding: 10px 12px !important;
+    font-size: 0 !important;  /* nasconde testo */
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    border-radius: 10px !important;
+  }
+  [onclick*="ShowAdd"]::before, [onclick*="showAdd"]::before,
+  [onclick*="otpShowAdd"]::before, [onclick*="wifiShowAdd"]::before,
+  [onclick*="noteNew"]::before, [onclick*="cardsNew"]::before {
+    content: '+';
+    font-size: 20px;
+    font-weight: 700;
+  }
+  
+  /* Input cerca nelle schede — font 16px no zoom iOS */
+  .pw-search-bar input {
+    font-size: 16px !important;
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -3334,7 +3367,7 @@ function switchTab(tab) {
   };
   moduleOpeners[tab]?.();
   if (window.innerWidth < 900 && tab === 'home') {
-    setTimeout(openMobileMenu, 80);
+    openMobileMenu();
   }
 }
 
@@ -7888,6 +7921,16 @@ function closeMobileMenu() {
   document.getElementById('mobile-menu').style.display = 'none';
   document.getElementById('mobile-menu-overlay').style.display = 'none';
 }
+
+// Event delegation: click su nav-item home apre sempre il menu mobile
+document.addEventListener('click', function(e) {
+  const navHome = e.target.closest('.nav-item[data-tab="home"]');
+  if (navHome && window.innerWidth < 900) {
+    e.preventDefault();
+    e.stopPropagation();
+    openMobileMenu();
+  }
+}, true);
 </script>
 
 
