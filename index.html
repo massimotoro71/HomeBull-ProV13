@@ -22956,18 +22956,26 @@ function cfGetProvincia(c) {
 }
 
 function cfCalcAuto(){
-  const cf=cfCalcola(
-    document.getElementById('cf_cognome')?.value,
-    document.getElementById('cf_nome')?.value,
-    document.getElementById('cf_nascita')?.value,
-    document.getElementById('cf_comune')?.value,
-    document.getElementById('cf_sesso')?.value
-  );
-  const el=document.getElementById('cf_result');
-  if(el)el.textContent=cf||'—';
-  if(cf&&cf.length===16){document.getElementById('cf_manual').value=cf;cfGenBarcode(cf);}
-  var _co=(document.getElementById('dnew_luogo')||{}).value||'';
-  if(_co){var _pp=cfGetProvincia(_co);var _pe=document.getElementById('dnew_provincia');if(_pe&&_pp)_pe.value=_pp;}
+  // Legge da dnew_* (form documenti) o cf_* (form standalone)
+  const cognome  = (document.getElementById('dnew_cognome')  || document.getElementById('cf_cognome'))?.value  || '';
+  const nome     = (document.getElementById('dnew_nome')     || document.getElementById('cf_nome'))?.value     || '';
+  const nascita  = (document.getElementById('dnew_nascita')  || document.getElementById('cf_nascita'))?.value  || '';
+  const comune   = (document.getElementById('dnew_luogo')    || document.getElementById('cf_comune'))?.value   || '';
+  const sesso    = (document.getElementById('dnew_sesso')    || document.getElementById('cf_sesso'))?.value    || 'M';
+  const cf = cfCalcola(cognome, nome, nascita, comune, sesso);
+  const el = document.getElementById('cf_result');
+  if(el) el.textContent = cf || '—';
+  if(cf && cf.length===16){
+    const man = document.getElementById('cf_manual');
+    if(man) man.value = cf;
+    cfGenBarcode(cf);
+  }
+  // Provincia automatica
+  if(comune && typeof cfGetProvincia === 'function'){
+    const prov = cfGetProvincia(comune);
+    const provEl = document.getElementById('dnew_provincia');
+    if(provEl && prov) provEl.value = prov;
+  }
 }
 
 function cfGenBarcode(cf){
