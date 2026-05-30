@@ -1437,10 +1437,6 @@ html, body {
   .app-main   { width: 100% !important; }
 }
 
-/* ── Force sidebar hidden on mobile ─────────────────────── */
-@media screen and (max-width: 899px) {
-  #sidebar,
-  #sidebar * { visibility: hidden !important; }
   #sidebar { 
     display: none !important; 
     width: 0 !important; 
@@ -1622,7 +1618,6 @@ html, body {
   }
 }
 
-/* ── Sidebar Drawer Mobile ───────────────────────────────── */
 @media (max-width: 899px) {
   #sidebar {
     display: flex !important;
@@ -1652,6 +1647,44 @@ html, body {
     backdrop-filter: blur(2px);
   }
   #sidebar-overlay.active { display: block; }
+}
+
+/* ── Sidebar Drawer Mobile (SAFE) ────────────────────────── */
+@media (max-width: 899px) {
+  /* Default: sidebar nascosta */
+  #sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    width: 280px !important;
+    max-width: 82vw !important;
+    z-index: 2000 !important;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: none;
+    overflow-y: auto;
+  }
+  /* Aperta */
+  #sidebar.drawer-open {
+    transform: translateX(0);
+    pointer-events: auto;
+    box-shadow: 6px 0 40px rgba(0,0,0,0.6);
+  }
+  /* Overlay */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1999;
+    background: rgba(0,0,0,0.55);
+  }
+  #sidebar-overlay.active { display: block; }
+  /* Assicura che app-main occupi tutto */
+  .app-layout { flex-direction: column !important; }
+  .app-main { width: 100vw !important; margin-left: 0 !important; }
+  #bottombar { display: flex !important; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
