@@ -1656,6 +1656,37 @@ html, body {
 @media (min-width: 900px) {
   #mob-fab { display: none !important; }
 }
+
+/* ══ FAB CENTRO + FIX SPAZIO ═══════════════════════════ */
+@media (max-width: 899px) {
+  /* FAB centrato */
+  #mob-fab {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 8px) !important;
+    border-radius: 22px !important;
+    width: auto !important;
+    padding: 0 20px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    gap: 6px !important;
+  }
+
+  /* Fix home panel — riempi lo spazio */
+  #panel-home {
+    background: var(--bg) !important;
+  }
+  #panel-home .tab-inner {
+    min-height: 100% !important;
+    background: var(--bg) !important;
+  }
+
+  /* Tab-container fissa bottom */
+  #tab-container {
+    bottom: var(--bottombar-h, 70px) !important;
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -8215,6 +8246,6 @@ document.addEventListener('click', function(e){
   </div>
 </div>
 
-<button id="mob-fab" onclick="openMobileMenu()" title="Menu">☰</button>
+<button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
 </body>
 </html>
