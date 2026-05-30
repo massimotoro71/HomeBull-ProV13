@@ -1454,6 +1454,173 @@ html, body {
     margin-left: 0 !important;
   }
 }
+
+/* ── Topbar mobile fix ───────────────────────────────────── */
+@media (max-width: 899px) {
+  #topbar {
+    padding: 0 10px;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .topbar-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  #topbar-title {
+    font-size: 15px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #topbar-sub {
+    font-size: 10px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-actions {
+    flex-shrink: 0;
+    gap: 5px;
+  }
+  .topbar-btn {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+    flex-shrink: 0;
+  }
+  /* Search bar nella topbar — più compatta */
+  .topbar-search {
+    width: 110px !important;
+    max-width: 110px !important;
+  }
+  .topbar-search input {
+    font-size: 13px !important;
+  }
+  /* Nasconde il testo "Cerca..." su schermi piccoli */
+  .topbar-search input::placeholder {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 390px) {
+  .topbar-search {
+    width: 90px !important;
+    max-width: 90px !important;
+  }
+  #topbar-title {
+    font-size: 14px !important;
+  }
+}
+
+/* ── Topbar mobile — fix overflow ───────────────────────── */
+@media (max-width: 899px) {
+  #topbar {
+    padding: 0 10px !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .topbar-title {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+  }
+  .topbar-title h1,
+  #topbar-title {
+    font-size: 15px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100%;
+  }
+  #topbar-sub {
+    font-size: 10px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .topbar-actions {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    gap: 4px !important;
+    align-items: center !important;
+  }
+  .topbar-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .topbar-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .topbar-back {
+    flex-shrink: 0 !important;
+    width: 32px !important;
+    height: 32px !important;
+  }
+  /* Tasto + Cartella password — testo ridotto */
+  .topbar-actions button[style*="font-size:12px"] {
+    padding: 5px 8px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
+  }
+}
+
+/* ── CF Result — dimensioni mobile ──────────────────────── */
+@media (max-width: 899px) {
+  #cf_result {
+    font-size: 15px !important;
+    letter-spacing: 2px !important;
+    word-break: break-all !important;
+  }
+  #cf_barcode_wrap {
+    padding: 10px 8px !important;
+    border-radius: 10px !important;
+  }
+  #cf_barcode_wrap svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  #cf_barcode_label {
+    font-size: 11px !important;
+    letter-spacing: 1px !important;
+  }
+  #cf_manual {
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
+  }
+
+  /* ── Topbar: cerca + aggiungi su riga separata ────────── */
+  #topbar {
+    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: var(--topbar-h) !important;
+    padding-bottom: 4px !important;
+  }
+  .topbar-title {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    order: 1;
+  }
+  .topbar-actions {
+    order: 2;
+    flex-shrink: 0 !important;
+  }
+  /* Se la riga è stretta, manda azioni a capo */
+  @supports (container-type: inline-size) {
+    .topbar-actions {
+      flex-basis: auto;
+    }
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -7273,8 +7440,22 @@ function cfGenBarcode(cf){
   const wrap=document.getElementById('cf_barcode_wrap');
   const lbl=document.getElementById('cf_barcode_label');
   if(!wrap)return;
-  try{JsBarcode('#cf_barcode',cf,{format:'CODE128',width:2,height:60,displayValue:false,background:'#ffffff',lineColor:'#000000'});if(lbl)lbl.textContent=cf;wrap.style.display='block';}
-  catch(e){console.warn('Barcode:',e);}
+  wrap.style.display='block';
+  setTimeout(()=>{
+    try{
+      const mob=window.innerWidth<900;
+      JsBarcode('#cf_barcode',cf,{
+        format:'CODE128',
+        width:mob?1.2:2,
+        height:mob?48:60,
+        displayValue:false,
+        background:'#ffffff',
+        lineColor:'#000000',
+        margin:6
+      });
+      if(lbl)lbl.textContent=cf;
+    }catch(e){console.warn('Barcode:',e);}
+  },50);
 }
 
 function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
