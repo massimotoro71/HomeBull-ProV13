@@ -1621,6 +1621,38 @@ html, body {
     }
   }
 }
+
+/* ── Sidebar Drawer Mobile ───────────────────────────────── */
+@media (max-width: 899px) {
+  #sidebar {
+    display: flex !important;
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    width: 280px !important;
+    max-width: 80vw !important;
+    z-index: 2000 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1) !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  #sidebar.drawer-open {
+    transform: translateX(0) !important;
+    box-shadow: 4px 0 32px rgba(0,0,0,0.5) !important;
+  }
+  /* Overlay scuro dietro la sidebar */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1999;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(2px);
+  }
+  #sidebar-overlay.active { display: block; }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -1897,59 +1929,59 @@ function cardsSearch(q) {
         <span class="sidebar-item-label">Home</span>
       </div>
 
-      <div class="sidebar-item" data-tab="calendar" onclick="switchTab('calendar')">
+      <div class="sidebar-item" data-tab="calendar" onclick="closeSidebar();switchTab('calendar')">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span class="sidebar-item-label">Calendario</span>
       </div>
 
-      <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
+      <div class="sidebar-item" data-tab="cards" onclick="closeSidebar();switchTab('cards')">
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <span class="sidebar-item-label">Carte</span>
       </div>
 
-      <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
+      <div class="sidebar-item" data-tab="documents" onclick="closeSidebar();switchTab('documents')">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span class="sidebar-item-label">Documenti</span>
       </div>
 
-      <div class="sidebar-item" data-tab="family" onclick="switchTab('family')">
+      <div class="sidebar-item" data-tab="family" onclick="closeSidebar();switchTab('family')">
         <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span class="sidebar-item-label">Famiglia</span>
       </div>
 
-      <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
+      <div class="sidebar-item" data-tab="finance" onclick="closeSidebar();switchTab('finance')">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span class="sidebar-item-label">Finanze</span>
       </div>
 
-      <div class="sidebar-item" data-tab="shopping" onclick="switchTab('shopping')">
+      <div class="sidebar-item" data-tab="shopping" onclick="closeSidebar();switchTab('shopping')">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="sidebar-item-label">Lista Spesa</span>
       </div>
 
-      <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
+      <div class="sidebar-item" data-tab="notes" onclick="closeSidebar();switchTab('notes')">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <span class="sidebar-item-label">Note</span>
       </div>
 
-      <div class="sidebar-item" data-tab="otp" onclick="switchTab('otp')">
+      <div class="sidebar-item" data-tab="otp" onclick="closeSidebar();switchTab('otp')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="sidebar-item-label">OTP / 2FA</span>
       </div>
 
 
-      <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
+      <div class="sidebar-item" data-tab="passwords" onclick="closeSidebar();switchTab('passwords')">
         <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="sidebar-item-label">Password</span>
         <span class="sidebar-item-badge" id="sb-pass-count">0</span>
       </div>
 
-      <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
+      <div class="sidebar-item" data-tab="server" onclick="closeSidebar();switchTab('server')">
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Server / IT</span>
       </div>
 
-      <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
+      <div class="sidebar-item" data-tab="wifi" onclick="closeSidebar();switchTab('wifi')">
         <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
         <span class="sidebar-item-label">Wi-Fi</span>
       </div>
@@ -3366,6 +3398,12 @@ function switchTab(tab) {
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
+  // Su mobile: Home apre la sidebar
+  if (tab === 'home' && window.innerWidth < 900) {
+    setTimeout(openSidebar, 50);
+  } else {
+    closeSidebar();
+  }
 }
 
 function switchTabFromDrawer(tab) {
@@ -7919,6 +7957,19 @@ function settingsApplyOnLoad() {
   }
 }
 
+
+// ── Sidebar Drawer ────────────────────────────────────────
+function openSidebar() {
+  if (window.innerWidth >= 900) return; // solo mobile
+  document.getElementById('sidebar').classList.add('drawer-open');
+  document.getElementById('sidebar-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('drawer-open');
+  document.getElementById('sidebar-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
 </script>
 
 
