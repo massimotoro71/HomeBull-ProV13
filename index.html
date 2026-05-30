@@ -1574,52 +1574,29 @@ html, body {
   }
 }
 
-.mm-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 13px 20px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-  cursor: pointer;
-  border-radius: 0;
-  transition: background 0.1s;
+.mob-item {
+  display:flex;align-items:center;gap:12px;
+  padding:13px 20px;font-size:15px;font-weight:700;
+  color:var(--text);cursor:pointer;
 }
-.mm-item:active { background: var(--surface); }
-.mm-item.active { color: var(--accent); background: var(--accent-bg); }
+.mob-item:active { background:var(--surface); }
 
-/* ── Search + Aggiungi nelle schede ─────────────────────── */
+#cf_barcode_wrap {
+  max-width: min(360px, 95vw) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 14px !important;
+  box-sizing: border-box !important;
+}
+#cf_barcode_wrap svg {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  display: block !important;
+}
+
 @media (max-width: 899px) {
-  /* Contenitore search+aggiungi */
-  .pw-search-bar { min-width: 0; }
-  
-  /* Bottoni "+ Aggiungi" nelle schede — solo icona su mobile */
-  [onclick*="ShowAdd"], [onclick*="showAdd"],
-  [onclick*="otpShowAdd"], [onclick*="wifiShowAdd"],
-  [onclick*="noteNew"], [onclick*="cardsNew"] {
-    padding: 10px 12px !important;
-    font-size: 0 !important;  /* nasconde testo */
-    width: 36px !important;
-    height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    border-radius: 10px !important;
-  }
-  [onclick*="ShowAdd"]::before, [onclick*="showAdd"]::before,
-  [onclick*="otpShowAdd"]::before, [onclick*="wifiShowAdd"]::before,
-  [onclick*="noteNew"]::before, [onclick*="cardsNew"]::before {
-    content: '+';
-    font-size: 20px;
-    font-weight: 700;
-  }
-  
-  /* Input cerca nelle schede — font 16px no zoom iOS */
-  .pw-search-bar input {
-    font-size: 16px !important;
-  }
+  .tab-panel { padding-bottom: 0 !important; }
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
@@ -3366,9 +3343,6 @@ function switchTab(tab) {
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
-  if (window.innerWidth < 900 && tab === 'home') {
-    openMobileMenu();
-  }
 }
 
 function switchTabFromDrawer(tab) {
@@ -7443,8 +7417,29 @@ function cfGenBarcode(cf){
   const wrap=document.getElementById('cf_barcode_wrap');
   const lbl=document.getElementById('cf_barcode_label');
   if(!wrap)return;
-  try{JsBarcode('#cf_barcode',cf,{format:'CODE128',width:2,height:60,displayValue:false,background:'#ffffff',lineColor:'#000000'});if(lbl)lbl.textContent=cf;wrap.style.display='block';}
-  catch(e){console.warn('Barcode:',e);}
+  wrap.style.display='block';
+  setTimeout(()=>{
+    try{
+      // Calcola width proporzionale come il QR scanner (max 95vw - 28px padding)
+      const availW = Math.min(360, window.innerWidth * 0.95) - 28;
+      // CODE128 per CF 16 char: ~143 bars → barWidth = availW/143
+      const barW = Math.max(1, Math.floor(availW / 143));
+      const barH = Math.round(barW * 30); // proporzione altezza
+      JsBarcode('#cf_barcode',cf,{
+        format:'CODE128',
+        width:barW,
+        height:Math.min(barH,60),
+        displayValue:false,
+        background:'#ffffff',
+        lineColor:'#000000',
+        margin:4
+      });
+      // Forza SVG a larghezza 100%
+      const svg=wrap.querySelector('svg');
+      if(svg){svg.style.width='100%';svg.style.height='auto';}
+      if(lbl)lbl.textContent=cf;
+    }catch(e){console.warn('Barcode:',e);}
+  },50);
 }
 
 function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
@@ -7909,25 +7904,32 @@ function settingsApplyOnLoad() {
 }
 
 
-function openMobileMenu() {
-  document.getElementById('mobile-menu').style.display = 'flex';
-  document.getElementById('mobile-menu-overlay').style.display = 'block';
-  // Aggiorna voce attiva
-  document.querySelectorAll('.mm-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.tab === HB.currentTab);
+function openMobileMenu(){
+  if(window.innerWidth>=900)return;
+  // Aggiorna item attivo
+  document.querySelectorAll('.mob-item[data-tab]').forEach(el=>{
+    el.style.color = el.dataset.tab===HB.currentTab ? 'var(--accent)' : 'var(--text)';
   });
+  document.getElementById('mob-menu').style.display='flex';
+  document.getElementById('mob-overlay').style.display='block';
 }
-function closeMobileMenu() {
-  document.getElementById('mobile-menu').style.display = 'none';
-  document.getElementById('mobile-menu-overlay').style.display = 'none';
+function closeMobileMenu(){
+  document.getElementById('mob-menu').style.display='none';
+  document.getElementById('mob-overlay').style.display='none';
 }
 
-// Event delegation: click su nav-item home apre sempre il menu mobile
-document.addEventListener('click', function(e) {
-  const navHome = e.target.closest('.nav-item[data-tab="home"]');
-  if (navHome && window.innerWidth < 900) {
+// Apri menu mobile al click/touch su Home nav
+document.addEventListener('touchend', function(e){
+  const el = e.target.closest('[data-tab="home"]');
+  if(el && el.classList.contains('nav-item') && window.innerWidth<900){
     e.preventDefault();
-    e.stopPropagation();
+    openMobileMenu();
+  }
+}, {capture:true, passive:false});
+document.addEventListener('click', function(e){
+  const el = e.target.closest('[data-tab="home"]');
+  if(el && el.classList.contains('nav-item') && window.innerWidth<900){
+    e.preventDefault();
     openMobileMenu();
   }
 }, true);
@@ -8152,32 +8154,31 @@ document.addEventListener('click', function(e) {
   </div>
 </div>
 
-<!-- MOBILE MENU — completamente separato dalla sidebar -->
-<div id="mobile-menu-overlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);"></div>
-<div id="mobile-menu" style="display:none;position:fixed;top:0;left:0;bottom:0;width:82vw;max-width:300px;z-index:8600;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;flex-direction:column;">
+<div id="mob-overlay" style="display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);" onclick="closeMobileMenu()"></div>
+<div id="mob-menu" style="display:none;position:fixed;top:0;left:0;bottom:0;width:82vw;max-width:300px;z-index:8600;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;flex-direction:column;">
   <div style="padding:20px 16px 12px;border-bottom:1px solid var(--border);">
     <div style="display:flex;align-items:center;gap:10px;">
       <div style="width:36px;height:36px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;">🏠</div>
-      <div><div style="font-size:16px;font-weight:800;">HomeBull</div><div style="font-size:11px;color:var(--text3);">v13 beta</div></div>
+      <div style="font-size:16px;font-weight:800;">HomeBull</div>
     </div>
   </div>
-  <div style="padding:8px 0;flex:1;">
-    <div onclick="switchTab('home');closeMobileMenu()"       class="mm-item" data-tab="home">🏠<span>Home</span></div>
-    <div onclick="switchTab('passwords');closeMobileMenu()"  class="mm-item" data-tab="passwords">🔐<span>Password</span></div>
-    <div onclick="switchTab('documents');closeMobileMenu()"  class="mm-item" data-tab="documents">📄<span>Documenti</span></div>
-    <div onclick="switchTab('notes');closeMobileMenu()"      class="mm-item" data-tab="notes">📝<span>Note</span></div>
-    <div onclick="switchTab('otp');closeMobileMenu()"        class="mm-item" data-tab="otp">🔑<span>OTP / 2FA</span></div>
-    <div onclick="switchTab('cards');closeMobileMenu()"      class="mm-item" data-tab="cards">💳<span>Carte</span></div>
-    <div onclick="switchTab('wifi');closeMobileMenu()"       class="mm-item" data-tab="wifi">📶<span>Wi-Fi</span></div>
-    <div onclick="switchTab('finance');closeMobileMenu()"    class="mm-item" data-tab="finance">💰<span>Finanza</span></div>
-    <div onclick="switchTab('calendar');closeMobileMenu()"   class="mm-item" data-tab="calendar">📅<span>Calendario</span></div>
-    <div onclick="switchTab('server');closeMobileMenu()"     class="mm-item" data-tab="server">📡<span>Server / IT</span></div>
-    <div onclick="switchTab('family');closeMobileMenu()"     class="mm-item" data-tab="family">👨‍👩‍👧<span>Famiglia</span></div>
-    <div onclick="switchTab('shopping');closeMobileMenu()"   class="mm-item" data-tab="shopping">🛒<span>Lista Spesa</span></div>
+  <div style="padding:6px 0;flex:1;overflow-y:auto;">
+    <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
+    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
+    <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
+    <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
+    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
+    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
+    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
+    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
+    <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
+    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
   </div>
-  <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
-    <div onclick="openSettings();closeMobileMenu()" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--text2);">⚙️<span>Impostazioni</span></div>
-    <div onclick="logout()" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:#ef4444;">🚪<span>Esci</span></div>
+  <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px;">
+    <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
+    <div class="mob-item" style="color:#ef4444;" onclick="logout()">🚪 Esci</div>
   </div>
 </div>
 </body>
