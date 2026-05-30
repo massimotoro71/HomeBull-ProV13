@@ -1574,71 +1574,20 @@ html, body {
   }
 }
 
-/* ══ MOBILE UNICO BLOCCO ═══════════════════════════════════
-   Samsung Galaxy S26 Ultra + iPhone 13 Pro
-   max-width: 899px
-═══════════════════════════════════════════════════════════ */
-@media (max-width: 899px) {
-
-  /* Sidebar: nascosta di default, drawer quando aperta */
-  #sidebar { display: none !important; }
-  #sidebar.drawer-open {
-    display: flex !important;
-    position: fixed !important;
-    top: 0; left: 0; bottom: 0;
-    width: 82vw;
-    max-width: 300px;
-    z-index: 2000;
-    overflow-y: auto;
-    border-right: 1px solid var(--border);
-  }
-
-  /* Overlay dietro sidebar */
-  #sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1999;
-    background: rgba(0,0,0,0.55);
-  }
-  #sidebar-overlay.visible { display: block !important; }
-
-  /* Layout base */
-  .app-layout { flex-direction: column !important; }
-  .app-main   { width: 100vw !important; margin-left: 0 !important; }
-  #bottombar  { display: flex !important; }
-
-  /* Safe area iPhone */
-  #topbar    { padding-top: env(safe-area-inset-top, 0px) !important; }
-  #bottombar { padding-bottom: env(safe-area-inset-bottom, 0px) !important; }
-
-  /* Topbar: titolo flex, tasti non escono */
-  #topbar {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-    gap: 6px !important;
-    flex-wrap: wrap !important;
-    height: auto !important;
-    min-height: var(--topbar-h) !important;
-  }
-  .topbar-title { flex: 1 1 0 !important; min-width: 0 !important; overflow: hidden; }
-  #topbar-title { font-size: 15px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
-  #topbar-sub   { font-size: 10px !important; white-space: nowrap !important; }
-  .topbar-actions { flex-shrink: 0 !important; gap: 4px !important; }
-  .topbar-btn { width: 32px !important; height: 32px !important; flex-shrink: 0 !important; }
-
-  /* Input: no zoom su iOS */
-  input, select, textarea { font-size: 16px !important; }
-
-  /* CF barcode */
-  #cf_result { font-size: 15px !important; letter-spacing: 2px !important; }
-  #cf_barcode_wrap { padding: 10px 8px !important; }
-  #cf_barcode_wrap svg { max-width: 100% !important; }
-  #cf_barcode_label { font-size: 11px !important; }
-
-  /* Touch */
-  * { -webkit-tap-highlight-color: transparent; }
+.mm-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.1s;
 }
+.mm-item:active { background: var(--surface); }
+.mm-item.active { color: var(--accent); background: var(--accent-bg); }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -3384,9 +3333,8 @@ function switchTab(tab) {
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
-  if (window.innerWidth < 900) {
-    if (tab === 'home') setTimeout(openSidebar, 80);
-    else closeSidebar();
+  if (window.innerWidth < 900 && tab === 'home') {
+    setTimeout(openMobileMenu, 80);
   }
 }
 
@@ -7462,14 +7410,8 @@ function cfGenBarcode(cf){
   const wrap=document.getElementById('cf_barcode_wrap');
   const lbl=document.getElementById('cf_barcode_label');
   if(!wrap)return;
-  wrap.style.display='block';
-  setTimeout(()=>{
-    try{
-      const mob=window.innerWidth<900;
-      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:mob?1.2:2,height:mob?48:60,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:6});
-      if(lbl)lbl.textContent=cf;
-    }catch(e){}
-  },50);
+  try{JsBarcode('#cf_barcode',cf,{format:'CODE128',width:2,height:60,displayValue:false,background:'#ffffff',lineColor:'#000000'});if(lbl)lbl.textContent=cf;wrap.style.display='block';}
+  catch(e){console.warn('Barcode:',e);}
 }
 
 function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
@@ -7934,19 +7876,17 @@ function settingsApplyOnLoad() {
 }
 
 
-// ── Sidebar Drawer (mobile) ───────────────────────────────
-function openSidebar() {
-  if (window.innerWidth >= 900) return;
-  document.getElementById('sidebar').classList.add('drawer-open');
-  const ov = document.getElementById('sidebar-overlay');
-  if (ov) ov.classList.add('visible');
-  document.body.style.overflow = 'hidden';
+function openMobileMenu() {
+  document.getElementById('mobile-menu').style.display = 'flex';
+  document.getElementById('mobile-menu-overlay').style.display = 'block';
+  // Aggiorna voce attiva
+  document.querySelectorAll('.mm-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === HB.currentTab);
+  });
 }
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('drawer-open');
-  const ov = document.getElementById('sidebar-overlay');
-  if (ov) ov.classList.remove('visible');
-  document.body.style.overflow = '';
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').style.display = 'none';
+  document.getElementById('mobile-menu-overlay').style.display = 'none';
 }
 </script>
 
@@ -8166,6 +8106,35 @@ function closeSidebar() {
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- MOBILE MENU — completamente separato dalla sidebar -->
+<div id="mobile-menu-overlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);"></div>
+<div id="mobile-menu" style="display:none;position:fixed;top:0;left:0;bottom:0;width:82vw;max-width:300px;z-index:8600;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;flex-direction:column;">
+  <div style="padding:20px 16px 12px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;">🏠</div>
+      <div><div style="font-size:16px;font-weight:800;">HomeBull</div><div style="font-size:11px;color:var(--text3);">v13 beta</div></div>
+    </div>
+  </div>
+  <div style="padding:8px 0;flex:1;">
+    <div onclick="switchTab('home');closeMobileMenu()"       class="mm-item" data-tab="home">🏠<span>Home</span></div>
+    <div onclick="switchTab('passwords');closeMobileMenu()"  class="mm-item" data-tab="passwords">🔐<span>Password</span></div>
+    <div onclick="switchTab('documents');closeMobileMenu()"  class="mm-item" data-tab="documents">📄<span>Documenti</span></div>
+    <div onclick="switchTab('notes');closeMobileMenu()"      class="mm-item" data-tab="notes">📝<span>Note</span></div>
+    <div onclick="switchTab('otp');closeMobileMenu()"        class="mm-item" data-tab="otp">🔑<span>OTP / 2FA</span></div>
+    <div onclick="switchTab('cards');closeMobileMenu()"      class="mm-item" data-tab="cards">💳<span>Carte</span></div>
+    <div onclick="switchTab('wifi');closeMobileMenu()"       class="mm-item" data-tab="wifi">📶<span>Wi-Fi</span></div>
+    <div onclick="switchTab('finance');closeMobileMenu()"    class="mm-item" data-tab="finance">💰<span>Finanza</span></div>
+    <div onclick="switchTab('calendar');closeMobileMenu()"   class="mm-item" data-tab="calendar">📅<span>Calendario</span></div>
+    <div onclick="switchTab('server');closeMobileMenu()"     class="mm-item" data-tab="server">📡<span>Server / IT</span></div>
+    <div onclick="switchTab('family');closeMobileMenu()"     class="mm-item" data-tab="family">👨‍👩‍👧<span>Famiglia</span></div>
+    <div onclick="switchTab('shopping');closeMobileMenu()"   class="mm-item" data-tab="shopping">🛒<span>Lista Spesa</span></div>
+  </div>
+  <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;">
+    <div onclick="openSettings();closeMobileMenu()" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--text2);">⚙️<span>Impostazioni</span></div>
+    <div onclick="logout()" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:#ef4444;">🚪<span>Esci</span></div>
   </div>
 </div>
 </body>
