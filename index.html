@@ -1574,42 +1574,173 @@ html, body {
   }
 }
 
-/* ── PIN Numpad ────────────────────────────────────────── */
-.pin-numpad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 16px 0;
+.mob-item{display:flex;align-items:center;gap:12px;padding:13px 20px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;}
+.mob-item:active{background:var(--surface);}
+#cf_barcode_wrap svg{width:100%!important;height:auto!important;}
+
+/* ══ MOBILE FIXES ════════════════════════════════════════ */
+@media (max-width: 899px) {
+
+  /* Quick access: 3 colonne su mobile */
+  .qa-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+  .qa-card {
+    padding: 12px 6px !important;
+    border-radius: 12px !important;
+  }
+  .qa-card-icon { font-size: 26px !important; }
+  .qa-card-label { font-size: 10px !important; }
+
+  /* Search bar + Aggiungi nelle schede */
+  .pw-search-bar {
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+  .pw-search-bar input {
+    font-size: 16px !important;
+    min-width: 0 !important;
+  }
+  /* Bottoni Aggiungi accanto alla search — solo icona */
+  .pw-search-bar ~ button,
+  .pw-search-bar + button {
+    flex-shrink: 0 !important;
+    padding: 10px 12px !important;
+    white-space: nowrap;
+    font-size: 13px !important;
+  }
+
+  /* Barcode CF */
+  #cf_barcode_wrap {
+    max-width: min(360px, 95vw) !important;
+    margin: 12px auto 0 !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+  }
+  #cf_barcode_wrap svg {
+    width: 100% !important;
+    height: auto !important;
+  }
 }
-.pin-key {
-  height: 60px;
-  border-radius: var(--radius-sm, 10px);
+
+/* ══ TASTO MENU MOBILE ═══════════════════════════════════ */
+@media (max-width: 899px) {
+  #mob-fab {
+    position: fixed;
+    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 12px);
+    left: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--accent);
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1500;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  /* Fix spazio bianco sotto */
+  #app {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .app-main {
+    padding-bottom: 0 !important;
+  }
+}
+@media (min-width: 900px) {
+  #mob-fab { display: none !important; }
+}
+
+/* ══ FAB CENTRO + FIX SPAZIO ═══════════════════════════ */
+@media (max-width: 899px) {
+  /* FAB centrato */
+  #mob-fab {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 8px) !important;
+    border-radius: 22px !important;
+    width: auto !important;
+    padding: 0 20px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    gap: 6px !important;
+  }
+
+  /* Fix home panel — riempi lo spazio */
+  #panel-home {
+    background: var(--bg) !important;
+  }
+  #panel-home .tab-inner {
+    min-height: 100% !important;
+    background: var(--bg) !important;
+  }
+
+  /* Tab-container fissa bottom */
+  #tab-container {
+    bottom: var(--bottombar-h, 70px) !important;
+  }
+}
+
+/* ══ QA-GRID 3 COLONNE MOBILE ══════════════════════════ */
+@media (max-width: 899px) {
+  div#quick-access-grid.qa-grid,
+  #quick-access-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+  #quick-access-grid .qa-card {
+    padding: 14px 6px !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  #quick-access-grid .qa-card-icon {
+    font-size: 28px !important;
+  }
+  #quick-access-grid .qa-card-label {
+    font-size: 10px !important;
+  }
+  /* FAB non copre contenuto — posizione più bassa */
+  #mob-fab {
+    bottom: calc(var(--bottombar-h, 70px) - 18px) !important;
+  }
+}
+
+.stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 22px;
-  font-weight: 600;
+  border-radius: 16px;
+  padding: 16px 14px;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  transition: background 0.1s, transform 0.1s;
-  font-family: inherit;
-  -webkit-tap-highlight-color: transparent;
+  gap: 4px;
+  transition: border-color 0.2s, transform 0.15s;
+  text-align: center;
 }
-.pin-key:active { background: var(--accent-bg); transform: scale(0.95); }
-.pin-key.ghost  { background: transparent; border-color: transparent; pointer-events: none; }
-.pin-dot {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  border: 2px solid var(--text3);
-  transition: all 0.15s;
+.stat-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.stat-card:active { transform: scale(0.97); }
+.stat-icon { font-size: 24px; margin-bottom: 2px; }
+.stat-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
 }
-.pin-dot.filled { background: var(--accent); border-color: var(--accent); }
-.pin-row {
-  display: flex; gap: 12px;
-  justify-content: center;
-  margin: 24px 0 16px;
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
@@ -1733,7 +1864,6 @@ function cardsSearch(q) {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
@@ -1755,7 +1885,6 @@ function cardsSearch(q) {
 
 <!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
 <div id="auth-screen">
-
   <div class="auth-logo">
     <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="8" y="12" width="20" height="16" rx="3"/>
@@ -1765,39 +1894,26 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-
   <div class="auth-card">
 
     <!-- LOGIN -->
     <div class="auth-step active" id="step-login">
       <div class="auth-label">Accedi al tuo account</div>
-      <input type="email" class="auth-input" id="fb-email"
-        placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-password"
-        placeholder="Password" autocomplete="current-password"
-        style="margin-top:10px;">
-      <div id="fb-error" class="auth-error" style="min-height:20px;margin:6px 0;"></div>
+      <input type="email" class="auth-input" id="fb-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
+      <input type="password" class="auth-input" id="fb-password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
+      <div id="fb-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
       <button class="auth-btn" onclick="fbLogin()">Accedi</button>
-
       <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
         <span style="font-size:12px;color:var(--text3);">oppure</span>
         <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
-
       <button onclick="fbGoogleLogin()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
-        <svg viewBox="0 0 24 24" width="18" height="18">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Continua con Google
       </button>
-
       <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text3);">
-        Non hai un account?
-        <span class="auth-link" onclick="goToStep('register')">Registrati</span>
+        Non hai un account? <span class="auth-link" onclick="goToStep('register')">Registrati</span>
       </div>
       <div id="fb-config-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:10px;font-size:11px;color:#f97316;text-align:center;">
         ⚠️ Firebase non configurato — modalità demo attiva
@@ -1807,19 +1923,13 @@ function cardsSearch(q) {
     <!-- REGISTRAZIONE -->
     <div class="auth-step" id="step-register">
       <div class="auth-label">Crea il tuo account</div>
-      <input type="email" class="auth-input" id="fb-reg-email"
-        placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-reg-pass"
-        placeholder="Password (min. 6 caratteri)" autocomplete="new-password"
-        style="margin-top:10px;">
-      <input type="password" class="auth-input" id="fb-reg-pass2"
-        placeholder="Ripeti password" autocomplete="new-password"
-        style="margin-top:10px;">
-      <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;"></div>
+      <input type="email" class="auth-input" id="fb-reg-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
+      <input type="password" class="auth-input" id="fb-reg-pass" placeholder="Password (min. 6 caratteri)" autocomplete="new-password" style="margin-top:10px;">
+      <input type="password" class="auth-input" id="fb-reg-pass2" placeholder="Ripeti password" autocomplete="new-password" style="margin-top:10px;">
+      <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
       <button class="auth-btn" onclick="fbRegister()">Crea account</button>
       <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--text3);">
-        Hai già un account?
-        <span class="auth-link" onclick="goToStep('login')">Accedi</span>
+        Hai già un account? <span class="auth-link" onclick="goToStep('login')">Accedi</span>
       </div>
     </div>
 
@@ -1827,12 +1937,9 @@ function cardsSearch(q) {
     <div class="auth-step" id="step-pin">
       <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
       <div class="pin-row" id="pin-dots">
-        <div class="pin-dot" id="pd0"></div>
-        <div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div>
-        <div class="pin-dot" id="pd3"></div>
-        <div class="pin-dot" id="pd4"></div>
-        <div class="pin-dot" id="pd5"></div>
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+        <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
       </div>
       <div class="pin-numpad" id="pin-numpad">
         <button class="pin-key" onclick="pinKey('1')">1</button>
@@ -1849,7 +1956,7 @@ function cardsSearch(q) {
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
-      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;">← Cambia account</button>
+      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
     </div>
 
   </div>
@@ -3042,9 +3149,9 @@ function checkAuthStatus() {
 }
 
 // ── Auth: Email OTP ────────────────────────────────────────
-async function sendOTP(){ /* rimosso */ }
+async function sendOTP(){/* firebase */}
 
-function verifyOTP(){ /* rimosso */ }
+function verifyOTP(){/* firebase */}
 
 // OTP digit navigation
 document.addEventListener('DOMContentLoaded', () => {
@@ -3311,7 +3418,7 @@ function switchTab(tab) {
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
     family:    () => typeof familyOpen === 'function' && familyOpen(),
-    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); if (window.innerWidth < 900) setTimeout(openMobileMenu, 120); }
   };
   moduleOpeners[tab]?.();
 }
@@ -3534,52 +3641,85 @@ function updateHomeDate() {
   const greet = h < 12 ? 'Buongiorno,' : h < 18 ? 'Buon pomeriggio,' : 'Buonasera,';
   const name  = getDisplayName();
   const dateStr = now.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  const timeStr = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
   const saluto = document.getElementById('home-saluto');
   const el = document.getElementById('home-greeting');
   const de = document.getElementById('home-date');
+  const te = document.getElementById('home-time');
   if (saluto) saluto.textContent = greet;
   if (el) el.textContent = name;
   if (de) de.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-  const te = document.getElementById('home-time');
-  if (te) te.textContent = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if (te) te.textContent = timeStr;
 }
+
+// Aggiorna ora ogni 30 secondi
+setInterval(() => {
+  const te = document.getElementById('home-time');
+  if (te) {
+    const now = new Date();
+    te.textContent = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+  }
+}, 30000);
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
+
+  // ── Contatori reali ──────────────────────────────────
   try { pwLoad(); } catch(e) {}
   try { notesLoad(); } catch(e) {}
   try { otpLoad(); } catch(e) {}
   try { docsLoad2(); } catch(e) {}
-  const set = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
-  set('stat-passwords', _pwItems?.length||0);
-  set('stat-notes',     _notes?.length||0);
-  set('stat-otp',       _otpList?.length||0);
-  set('stat-docs',      _docs2?.length||0);
-  // Alert reali
-  const box = document.getElementById('home-alerts');
-  if (!box) return;
+
+  const pw   = document.getElementById('stat-passwords');
+  const nt   = document.getElementById('stat-notes');
+  const otp  = document.getElementById('stat-otp');
+  const docs = document.getElementById('stat-docs');
+
+  if (pw)   pw.textContent   = _pwItems?.length  || 0;
+  if (nt)   nt.textContent   = _notes?.length     || 0;
+  if (otp)  otp.textContent  = _otpList?.length   || 0;
+  if (docs) docs.textContent = _docs2?.length     || 0;
+
+  // ── Alert reali ──────────────────────────────────────
+  const alertBox = document.getElementById('home-alerts');
+  if (!alertBox) return;
   const alerts = [];
+
+  // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
-  (_docs2||[]).forEach(d => {
-    if (!d.expiry) return;
-    const exp = new Date(d.expiry);
-    const days = Math.ceil((exp-now)/86400000);
-    if (days<0) alerts.push({icon:'⚠️',color:'#ef4444',text:d.label+' di '+d.cognome+' '+d.nome+' scaduto',time:'Scaduto'});
-    else if (days<=90) alerts.push({icon:'⏰',color:'#f97316',text:d.label+' di '+d.cognome+' '+d.nome+' scade tra '+days+'gg',time:days+'gg'});
+  (_docs2 || []).forEach(doc => {
+    if (!doc.expiry) return;
+    const exp = new Date(doc.expiry);
+    const days = Math.ceil((exp - now) / 86400000);
+    if (days < 0) {
+      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto' });
+    } else if (days <= 90) {
+      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg' });
+    }
   });
-  if ((_otpList||[]).length>0) alerts.push({icon:'🔑',color:'#10b981',text:_otpList.length+' codici OTP attivi',time:''});
-  if (alerts.length===0) alerts.push({icon:'✅',color:'#10b981',text:'Tutto in ordine — nessuna scadenza imminente',time:''});
-  box.innerHTML = alerts.slice(0,5).map(a=>`
+
+  // 2. OTP attivi
+  if ((_otpList||[]).length > 0) {
+    alerts.push({ icon:'🔑', color:'#10b981', text: (_otpList.length) + ' codici OTP / 2FA attivi', time: '' });
+  }
+
+  // 3. Nessun dato
+  if (alerts.length === 0 && (_pwItems||[]).length === 0) {
+    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '' });
+  } else if (alerts.length === 0) {
+    alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '' });
+  }
+
+  // Render alert
+  alertBox.innerHTML = alerts.slice(0, 5).map(a => `
     <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;">
       <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
       <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${a.text}</div>
-      ${a.time?`<div style="font-size:11px;font-weight:700;color:${a.color};flex-shrink:0;">${a.time}</div>`:''}
-    </div>`).join('');
+      ${a.time ? `<div style="font-size:11px;font-weight:700;color:${a.color};flex-shrink:0;">${a.time}</div>` : ''}
+    </div>
+  `).join('');
 }
 
-
-// ── Toast ──────────────────────────────────────────────────
-let toastTimer;
 function showToast(msg, duration = 2800) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -6693,13 +6833,20 @@ function renderQuickAccess() {
   const grid = document.getElementById('quick-access-grid');
   if (!grid) return;
   grid.innerHTML = '';
+  // Forza 3 colonne su mobile
+  if (window.innerWidth < 900) {
+    grid.style.cssText = 'display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin-bottom:24px;';
+  }
   tabs.forEach(tabId => {
     const meta = ALL_TABS_META.find(t => t.id === tabId);
     if (!meta) return;
     const card = document.createElement('div');
     card.className = 'qa-card';
+    if (window.innerWidth < 900) {
+      card.style.cssText = 'padding:14px 6px!important;';
+    }
     card.onclick = () => switchTab(tabId);
-    card.innerHTML = `<div class="qa-card-icon">${meta.icon}</div><div class="qa-card-label">${meta.label}</div>`;
+    card.innerHTML = `<div class="qa-card-icon" style="${window.innerWidth<900?'font-size:28px':''}">${meta.icon}</div><div class="qa-card-label" style="${window.innerWidth<900?'font-size:10px':''}">${meta.label}</div>`;
     grid.appendChild(card);
   });
 }
@@ -7408,8 +7555,17 @@ function cfGenBarcode(cf){
   const wrap=document.getElementById('cf_barcode_wrap');
   const lbl=document.getElementById('cf_barcode_label');
   if(!wrap)return;
-  try{JsBarcode('#cf_barcode',cf,{format:'CODE128',width:2,height:60,displayValue:false,background:'#ffffff',lineColor:'#000000'});if(lbl)lbl.textContent=cf;wrap.style.display='block';}
-  catch(e){console.warn('Barcode:',e);}
+  wrap.style.display='block';
+  setTimeout(()=>{
+    try{
+      const availW = Math.min(360, window.innerWidth*0.95) - 28;
+      const barW = Math.max(1, Math.floor(availW/143));
+      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:Math.min(barW*30,60),displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
+      const svg=wrap.querySelector('svg');
+      if(svg){svg.style.width='100%';svg.style.height='auto';}
+      if(lbl)lbl.textContent=cf;
+    }catch(e){console.warn(e);}
+  },50);
 }
 
 function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
@@ -7874,9 +8030,26 @@ function settingsApplyOnLoad() {
 }
 
 
+function openMobileMenu(){
+  if(window.innerWidth>=900)return;
+  document.getElementById('mob-menu').style.display='flex';
+  document.getElementById('mob-overlay').style.display='block';
+}
+function closeMobileMenu(){
+  document.getElementById('mob-menu').style.display='none';
+  document.getElementById('mob-overlay').style.display='none';
+}
+
+// Apri menu mobile ad ogni tap su elemento [data-tab="home"]
+document.addEventListener('click', function(e){
+  if (window.innerWidth >= 900) return;
+  const el = e.target.closest('[data-tab="home"]');
+  if (el) { e.preventDefault(); openMobileMenu(); }
+}, true);
+
 // ════════════════════════════════════════════════════════════
-//  FIREBASE — Configurazione
-//  ⚠️  Sostituisci con le tue credenziali da console.firebase.google.com
+//  FIREBASE — ⚠️ Sostituisci con le tue credenziali
+//  console.firebase.google.com
 // ════════════════════════════════════════════════════════════
 const FB_CFG = {
   apiKey:            "INSERISCI_API_KEY",
@@ -7887,134 +8060,92 @@ const FB_CFG = {
   appId:             "INSERISCI_APP_ID"
 };
 
-let fbAuth = null, fbDb = null, fbReady = false;
+let fbAuth=null, fbDb=null, fbReady=false;
 
-function fbInit() {
-  try {
-    if (FB_CFG.apiKey === 'INSERISCI_API_KEY') {
-      // Modalità demo — salta Firebase, vai diretto al PIN
-      document.getElementById('fb-config-warning').style.display = 'block';
-      fbReady = false;
-      // Demo: accedi direttamente senza Firebase
-      return;
+function fbInit(){
+  try{
+    if(FB_CFG.apiKey==='INSERISCI_API_KEY'){
+      document.getElementById('fb-config-warning').style.display='block';
+      fbReady=false; return;
     }
-    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
-    fbAuth = firebase.auth();
-    fbDb   = firebase.firestore();
-    fbReady = true;
-
-    fbAuth.onAuthStateChanged(user => {
-      if (user) {
-        HB.user = { email: user.email, uid: user.uid };
-        document.getElementById('fb-error').textContent = '';
-        fbSyncLoad().then(() => goToStep('pin'));
-      } else {
-        goToStep('login');
-      }
+    if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
+    fbAuth.onAuthStateChanged(user=>{
+      if(user){ HB.user={email:user.email,uid:user.uid}; fbSyncLoad().then(()=>goToStep('pin')); }
+      else{ goToStep('login'); }
     });
-  } catch(e) {
-    console.warn('Firebase init error:', e);
-    fbReady = false;
-  }
+  }catch(e){ console.warn('Firebase:',e); fbReady=false; }
 }
 
-async function fbLogin() {
-  const email = document.getElementById('fb-email').value.trim();
-  const pass  = document.getElementById('fb-password').value;
-  const err   = document.getElementById('fb-error');
-  err.textContent = '';
-  if (!email || !pass) { err.textContent = 'Inserisci email e password'; return; }
-  if (!fbReady) { unlockApp(); return; } // demo
-  try {
-    await fbAuth.signInWithEmailAndPassword(email, pass);
-  } catch(e) { err.textContent = fbMsg(e.code); }
+async function fbLogin(){
+  const email=document.getElementById('fb-email').value.trim();
+  const pass=document.getElementById('fb-password').value;
+  const err=document.getElementById('fb-error');
+  err.textContent='';
+  if(!email||!pass){err.textContent='Inserisci email e password';return;}
+  if(!fbReady){unlockApp();return;}
+  try{ await fbAuth.signInWithEmailAndPassword(email,pass); }
+  catch(e){err.textContent=fbMsg(e.code);}
 }
 
-async function fbGoogleLogin() {
-  if (!fbReady) { unlockApp(); return; }
-  try {
-    await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-  } catch(e) {
-    document.getElementById('fb-error').textContent = fbMsg(e.code);
-  }
+async function fbGoogleLogin(){
+  if(!fbReady){unlockApp();return;}
+  try{ await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+  catch(e){document.getElementById('fb-error').textContent=fbMsg(e.code);}
 }
 
-async function fbRegister() {
-  const email = document.getElementById('fb-reg-email').value.trim();
-  const p1    = document.getElementById('fb-reg-pass').value;
-  const p2    = document.getElementById('fb-reg-pass2').value;
-  const err   = document.getElementById('fb-reg-error');
-  err.textContent = '';
-  if (!email || !p1) { err.textContent = 'Compila tutti i campi'; return; }
-  if (p1 !== p2)     { err.textContent = 'Le password non coincidono'; return; }
-  if (p1.length < 6) { err.textContent = 'Password minimo 6 caratteri'; return; }
-  if (!fbReady) { unlockApp(); return; }
-  try {
-    await fbAuth.createUserWithEmailAndPassword(email, p1);
-  } catch(e) { err.textContent = fbMsg(e.code); }
+async function fbRegister(){
+  const email=document.getElementById('fb-reg-email').value.trim();
+  const p1=document.getElementById('fb-reg-pass').value;
+  const p2=document.getElementById('fb-reg-pass2').value;
+  const err=document.getElementById('fb-reg-error');
+  err.textContent='';
+  if(!email||!p1){err.textContent='Compila tutti i campi';return;}
+  if(p1!==p2){err.textContent='Le password non coincidono';return;}
+  if(p1.length<6){err.textContent='Password minimo 6 caratteri';return;}
+  if(!fbReady){unlockApp();return;}
+  try{ await fbAuth.createUserWithEmailAndPassword(email,p1); }
+  catch(e){err.textContent=fbMsg(e.code);}
 }
 
-function fbLogout() {
-  if (fbReady && fbAuth) fbAuth.signOut();
-  HB.user = null;
-  goToStep('login');
+function fbLogout(){
+  if(fbReady&&fbAuth) fbAuth.signOut();
+  HB.user=null; goToStep('login');
 }
 
-function fbMsg(code) {
-  return ({
-    'auth/user-not-found':       'Account non trovato',
-    'auth/wrong-password':       'Password errata',
-    'auth/invalid-credential':   'Email o password errata',
-    'auth/email-already-in-use': 'Email già registrata',
-    'auth/invalid-email':        'Email non valida',
-    'auth/weak-password':        'Password troppo debole (min. 6 caratteri)',
-    'auth/too-many-requests':    'Troppi tentativi — riprova tra poco',
-    'auth/popup-closed-by-user': 'Login annullato',
-  })[code] || 'Errore (' + code + ')';
+function fbMsg(c){
+  return({'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata',
+    'auth/invalid-credential':'Email o password errata','auth/email-already-in-use':'Email già registrata',
+    'auth/invalid-email':'Email non valida','auth/weak-password':'Password troppo debole',
+    'auth/too-many-requests':'Troppi tentativi — riprova tra poco',
+    'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
-// ── Firestore sync ────────────────────────────────────────
-const FB_SYNC_KEYS = [
-  'hb12_passwords','hb12_notes','hb12_otp','hb12_cards',
-  'hb12_wifi','hb13_docs2','hb12_finance','hb12_server',
-  'hb13_family','hb13_shop_lists'
-];
-
-async function fbSyncLoad() {
-  if (!fbReady || !HB.user) return;
-  try {
-    const snap = await fbDb.collection('users').doc(HB.user.uid).collection('vault').get();
-    snap.forEach(doc => { if (doc.data().v) localStorage.setItem(doc.id, doc.data().v); });
+async function fbSyncLoad(){
+  if(!fbReady||!HB.user)return;
+  try{
+    const snap=await fbDb.collection('users').doc(HB.user.uid).collection('vault').get();
+    snap.forEach(doc=>{if(doc.data().v)localStorage.setItem(doc.id,doc.data().v);});
     console.log('✓ Dati caricati dal cloud');
-  } catch(e) { console.warn('Sync load:', e); }
+  }catch(e){console.warn('SyncLoad:',e);}
 }
 
-async function fbSyncSave(key) {
-  if (!fbReady || !HB.user) return;
-  const v = localStorage.getItem(key);
-  if (!v) return;
-  try {
-    await fbDb.collection('users').doc(HB.user.uid).collection('vault').doc(key).set({
-      v, t: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) { console.warn('Sync save:', e); }
-}
-
-async function fbSyncAll() {
-  if (!fbReady || !HB.user) { showToast('Firebase non configurato'); return; }
-  for (const k of FB_SYNC_KEYS) await fbSyncSave(k);
+async function fbSyncAll(){
+  if(!fbReady||!HB.user){showToast('Firebase non configurato');return;}
+  const keys=['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
+    'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists'];
+  for(const k of keys){
+    const v=localStorage.getItem(k);
+    if(v) try{await fbDb.collection('users').doc(HB.user.uid).collection('vault').doc(k)
+      .set({v,t:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){}
+  }
   showToast('☁️ Sync cloud completato');
 }
 
-// ── Override logout ───────────────────────────────────────
-function logout() {
-  fbLogout();
-  HB.sessionKey = null;
-  HB.user = null;
-  location.reload();
+function logout(){
+  fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
 
-// Init
 fbInit();
 </script>
 
@@ -8236,5 +8367,35 @@ fbInit();
     </div>
   </div>
 </div>
+
+<div id="mob-overlay" onclick="closeMobileMenu()" style="display:none;position:fixed;inset:0;z-index:8500;background:rgba(0,0,0,0.6);"></div>
+<div id="mob-menu" style="display:none;position:fixed;top:0;left:0;bottom:0;width:82vw;max-width:300px;z-index:8600;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;flex-direction:column;">
+  <div style="padding:20px 16px 12px;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:36px;height:36px;border-radius:12px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;">🏠</div>
+      <div style="font-size:16px;font-weight:800;">HomeBull</div>
+    </div>
+  </div>
+  <div style="padding:6px 0;flex:1;overflow-y:auto;">
+    <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
+    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
+    <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
+    <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
+    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
+    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
+    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
+    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
+    <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
+    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
+  </div>
+  <div style="padding:10px 14px;border-top:1px solid var(--border);">
+    <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
+    <div class="mob-item" style="color:#ef4444;" onclick="logout()">🚪 Esci</div>
+  </div>
+</div>
+
+<button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
 </body>
 </html>
