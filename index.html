@@ -1573,6 +1573,44 @@ html, body {
     white-space: nowrap;
   }
 }
+
+/* ── PIN Numpad ────────────────────────────────────────── */
+.pin-numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+}
+.pin-key {
+  height: 60px;
+  border-radius: var(--radius-sm, 10px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, transform 0.1s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.pin-key:active { background: var(--accent-bg); transform: scale(0.95); }
+.pin-key.ghost  { background: transparent; border-color: transparent; pointer-events: none; }
+.pin-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--text3);
+  transition: all 0.15s;
+}
+.pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+.pin-row {
+  display: flex; gap: 12px;
+  justify-content: center;
+  margin: 24px 0 16px;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -1695,6 +1733,11 @@ function cardsSearch(q) {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -1712,6 +1755,7 @@ function cardsSearch(q) {
 
 <!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
 <div id="auth-screen">
+
   <div class="auth-logo">
     <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="8" y="12" width="20" height="16" rx="3"/>
@@ -1719,73 +1763,68 @@ function cardsSearch(q) {
       <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
     </svg>
   </div>
-  <h1 class="auth-title">HomeBull Pro</h1>
+  <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="background:#1e1e2e;border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:5px 14px;margin-bottom:20px;font-size:11px;font-weight:700;color:#6366f1;letter-spacing:0.08em;">
-    v12.4.9-alpha · build 28/05/2025
-  </div>
 
   <div class="auth-card">
 
-    <!-- Step 1: Email -->
-    <div class="auth-step active" id="step-email">
-      <div class="auth-progress">
-        <div class="step-dot done" id="pdot-1"></div>
-        <div class="step-dot" id="pdot-2"></div>
-        <div class="step-dot" id="pdot-3"></div>
+    <!-- LOGIN -->
+    <div class="auth-step active" id="step-login">
+      <div class="auth-label">Accedi al tuo account</div>
+      <input type="email" class="auth-input" id="fb-email"
+        placeholder="nome@email.com" autocomplete="email" inputmode="email">
+      <input type="password" class="auth-input" id="fb-password"
+        placeholder="Password" autocomplete="current-password"
+        style="margin-top:10px;">
+      <div id="fb-error" class="auth-error" style="min-height:20px;margin:6px 0;"></div>
+      <button class="auth-btn" onclick="fbLogin()">Accedi</button>
+
+      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:12px;color:var(--text3);">oppure</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
-      <div class="auth-label">La tua email</div>
-      <input type="email" class="auth-input" id="auth-email"
-             placeholder="nome@email.com"
-             autocomplete="email" inputmode="email">
-      <button class="auth-btn" id="btn-send-otp" onclick="sendOTP()">
-        Invia codice di accesso
+
+      <button onclick="fbGoogleLogin()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continua con Google
       </button>
-      <p class="auth-hint">
-        Riceverai un codice OTP a 6 cifre.<br>
-        Nessun dato viene inviato senza il tuo consenso.
-      </p>
+
+      <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text3);">
+        Non hai un account?
+        <span class="auth-link" onclick="goToStep('register')">Registrati</span>
+      </div>
+      <div id="fb-config-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:10px;font-size:11px;color:#f97316;text-align:center;">
+        ⚠️ Firebase non configurato — modalità demo attiva
+      </div>
     </div>
 
-    <!-- Step 2: OTP -->
-    <div class="auth-step" id="step-otp">
-      <div class="auth-progress">
-        <div class="step-dot done" id="pdot-1b"></div>
-        <div class="step-dot done" id="pdot-2b"></div>
-        <div class="step-dot" id="pdot-3b"></div>
+    <!-- REGISTRAZIONE -->
+    <div class="auth-step" id="step-register">
+      <div class="auth-label">Crea il tuo account</div>
+      <input type="email" class="auth-input" id="fb-reg-email"
+        placeholder="nome@email.com" autocomplete="email" inputmode="email">
+      <input type="password" class="auth-input" id="fb-reg-pass"
+        placeholder="Password (min. 6 caratteri)" autocomplete="new-password"
+        style="margin-top:10px;">
+      <input type="password" class="auth-input" id="fb-reg-pass2"
+        placeholder="Ripeti password" autocomplete="new-password"
+        style="margin-top:10px;">
+      <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;"></div>
+      <button class="auth-btn" onclick="fbRegister()">Crea account</button>
+      <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--text3);">
+        Hai già un account?
+        <span class="auth-link" onclick="goToStep('login')">Accedi</span>
       </div>
-      <div class="auth-label">Codice ricevuto via email</div>
-      <div class="otp-grid">
-        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
-        <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
-      </div>
-      <div class="auth-error" id="otp-error"></div>
-      <!-- Hint codice demo -->
-      <div id="otp-demo-hint" style="display:none;background:linear-gradient(135deg,#1e1e3a,#1a1a2e);border:2px solid #6366f1;border-radius:14px;padding:16px;text-align:center;margin-bottom:12px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#6366f1;margin-bottom:8px;">🔑 Codice demo (pre-compilato)</div>
-        <div id="otp-demo-code" style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#818cf8;letter-spacing:0.15em;"></div>
-        <div style="font-size:11px;color:#5a5a7a;margin-top:6px;">Clicca "Verifica codice" per continuare</div>
-      </div>
-      <button class="auth-btn" id="btn-verify-otp" onclick="verifyOTP()">
-        Verifica codice
-      </button>
-      <p class="auth-hint">
-        Non hai ricevuto il codice?
-        <span class="auth-link" onclick="goToStep('email')">Riprova</span>
-      </p>
     </div>
 
-    <!-- Step 3: PIN setup / PIN login -->
+    <!-- PIN MASTER -->
     <div class="auth-step" id="step-pin">
-      <div class="auth-progress">
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-        <div class="step-dot done"></div>
-      </div>
       <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
       <div class="pin-row" id="pin-dots">
         <div class="pin-dot" id="pd0"></div>
@@ -1794,28 +1833,23 @@ function cardsSearch(q) {
         <div class="pin-dot" id="pd3"></div>
         <div class="pin-dot" id="pd4"></div>
         <div class="pin-dot" id="pd5"></div>
-        <div class="pin-dot" id="pd6"></div>
-        <div class="pin-dot" id="pd7"></div>
+      </div>
+      <div class="pin-numpad" id="pin-numpad">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key ghost"></button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
-      <div class="pin-pad" id="pin-pad">
-        <button class="pin-key" onclick="pinPress('1')">1</button>
-        <button class="pin-key" onclick="pinPress('2')">2</button>
-        <button class="pin-key" onclick="pinPress('3')">3</button>
-        <button class="pin-key" onclick="pinPress('4')">4</button>
-        <button class="pin-key" onclick="pinPress('5')">5</button>
-        <button class="pin-key" onclick="pinPress('6')">6</button>
-        <button class="pin-key" onclick="pinPress('7')">7</button>
-        <button class="pin-key" onclick="pinPress('8')">8</button>
-        <button class="pin-key" onclick="pinPress('9')">9</button>
-        <button class="pin-key danger" id="pin-key-left" onclick="pinKeyLeftAction()">✕</button>
-        <button class="pin-key" onclick="pinPress('0')">0</button>
-        <button class="pin-key" onclick="pinClear()" style="font-size:22px;">⌫</button>
-      </div>
-      <div style="margin-top:12px;text-align:center;">
-        <span id="bio-register-hint" style="display:none;font-size:12px;color:var(--text3);cursor:pointer;" onclick="registerBiometric()">+ Registra impronta digitale</span>
-        <span id="forgot-pin-btn" style="display:none;font-size:12px;color:var(--accent2);cursor:pointer;text-decoration:underline;" onclick="startForgotPin()">Ho dimenticato il PIN</span>
-      </div>
+      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;">← Cambia account</button>
     </div>
 
   </div>
@@ -1954,7 +1988,11 @@ function cardsSearch(q) {
             </button>
           </div>
         </div>
-        <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 0;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin:4px 0 0;">
+          <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);"></div>
+          <div style="width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+          <div id="home-time" style="font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;"></div>
+        </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
           <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.0.0-beta</span>
@@ -1974,22 +2012,37 @@ function cardsSearch(q) {
         </div>
         <div id="quick-access-grid" class="qa-grid" style="margin-bottom:24px;"></div>
 
-        <!-- Stats contatori (nascosti, mantenuti per JS) -->
-        <div id="home-stats-section" style="display:none !important;">
-          <span id="stat-passwords"></span><span id="stat-docs"></span>
-          <span id="stat-notes"></span><span id="stat-otp"></span>
-        </div>
-
-        <!-- Alert -->
-        <div id="home-alerts-section" style="margin-top:20px;">
-          <div class="home-section-title">🔔 Alert</div>
-          <div id="home-alerts">
-            <div class="alert-item">
-              <div class="alert-dot yellow"></div>
-              <div class="alert-text">Benvenuto in HomeBull Pro v12</div>
-              <div class="alert-time">Ora</div>
+        <!-- Stats reali -->
+        <div id="home-stats-section" style="margin-bottom:20px;">
+          <div class="home-section-title" style="margin-bottom:10px;">📊 Il tuo vault</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;" id="home-stats-grid">
+            <div class="stat-card" onclick="switchTab('passwords')">
+              <div class="stat-icon">🔐</div>
+              <div class="stat-num" id="stat-passwords">0</div>
+              <div class="stat-label">Password</div>
+            </div>
+            <div class="stat-card" onclick="switchTab('notes')">
+              <div class="stat-icon">📝</div>
+              <div class="stat-num" id="stat-notes">0</div>
+              <div class="stat-label">Note</div>
+            </div>
+            <div class="stat-card" onclick="switchTab('otp')">
+              <div class="stat-icon">🔑</div>
+              <div class="stat-num" id="stat-otp">0</div>
+              <div class="stat-label">OTP / 2FA</div>
+            </div>
+            <div class="stat-card" onclick="switchTab('documents')">
+              <div class="stat-icon">📄</div>
+              <div class="stat-num" id="stat-docs">0</div>
+              <div class="stat-label">Documenti</div>
             </div>
           </div>
+        </div>
+
+        <!-- Alert reali -->
+        <div id="home-alerts-section" style="margin-bottom:24px;">
+          <div class="home-section-title" style="margin-bottom:10px;">🔔 Alert</div>
+          <div id="home-alerts"></div>
         </div>
 
       </div>
@@ -2989,66 +3042,9 @@ function checkAuthStatus() {
 }
 
 // ── Auth: Email OTP ────────────────────────────────────────
-async function sendOTP() {
-  const email = document.getElementById('auth-email').value.trim();
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showToast('Inserisci un\'email valida');
-    return;
-  }
+async function sendOTP(){ /* rimosso */ }
 
-  const btn = document.getElementById('btn-send-otp');
-  btn.disabled = true;
-  btn.textContent = 'Invio in corso...';
-
-  // Generate 6-digit OTP and "send" it (in demo: show in console + toast)
-  HB.otpCode = String(Math.floor(100000 + Math.random() * 900000));
-  HB.user = { email };
-
-  console.log('[HB12 Demo] OTP:', HB.otpCode);
-
-  setTimeout(() => {
-    btn.disabled = false;
-    btn.textContent = 'Invia codice di accesso';
-    goToStep('otp');
-    // Mostra il codice direttamente nella pagina OTP (modalità demo)
-    const hint = document.getElementById('otp-demo-hint');
-    const codeEl = document.getElementById('otp-demo-code');
-    if (hint) hint.style.display = 'block';
-    if (codeEl) codeEl.textContent = HB.otpCode;
-    // Pre-compila i campi con il codice demo
-    const digits = document.querySelectorAll('.otp-digit');
-    HB.otpCode.split('').forEach((d, i) => { if (digits[i]) digits[i].value = d; });
-    showToast('📧 Codice demo: ' + HB.otpCode, 8000);
-  }, 800);
-}
-
-function verifyOTP() {
-  const digits = [...document.querySelectorAll('.otp-digit')].map(d => d.value).join('');
-  if (digits.length !== 6) {
-    document.getElementById('otp-error').textContent = 'Inserisci tutte le 6 cifre';
-    return;
-  }
-
-  if (digits === HB.otpCode) {
-    document.getElementById('otp-error').textContent = '';
-    saveUser(HB.user);
-    const hasPIN = !!localStorage.getItem('hb12_pin_hash');
-    if (hasPIN) {
-      HB.authState = 'pin-login';
-      document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
-    } else {
-      HB.authState = 'pin-setup';
-      HB.pinMode = 'setup';
-      document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master (6-8 cifre)';
-    }
-    goToStep('pin');
-    showToast('✅ Email verificata');
-  } else {
-    document.getElementById('otp-error').textContent = 'Codice non corretto — riprova';
-    document.querySelectorAll('.otp-digit').forEach(d => d.value = '');
-    document.querySelectorAll('.otp-digit')[0].focus();
-  }
-}
+function verifyOTP(){ /* rimosso */ }
 
 // OTP digit navigation
 document.addEventListener('DOMContentLoaded', () => {
@@ -3544,22 +3540,42 @@ function updateHomeDate() {
   if (saluto) saluto.textContent = greet;
   if (el) el.textContent = name;
   if (de) de.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+  const te = document.getElementById('home-time');
+  if (te) te.textContent = now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 }
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
-  // Aggiorna contatori
-  pwLoad();
-  const el = document.getElementById('stat-passwords');
-  if (el) el.textContent = _pwItems.length > 0 ? _pwItems.length : '0';
-  noteLoad();
-  const nel = document.getElementById('stat-notes');
-  if (nel) nel.textContent = _notes.length > 0 ? _notes.length : '0';
-  otpLoad();
-  const oel = document.getElementById('stat-otp');
-  if (oel) oel.textContent = _otpAccounts.length > 0 ? _otpAccounts.length : '0';
+  try { pwLoad(); } catch(e) {}
+  try { notesLoad(); } catch(e) {}
+  try { otpLoad(); } catch(e) {}
+  try { docsLoad2(); } catch(e) {}
+  const set = (id,val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('stat-passwords', _pwItems?.length||0);
+  set('stat-notes',     _notes?.length||0);
+  set('stat-otp',       _otpList?.length||0);
+  set('stat-docs',      _docs2?.length||0);
+  // Alert reali
+  const box = document.getElementById('home-alerts');
+  if (!box) return;
+  const alerts = [];
+  const now = new Date();
+  (_docs2||[]).forEach(d => {
+    if (!d.expiry) return;
+    const exp = new Date(d.expiry);
+    const days = Math.ceil((exp-now)/86400000);
+    if (days<0) alerts.push({icon:'⚠️',color:'#ef4444',text:d.label+' di '+d.cognome+' '+d.nome+' scaduto',time:'Scaduto'});
+    else if (days<=90) alerts.push({icon:'⏰',color:'#f97316',text:d.label+' di '+d.cognome+' '+d.nome+' scade tra '+days+'gg',time:days+'gg'});
+  });
+  if ((_otpList||[]).length>0) alerts.push({icon:'🔑',color:'#10b981',text:_otpList.length+' codici OTP attivi',time:''});
+  if (alerts.length===0) alerts.push({icon:'✅',color:'#10b981',text:'Tutto in ordine — nessuna scadenza imminente',time:''});
+  box.innerHTML = alerts.slice(0,5).map(a=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;">
+      <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
+      <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${a.text}</div>
+      ${a.time?`<div style="font-size:11px;font-weight:700;color:${a.color};flex-shrink:0;">${a.time}</div>`:''}
+    </div>`).join('');
 }
-
 
 
 // ── Toast ──────────────────────────────────────────────────
@@ -7857,6 +7873,149 @@ function settingsApplyOnLoad() {
   }
 }
 
+
+// ════════════════════════════════════════════════════════════
+//  FIREBASE — Configurazione
+//  ⚠️  Sostituisci con le tue credenziali da console.firebase.google.com
+// ════════════════════════════════════════════════════════════
+const FB_CFG = {
+  apiKey:            "INSERISCI_API_KEY",
+  authDomain:        "INSERISCI_PROJECT.firebaseapp.com",
+  projectId:         "INSERISCI_PROJECT_ID",
+  storageBucket:     "INSERISCI_PROJECT.appspot.com",
+  messagingSenderId: "INSERISCI_SENDER_ID",
+  appId:             "INSERISCI_APP_ID"
+};
+
+let fbAuth = null, fbDb = null, fbReady = false;
+
+function fbInit() {
+  try {
+    if (FB_CFG.apiKey === 'INSERISCI_API_KEY') {
+      // Modalità demo — salta Firebase, vai diretto al PIN
+      document.getElementById('fb-config-warning').style.display = 'block';
+      fbReady = false;
+      // Demo: accedi direttamente senza Firebase
+      return;
+    }
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    fbAuth = firebase.auth();
+    fbDb   = firebase.firestore();
+    fbReady = true;
+
+    fbAuth.onAuthStateChanged(user => {
+      if (user) {
+        HB.user = { email: user.email, uid: user.uid };
+        document.getElementById('fb-error').textContent = '';
+        fbSyncLoad().then(() => goToStep('pin'));
+      } else {
+        goToStep('login');
+      }
+    });
+  } catch(e) {
+    console.warn('Firebase init error:', e);
+    fbReady = false;
+  }
+}
+
+async function fbLogin() {
+  const email = document.getElementById('fb-email').value.trim();
+  const pass  = document.getElementById('fb-password').value;
+  const err   = document.getElementById('fb-error');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Inserisci email e password'; return; }
+  if (!fbReady) { unlockApp(); return; } // demo
+  try {
+    await fbAuth.signInWithEmailAndPassword(email, pass);
+  } catch(e) { err.textContent = fbMsg(e.code); }
+}
+
+async function fbGoogleLogin() {
+  if (!fbReady) { unlockApp(); return; }
+  try {
+    await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  } catch(e) {
+    document.getElementById('fb-error').textContent = fbMsg(e.code);
+  }
+}
+
+async function fbRegister() {
+  const email = document.getElementById('fb-reg-email').value.trim();
+  const p1    = document.getElementById('fb-reg-pass').value;
+  const p2    = document.getElementById('fb-reg-pass2').value;
+  const err   = document.getElementById('fb-reg-error');
+  err.textContent = '';
+  if (!email || !p1) { err.textContent = 'Compila tutti i campi'; return; }
+  if (p1 !== p2)     { err.textContent = 'Le password non coincidono'; return; }
+  if (p1.length < 6) { err.textContent = 'Password minimo 6 caratteri'; return; }
+  if (!fbReady) { unlockApp(); return; }
+  try {
+    await fbAuth.createUserWithEmailAndPassword(email, p1);
+  } catch(e) { err.textContent = fbMsg(e.code); }
+}
+
+function fbLogout() {
+  if (fbReady && fbAuth) fbAuth.signOut();
+  HB.user = null;
+  goToStep('login');
+}
+
+function fbMsg(code) {
+  return ({
+    'auth/user-not-found':       'Account non trovato',
+    'auth/wrong-password':       'Password errata',
+    'auth/invalid-credential':   'Email o password errata',
+    'auth/email-already-in-use': 'Email già registrata',
+    'auth/invalid-email':        'Email non valida',
+    'auth/weak-password':        'Password troppo debole (min. 6 caratteri)',
+    'auth/too-many-requests':    'Troppi tentativi — riprova tra poco',
+    'auth/popup-closed-by-user': 'Login annullato',
+  })[code] || 'Errore (' + code + ')';
+}
+
+// ── Firestore sync ────────────────────────────────────────
+const FB_SYNC_KEYS = [
+  'hb12_passwords','hb12_notes','hb12_otp','hb12_cards',
+  'hb12_wifi','hb13_docs2','hb12_finance','hb12_server',
+  'hb13_family','hb13_shop_lists'
+];
+
+async function fbSyncLoad() {
+  if (!fbReady || !HB.user) return;
+  try {
+    const snap = await fbDb.collection('users').doc(HB.user.uid).collection('vault').get();
+    snap.forEach(doc => { if (doc.data().v) localStorage.setItem(doc.id, doc.data().v); });
+    console.log('✓ Dati caricati dal cloud');
+  } catch(e) { console.warn('Sync load:', e); }
+}
+
+async function fbSyncSave(key) {
+  if (!fbReady || !HB.user) return;
+  const v = localStorage.getItem(key);
+  if (!v) return;
+  try {
+    await fbDb.collection('users').doc(HB.user.uid).collection('vault').doc(key).set({
+      v, t: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { console.warn('Sync save:', e); }
+}
+
+async function fbSyncAll() {
+  if (!fbReady || !HB.user) { showToast('Firebase non configurato'); return; }
+  for (const k of FB_SYNC_KEYS) await fbSyncSave(k);
+  showToast('☁️ Sync cloud completato');
+}
+
+// ── Override logout ───────────────────────────────────────
+function logout() {
+  fbLogout();
+  HB.sessionKey = null;
+  HB.user = null;
+  location.reload();
+}
+
+// Init
+fbInit();
 </script>
 
 
