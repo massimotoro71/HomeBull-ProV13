@@ -1742,6 +1742,47 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+/* ── PIN Numpad ─────────────────────────────────────────── */
+.pin-numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+  width: 100%;
+}
+.pin-key {
+  height: 64px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, transform 0.1s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.pin-key:active { background: var(--accent-bg); transform: scale(0.94); }
+.pin-key.ghost  { background: transparent !important; border-color: transparent !important; pointer-events: none; }
+.pin-key.bio-btn { font-size: 22px; }
+.pin-dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border2, var(--text3));
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+.pin-row {
+  display: flex; gap: 14px;
+  justify-content: center;
+  margin: 20px 0 16px;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -1940,6 +1981,7 @@ function cardsSearch(q) {
         <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
         <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
+        <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
       </div>
       <div class="pin-numpad" id="pin-numpad">
         <button class="pin-key" onclick="pinKey('1')">1</button>
@@ -1951,7 +1993,8 @@ function cardsSearch(q) {
         <button class="pin-key" onclick="pinKey('7')">7</button>
         <button class="pin-key" onclick="pinKey('8')">8</button>
         <button class="pin-key" onclick="pinKey('9')">9</button>
-        <button class="pin-key ghost"></button>
+        <button class="pin-key bio-btn" id="pin-bio-btn" onclick="pinBioAuth()" style="display:none;">👆</button>
+        <button class="pin-key ghost" id="pin-bio-ghost"></button>
         <button class="pin-key" onclick="pinKey('0')">0</button>
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
@@ -3194,7 +3237,7 @@ function updatePinDots() {
 }
 
 async function pinConfirm() {
-  if (HB.pinBuffer.length < 6) {
+  if (HB.pinBuffer.length < 8) {
     showPinError('Minimo 6 cifre');
     return;
   }
@@ -3612,6 +3655,7 @@ function handleDrawerClick(e) {
 function goToStep(step) {
   document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + step)?.classList.add('active');
+  if (step === 'pin') setTimeout(pinCheckBio, 100);
   if (step === 'email') setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
 }
 
@@ -6820,7 +6864,7 @@ function loadQuickAccess() {
     if (Array.isArray(saved) && saved.length > 0) {
       const merged = [...saved];
       for (const d of def6) {
-        if (!merged.includes(d) && merged.length < 6) merged.push(d);
+        if (!merged.includes(d) && merged.length < 8) merged.push(d);
       }
       return merged;
     }
@@ -6864,7 +6908,7 @@ function editQuickAccess() {
       if (qaSelected.includes(tab.id)) {
         qaSelected = qaSelected.filter(t => t !== tab.id);
         el.classList.remove('selected');
-      } else if (qaSelected.length < 6) {
+      } else if (qaSelected.length < 8) {
         qaSelected.push(tab.id);
         el.classList.add('selected');
       } else {
@@ -7068,7 +7112,7 @@ function openHomeCustom() {
       if (qaSelected.includes(tab.id)) {
         qaSelected = qaSelected.filter(t => t !== tab.id);
         el.classList.remove('selected');
-      } else if (qaSelected.length < 6) {
+      } else if (qaSelected.length < 8) {
         qaSelected.push(tab.id);
         el.classList.add('selected');
       } else {
@@ -8147,6 +8191,48 @@ function logout(){
 }
 
 fbInit();
+
+// ── Biometria PIN ──────────────────────────────────────────
+async function pinCheckBio() {
+  // Mostra tasto biometrico se supportato e abilitato
+  const bioBtn   = document.getElementById('pin-bio-btn');
+  const bioGhost = document.getElementById('pin-bio-ghost');
+  if (!bioBtn || !bioGhost) return;
+  const supported = window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().catch(()=>false);
+  const enabled   = localStorage.getItem('hb_bio') === '1';
+  if (supported && enabled) {
+    bioBtn.style.display = 'flex';
+    bioGhost.style.display = 'none';
+  } else {
+    bioBtn.style.display = 'none';
+    bioGhost.style.display = 'flex';
+  }
+}
+
+async function pinBioAuth() {
+  try {
+    // Usa WebAuthn per verifica biometrica
+    const challenge = new Uint8Array(32);
+    crypto.getRandomValues(challenge);
+    const credential = await navigator.credentials.get({
+      publicKey: {
+        challenge,
+        timeout: 60000,
+        userVerification: 'required',
+        rpId: window.location.hostname || 'localhost',
+      }
+    });
+    if (credential) {
+      // Autenticazione biometrica riuscita
+      showToast('👆 Accesso biometrico');
+      unlockApp();
+    }
+  } catch(e) {
+    if (e.name !== 'NotAllowedError') {
+      showToast('Biometria non disponibile');
+    }
+  }
+}
 </script>
 
 
