@@ -1712,6 +1712,36 @@ html, body {
     bottom: calc(var(--bottombar-h, 70px) - 18px) !important;
   }
 }
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: border-color 0.2s, transform 0.15s;
+  text-align: center;
+}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.stat-card:active { transform: scale(0.97); }
+.stat-icon { font-size: 24px; margin-bottom: 2px; }
+.stat-num {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -2113,22 +2143,37 @@ function cardsSearch(q) {
         </div>
         <div id="quick-access-grid" class="qa-grid" style="margin-bottom:24px;"></div>
 
-        <!-- Stats contatori (nascosti, mantenuti per JS) -->
-        <div id="home-stats-section" style="display:none !important;">
-          <span id="stat-passwords"></span><span id="stat-docs"></span>
-          <span id="stat-notes"></span><span id="stat-otp"></span>
-        </div>
-
-        <!-- Alert -->
-        <div id="home-alerts-section" style="margin-top:20px;">
-          <div class="home-section-title">🔔 Alert</div>
-          <div id="home-alerts">
-            <div class="alert-item">
-              <div class="alert-dot yellow"></div>
-              <div class="alert-text">Benvenuto in HomeBull Pro v12</div>
-              <div class="alert-time">Ora</div>
+        <!-- Stats reali -->
+        <div id="home-stats-section" style="margin-bottom:20px;">
+          <div class="home-section-title" style="margin-bottom:10px;">📊 Il tuo vault</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;" id="home-stats-grid">
+            <div class="stat-card" onclick="switchTab('passwords')">
+              <div class="stat-icon">🔐</div>
+              <div class="stat-num" id="stat-passwords">0</div>
+              <div class="stat-label">Password</div>
+            </div>
+            <div class="stat-card" onclick="switchTab('notes')">
+              <div class="stat-icon">📝</div>
+              <div class="stat-num" id="stat-notes">0</div>
+              <div class="stat-label">Note</div>
+            </div>
+            <div class="stat-card" onclick="switchTab('otp')">
+              <div class="stat-icon">🔑</div>
+              <div class="stat-num" id="stat-otp">0</div>
+              <div class="stat-label">OTP / 2FA</div>
+            </div>
+            <div class="stat-card" onclick="switchTab('documents')">
+              <div class="stat-icon">📄</div>
+              <div class="stat-num" id="stat-docs">0</div>
+              <div class="stat-label">Documenti</div>
             </div>
           </div>
+        </div>
+
+        <!-- Alert reali -->
+        <div id="home-alerts-section" style="margin-bottom:24px;">
+          <div class="home-section-title" style="margin-bottom:10px;">🔔 Alert</div>
+          <div id="home-alerts"></div>
         </div>
 
       </div>
@@ -3687,22 +3732,63 @@ function updateHomeDate() {
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
-  // Aggiorna contatori
-  pwLoad();
-  const el = document.getElementById('stat-passwords');
-  if (el) el.textContent = _pwItems.length > 0 ? _pwItems.length : '0';
-  noteLoad();
-  const nel = document.getElementById('stat-notes');
-  if (nel) nel.textContent = _notes.length > 0 ? _notes.length : '0';
-  otpLoad();
-  const oel = document.getElementById('stat-otp');
-  if (oel) oel.textContent = _otpAccounts.length > 0 ? _otpAccounts.length : '0';
+
+  // ── Contatori reali ──────────────────────────────────
+  try { pwLoad(); } catch(e) {}
+  try { notesLoad(); } catch(e) {}
+  try { otpLoad(); } catch(e) {}
+  try { docsLoad2(); } catch(e) {}
+
+  const pw   = document.getElementById('stat-passwords');
+  const nt   = document.getElementById('stat-notes');
+  const otp  = document.getElementById('stat-otp');
+  const docs = document.getElementById('stat-docs');
+
+  if (pw)   pw.textContent   = _pwItems?.length  || 0;
+  if (nt)   nt.textContent   = _notes?.length     || 0;
+  if (otp)  otp.textContent  = _otpList?.length   || 0;
+  if (docs) docs.textContent = _docs2?.length     || 0;
+
+  // ── Alert reali ──────────────────────────────────────
+  const alertBox = document.getElementById('home-alerts');
+  if (!alertBox) return;
+  const alerts = [];
+
+  // 1. Documenti in scadenza (entro 90 giorni)
+  const now = new Date();
+  (_docs2 || []).forEach(doc => {
+    if (!doc.expiry) return;
+    const exp = new Date(doc.expiry);
+    const days = Math.ceil((exp - now) / 86400000);
+    if (days < 0) {
+      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto' });
+    } else if (days <= 90) {
+      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg' });
+    }
+  });
+
+  // 2. OTP attivi
+  if ((_otpList||[]).length > 0) {
+    alerts.push({ icon:'🔑', color:'#10b981', text: (_otpList.length) + ' codici OTP / 2FA attivi', time: '' });
+  }
+
+  // 3. Nessun dato
+  if (alerts.length === 0 && (_pwItems||[]).length === 0) {
+    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '' });
+  } else if (alerts.length === 0) {
+    alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '' });
+  }
+
+  // Render alert
+  alertBox.innerHTML = alerts.slice(0, 5).map(a => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;">
+      <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
+      <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${a.text}</div>
+      ${a.time ? `<div style="font-size:11px;font-weight:700;color:${a.color};flex-shrink:0;">${a.time}</div>` : ''}
+    </div>
+  `).join('');
 }
 
-
-
-// ── Toast ──────────────────────────────────────────────────
-let toastTimer;
 function showToast(msg, duration = 2800) {
   const t = document.getElementById('toast');
   t.textContent = msg;
