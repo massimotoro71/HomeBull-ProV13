@@ -6660,19 +6660,13 @@ function shopIsSelected(product) {
 }
 
 function shopToggle(product) {
-  if (shopIsSelected(product)) {
-    // Rimuovi dalla lista
-    Object.keys(_shopList).forEach(id => {
-      if (id === product.id || id.startsWith(product.id + '_')) delete _shopList[id];
-    });
-    shopSave(); shopRenderAll();
+  // Aggiunge sempre una nuova istanza — usa ✕ per rimuovere
+  const variants = SHOP_VARIANTS[product.name];
+  if (variants && variants.length) {
+    shopShowDetail(product);
   } else {
-    const variants = SHOP_VARIANTS[product.name];
-    if (variants && variants.length) {
-      shopShowDetail(product);
-    } else {
-      shopAddDirect(product, product.name);
-    }
+    shopAddDirect(product, product.name);
+    showToast('✅ ' + product.name + ' aggiunto');
   }
 }
 
