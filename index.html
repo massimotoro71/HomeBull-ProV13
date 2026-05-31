@@ -2123,7 +2123,11 @@ function cardsSearch(q) {
             </button>
           </div>
         </div>
-        <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);margin:4px 0 0;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin:4px 0 0;">
+          <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);"></div>
+          <div style="width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+          <div id="home-time" style="font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;"></div>
+        </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
           <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.0.0-beta</span>
@@ -3722,13 +3726,25 @@ function updateHomeDate() {
   const greet = h < 12 ? 'Buongiorno,' : h < 18 ? 'Buon pomeriggio,' : 'Buonasera,';
   const name  = getDisplayName();
   const dateStr = now.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  const timeStr = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
   const saluto = document.getElementById('home-saluto');
   const el = document.getElementById('home-greeting');
   const de = document.getElementById('home-date');
+  const te = document.getElementById('home-time');
   if (saluto) saluto.textContent = greet;
   if (el) el.textContent = name;
   if (de) de.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+  if (te) te.textContent = timeStr;
 }
+
+// Aggiorna ora ogni 30 secondi
+setInterval(() => {
+  const te = document.getElementById('home-time');
+  if (te) {
+    const now = new Date();
+    te.textContent = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+  }
+}, 30000);
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
