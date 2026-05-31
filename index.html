@@ -1687,6 +1687,31 @@ html, body {
     bottom: var(--bottombar-h, 70px) !important;
   }
 }
+
+/* ══ QA-GRID 3 COLONNE MOBILE ══════════════════════════ */
+@media (max-width: 899px) {
+  div#quick-access-grid.qa-grid,
+  #quick-access-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+  #quick-access-grid .qa-card {
+    padding: 14px 6px !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  #quick-access-grid .qa-card-icon {
+    font-size: 28px !important;
+  }
+  #quick-access-grid .qa-card-label {
+    font-size: 10px !important;
+  }
+  /* FAB non copre contenuto — posizione più bassa */
+  #mob-fab {
+    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 6px) !important;
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -6791,13 +6816,20 @@ function renderQuickAccess() {
   const grid = document.getElementById('quick-access-grid');
   if (!grid) return;
   grid.innerHTML = '';
+  // Forza 3 colonne su mobile
+  if (window.innerWidth < 900) {
+    grid.style.cssText = 'display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin-bottom:24px;';
+  }
   tabs.forEach(tabId => {
     const meta = ALL_TABS_META.find(t => t.id === tabId);
     if (!meta) return;
     const card = document.createElement('div');
     card.className = 'qa-card';
+    if (window.innerWidth < 900) {
+      card.style.cssText = 'padding:14px 6px!important;';
+    }
     card.onclick = () => switchTab(tabId);
-    card.innerHTML = `<div class="qa-card-icon">${meta.icon}</div><div class="qa-card-label">${meta.label}</div>`;
+    card.innerHTML = `<div class="qa-card-icon" style="${window.innerWidth<900?'font-size:28px':''}">${meta.icon}</div><div class="qa-card-label" style="${window.innerWidth<900?'font-size:10px':''}">${meta.label}</div>`;
     grid.appendChild(card);
   });
 }
