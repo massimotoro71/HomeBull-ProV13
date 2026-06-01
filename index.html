@@ -8856,7 +8856,12 @@ document.addEventListener('keydown', function(e) {
   } else if (e.key === 'Backspace' || e.key === 'Delete') {
     pinDelete();
   } else if (e.key === 'Enter') {
-    if (HB.pinBuffer.length >= 4) pinConfirm();
+    if (HB.pinBuffer.length === 8) {
+      pinConfirm();
+    } else if (HB.pinBuffer.length > 0) {
+      const err = document.getElementById('pin-error');
+      if (err) { err.textContent = 'PIN incompleto — inserisci 8 cifre'; setTimeout(()=>err.textContent='',2000); }
+    }
   }
 });
 </script>
