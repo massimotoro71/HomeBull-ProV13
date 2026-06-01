@@ -5,11 +5,9 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0a0a0f",
   "theme_color": "#6366f1",
   "orientation": "any",
-  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./icon-192.png",
