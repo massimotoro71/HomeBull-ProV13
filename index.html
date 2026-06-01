@@ -2001,7 +2001,7 @@ function cardsSearch(q) {
 }
 
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -2023,81 +2023,108 @@ function cardsSearch(q) {
 </div>
 
 <!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
-<div id="auth-screen">
-  <div class="auth-logo">
-    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<div id="auth-screen" style="position:fixed;inset:0;z-index:9999;background:#0f0f1a;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:40px 20px 40px;">
+
+  <!-- Logo -->
+  <div style="width:72px;height:72px;border-radius:22px;background:#6366f1;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 0 40px rgba(99,102,241,0.4);">
+    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="36" height="36">
       <rect x="8" y="12" width="20" height="16" rx="3"/>
       <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
       <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
     </svg>
   </div>
-  <h1 class="auth-title">HomeBull</h1>
-  <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div class="auth-card">
+  <h1 style="font-size:28px;font-weight:900;color:white;margin:0 0 6px;font-family:inherit;">HomeBull</h1>
+  <p style="font-size:13px;color:#94a3b8;margin:0 0 28px;text-align:center;">Il tuo vault personale, sempre cifrato</p>
+
+  <!-- Auth Card -->
+  <div style="width:100%;max-width:340px;background:#1e1e2e;border:1px solid #2d2d44;border-radius:20px;padding:24px 20px;">
 
     <!-- LOGIN -->
     <div class="auth-step active" id="step-login">
-      <div class="auth-label">Accedi al tuo account</div>
-      <input type="email" class="auth-input" id="fb-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
-      <div id="fb-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
-      <button class="auth-btn" onclick="fbLogin()">Accedi</button>
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:12px;color:var(--text3);">oppure</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:14px;">Accedi al tuo account</div>
+      <input type="email" id="fb-email" placeholder="nome@email.com"
+        autocomplete="email" inputmode="email"
+        style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid #2d2d44;background:#0f0f1a;color:white;font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:10px;">
+      <input type="password" id="fb-password" placeholder="Password"
+        autocomplete="current-password"
+        style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid #2d2d44;background:#0f0f1a;color:white;font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;">
+      <div id="fb-error" style="min-height:18px;margin:8px 0;font-size:12px;color:#ef4444;text-align:center;"></div>
+      <button onclick="fbLogin()"
+        style="width:100%;padding:14px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:14px;">
+        Accedi
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="flex:1;height:1px;background:#2d2d44;"></div>
+        <span style="font-size:11px;color:#64748b;">oppure</span>
+        <div style="flex:1;height:1px;background:#2d2d44;"></div>
       </div>
-      <button onclick="fbGoogleLogin()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
+      <button onclick="fbGoogleLogin()"
+        style="width:100%;padding:12px;border-radius:12px;border:1px solid #2d2d44;background:#1a1a2e;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-sizing:border-box;margin-bottom:16px;">
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Continua con Google
       </button>
-      <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text3);">
-        Non hai un account? <span class="auth-link" onclick="goToStep('register')">Registrati</span>
+      <div style="text-align:center;font-size:12px;color:#64748b;">
+        Non hai un account?
+        <span onclick="goToStep('register')" style="color:#6366f1;cursor:pointer;font-weight:700;">Registrati</span>
       </div>
-      <div id="fb-config-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:10px;font-size:11px;color:#f97316;text-align:center;">
-        ⚠️ Firebase non configurato — modalità demo attiva
+      <div id="fb-config-warning" style="display:none;margin-top:12px;padding:8px 12px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:8px;font-size:11px;color:#f97316;text-align:center;">
+        ⚠️ Firebase non configurato
       </div>
     </div>
 
     <!-- REGISTRAZIONE -->
     <div class="auth-step" id="step-register">
-      <div class="auth-label">Crea il tuo account</div>
-      <input type="email" class="auth-input" id="fb-reg-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-reg-pass" placeholder="Password (min. 6 caratteri)" autocomplete="new-password" style="margin-top:10px;">
-      <input type="password" class="auth-input" id="fb-reg-pass2" placeholder="Ripeti password" autocomplete="new-password" style="margin-top:10px;">
-      <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
-      <button class="auth-btn" onclick="fbRegister()">Crea account</button>
-      <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--text3);">
-        Hai già un account? <span class="auth-link" onclick="goToStep('login')">Accedi</span>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:14px;">Crea il tuo account</div>
+      <input type="email" id="fb-reg-email" placeholder="nome@email.com"
+        autocomplete="email" inputmode="email"
+        style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid #2d2d44;background:#0f0f1a;color:white;font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:10px;">
+      <input type="password" id="fb-reg-pass" placeholder="Password (min. 6 caratteri)"
+        autocomplete="new-password"
+        style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid #2d2d44;background:#0f0f1a;color:white;font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:10px;">
+      <input type="password" id="fb-reg-pass2" placeholder="Ripeti password"
+        autocomplete="new-password"
+        style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid #2d2d44;background:#0f0f1a;color:white;font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;">
+      <div id="fb-reg-error" style="min-height:18px;margin:8px 0;font-size:12px;color:#ef4444;text-align:center;"></div>
+      <button onclick="fbRegister()"
+        style="width:100%;padding:14px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:14px;">
+        Crea account
+      </button>
+      <div style="text-align:center;font-size:12px;color:#64748b;">
+        Hai già un account?
+        <span onclick="goToStep('login')" style="color:#6366f1;cursor:pointer;font-weight:700;">Accedi</span>
       </div>
     </div>
 
-    <!-- PIN MASTER -->
+    <!-- PIN -->
     <div class="auth-step" id="step-pin">
-      <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
-      <div class="pin-row" id="pin-dots">
+      <div id="pin-label" style="font-size:13px;font-weight:700;color:#94a3b8;text-align:center;margin-bottom:20px;">Scegli il tuo PIN Master</div>
+      <div id="pin-dots" style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;">
         <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
         <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
         <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
       </div>
-      <div class="pin-numpad" id="pin-numpad">
-        <button class="pin-key" onclick="pinKey('1')">1</button>
-        <button class="pin-key" onclick="pinKey('2')">2</button>
-        <button class="pin-key" onclick="pinKey('3')">3</button>
-        <button class="pin-key" onclick="pinKey('4')">4</button>
-        <button class="pin-key" onclick="pinKey('5')">5</button>
-        <button class="pin-key" onclick="pinKey('6')">6</button>
-        <button class="pin-key" onclick="pinKey('7')">7</button>
-        <button class="pin-key" onclick="pinKey('8')">8</button>
-        <button class="pin-key" onclick="pinKey('9')">9</button>
-        <button class="pin-key bio-btn" id="pin-bio-btn" onclick="pinBioAuth()" style="display:none;">👆</button>
+      <div id="pin-numpad" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;">
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key" id="pin-bio-btn" onclick="pinBioAuth()" style="display:none;">👆</button>
         <button class="pin-key ghost" id="pin-bio-ghost"></button>
-        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
-      <div class="auth-error" id="pin-error"></div>
-      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
+      <div id="pin-error" style="min-height:18px;font-size:12px;color:#ef4444;text-align:center;margin-bottom:8px;"></div>
+      <div style="display:flex;gap:16px;justify-content:center;font-size:12px;color:#64748b;">
+        <span onclick="fbLogout()" style="cursor:pointer;">← Cambia account</span>
+        <span style="color:#2d2d44;">|</span>
+        <span onclick="pinReset()" style="cursor:pointer;color:#ef4444;">🔄 Reset PIN</span>
+      </div>
     </div>
 
   </div>
