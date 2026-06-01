@@ -8370,12 +8370,20 @@ function fbInit(){
       if(user){
         HB.user={email:user.email,uid:user.uid};
         fbSyncLoad().then(()=>{
-          // Vai al PIN solo se auth-screen è visibile
-          const as=document.getElementById('auth-screen');
-          if(as && as.style.display!=='none') goToStep('pin');
+          // Determina modalità PIN
+          const hasPinHash = !!localStorage.getItem('hb12_pin_hash');
+          HB.authState = hasPinHash ? 'pin-login' : 'pin-setup';
+          HB.pinBuffer = '';
+          HB.pinFirst  = '';
+          HB.pinMode   = 'setup';
+          updatePinDots();
+          const lbl = document.getElementById('pin-label');
+          if(lbl) lbl.textContent = hasPinHash ? 'Inserisci il tuo PIN' : 'Scegli il tuo PIN Master';
+          goToStep('pin');
         });
       } else {
-        goToStep('email');
+        HB.authState = 'email';
+        goToStep('login');
       }
     });
     console.log('Firebase ✓');
