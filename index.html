@@ -8340,9 +8340,15 @@ async function fbLogin(){
   const err=document.getElementById('fb-error');
   err.textContent='';
   if(!email||!pass){err.textContent='Inserisci email e password';return;}
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.signInWithEmailAndPassword(email,pass); }
-  catch(e){err.textContent=fbMsg(e.code);}
+  if(!fbReady){
+    HB.user={email:email,uid:'demo_'+Date.now()};
+    goToStep('pin'); return;
+  }
+  err.textContent='⏳ Accesso in corso...';
+  try{
+    await fbAuth.signInWithEmailAndPassword(email,pass);
+    err.textContent='';
+  }catch(e){err.textContent=fbMsg(e.code);}
 }
 
 async function fbGoogleLogin(){
@@ -8403,7 +8409,6 @@ function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
 
-fbInit();
 
 // ── Biometria PIN ──────────────────────────────────────────
 async function pinCheckBio() {
