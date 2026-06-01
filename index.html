@@ -3446,37 +3446,7 @@ function showPinError(msg) {
   setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
 }
 
-async function setupPIN(pin) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
-  HB.sessionKey = await deriveKey(pin, salt);
-  // Save PIN hash (PBKDF2 output — not the PIN itself)
-  const hashBuf = await crypto.subtle.exportKey('raw', HB.sessionKey);
-  const hashArr = new Uint8Array(hashBuf).slice(0, 16);
-  let h = '';
-  hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
-  localStorage.setItem('hb12_pin_hash', h);
-}
-
-async function verifyPIN(pin) {
-  try {
-    const saltB64 = localStorage.getItem('hb12_salt');
-    if (!saltB64) return false;
-    const salt = new Uint8Array(atob(saltB64).split('').map(c => c.charCodeAt(0)));
-    const key = await deriveKey(pin, salt);
-    const hashBuf = await crypto.subtle.exportKey('raw', key);
-    const hashArr = new Uint8Array(hashBuf).slice(0, 16);
-    let h = '';
-    hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
-    if (h === localStorage.getItem('hb12_pin_hash')) {
-      HB.sessionKey = key;
-      return true;
-    }
-    return false;
-  } catch(e) { return false; }
-}
-
-// ── Crypto ─────────────────────────────────────────────────
+async // ── Crypto ─────────────────────────────────────────────────
 async function deriveKey(pin, salt) {
   const km = await crypto.subtle.importKey(
     'raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveKey']
@@ -8249,7 +8219,22 @@ function settingsImport(event){const file=event.target.files[0];if(!file)return;
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 function settingsToggleBio(){const enabled=localStorage.getItem('hb_bio')==='1';localStorage.setItem('hb_bio',enabled?'0':'1');settingsCheckBio();showToast(enabled?'Biometria disattivata':'👆 Biometria attivata');}
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
-function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
+function settingsChangePin(){
+  closeSettings();
+  // Mostra direttamente il cambio PIN senza richiedere login
+  setTimeout(()=>{
+    HB.authState = 'pin-setup';
+    HB.pinBuffer = '';
+    HB.pinFirst  = '';
+    HB.pinMode   = 'setup';
+    document.getElementById('pin-label').textContent = 'Scegli il nuovo PIN Master';
+    document.getElementById('pin-error').textContent = '';
+    updatePinDots();
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+    goToStep('pin');
+  }, 300);
+}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();if(typeof logout==='function')logout();};}
 function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
