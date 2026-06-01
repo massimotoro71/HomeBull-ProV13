@@ -1783,85 +1783,6 @@ html, body {
   justify-content: center;
   margin: 20px 0 16px;
 }
-
-/* ── Calendario Turni ───────────────────────────────────── */
-.cal-day {
-  position: relative;
-  overflow: hidden;
-}
-.cal-day-shift1 {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-.cal-day-shift2 {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-}
-.cal-day-num {
-  position: relative;
-  z-index: 1;
-  font-size: inherit;
-  font-weight: inherit;
-  mix-blend-mode: multiply;
-}
-[data-theme="dark"] .cal-day-num { mix-blend-mode: screen; }
-
-/* Turni accordion */
-#turni-accordion {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  margin-bottom: 14px;
-  overflow: hidden;
-}
-#turni-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 800;
-  user-select: none;
-}
-#turni-body { display: none; padding: 0 14px 14px; }
-#turni-body.open { display: block; }
-.turno-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  margin-bottom: 6px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.turno-item:active { transform: scale(0.97); }
-.turno-item.selected-turno { border: 2px solid var(--accent); }
-.turno-swatch {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-.turno-info { flex: 1; min-width: 0; }
-.turno-label { font-size: 14px; font-weight: 700; }
-.turno-time  { font-size: 11px; color: var(--text3); }
-.turno-ore   { font-size: 11px; font-weight: 700; color: var(--accent); }
-
-/* Ore mensili */
-#turni-ore-mese {
-  text-align: center;
-  padding: 10px;
-  font-size: 13px;
-  color: var(--text3);
-  border-top: 1px solid var(--border);
-  margin-top: 6px;
-}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -2558,48 +2479,6 @@ function cardsSearch(q) {
           <div style="display:flex;gap:10px;">
             <button onclick="calCloseForm()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
             <button onclick="calSaveEvent()" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Salva evento</button>
-          </div>
-        </div>
-
-        <!-- ═══ TURNI ACCORDION ═══ -->
-        <div id="turni-accordion">
-          <div id="turni-header" onclick="turniToggle()">
-            <div>📋 Turni</div>
-            <div id="turni-arrow" style="font-size:18px;transition:transform 0.2s;">›</div>
-          </div>
-          <div id="turni-body">
-            <!-- Giorno selezionato -->
-            <div id="turni-day-label" style="font-size:12px;color:var(--text3);margin-bottom:10px;padding:0 2px;"></div>
-            <!-- Lista turni -->
-            <div id="turni-list"></div>
-            <!-- Aggiungi turno -->
-            <button onclick="turnoShowAdd()" style="width:100%;padding:11px;border-radius:12px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">+ Aggiungi turno</button>
-            <!-- Form nuovo turno (hidden) -->
-            <div id="turno-form" style="display:none;margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px;">
-              <div style="font-size:13px;font-weight:800;margin-bottom:10px;">Nuovo turno</div>
-              <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;">
-                <input type="color" id="turno-color" value="#6366f1"
-                  style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:var(--surface);">
-                <input type="text" id="turno-label" placeholder="Etichetta (es. Matt.)"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-                <div>
-                  <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Inizio</div>
-                  <input type="time" id="turno-start" style="width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;">
-                </div>
-                <div>
-                  <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Fine</div>
-                  <input type="time" id="turno-end" style="width:100%;padding:9px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;">
-                </div>
-              </div>
-              <div style="display:flex;gap:8px;">
-                <button onclick="turnoHideAdd()" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-                <button onclick="turnoSave()" style="flex:2;padding:10px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-              </div>
-            </div>
-            <!-- Ore mensili -->
-            <div id="turni-ore-mese"></div>
           </div>
         </div>
 
@@ -5712,7 +5591,6 @@ function calLoad() {
 function calSaveAll() { localStorage.setItem(CAL_KEY, JSON.stringify(_calEvents)); }
 
 function calOpen() {
-  turniLoad();
   calLoad();
   const now = new Date();
   _calYear  = now.getFullYear();
@@ -5734,9 +5612,10 @@ function calRenderMonth() {
 
   const firstDay = new Date(_calYear, _calMonth, 1);
   const lastDay  = new Date(_calYear, _calMonth + 1, 0);
-  const startDow = (firstDay.getDay() + 6) % 7;
+  const startDow = (firstDay.getDay() + 6) % 7; // lunedì=0
   const today    = new Date();
 
+  // Giorni del mese corrente con eventi
   const eventDates = new Set(_calEvents
     .filter(e => { const d = new Date(e.date); return d.getFullYear()===_calYear && d.getMonth()===_calMonth; })
     .map(e => new Date(e.date).getDate())
@@ -5744,6 +5623,7 @@ function calRenderMonth() {
 
   grid.innerHTML = '';
 
+  // Giorni mese precedente
   for (let i = 0; i < startDow; i++) {
     const d = new Date(_calYear, _calMonth, -startDow + i + 1);
     const el = document.createElement('div');
@@ -5752,44 +5632,16 @@ function calRenderMonth() {
     grid.appendChild(el);
   }
 
+  // Giorni mese corrente
   for (let d = 1; d <= lastDay.getDate(); d++) {
     const el = document.createElement('div');
     el.className = 'cal-day';
-    el.style.cssText = 'position:relative;overflow:hidden;';
+    el.textContent = d;
     const isToday = d === today.getDate() && _calMonth === today.getMonth() && _calYear === today.getFullYear();
     const dateStr = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     if (isToday) el.classList.add('today');
     if (_calSelectedDate === dateStr) el.classList.add('selected');
     if (eventDates.has(d)) el.classList.add('has-event');
-
-    // ── Turni: colori nel giorno ──
-    const dayShifts = (_calDayShifts[dateStr] || []).slice(0, 2);
-    if (dayShifts.length === 1) {
-      const t = _turniDef.find(t => t.id === dayShifts[0]);
-      if (t) {
-        const bg = document.createElement('div');
-        bg.style.cssText = `position:absolute;inset:0;background:${t.color}55;z-index:0;`;
-        el.appendChild(bg);
-      }
-    } else if (dayShifts.length === 2) {
-      const t1 = _turniDef.find(t => t.id === dayShifts[0]);
-      const t2 = _turniDef.find(t => t.id === dayShifts[1]);
-      if (t1) {
-        const bg1 = document.createElement('div');
-        bg1.style.cssText = `position:absolute;inset:0;background:${t1.color}66;z-index:0;clip-path:polygon(0 0,100% 0,0 100%);`;
-        el.appendChild(bg1);
-      }
-      if (t2) {
-        const bg2 = document.createElement('div');
-        bg2.style.cssText = `position:absolute;inset:0;background:${t2.color}66;z-index:0;clip-path:polygon(100% 0,100% 100%,0 100%);`;
-        el.appendChild(bg2);
-      }
-    }
-
-    const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-weight:700;';
-    num.textContent = d;
-    el.appendChild(num);
     el.onclick = () => calSelectDate(dateStr);
     grid.appendChild(el);
   }
@@ -6676,59 +6528,14 @@ function shopRenderActive() {
   }
   grid.innerHTML = '';
   items.forEach(([id, item]) => {
-    const qty = item.qty || 1;
     const el = document.createElement('div');
     el.className = 'shop-list-item';
-    el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;';
-    el.innerHTML = `
-      <div class="shop-list-item-icon" style="font-size:22px;flex-shrink:0;">${item.icon}</div>
-      <div style="flex:1;min-width:0;">
-        <div class="shop-list-item-name" style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
-          onclick="shopRename('${id}')" title="Tieni premuto per rinominare">${item.name}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-        <button onclick="shopQty('${id}',-1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">−</button>
-        <span style="font-size:15px;font-weight:800;min-width:20px;text-align:center;color:var(--accent);">${qty}</span>
-        <button onclick="shopQty('${id}',+1)" style="width:28px;height:28px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">+</button>
-        <button onclick="shopRemove('${id}')" style="width:28px;height:28px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-      </div>`;
+    el.onclick = () => shopRemove(id);
+    el.innerHTML = `<div class="shop-list-item-icon">${item.icon}</div>
+      <div class="shop-list-item-name">${item.name}</div>
+      <button class="shop-list-item-del">✕</button>`;
     grid.appendChild(el);
   });
-}
-
-function shopQty(id, delta) {
-  if (!_shopList[id]) return;
-  const newQty = (_shopList[id].qty || 1) + delta;
-  if (newQty <= 0) { shopRemove(id); return; }
-  _shopList[id].qty = newQty;
-  shopSave(); shopRenderActive();
-}
-
-function shopRename(id) {
-  if (!_shopList[id]) return;
-  const item = _shopList[id];
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:18px;padding:20px;width:100%;max-width:320px;border:1px solid var(--border);';
-  box.innerHTML = `
-    <div style="font-size:15px;font-weight:800;margin-bottom:12px;">${item.icon} Rinomina prodotto</div>
-    <input id="_shop_rename_inp" type="text" value="${item.name}"
-      style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;">
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button id="_sr_cancel" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_sr_ok" style="flex:1;padding:11px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>`;
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-  const inp = document.getElementById('_shop_rename_inp');
-  inp.focus(); inp.select();
-  document.getElementById('_sr_cancel').onclick = () => overlay.remove();
-  document.getElementById('_sr_ok').onclick = () => {
-    const newName = inp.value.trim();
-    if (newName) { _shopList[id].name = newName; shopSave(); shopRenderActive(); }
-    overlay.remove();
-  };
 }
 
 // ── Usati di recente ────────────────────────────────────
@@ -6808,13 +6615,19 @@ function shopIsSelected(product) {
 }
 
 function shopToggle(product) {
-  // Aggiunge sempre una nuova istanza — usa ✕ per rimuovere
-  const variants = SHOP_VARIANTS[product.name];
-  if (variants && variants.length) {
-    shopShowDetail(product);
+  if (shopIsSelected(product)) {
+    // Rimuovi dalla lista
+    Object.keys(_shopList).forEach(id => {
+      if (id === product.id || id.startsWith(product.id + '_')) delete _shopList[id];
+    });
+    shopSave(); shopRenderAll();
   } else {
-    shopAddDirect(product, product.name);
-    showToast('✅ ' + product.name + ' aggiunto');
+    const variants = SHOP_VARIANTS[product.name];
+    if (variants && variants.length) {
+      shopShowDetail(product);
+    } else {
+      shopAddDirect(product, product.name);
+    }
   }
 }
 
@@ -8419,175 +8232,6 @@ async function pinBioAuth() {
       showToast('Biometria non disponibile');
     }
   }
-}
-
-// ════════════════════════════════════════════════════════════
-//  TURNI CALENDARIO
-// ════════════════════════════════════════════════════════════
-const TURNI_DEF_KEY  = 'hb13_turni_def';
-const TURNI_DAYS_KEY = 'hb13_turni_days';
-let _turniDef     = [];   // [{id, label, color, start, end}]
-let _calDayShifts = {};   // { 'YYYY-MM-DD': [turnoId, turnoId?] }
-let _turniOpen    = false;
-let _selectedTurno = null;
-
-function turniLoad() {
-  try { _turniDef     = JSON.parse(localStorage.getItem(TURNI_DEF_KEY))  || []; } catch(e) { _turniDef = []; }
-  try { _calDayShifts = JSON.parse(localStorage.getItem(TURNI_DAYS_KEY)) || {}; } catch(e) { _calDayShifts = {}; }
-}
-function turniSave() {
-  localStorage.setItem(TURNI_DEF_KEY,  JSON.stringify(_turniDef));
-  localStorage.setItem(TURNI_DAYS_KEY, JSON.stringify(_calDayShifts));
-}
-
-function turniToggle() {
-  _turniOpen = !_turniOpen;
-  document.getElementById('turni-body').classList.toggle('open', _turniOpen);
-  document.getElementById('turni-arrow').style.transform = _turniOpen ? 'rotate(90deg)' : '';
-  if (_turniOpen) turniRender();
-}
-
-function turniRender() {
-  const list = document.getElementById('turni-list');
-  const dayLabel = document.getElementById('turni-day-label');
-  if (!list) return;
-
-  // Label giorno selezionato
-  if (_calSelectedDate) {
-    const d = new Date(_calSelectedDate);
-    dayLabel.textContent = '📅 Giorno selezionato: ' + d.toLocaleDateString('it-IT', {weekday:'long',day:'numeric',month:'long'});
-  } else {
-    dayLabel.textContent = '👆 Seleziona un giorno dal calendario';
-  }
-
-  if (!_turniDef.length) {
-    list.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:12px;">Nessun turno — aggiungine uno!</div>';
-    turniOreRender();
-    return;
-  }
-
-  const dayShifts = _calSelectedDate ? (_calDayShifts[_calSelectedDate] || []) : [];
-
-  list.innerHTML = '';
-  _turniDef.forEach(t => {
-    const isAssigned = dayShifts.includes(t.id);
-    const ore = turnoOre(t);
-    const el = document.createElement('div');
-    el.className = 'turno-item' + (isAssigned ? ' selected-turno' : '');
-    el.style.borderColor = isAssigned ? t.color : '';
-    el.innerHTML = `
-      <div class="turno-swatch" style="background:${t.color};"></div>
-      <div class="turno-info">
-        <div class="turno-label">${t.label}</div>
-        <div class="turno-time">${t.start||''} ${t.start&&t.end?'–':''} ${t.end||''}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        ${ore ? `<span class="turno-ore">${ore}h</span>` : ''}
-        ${isAssigned ? `<span style="font-size:18px;">✓</span>` : ''}
-        <button onclick="turnoDelete('${t.id}')" style="width:24px;height:24px;border-radius:6px;border:none;background:rgba(239,68,68,0.1);color:#ef4444;font-size:12px;cursor:pointer;">✕</button>
-      </div>`;
-    el.onclick = (e) => {
-      if (e.target.tagName === 'BUTTON') return;
-      turnoAssign(t.id);
-    };
-    list.appendChild(el);
-  });
-  turniOreRender();
-}
-
-function turnoOre(t) {
-  if (!t.start || !t.end) return null;
-  const [h1,m1] = t.start.split(':').map(Number);
-  const [h2,m2] = t.end.split(':').map(Number);
-  let mins = (h2*60+m2) - (h1*60+m1);
-  if (mins < 0) mins += 1440; // turno notturno
-  return (mins/60).toFixed(1).replace('.0','');
-}
-
-function turnoAssign(turnoId) {
-  if (!_calSelectedDate) { showToast('👆 Seleziona prima un giorno'); return; }
-  const current = _calDayShifts[_calSelectedDate] || [];
-  let updated;
-  if (current.includes(turnoId)) {
-    // Rimuovi se già assegnato
-    updated = current.filter(id => id !== turnoId);
-  } else if (current.length >= 2) {
-    // Max 2 turni — sostituisci il secondo
-    updated = [current[0], turnoId];
-    showToast('Max 2 turni per giorno — secondo sostituito');
-  } else {
-    updated = [...current, turnoId];
-  }
-  if (updated.length === 0) delete _calDayShifts[_calSelectedDate];
-  else _calDayShifts[_calSelectedDate] = updated;
-  turniSave();
-  calRenderMonth();
-  turniRender();
-}
-
-function turnoDelete(turnoId) {
-  _turniDef = _turniDef.filter(t => t.id !== turnoId);
-  // Rimuovi da tutti i giorni
-  Object.keys(_calDayShifts).forEach(date => {
-    _calDayShifts[date] = _calDayShifts[date].filter(id => id !== turnoId);
-    if (!_calDayShifts[date].length) delete _calDayShifts[date];
-  });
-  turniSave(); turniRender(); calRenderMonth();
-}
-
-function turnoShowAdd() { document.getElementById('turno-form').style.display = 'block'; }
-function turnoHideAdd() { document.getElementById('turno-form').style.display = 'none'; }
-
-function turnoSave() {
-  const label = document.getElementById('turno-label').value.trim();
-  const color = document.getElementById('turno-color').value;
-  const start = document.getElementById('turno-start').value;
-  const end   = document.getElementById('turno-end').value;
-  if (!label) { showToast("Inserisci un'etichetta"); return; }
-  const turno = { id: 'turno_' + Date.now(), label, color, start, end };
-  _turniDef.push(turno);
-  turniSave();
-  document.getElementById('turno-label').value = '';
-  document.getElementById('turno-start').value = '';
-  document.getElementById('turno-end').value   = '';
-  turnoHideAdd();
-  turniRender();
-  showToast('✅ Turno "' + label + '" aggiunto');
-}
-
-function turniOreRender() {
-  const el = document.getElementById('turni-ore-mese');
-  if (!el) return;
-  // Calcola ore totali del mese corrente
-  let totalMins = 0;
-  const prefix = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-`;
-  Object.entries(_calDayShifts).forEach(([date, shifts]) => {
-    if (!date.startsWith(prefix)) return;
-    shifts.forEach(id => {
-      const t = _turniDef.find(t => t.id === id);
-      if (t && t.start && t.end) {
-        const [h1,m1] = t.start.split(':').map(Number);
-        const [h2,m2] = t.end.split(':').map(Number);
-        let mins = (h2*60+m2) - (h1*60+m1);
-        if (mins < 0) mins += 1440;
-        totalMins += mins;
-      }
-    });
-  });
-  const ore = Math.floor(totalMins/60);
-  const min = totalMins % 60;
-  el.textContent = totalMins > 0
-    ? '📊 Ore mese: ' + ore + 'h' + (min > 0 ? ' ' + min + 'm' : '')
-    : '';
-}
-
-// Override calSelectDate per aggiornare turni
-const _origCalSelect = typeof calSelectDate === 'function' ? calSelectDate : null;
-function calSelectDate(dateStr) {
-  _calSelectedDate = dateStr;
-  calRenderMonth();
-  if (typeof calShowForm === 'function') calShowForm(dateStr);
-  if (_turniOpen) turniRender();
 }
 </script>
 
