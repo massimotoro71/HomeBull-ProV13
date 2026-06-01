@@ -2,10 +2,7 @@
 <html lang="it" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0f">
@@ -1096,7 +1093,7 @@ html, body {
   background: var(--accent-bg); border: 2px solid var(--accent);
   cursor: pointer; position: relative; min-width: 0;
 }
-.shop-list-item-icon { font-size: 16px; line-height: 1; }
+.shop-list-item-icon { font-size: 20px; line-height: 1; }
 .shop-list-item-name {
   font-size: 8px; font-weight: 800; text-transform: uppercase;
   color: var(--accent); text-align: center; max-width: 100%;
@@ -1865,25 +1862,6 @@ html, body {
   border-top: 1px solid var(--border);
   margin-top: 6px;
 }
-
-/* ── Lista spesa attiva — tile grandi ──────────────────── */
-@media (max-width: 899px) {
-  #shop-active-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-  }
-  .shop-list-item {
-    min-height: 90px !important;
-    padding: 12px 8px !important;
-    border-radius: 16px !important;
-  }
-  .shop-list-item-icon {
-    font-size: 28px !important;
-  }
-  .shop-list-item-name {
-    font-size: 11px !important;
-  }
-}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -2039,7 +2017,7 @@ function cardsSearch(q) {
   <div class="auth-card">
 
     <!-- LOGIN -->
-    <div class="auth-step active" id="step-email">
+    <div class="auth-step active" id="step-login">
       <div class="auth-label">Accedi al tuo account</div>
       <input type="email" class="auth-input" id="fb-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
       <input type="password" class="auth-input" id="fb-password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
@@ -2071,7 +2049,7 @@ function cardsSearch(q) {
       <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
       <button class="auth-btn" onclick="fbRegister()">Crea account</button>
       <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--text3);">
-        Hai già un account? <span class="auth-link" onclick="goToStep('email')">Accedi</span>
+        Hai già un account? <span class="auth-link" onclick="goToStep('login')">Accedi</span>
       </div>
     </div>
 
@@ -2100,11 +2078,7 @@ function cardsSearch(q) {
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
-      <div style="display:flex;gap:10px;margin-top:12px;justify-content:center;">
-        <button onclick="fbLogout()" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
-        <span style="color:var(--border);font-size:12px;">|</span>
-        <button onclick="pinReset()" style="background:none;border:none;color:#ef4444;font-size:12px;cursor:pointer;font-family:inherit;">🔄 Reset PIN</button>
-      </div>
+      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
     </div>
 
   </div>
@@ -2538,21 +2512,10 @@ function cardsSearch(q) {
 
         <!-- Mini calendario -->
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
-          <!-- Toggle Mese/Settimana -->
-          <div style="display:flex;gap:6px;margin-bottom:12px;">
-            <button id="cal-view-month" onclick="calSetView('month')"
-              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);">
-              📅 Mese
-            </button>
-            <button id="cal-view-week" onclick="calSetView('week')"
-              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
-              📆 Settimana
-            </button>
-          </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <button onclick="calPrev()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
+            <button onclick="calPrevMonth()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
             <div id="cal-month-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;"></div>
-            <button onclick="calNext()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">›</button>
+            <button onclick="calNextMonth()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">›</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
             <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Lu</div>
@@ -2563,14 +2526,7 @@ function cardsSearch(q) {
             <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);">Sa</div>
             <div style="text-align:center;font-size:10px;font-weight:800;color:#ef4444;">Do</div>
           </div>
-          <!-- Griglia mese -->
-          <div id="cal-grid-month">
-            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
-          </div>
-          <!-- Griglia settimana -->
-          <div id="cal-grid-week" style="display:none;">
-            <div id="cal-week-grid"></div>
-          </div>
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
         </div>
 
         <!-- Evento selezionato / form nuovo evento -->
@@ -3066,7 +3022,7 @@ function cardsSearch(q) {
             <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);">🛒 <span id="shop-list-name-label">Lista</span></div>
             <button onclick="shopClearAll()" id="shop-clear-btn" style="display:none;padding:5px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota</button>
           </div>
-          <div id="shop-active-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;min-height:60px;">
+          <div id="shop-active-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;min-height:60px;">
             <div style="grid-column:1/-1;text-align:center;padding:16px 0;color:var(--text3);font-size:12px;">Tocca i prodotti qui sotto per aggiungerli</div>
           </div>
         </div>
@@ -3453,6 +3409,36 @@ function showPinError(msg) {
   setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
 }
 
+async function setupPIN(pin) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
+  HB.sessionKey = await deriveKey(pin, salt);
+  // Save PIN hash (PBKDF2 output — not the PIN itself)
+  const hashBuf = await crypto.subtle.exportKey('raw', HB.sessionKey);
+  const hashArr = new Uint8Array(hashBuf).slice(0, 16);
+  let h = '';
+  hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
+  localStorage.setItem('hb12_pin_hash', h);
+}
+
+async function verifyPIN(pin) {
+  try {
+    const saltB64 = localStorage.getItem('hb12_salt');
+    if (!saltB64) return false;
+    const salt = new Uint8Array(atob(saltB64).split('').map(c => c.charCodeAt(0)));
+    const key = await deriveKey(pin, salt);
+    const hashBuf = await crypto.subtle.exportKey('raw', key);
+    const hashArr = new Uint8Array(hashBuf).slice(0, 16);
+    let h = '';
+    hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
+    if (h === localStorage.getItem('hb12_pin_hash')) {
+      HB.sessionKey = key;
+      return true;
+    }
+    return false;
+  } catch(e) { return false; }
+}
+
 // ── Crypto ─────────────────────────────────────────────────
 async function deriveKey(pin, salt) {
   const km = await crypto.subtle.importKey(
@@ -3791,7 +3777,7 @@ function goToStep(step) {
   document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + step)?.classList.add('active');
   if (step === 'pin') setTimeout(pinCheckBio, 100);
-  if (step === 'email') setTimeout(() => document.getElementById('fb-email')?.focus(), 100);
+  if (step === 'email') setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
 }
 
 const HB_NAME_KEY = 'hb12_display_name';
@@ -6693,21 +6679,22 @@ function shopRenderActive() {
     const qty = item.qty || 1;
     const el = document.createElement('div');
     el.className = 'shop-list-item';
-    el.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 6px 8px;gap:4px;position:relative;min-height:100px;';
+    el.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;';
     el.innerHTML = `
-      <div style="font-size:28px;line-height:1;">${item.icon}</div>
-      <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:var(--accent);text-align:center;word-break:break-word;max-width:100%;padding:0 2px;"
-        onclick="shopRename('${id}')">${item.name}</div>
-      <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
-        <button onclick="shopQty('${id}',-1)" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;">−</button>
-        <span style="font-size:14px;font-weight:800;min-width:16px;text-align:center;color:var(--accent);">${qty}</span>
-        <button onclick="shopQty('${id}',+1)" style="width:24px;height:24px;border-radius:6px;border:none;background:var(--accent);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;">+</button>
+      <div class="shop-list-item-icon" style="font-size:22px;flex-shrink:0;">${item.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="shop-list-item-name" style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+          onclick="shopRename('${id}')" title="Tieni premuto per rinominare">${item.name}</div>
       </div>
-      <button onclick="shopRemove('${id}')" style="position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:5px;border:none;background:rgba(239,68,68,0.15);color:#ef4444;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>`;
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <button onclick="shopQty('${id}',-1)" style="width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">−</button>
+        <span style="font-size:15px;font-weight:800;min-width:20px;text-align:center;color:var(--accent);">${qty}</span>
+        <button onclick="shopQty('${id}',+1)" style="width:28px;height:28px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">+</button>
+        <button onclick="shopRemove('${id}')" style="width:28px;height:28px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>`;
     grid.appendChild(el);
   });
 }
-
 
 function shopQty(id, delta) {
   if (!_shopList[id]) return;
@@ -8226,22 +8213,7 @@ function settingsImport(event){const file=event.target.files[0];if(!file)return;
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 function settingsToggleBio(){const enabled=localStorage.getItem('hb_bio')==='1';localStorage.setItem('hb_bio',enabled?'0':'1');settingsCheckBio();showToast(enabled?'Biometria disattivata':'👆 Biometria attivata');}
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
-function settingsChangePin(){
-  closeSettings();
-  // Mostra direttamente il cambio PIN senza richiedere login
-  setTimeout(()=>{
-    HB.authState = 'pin-setup';
-    HB.pinBuffer = '';
-    HB.pinFirst  = '';
-    HB.pinMode   = 'setup';
-    document.getElementById('pin-label').textContent = 'Scegli il nuovo PIN Master';
-    document.getElementById('pin-error').textContent = '';
-    updatePinDots();
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('app').classList.remove('visible');
-    goToStep('pin');
-  }, 300);
-}
+function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();if(typeof logout==='function')logout();};}
 function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
@@ -8311,13 +8283,12 @@ document.addEventListener('click', function(e){
 //  console.firebase.google.com
 // ════════════════════════════════════════════════════════════
 const FB_CFG = {
-  apiKey:            "AIzaSyBr6t6gKmanpthFfyUBqfSOMVICc8Efyjs",
-  authDomain:        "homebull-f57fc.firebaseapp.com",
-  databaseURL:       "https://homebull-f57fc-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "homebull-f57fc",
-  storageBucket:     "homebull-f57fc.firebasestorage.app",
-  messagingSenderId: "140879408214",
-  appId:             "1:140879408214:web:5aee6065b9895fbe471ff7"
+  apiKey:            "INSERISCI_API_KEY",
+  authDomain:        "INSERISCI_PROJECT.firebaseapp.com",
+  projectId:         "INSERISCI_PROJECT_ID",
+  storageBucket:     "INSERISCI_PROJECT.appspot.com",
+  messagingSenderId: "INSERISCI_SENDER_ID",
+  appId:             "INSERISCI_APP_ID"
 };
 
 let fbAuth=null, fbDb=null, fbReady=false;
@@ -8325,38 +8296,16 @@ let fbAuth=null, fbDb=null, fbReady=false;
 function fbInit(){
   try{
     if(FB_CFG.apiKey==='INSERISCI_API_KEY'){
-      const w=document.getElementById('fb-config-warning');
-      if(w) w.style.display='block';
-      fbReady=false; return;
-    }
-    if(typeof firebase==='undefined'){
-      console.warn('Firebase SDK non caricato');
+      document.getElementById('fb-config-warning').style.display='block';
       fbReady=false; return;
     }
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
-    fbAuth=firebase.auth();
-    fbDb=firebase.firestore();
-    fbReady=true;
+    fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
     fbAuth.onAuthStateChanged(user=>{
-      if(user){
-        HB.user={email:user.email,uid:user.uid};
-        fbSyncLoad().then(()=>{
-          // Vai al PIN solo se auth-screen è visibile
-          const as=document.getElementById('auth-screen');
-          if(as && as.style.display!=='none') goToStep('pin');
-        });
-      } else {
-        goToStep('email');
-      }
+      if(user){ HB.user={email:user.email,uid:user.uid}; fbSyncLoad().then(()=>goToStep('pin')); }
+      else{ goToStep('login'); }
     });
-    console.log('Firebase ✓');
-  }catch(e){
-    console.warn('Firebase error:',e);
-    fbReady=false;
-    // Mostra errore all'utente
-    const err=document.getElementById('fb-error');
-    if(err) err.textContent='Errore connessione: '+e.message;
-  }
+  }catch(e){ console.warn('Firebase:',e); fbReady=false; }
 }
 
 async function fbLogin(){
@@ -8365,15 +8314,9 @@ async function fbLogin(){
   const err=document.getElementById('fb-error');
   err.textContent='';
   if(!email||!pass){err.textContent='Inserisci email e password';return;}
-  if(!fbReady){
-    HB.user={email:email,uid:'demo_'+Date.now()};
-    goToStep('pin'); return;
-  }
-  err.textContent='⏳ Accesso in corso...';
-  try{
-    await fbAuth.signInWithEmailAndPassword(email,pass);
-    err.textContent='';
-  }catch(e){err.textContent=fbMsg(e.code);}
+  if(!fbReady){unlockApp();return;}
+  try{ await fbAuth.signInWithEmailAndPassword(email,pass); }
+  catch(e){err.textContent=fbMsg(e.code);}
 }
 
 async function fbGoogleLogin(){
@@ -8398,7 +8341,7 @@ async function fbRegister(){
 
 function fbLogout(){
   if(fbReady&&fbAuth) fbAuth.signOut();
-  HB.user=null; goToStep('email');
+  HB.user=null; goToStep('login');
 }
 
 function fbMsg(c){
@@ -8434,6 +8377,7 @@ function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
 
+fbInit();
 
 // ── Biometria PIN ──────────────────────────────────────────
 async function pinCheckBio() {
@@ -8644,207 +8588,6 @@ function calSelectDate(dateStr) {
   calRenderMonth();
   if (typeof calShowForm === 'function') calShowForm(dateStr);
   if (_turniOpen) turniRender();
-}
-
-// ════════════════════════════════════════════════════════════
-//  VISTA SETTIMANALE CALENDARIO
-// ════════════════════════════════════════════════════════════
-let _calView = 'month';  // 'month' | 'week'
-let _calWeekStart = null; // Date del lunedì corrente
-
-function calSetView(view) {
-  _calView = view;
-  // Update toggle buttons
-  const btnM = document.getElementById('cal-view-month');
-  const btnW = document.getElementById('cal-view-week');
-  const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
-  const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
-  if (btnM) btnM.style.cssText = btnM.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='month'?active:normal);
-  if (btnW) btnW.style.cssText = btnW.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='week'?active:normal);
-
-  // Show/hide grids
-  const gm = document.getElementById('cal-grid-month');
-  const gw = document.getElementById('cal-grid-week');
-  const daysRow = document.querySelector('#panel-calendar .cal-days-row');
-  if (gm) gm.style.display = view==='month' ? '' : 'none';
-  if (gw) gw.style.display = view==='week'  ? '' : 'none';
-
-  if (view==='week') {
-    // Inizia dalla settimana che contiene la data selezionata o oggi
-    const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
-    const dow = (ref.getDay() + 6) % 7; // lunedì=0
-    _calWeekStart = new Date(ref);
-    _calWeekStart.setDate(ref.getDate() - dow);
-    calRenderWeek();
-  } else {
-    calRenderMonth();
-  }
-}
-
-function calPrev() {
-  if (_calView === 'week') {
-    _calWeekStart.setDate(_calWeekStart.getDate() - 7);
-    calRenderWeek();
-  } else {
-    calPrevMonth();
-  }
-}
-function calNext() {
-  if (_calView === 'week') {
-    _calWeekStart.setDate(_calWeekStart.getDate() + 7);
-    calRenderWeek();
-  } else {
-    calNextMonth();
-  }
-}
-
-function calRenderWeek() {
-  const grid = document.getElementById('cal-week-grid');
-  const label = document.getElementById('cal-month-label');
-  if (!grid || !_calWeekStart) return;
-
-  const today = new Date();
-  const days = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(_calWeekStart);
-    d.setDate(_calWeekStart.getDate() + i);
-    days.push(d);
-  }
-
-  // Label: "Lun 2 – Dom 8 Giugno"
-  const start = days[0], end = days[6];
-  const opts = { day:'numeric', month:'long' };
-  label.textContent = start.toLocaleDateString('it-IT',{day:'numeric'}) + ' – ' +
-    end.toLocaleDateString('it-IT', opts) + ' ' + end.getFullYear();
-
-  const DAY_NAMES = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
-
-  grid.innerHTML = '';
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:4px;';
-
-  days.forEach((d, i) => {
-    const dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    const isToday = d.toDateString() === today.toDateString();
-    const isSelected = _calSelectedDate === dateStr;
-    const shifts = (_calDayShifts[dateStr] || []).slice(0, 2);
-    const hasEvent = _calEvents.some(e => e.date && e.date.startsWith(dateStr));
-
-    const col = document.createElement('div');
-    col.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
-
-    // Header giorno
-    const head = document.createElement('div');
-    head.style.cssText = `text-align:center;font-size:10px;font-weight:800;color:${i===6?'#ef4444':'var(--text3)'};padding-bottom:2px;`;
-    head.textContent = DAY_NAMES[i];
-    col.appendChild(head);
-
-    // Cella giorno
-    const cell = document.createElement('div');
-    cell.style.cssText = `
-      position:relative;overflow:hidden;border-radius:10px;
-      min-height:64px;cursor:pointer;
-      border:${isSelected?'2px solid var(--accent)':isToday?'2px solid var(--accent-bg)':'1px solid var(--border)'};
-      background:${isToday?'var(--accent-bg)':'var(--surface)'};
-      display:flex;flex-direction:column;align-items:center;padding:6px 2px;gap:2px;
-    `;
-
-    // Colori turni
-    if (shifts.length === 1) {
-      const t = _turniDef.find(t=>t.id===shifts[0]);
-      if (t) {
-        const bg = document.createElement('div');
-        bg.style.cssText = `position:absolute;inset:0;background:${t.color}55;z-index:0;`;
-        cell.appendChild(bg);
-      }
-    } else if (shifts.length === 2) {
-      const t1 = _turniDef.find(t=>t.id===shifts[0]);
-      const t2 = _turniDef.find(t=>t.id===shifts[1]);
-      if (t1) { const b=document.createElement('div'); b.style.cssText=`position:absolute;inset:0;background:${t1.color}66;z-index:0;clip-path:polygon(0 0,100% 0,0 100%);`; cell.appendChild(b); }
-      if (t2) { const b=document.createElement('div'); b.style.cssText=`position:absolute;inset:0;background:${t2.color}66;z-index:0;clip-path:polygon(100% 0,100% 100%,0 100%);`; cell.appendChild(b); }
-    }
-
-    // Numero giorno
-    const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-size:16px;font-weight:800;';
-    num.textContent = d.getDate();
-    cell.appendChild(num);
-
-    // Etichette turni
-    shifts.forEach(id => {
-      const t = _turniDef.find(t=>t.id===id);
-      if (!t) return;
-      const tag = document.createElement('span');
-      tag.style.cssText = `position:relative;z-index:1;font-size:9px;font-weight:800;color:white;background:${t.color};border-radius:4px;padding:1px 4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
-      tag.textContent = t.label;
-      cell.appendChild(tag);
-    });
-
-    // Punto evento
-    if (hasEvent) {
-      const dot = document.createElement('div');
-      dot.style.cssText = 'position:absolute;bottom:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--accent);z-index:1;';
-      cell.appendChild(dot);
-    }
-
-    cell.onclick = () => calSelectDate(dateStr);
-    col.appendChild(cell);
-    grid.appendChild(col);
-  });
-
-  // Lista eventi della settimana
-  const evLabel = document.getElementById('cal-events-label');
-  const evList  = document.getElementById('cal-events-list');
-  if (evLabel) evLabel.textContent = 'Eventi settimana';
-  if (evList) {
-    const weekEvents = _calEvents.filter(e => {
-      const d = new Date(e.date);
-      return d >= days[0] && d <= days[6];
-    }).sort((a,b) => new Date(a.date)-new Date(b.date));
-    if (!weekEvents.length) {
-      evList.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:16px;">Nessun evento questa settimana</div>';
-    } else {
-      evList.innerHTML = weekEvents.map(e => `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${e.color||'var(--accent)'};border-radius:12px;margin-bottom:6px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:700;">${e.title}</div>
-            <div style="font-size:11px;color:var(--text3);">${new Date(e.date).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})}${e.time?' · '+e.time:''}</div>
-          </div>
-        </div>`).join('');
-    }
-  }
-}
-
-function pinReset() {
-  // Conferma prima di resettare
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const bx = document.createElement('div');
-  bx.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:300px;width:100%;text-align:center;border:1px solid var(--border);';
-  bx.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">🔄</div>'
-    + '<div style="font-size:15px;font-weight:800;margin-bottom:8px;">Reset PIN?</div>'
-    + '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Il PIN verrà cancellato e potrai impostarne uno nuovo. I tuoi dati rimarranno intatti.</div>'
-    + '<div style="display:flex;gap:10px;">'
-    + '<button id="_pr_c" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
-    + '<button id="_pr_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Reset</button>'
-    + '</div>';
-  ov.appendChild(bx); document.body.appendChild(ov);
-  document.getElementById('_pr_c').onclick = () => ov.remove();
-  document.getElementById('_pr_ok').onclick = () => {
-    // Cancella PIN salvato
-    localStorage.removeItem('hb12_pin_hash');
-    localStorage.removeItem('hb12_salt');
-    localStorage.removeItem('hb12_pin');
-    // Imposta modalità setup
-    HB.authState = 'pin-setup';
-    HB.pinBuffer = '';
-    HB.pinFirst  = '';
-    HB.pinMode   = 'setup';
-    updatePinDots();
-    document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
-    document.getElementById('pin-error').textContent = '';
-    ov.remove();
-    showToast('PIN resettato — imposta un nuovo PIN');
-  };
 }
 </script>
 
