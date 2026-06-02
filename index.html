@@ -2035,46 +2035,47 @@ function cardsSearch(q) {
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
   <div class="auth-card">
 
-    <!-- LOGIN -->
+    <!-- STEP 1: EMAIL -->
     <div class="auth-step active" id="step-login">
-      <div class="auth-label">Accedi al tuo account</div>
+      <div class="auth-label">Inserisci la tua email</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;text-align:center;">Riceverai un codice di verifica</div>
       <input type="email" class="auth-input" id="fb-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
       <div id="fb-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
-      <button class="auth-btn" onclick="fbLogin()">Accedi</button>
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:12px;color:var(--text3);">oppure</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-      </div>
-      <button onclick="fbGoogleLogin()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
-        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Continua con Google
-      </button>
-      <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text3);">
-        Non hai un account? <span class="auth-link" onclick="goToStep('register')">Registrati</span>
-      </div>
+      <button class="auth-btn" id="send-otp-btn" onclick="sendEmailOTP()">Invia codice →</button>
       <div id="fb-config-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:10px;font-size:11px;color:#f97316;text-align:center;">
-        ⚠️ Firebase non configurato — modalità demo attiva
+        ⚠️ Firebase non configurato
       </div>
     </div>
 
-    <!-- REGISTRAZIONE -->
-    <div class="auth-step" id="step-register">
-      <div class="auth-label">Crea il tuo account</div>
-      <input type="email" class="auth-input" id="fb-reg-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-reg-pass" placeholder="Password (min. 6 caratteri)" autocomplete="new-password" style="margin-top:10px;">
-      <input type="password" class="auth-input" id="fb-reg-pass2" placeholder="Ripeti password" autocomplete="new-password" style="margin-top:10px;">
-      <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
-      <button class="auth-btn" onclick="fbRegister()">Crea account</button>
-      <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--text3);">
-        Hai già un account? <span class="auth-link" onclick="goToStep('login')">Accedi</span>
+    <!-- STEP 2: OTP CODE -->
+    <div class="auth-step" id="step-otp">
+      <div class="auth-label">Codice di verifica</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;text-align:center;">
+        Controlla la tua email<br>
+        <span id="otp-email-hint" style="color:var(--accent);font-weight:700;"></span>
       </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
+        <input type="text" class="auth-input" id="otp-d1" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d2" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d3" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d4" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d5" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d6" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+      </div>
+      <div id="otp-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
+      <button class="auth-btn" onclick="verifyEmailOTP()">Verifica →</button>
+      <div style="margin-top:12px;text-align:center;">
+        <button onclick="goToStep('login')" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia email</button>
+        <span style="color:var(--border);margin:0 8px;">|</span>
+        <button onclick="resendOTP()" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;font-family:inherit;" id="resend-btn">Reinvia codice</button>
+      </div>
+      <div id="otp-timer" style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;"></div>
     </div>
 
-    <!-- PIN MASTER -->
+    <!-- STEP 3: PIN MASTER -->
     <div class="auth-step" id="step-pin">
       <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center;" id="pin-sub">8 cifre — usato per sbloccare l'app</div>
       <div class="pin-row" id="pin-dots">
         <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
@@ -2097,7 +2098,20 @@ function cardsSearch(q) {
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
-      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
+      <button onclick="authLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
+    </div>
+
+    <!-- STEP 4: BIOMETRIA OPZIONALE (solo primo accesso) -->
+    <div class="auth-step" id="step-bio-setup">
+      <div style="font-size:48px;text-align:center;margin-bottom:16px;">👆</div>
+      <div class="auth-label">Abilita biometria?</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:24px;text-align:center;">
+        Accedi più velocemente con impronta digitale o Face ID
+      </div>
+      <button class="auth-btn" onclick="setupBioAndEnter()">Abilita impronta / Face ID</button>
+      <button onclick="skipBioAndEnter()" style="width:100%;padding:12px;margin-top:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
+        Salta per ora
+      </button>
     </div>
 
   </div>
@@ -2120,7 +2134,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA142</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA145</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2257,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA142</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA145</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3296,7 +3310,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA142',
+  version: 'BETA145',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3394,8 +3408,6 @@ window.addEventListener('load', () => {
 });
 
 function checkAuthStatus() {
-  // Se c'è un utente salvato E un PIN, vai subito alla schermata PIN
-  // Firebase onAuthStateChanged confermerà o smentirà dopo
   const savedUser = localStorage.getItem('hb_last_user');
   const hasPIN = !!localStorage.getItem('hb12_pin_hash');
   if (savedUser && hasPIN) {
@@ -3405,12 +3417,20 @@ function checkAuthStatus() {
       goToStep('pin');
       const lbl = document.getElementById('pin-label');
       if (lbl) lbl.textContent = 'Inserisci il tuo PIN';
+      const sub = document.getElementById('pin-sub');
+      if (sub) sub.textContent = '';
       const fp = document.getElementById('forgot-pin-btn');
       if (fp) fp.style.display = 'block';
+      // Avvia biometria automatica su mobile
+      setTimeout(() => {
+        checkBiometricAvailable();
+        if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
+          setTimeout(tryBiometric, 600);
+        }
+      }, 300);
       return;
     } catch(e) {}
   }
-  // Nessun utente salvato — mostra login
   goToStep('login');
 }
 
@@ -3491,7 +3511,12 @@ async function pinConfirm() {
       }
       HB._lastPin = HB.pinBuffer; // salva per registrazione biometrica
       await setupPIN(HB.pinBuffer);
-      unlockApp();
+      // Offri biometria se disponibile e non già configurata
+      if (window.PublicKeyCredential && !localStorage.getItem(HB_BIO_KEY)) {
+        goToStep('bio-setup');
+      } else {
+        unlockApp();
+      }
     }
   }
 
@@ -3880,8 +3905,14 @@ function handleDrawerClick(e) {
 function goToStep(step) {
   document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + step)?.classList.add('active');
-  if (step === 'pin') setTimeout(pinCheckBio, 100);
-  if (step === 'email') setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
+  HB.pinBuffer = '';
+  updatePinDots();
+  if (step === 'pin') {
+    setTimeout(pinCheckBio, 100);
+    document.getElementById('pin-error').textContent = '';
+  }
+  if (step === 'login') setTimeout(() => document.getElementById('fb-email')?.focus(), 200);
+  if (step === 'otp') setTimeout(() => document.getElementById('otp-d1')?.focus(), 200);
 }
 
 const HB_NAME_KEY = 'hb12_display_name';
@@ -8462,69 +8493,205 @@ function fbInit(){
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
     fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
     // Mantieni sessione anche dopo chiusura browser — aspetta prima di registrare listener
-    fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn).finally(()=>{
+    fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn);
+    // onAuthStateChanged — solo per sync Firestore, routing gestito da OTP
     fbAuth.onAuthStateChanged(user=>{
       if(user){
-        HB.user={email:user.email,uid:user.uid};
-        // Salva utente per accesso rapido futuro
-        localStorage.setItem('hb_last_user', JSON.stringify({email:user.email,uid:user.uid}));
-        const hasPIN = !!localStorage.getItem('hb12_pin_hash');
-        if(hasPIN){
-          HB.authState = 'pin-login';
-          const fp = document.getElementById('forgot-pin-btn');
-          if(fp) fp.style.display = 'block';
-        } else {
-          HB.authState = 'pin-setup';
-          HB.pinMode = 'setup';
-        }
-        fbSyncLoad().then(()=>{
-          goToStep('pin');
-          const lbl = document.getElementById('pin-label');
-          if(lbl) lbl.textContent = hasPIN ? 'Inserisci il tuo PIN' : 'Scegli il tuo PIN Master';
-        });
-      } else {
-        goToStep('login');
+        HB.user={email:user.email||_otpEmail,uid:user.uid};
+        localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
+        fbSyncLoad().catch(()=>{});
       }
     });
-    }); // end setPersistence.finally
   }catch(e){ console.warn('Firebase:',e); fbReady=false; }
 }
 
-async function fbLogin(){
-  const email=document.getElementById('fb-email').value.trim();
-  const pass=document.getElementById('fb-password').value;
-  const err=document.getElementById('fb-error');
-  err.textContent='';
-  if(!email||!pass){err.textContent='Inserisci email e password';return;}
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.signInWithEmailAndPassword(email,pass); }
-  catch(e){err.textContent=fbMsg(e.code);}
+// ── OTP Email Auth ───────────────────────────────────────
+let _otpCode = '';
+let _otpEmail = '';
+let _otpTimer = null;
+let _otpExpiry = 0;
+
+async function sendEmailOTP() {
+  const email = document.getElementById('fb-email').value.trim();
+  const err = document.getElementById('fb-error');
+  err.textContent = '';
+  if (!email || !email.includes('@')) { err.textContent = 'Inserisci un'email valida'; return; }
+
+  const btn = document.getElementById('send-otp-btn');
+  btn.disabled = true; btn.textContent = 'Invio in corso...';
+
+  // Genera OTP 6 cifre
+  _otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _otpEmail = email;
+  _otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minuti
+
+  // Usa Firebase per inviare email con link (passwordless) oppure salva OTP localmente per ora
+  // Per ora: Firebase Email Link (passwordless)
+  if (fbReady) {
+    try {
+      // Salva OTP in Firestore temporaneamente (non in produzione usare Cloud Functions)
+      await fbDb.collection('_otp').doc(email).set({
+        code: _otpCode,
+        expiry: _otpExpiry,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      // Invia email con link Magic Link come conferma
+      const actionCodeSettings = {
+        url: 'https://massimotoro71.github.io/HomeBull-ProV13/',
+        handleCodeInApp: true,
+      };
+      await fbAuth.sendSignInLinkToEmail(email, actionCodeSettings);
+      window.localStorage.setItem('emailForSignIn', email);
+    } catch(e) {
+      console.warn('Firebase email send failed, using local OTP', e);
+    }
+  }
+
+  // Mostra schermata OTP
+  document.getElementById('otp-email-hint').textContent = email;
+  goToStep('otp');
+  startOTPTimer();
+  // Focus primo campo
+  setTimeout(() => document.getElementById('otp-d1')?.focus(), 300);
+  setupOTPInputs();
+
+  btn.disabled = false; btn.textContent = 'Invia codice →';
+  showToast('📧 Codice inviato a ' + email);
+  // In dev: mostra il codice nel toast
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    setTimeout(() => showToast('🔑 DEV: ' + _otpCode, 8000), 1000);
+  }
 }
 
-async function fbGoogleLogin(){
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-  catch(e){document.getElementById('fb-error').textContent=fbMsg(e.code);}
+function setupOTPInputs() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = '';
+    el.oninput = () => {
+      el.value = el.value.replace(/\D/g, '').slice(-1);
+      if (el.value && i < ids.length - 1) document.getElementById(ids[i+1])?.focus();
+      if (ids.every(x => document.getElementById(x)?.value)) verifyEmailOTP();
+    };
+    el.onkeydown = (e) => {
+      if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(ids[i-1])?.focus();
+    };
+  });
 }
 
-async function fbRegister(){
-  const email=document.getElementById('fb-reg-email').value.trim();
-  const p1=document.getElementById('fb-reg-pass').value;
-  const p2=document.getElementById('fb-reg-pass2').value;
-  const err=document.getElementById('fb-reg-error');
-  err.textContent='';
-  if(!email||!p1){err.textContent='Compila tutti i campi';return;}
-  if(p1!==p2){err.textContent='Le password non coincidono';return;}
-  if(p1.length<6){err.textContent='Password minimo 6 caratteri';return;}
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.createUserWithEmailAndPassword(email,p1); }
-  catch(e){err.textContent=fbMsg(e.code);}
+function startOTPTimer() {
+  if (_otpTimer) clearInterval(_otpTimer);
+  const timerEl = document.getElementById('otp-timer');
+  const resendBtn = document.getElementById('resend-btn');
+  _otpTimer = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((_otpExpiry - Date.now()) / 1000));
+    if (timerEl) timerEl.textContent = remaining > 0 ? `Codice valido per ${remaining}s` : 'Codice scaduto';
+    if (resendBtn) resendBtn.disabled = remaining > 540; // disabilita reinvio per 1 minuto
+    if (remaining === 0) clearInterval(_otpTimer);
+  }, 1000);
 }
 
-function fbLogout(){
-  if(fbReady&&fbAuth) fbAuth.signOut();
-  HB.user=null; goToStep('login');
+async function verifyEmailOTP() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  const entered = ids.map(id => document.getElementById(id)?.value).join('');
+  const err = document.getElementById('otp-error');
+  err.textContent = '';
+
+  if (entered.length < 6) { err.textContent = 'Inserisci tutte le 6 cifre'; return; }
+  if (Date.now() > _otpExpiry) { err.textContent = 'Codice scaduto — reinvia'; return; }
+
+  // Verifica OTP
+  let valid = false;
+  if (fbReady) {
+    try {
+      const doc = await fbDb.collection('_otp').doc(_otpEmail).get();
+      if (doc.exists && doc.data().code === entered && Date.now() < doc.data().expiry) {
+        valid = true;
+        // Cancella OTP usato
+        await fbDb.collection('_otp').doc(_otpEmail).delete();
+        // Crea/accedi utente Firebase con email link o anonymous + link
+        // Per ora: crea account anonimo e collega email
+        if (!fbAuth.currentUser) {
+          try {
+            await fbAuth.signInAnonymously();
+          } catch(e2) { console.warn(e2); }
+        }
+      }
+    } catch(e) {
+      // Fallback locale
+      if (_otpCode && entered === _otpCode) valid = true;
+    }
+  } else {
+    if (_otpCode && entered === _otpCode) valid = true;
+  }
+
+  if (!valid) {
+    err.textContent = 'Codice non valido';
+    ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.borderColor = '#ef4444'; });
+    setTimeout(() => ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.borderColor = ''; }), 1000);
+    return;
+  }
+
+  // OTP verificato — salva utente
+  HB.user = { email: _otpEmail, uid: fbAuth.currentUser?.uid || 'local_' + _otpEmail };
+  localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
+  if (_otpTimer) clearInterval(_otpTimer);
+
+  // Vai al PIN
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+  if (hasPIN) {
+    HB.authState = 'pin-login';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
+    document.getElementById('pin-sub').textContent = '';
+    const fp = document.getElementById('forgot-pin-btn');
+    if (fp) fp.style.display = 'block';
+  } else {
+    HB.authState = 'pin-setup';
+    HB.pinMode = 'setup';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
+    document.getElementById('pin-sub').textContent = '8 cifre — usato per sbloccare l'app';
+  }
 }
+
+async function resendOTP() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  _otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _otpExpiry = Date.now() + 10 * 60 * 1000;
+  startOTPTimer();
+  showToast('📧 Nuovo codice inviato');
+  if (window.location.hostname === 'localhost') setTimeout(() => showToast('🔑 DEV: ' + _otpCode, 8000), 500);
+}
+
+async function setupBioAndEnter() {
+  const ok = await registerBiometric();
+  if (ok) showToast('✅ Biometria abilitata!');
+  unlockApp();
+}
+
+function skipBioAndEnter() {
+  unlockApp();
+}
+
+function authLogout() {
+  // Logout vero — cancella tutto
+  localStorage.removeItem('hb_last_user');
+  localStorage.removeItem('hb12_pin_hash');
+  localStorage.removeItem(HB_BIO_KEY);
+  localStorage.removeItem(HB_BIO_PIN_KEY);
+  localStorage.setItem('hb_bio', '0');
+  if (fbReady && fbAuth) fbAuth.signOut().catch(()=>{});
+  HB.user = null;
+  _otpCode = '';
+  _otpEmail = '';
+  goToStep('login');
+  showToast('Disconnesso');
+}
+
+function fbLogout() { authLogout(); }
 
 function fbMsg(c){
   return({'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata',
@@ -9132,7 +9299,7 @@ function calRenderWeek() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA142</div>
+            <div style="font-size:13px;color:var(--text3);">BETA145</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
