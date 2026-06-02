@@ -3315,9 +3315,23 @@ if ('serviceWorker' in navigator) {
 
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('load', () => {
+  // Nascondi loading dopo 800ms
   setTimeout(() => {
     document.getElementById('loading-overlay').classList.add('hidden');
   }, 800);
+
+  // Timeout di sicurezza — se Firebase non risponde entro 4s vai al login
+  setTimeout(() => {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
+      overlay.classList.add('hidden');
+    }
+    const authScreen = document.getElementById('auth-screen');
+    const app = document.getElementById('app');
+    if (authScreen && authScreen.style.display === 'none' && app && !app.classList.contains('visible')) {
+      goToStep('login');
+    }
+  }, 4000);
 
   updateHomeDate();
   checkAuthStatus();
@@ -7550,7 +7564,7 @@ async function registerBiometric() {
   } catch(e) {
     console.warn('[Bio register]', e);
     if (e.name === 'NotAllowedError') {
-      showToast('⚠️ Registrazione annullata dall'utente');
+      showToast('⚠️ Registrazione annullata');
     } else if (e.name === 'InvalidStateError') {
       showToast('⚠️ Impronta già registrata su questo dispositivo');
       // Prova comunque a sbloccare
