@@ -7018,14 +7018,12 @@ let _backHandlerActive = false;
 function initBackHandler() {
   if (_backHandlerActive) return;
   _backHandlerActive = true;
-  // replaceState + doppio pushState = buffer di 2 voci
-  // → ci vogliono 2 back per uscire, noi le intercettiamo entrambe
+  // Riempi la history con molti stati così il back non esce mai dall'app
   history.replaceState({ hb: 'root' }, '');
-  history.pushState({ hb: 'app' }, '');
-  history.pushState({ hb: 'app' }, '');
+  for (let i = 0; i < 10; i++) history.pushState({ hb: 'app' }, '');
 
-  window.addEventListener('popstate', () => {
-    // Reinserisci subito per mantenere il buffer
+  window.addEventListener('popstate', (e) => {
+    // Reinserisci subito per mantenere il buffer infinito
     history.pushState({ hb: 'app' }, '');
 
     // Chiudi qualsiasi modal/overlay aperto
@@ -7059,15 +7057,11 @@ function initBackHandler() {
     if (HB.currentTab !== 'home') {
       switchTab('home'); return;
     }
-    // Home: doppio tap per uscire
-    backPressCount++;
-    if (backPressCount === 1) {
-      showToast('Premi ancora per uscire', 2000);
+    // Home: mostra toast ma NON uscire mai (PWA non deve chiudersi con back)
+    if (backPressCount === 0) {
+      backPressCount = 1;
+      showToast('Premi Home del dispositivo per uscire', 2000);
       backPressTimer = setTimeout(() => { backPressCount = 0; }, 2200);
-    } else {
-      clearTimeout(backPressTimer);
-      backPressCount = 0;
-      history.go(-4); // salta tutti i nostri stati e chiude
     }
   });
 }
