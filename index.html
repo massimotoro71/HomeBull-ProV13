@@ -2082,19 +2082,19 @@ function cardsSearch(q) {
         <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
       </div>
       <div class="pin-numpad" id="pin-numpad">
-        <button class="pin-key" onclick="pinPress('1')">1</button>
-        <button class="pin-key" onclick="pinPress('2')">2</button>
-        <button class="pin-key" onclick="pinPress('3')">3</button>
-        <button class="pin-key" onclick="pinPress('4')">4</button>
-        <button class="pin-key" onclick="pinPress('5')">5</button>
-        <button class="pin-key" onclick="pinPress('6')">6</button>
-        <button class="pin-key" onclick="pinPress('7')">7</button>
-        <button class="pin-key" onclick="pinPress('8')">8</button>
-        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
         <button class="pin-key bio-btn" id="pin-bio-btn" onclick="pinBioAuth()" style="display:none;">👆</button>
         <button class="pin-key ghost" id="pin-bio-ghost"></button>
-        <button class="pin-key" onclick="pinPress('0')">0</button>
-        <button class="pin-key" onclick="pinClear()">⌫</button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
       <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
@@ -3343,9 +3343,9 @@ function checkAuthStatus() {
       }
     }, 300);
   } else {
-    // New user → start from login
+    // New user → start from email
     HB.authState = 'email';
-    goToStep('login');
+    goToStep('email');
   }
 }
 
@@ -3396,7 +3396,7 @@ function updatePinDots() {
 
 async function pinConfirm() {
   if (HB.pinBuffer.length < 8) {
-    showPinError('Inserisci tutte e 8 le cifre');
+    showPinError('Minimo 6 cifre');
     return;
   }
 
