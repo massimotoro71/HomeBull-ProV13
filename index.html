@@ -2034,6 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA146</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8547,15 +8548,6 @@ async function sendEmailOTP() {
   setupOTPInputs();
   btn.disabled = false; btn.textContent = 'Invia codice →';
 }
-
-
-  // Mostra schermata OTP
-  document.getElementById('otp-email-hint').textContent = email;
-  goToStep('otp');
-  startOTPTimer();
-  // Focus primo campo
-  setTimeout(() => document.getElementById('otp-d1')?.focus(), 300);
-  setupOTPInputs();
 
 function setupOTPInputs() {
   const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
