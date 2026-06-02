@@ -3394,7 +3394,23 @@ window.addEventListener('load', () => {
 });
 
 function checkAuthStatus() {
-  // Firebase onAuthStateChanged gestisce il routing — qui mostriamo solo login
+  // Se c'è un utente salvato E un PIN, vai subito alla schermata PIN
+  // Firebase onAuthStateChanged confermerà o smentirà dopo
+  const savedUser = localStorage.getItem('hb_last_user');
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+  if (savedUser && hasPIN) {
+    try {
+      HB.user = JSON.parse(savedUser);
+      HB.authState = 'pin-login';
+      goToStep('pin');
+      const lbl = document.getElementById('pin-label');
+      if (lbl) lbl.textContent = 'Inserisci il tuo PIN';
+      const fp = document.getElementById('forgot-pin-btn');
+      if (fp) fp.style.display = 'block';
+      return;
+    } catch(e) {}
+  }
+  // Nessun utente salvato — mostra login
   goToStep('login');
 }
 
@@ -8445,11 +8461,13 @@ function fbInit(){
     }
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
     fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
-    // Mantieni sessione anche dopo chiusura browser
-    fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn);
+    // Mantieni sessione anche dopo chiusura browser — aspetta prima di registrare listener
+    fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn).finally(()=>{
     fbAuth.onAuthStateChanged(user=>{
       if(user){
         HB.user={email:user.email,uid:user.uid};
+        // Salva utente per accesso rapido futuro
+        localStorage.setItem('hb_last_user', JSON.stringify({email:user.email,uid:user.uid}));
         const hasPIN = !!localStorage.getItem('hb12_pin_hash');
         if(hasPIN){
           HB.authState = 'pin-login';
@@ -8468,6 +8486,7 @@ function fbInit(){
         goToStep('login');
       }
     });
+    }); // end setPersistence.finally
   }catch(e){ console.warn('Firebase:',e); fbReady=false; }
 }
 
