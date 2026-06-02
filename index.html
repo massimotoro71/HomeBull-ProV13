@@ -3670,7 +3670,7 @@ function switchTab(tab) {
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
     family:    () => typeof familyOpen === 'function' && familyOpen(),
-    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); if (window.innerWidth < 900) setTimeout(openMobileMenu, 120); }
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
 }
