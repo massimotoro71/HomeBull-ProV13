@@ -7514,43 +7514,59 @@ async function _bioDecrypt(key, b64) {
 
 async function registerBiometric() {
   if (!window.PublicKeyCredential) {
-    showToast('⚠️ Biometrico non supportato'); return;
+    showToast('⚠️ Biometrico non supportato'); return false;
   }
-  const currentPin = HB._lastPin || HB.pinBuffer || HB.pinFirst || '';
-  if (!currentPin) { showToast('Inserisci prima il PIN per registrare l\'impronta'); return; }
   try {
     const challenge = crypto.getRandomValues(new Uint8Array(32));
-    const userId    = crypto.getRandomValues(new Uint8Array(16));
+    const userId    = new TextEncoder().encode(HB.user?.uid || HB.user?.email || 'homebull-user');
+    const hostname  = location.hostname || 'localhost';
     const credential = await navigator.credentials.create({ publicKey: {
       challenge,
-      rp: { name:'HomeBull Pro', id: location.hostname },
-      user: { id:userId, name: HB.user?.email||'user', displayName:'HomeBull' },
+      rp: { name:'HomeBull Pro', id: hostname },
+      user: { id: userId.slice(0,64), name: HB.user?.email||'homebull-user', displayName:'HomeBull' },
       pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-      authenticatorSelection: { userVerification:'required', residentKey:'preferred' },
+      authenticatorSelection: {
+        authenticatorAttachment: 'platform',
+        userVerification: 'required',
+        residentKey: 'discouraged'
+      },
       timeout: 60000
     }});
-    if (!credential) return;
+    if (!credential) return false;
     // Salva credId
     const rawId = new Uint8Array(credential.rawId);
     let bin=''; rawId.forEach(b => bin+=String.fromCharCode(b));
     localStorage.setItem(HB_BIO_KEY, btoa(bin));
-    // Cifra il PIN con chiave derivata dal rawId (stessa ogni volta → recuperabile)
-    const bioKey = await _deriveBioKey(rawId);
-    const encPin = await _bioEncrypt(bioKey, currentPin);
-    localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+    // Salva PIN cifrato se disponibile
+    const currentPin = HB._lastPin || '';
+    if (currentPin) {
+      const bioKey = await _deriveBioKey(rawId);
+      const encPin = await _bioEncrypt(bioKey, currentPin);
+      localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+    }
     showToast('✅ Impronta registrata! Al prossimo avvio premi 👆 per entrare.');
     checkBiometricAvailable();
+    return true;
   } catch(e) {
     console.warn('[Bio register]', e);
-    showToast('⚠️ Registrazione annullata o non riuscita');
+    if (e.name === 'NotAllowedError') {
+      showToast('⚠️ Registrazione annullata dall'utente');
+    } else if (e.name === 'InvalidStateError') {
+      showToast('⚠️ Impronta già registrata su questo dispositivo');
+      // Prova comunque a sbloccare
+      checkBiometricAvailable();
+    } else if (e.name === 'NotSupportedError') {
+      showToast('⚠️ Questo dispositivo non supporta la biometria');
+    } else {
+      showToast('⚠️ Errore: ' + e.name + ' — ' + e.message);
+    }
   }
 }
 
 async function tryBiometric() {
   const credIdB64 = localStorage.getItem(HB_BIO_KEY);
-  const encPin    = localStorage.getItem(HB_BIO_PIN_KEY);
-  if (!credIdB64 || !encPin || !window.PublicKeyCredential) {
-    showToast('Biometrico non disponibile'); return;
+  if (!credIdB64 || !window.PublicKeyCredential) {
+    showToast('⚠️ Nessuna impronta registrata'); return;
   }
   try {
     const credIdBytes = new Uint8Array(atob(credIdB64).split('').map(c=>c.charCodeAt(0)));
@@ -7560,22 +7576,29 @@ async function tryBiometric() {
       userVerification: 'required', timeout: 60000
     }});
     if (!assertion) return;
-    // Recupera PIN usando chiave derivata dal rawId
-    const rawId  = new Uint8Array(assertion.rawId);
-    const bioKey = await _deriveBioKey(rawId);
-    const pin    = await _bioDecrypt(bioKey, encPin);
-    if (!pin) { showToast('Biometrico non riuscito — usa il PIN'); return; }
-    // Verifica PIN e sblocca
-    const ok = await verifyPIN(pin);
-    if (ok) {
-      showToast('🔑 Identità verificata');
-      unlockApp();
-    } else {
-      showToast('⚠️ Errore verifica — usa il PIN');
+    const encPin = localStorage.getItem(HB_BIO_PIN_KEY);
+    if (encPin) {
+      // Prova a decifrare il PIN e verificarlo
+      try {
+        const rawId  = new Uint8Array(assertion.rawId);
+        const bioKey = await _deriveBioKey(rawId);
+        const pin    = await _bioDecrypt(bioKey, encPin);
+        if (pin) {
+          const ok = await verifyPIN(pin);
+          if (ok) { showToast('👆 Accesso biometrico'); unlockApp(); return; }
+        }
+      } catch(e2) { console.warn('[Bio decrypt]', e2); }
     }
+    // Fallback: biometria verificata → sblocca direttamente
+    showToast('👆 Accesso biometrico');
+    unlockApp();
   } catch(e) {
     console.warn('[Bio auth]', e);
-    showToast('Biometrico non riuscito — usa il PIN');
+    if (e.name === 'NotAllowedError') {
+      showToast('Biometria annullata');
+    } else {
+      showToast('Biometrico non riuscito — usa il PIN');
+    }
   }
 }
 
