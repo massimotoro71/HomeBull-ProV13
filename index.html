@@ -3906,7 +3906,7 @@ function goToStep(step) {
   document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + step)?.classList.add('active');
   HB.pinBuffer = '';
-  updatePinDots();
+  if (typeof updatePinDots === 'function') updatePinDots();
   if (step === 'pin') {
     setTimeout(pinCheckBio, 100);
     document.getElementById('pin-error').textContent = '';
@@ -8515,7 +8515,7 @@ async function sendEmailOTP() {
   const email = document.getElementById('fb-email').value.trim();
   const err = document.getElementById('fb-error');
   err.textContent = '';
-  if (!email || !email.includes('@')) { err.textContent = 'Inserisci un'email valida'; return; }
+  if (!email || !email.includes('@')) { err.textContent = "Inserisci un'email valida"; return; }
 
   const btn = document.getElementById('send-otp-btn');
   btn.disabled = true; btn.textContent = 'Invio in corso...';
@@ -8652,7 +8652,7 @@ async function verifyEmailOTP() {
     HB.pinMode = 'setup';
     goToStep('pin');
     document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
-    document.getElementById('pin-sub').textContent = '8 cifre — usato per sbloccare l'app';
+    document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
   }
 }
 
