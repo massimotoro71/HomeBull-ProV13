@@ -5672,7 +5672,7 @@ function otpSearch(q) { otpRenderList(q); }
 // ── Updater: rinnova codici ogni secondo ─────────────────
 function otpStartUpdater() {
   if (_otpTimer) clearInterval(_otpTimer);
-  _otpTimer = setInterval(() => {
+  _otpCountdownTimer = setInterval(() => {
     if (HB.currentTab !== 'otp') { clearInterval(_otpTimer); return; }
     const now  = Math.floor(Date.now()/1000);
     const rem  = 30 - (now % 30);
@@ -8497,7 +8497,7 @@ function fbInit(){
     // onAuthStateChanged — solo per sync Firestore, routing gestito da OTP
     fbAuth.onAuthStateChanged(user=>{
       if(user){
-        HB.user={email:user.email||_otpEmail,uid:user.uid};
+        HB.user={email:user.email||_emailOtpAddr,uid:user.uid};
         localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
         fbSyncLoad().catch(()=>{});
       }
@@ -8506,10 +8506,10 @@ function fbInit(){
 }
 
 // ── OTP Email Auth ───────────────────────────────────────
-let _otpCode = '';
-let _otpEmail = '';
-let _otpTimer = null;
-let _otpExpiry = 0;
+let _emailOtpCode = '';
+let _emailOtpAddr = '';
+let _otpCountdownTimer = null;
+let _emailOtpExpiry = 0;
 
 async function sendEmailOTP() {
   const email = document.getElementById('fb-email').value.trim();
@@ -8521,9 +8521,9 @@ async function sendEmailOTP() {
   btn.disabled = true; btn.textContent = 'Invio in corso...';
 
   // Genera OTP 6 cifre
-  _otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  _otpEmail = email;
-  _otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minuti
+  _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _emailOtpAddr = email;
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minuti
 
   // Usa Firebase per inviare email con link (passwordless) oppure salva OTP localmente per ora
   // Per ora: Firebase Email Link (passwordless)
@@ -8541,7 +8541,7 @@ async function sendEmailOTP() {
         handleCodeInApp: true,
       };
       await fbAuth.sendSignInLinkToEmail(email, actionCodeSettings);
-      window.localStorage.setItem('emailForSignIn', email);
+      window.localStorage.setItem('emailForSignIn', _emailOtpAddr);
     } catch(e) {
       console.warn('Firebase email send failed, using local OTP', e);
     }
@@ -8581,14 +8581,14 @@ function setupOTPInputs() {
 }
 
 function startOTPTimer() {
-  if (_otpTimer) clearInterval(_otpTimer);
+  if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
   const timerEl = document.getElementById('otp-timer');
   const resendBtn = document.getElementById('resend-btn');
-  _otpTimer = setInterval(() => {
+  _otpCountdownTimer = setInterval(() => {
     const remaining = Math.max(0, Math.floor((_otpExpiry - Date.now()) / 1000));
     if (timerEl) timerEl.textContent = remaining > 0 ? `Codice valido per ${remaining}s` : 'Codice scaduto';
     if (resendBtn) resendBtn.disabled = remaining > 540; // disabilita reinvio per 1 minuto
-    if (remaining === 0) clearInterval(_otpTimer);
+    if (remaining === 0) clearInterval(_otpCountdownTimer);
   }, 1000);
 }
 
@@ -8599,17 +8599,17 @@ async function verifyEmailOTP() {
   err.textContent = '';
 
   if (entered.length < 6) { err.textContent = 'Inserisci tutte le 6 cifre'; return; }
-  if (Date.now() > _otpExpiry) { err.textContent = 'Codice scaduto — reinvia'; return; }
+  if (Date.now() > _emailOtpExpiry) { err.textContent = 'Codice scaduto — reinvia'; return; }
 
   // Verifica OTP
   let valid = false;
   if (fbReady) {
     try {
-      const doc = await fbDb.collection('_otp').doc(_otpEmail).get();
+      const doc = await fbDb.collection('_otp').doc(_emailOtpAddr).get();
       if (doc.exists && doc.data().code === entered && Date.now() < doc.data().expiry) {
         valid = true;
         // Cancella OTP usato
-        await fbDb.collection('_otp').doc(_otpEmail).delete();
+        await fbDb.collection('_otp').doc(_emailOtpAddr).delete();
         // Crea/accedi utente Firebase con email link o anonymous + link
         // Per ora: crea account anonimo e collega email
         if (!fbAuth.currentUser) {
@@ -8620,10 +8620,10 @@ async function verifyEmailOTP() {
       }
     } catch(e) {
       // Fallback locale
-      if (_otpCode && entered === _otpCode) valid = true;
+      if (_emailOtpCode && entered === _emailOtpCode) valid = true;
     }
   } else {
-    if (_otpCode && entered === _otpCode) valid = true;
+    if (_emailOtpCode && entered === _emailOtpCode) valid = true;
   }
 
   if (!valid) {
@@ -8634,7 +8634,7 @@ async function verifyEmailOTP() {
   }
 
   // OTP verificato — salva utente
-  HB.user = { email: _otpEmail, uid: fbAuth.currentUser?.uid || 'local_' + _otpEmail };
+  HB.user = { email: _emailOtpAddr, uid: fbAuth.currentUser?.uid || 'local_' + _otpEmail };
   localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
   if (_otpTimer) clearInterval(_otpTimer);
 
@@ -8659,8 +8659,8 @@ async function verifyEmailOTP() {
 async function resendOTP() {
   const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
   ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-  _otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  _otpExpiry = Date.now() + 10 * 60 * 1000;
+  _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
   startOTPTimer();
   showToast('📧 Nuovo codice inviato');
   if (window.location.hostname === 'localhost') setTimeout(() => showToast('🔑 DEV: ' + _otpCode, 8000), 500);
@@ -8685,8 +8685,8 @@ function authLogout() {
   localStorage.setItem('hb_bio', '0');
   if (fbReady && fbAuth) fbAuth.signOut().catch(()=>{});
   HB.user = null;
-  _otpCode = '';
-  _otpEmail = '';
+  _emailOtpCode = '';
+  _emailOtpAddr = '';
   goToStep('login');
   showToast('Disconnesso');
 }
