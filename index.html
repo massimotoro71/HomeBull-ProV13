@@ -3917,6 +3917,7 @@ function updateHomeStats() {
   `).join('');
 }
 
+let toastTimer;
 function showToast(msg, duration = 2800) {
   const t = document.getElementById('toast');
   t.textContent = msg;
