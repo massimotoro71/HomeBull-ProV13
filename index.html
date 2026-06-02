@@ -8389,6 +8389,8 @@ function fbInit(){
     }
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
     fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
+    // Mantieni sessione anche dopo chiusura browser
+    fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn);
     fbAuth.onAuthStateChanged(user=>{
       if(user){
         HB.user={email:user.email,uid:user.uid};
