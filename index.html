@@ -8528,7 +8528,7 @@ async function sendEmailOTP() {
 
   try {
     emailjs.init('OGguPT8ZipdDXinUX');
-    await emailjs.send('service_gpuw6q6', 'template_u0j1zj9', {
+    await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
       to_email: email,
       otp_code: _emailOtpCode,
       name: 'HomeBull'
@@ -8632,7 +8632,7 @@ async function resendOTP() {
   startOTPTimer();
   try {
     emailjs.init('OGguPT8ZipdDXinUX');
-    await emailjs.send('service_gpuw6q6', 'template_u0j1zj9', {
+    await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
       to_email: _emailOtpAddr,
       otp_code: _emailOtpCode,
       name: 'HomeBull'
