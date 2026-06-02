@@ -7013,11 +7013,27 @@ function initBackHandler() {
     // Reinserisci subito per mantenere il buffer
     history.pushState({ hb: 'app' }, '');
 
+    // Chiudi qualsiasi modal/overlay aperto
+    if (document.getElementById('settings-overlay')?.style.display === 'flex') {
+      closeSettings(); return;
+    }
+    if (document.getElementById('mob-overlay')?.style.display === 'block') {
+      closeMobileMenu(); return;
+    }
     if (document.getElementById('search-overlay')?.classList.contains('open')) {
       closeGlobalSearch(); return;
     }
     if (document.getElementById('more-drawer')?.classList.contains('open')) {
       closeMoreDrawer(); return;
+    }
+    if (document.getElementById('shop-detail-modal')?.style.display === 'flex') {
+      shopCloseDetail(); return;
+    }
+    if (document.getElementById('wifi-qr-modal')?.style.display === 'flex') {
+      wifiCloseQR(); return;
+    }
+    if (document.getElementById('qr-scanner-modal')?.style.display === 'flex') {
+      if(typeof stopQRScanner==='function') stopQRScanner(); return;
     }
     if (document.getElementById('qa-edit-modal')?.style.display === 'flex') {
       closeQaEdit(); return;
