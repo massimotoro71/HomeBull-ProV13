@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA147</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA148</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -3979,7 +3979,7 @@ function updateHomeStats() {
 
   if (pw)   pw.textContent   = _pwItems?.length  || 0;
   if (nt)   nt.textContent   = _notes?.length     || 0;
-  if (otp)  otp.textContent  = _otpList?.length   || 0;
+  const _otpListData = JSON.parse(localStorage.getItem('hb12_otp')||'[]'); if (otp) otp.textContent = _otpListData.length || 0;
   if (docs) docs.textContent = _docs2?.length     || 0;
 
   // ── Alert reali ──────────────────────────────────────
@@ -4001,8 +4001,9 @@ function updateHomeStats() {
   });
 
   // 2. OTP attivi
-  if ((_otpList||[]).length > 0) {
-    alerts.push({ icon:'🔑', color:'#10b981', text: (_otpList.length) + ' codici OTP / 2FA attivi', time: '' });
+  const _otpAlerts = JSON.parse(localStorage.getItem('hb12_otp')||'[]');
+  if (_otpAlerts.length > 0) {
+    alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '' });
   }
 
   // 3. Nessun dato
@@ -8601,10 +8602,26 @@ async function verifyEmailOTP() {
     return;
   }
 
-  // OTP verificato — salva utente
-  HB.user = { email: _emailOtpAddr, uid: fbAuth.currentUser?.uid || 'local_' + _emailOtpAddr };
+  // Login Firebase con email+password stabile (deterministico)
+  let _fbUid = null;
+  if (fbReady) {
+    const stablePass = 'HB_' + btoa(_emailOtpAddr).replace(/=/g,'') + '_v1';
+    try {
+      const cred = await fbAuth.signInWithEmailAndPassword(_emailOtpAddr, stablePass);
+      _fbUid = cred.user.uid;
+    } catch(e) {
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+        try {
+          const cred2 = await fbAuth.createUserWithEmailAndPassword(_emailOtpAddr, stablePass);
+          _fbUid = cred2.user.uid;
+        } catch(e2) { console.warn('Firebase create:', e2); }
+      } else { console.warn('Firebase login:', e); }
+    }
+  }
+  // OTP verificato — salva utente con UID Firebase stabile
+  HB.user = { email: _emailOtpAddr, uid: _fbUid || ('local_' + btoa(_emailOtpAddr).slice(0,12)) };
   localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
-  if (_otpTimer) clearInterval(_otpTimer);
+  if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
 
   // Vai al PIN
   const hasPIN = !!localStorage.getItem('hb12_pin_hash');
