@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#0a0a0f">
 <title>HomeBull Pro</title>
 <link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="apple-touch-icon" href="data:image/png;base64,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">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,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">
 <style>
@@ -8520,32 +8521,33 @@ async function sendEmailOTP() {
   const btn = document.getElementById('send-otp-btn');
   btn.disabled = true; btn.textContent = 'Invio in corso...';
 
-  // Genera OTP 6 cifre
   _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
   _emailOtpAddr = email;
-  _emailOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 minuti
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
 
-  // Usa Firebase per inviare email con link (passwordless) oppure salva OTP localmente per ora
-  // Per ora: Firebase Email Link (passwordless)
-  if (fbReady) {
-    try {
-      // Salva OTP in Firestore temporaneamente (non in produzione usare Cloud Functions)
-      await fbDb.collection('_otp').doc(email).set({
-        code: _otpCode,
-        expiry: _otpExpiry,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      // Invia email con link Magic Link come conferma
-      const actionCodeSettings = {
-        url: 'https://massimotoro71.github.io/HomeBull-ProV13/',
-        handleCodeInApp: true,
-      };
-      await fbAuth.sendSignInLinkToEmail(email, actionCodeSettings);
-      window.localStorage.setItem('emailForSignIn', _emailOtpAddr);
-    } catch(e) {
-      console.warn('Firebase email send failed, using local OTP', e);
-    }
+  try {
+    emailjs.init('OGguPT8ZipdDXinUX');
+    await emailjs.send('service_gpuw6q6', 'template_u0j1zj9', {
+      to_email: email,
+      otp_code: _emailOtpCode,
+      name: 'HomeBull'
+    });
+    showToast('📧 Codice inviato a ' + email);
+  } catch(e) {
+    console.warn('EmailJS error:', e);
+    err.textContent = 'Errore invio email — riprova';
+    btn.disabled = false; btn.textContent = 'Invia codice →';
+    return;
   }
+
+  document.getElementById('otp-email-hint').textContent = email;
+  goToStep('otp');
+  startOTPTimer();
+  setTimeout(() => document.getElementById('otp-d1')?.focus(), 300);
+  setupOTPInputs();
+  btn.disabled = false; btn.textContent = 'Invia codice →';
+}
+
 
   // Mostra schermata OTP
   document.getElementById('otp-email-hint').textContent = email;
@@ -8554,14 +8556,6 @@ async function sendEmailOTP() {
   // Focus primo campo
   setTimeout(() => document.getElementById('otp-d1')?.focus(), 300);
   setupOTPInputs();
-
-  btn.disabled = false; btn.textContent = 'Invia codice →';
-  showToast('📧 Codice inviato a ' + email);
-  // In dev: mostra il codice nel toast
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    setTimeout(() => showToast('🔑 DEV: ' + _otpCode, 8000), 1000);
-  }
-}
 
 function setupOTPInputs() {
   const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
@@ -8585,7 +8579,7 @@ function startOTPTimer() {
   const timerEl = document.getElementById('otp-timer');
   const resendBtn = document.getElementById('resend-btn');
   _otpCountdownTimer = setInterval(() => {
-    const remaining = Math.max(0, Math.floor((_otpExpiry - Date.now()) / 1000));
+    const remaining = Math.max(0, Math.floor((_emailOtpExpiry - Date.now()) / 1000));
     if (timerEl) timerEl.textContent = remaining > 0 ? `Codice valido per ${remaining}s` : 'Codice scaduto';
     if (resendBtn) resendBtn.disabled = remaining > 540; // disabilita reinvio per 1 minuto
     if (remaining === 0) clearInterval(_otpCountdownTimer);
@@ -8601,29 +8595,11 @@ async function verifyEmailOTP() {
   if (entered.length < 6) { err.textContent = 'Inserisci tutte le 6 cifre'; return; }
   if (Date.now() > _emailOtpExpiry) { err.textContent = 'Codice scaduto — reinvia'; return; }
 
-  // Verifica OTP
-  let valid = false;
-  if (fbReady) {
-    try {
-      const doc = await fbDb.collection('_otp').doc(_emailOtpAddr).get();
-      if (doc.exists && doc.data().code === entered && Date.now() < doc.data().expiry) {
-        valid = true;
-        // Cancella OTP usato
-        await fbDb.collection('_otp').doc(_emailOtpAddr).delete();
-        // Crea/accedi utente Firebase con email link o anonymous + link
-        // Per ora: crea account anonimo e collega email
-        if (!fbAuth.currentUser) {
-          try {
-            await fbAuth.signInAnonymously();
-          } catch(e2) { console.warn(e2); }
-        }
-      }
-    } catch(e) {
-      // Fallback locale
-      if (_emailOtpCode && entered === _emailOtpCode) valid = true;
-    }
-  } else {
-    if (_emailOtpCode && entered === _emailOtpCode) valid = true;
+  // Verifica OTP localmente
+  const valid = (_emailOtpCode && entered === _emailOtpCode);
+  // Login Firebase anonimo per avere UID
+  if (valid && fbReady && !fbAuth.currentUser) {
+    try { await fbAuth.signInAnonymously(); } catch(e) { console.warn(e); }
   }
 
   if (!valid) {
@@ -8634,7 +8610,7 @@ async function verifyEmailOTP() {
   }
 
   // OTP verificato — salva utente
-  HB.user = { email: _emailOtpAddr, uid: fbAuth.currentUser?.uid || 'local_' + _otpEmail };
+  HB.user = { email: _emailOtpAddr, uid: fbAuth.currentUser?.uid || 'local_' + _emailOtpAddr };
   localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
   if (_otpTimer) clearInterval(_otpTimer);
 
@@ -8662,9 +8638,19 @@ async function resendOTP() {
   _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
   _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
   startOTPTimer();
-  showToast('📧 Nuovo codice inviato');
-  if (window.location.hostname === 'localhost') setTimeout(() => showToast('🔑 DEV: ' + _otpCode, 8000), 500);
+  try {
+    emailjs.init('OGguPT8ZipdDXinUX');
+    await emailjs.send('service_gpuw6q6', 'template_u0j1zj9', {
+      to_email: _emailOtpAddr,
+      otp_code: _emailOtpCode,
+      name: 'HomeBull'
+    });
+    showToast('📧 Nuovo codice inviato');
+  } catch(e) {
+    showToast('Errore reinvio — riprova');
+  }
 }
+
 
 async function setupBioAndEnter() {
   const ok = await registerBiometric();
