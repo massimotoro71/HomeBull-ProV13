@@ -3324,29 +3324,8 @@ window.addEventListener('load', () => {
 });
 
 function checkAuthStatus() {
-  const user = loadUser();
-  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
-
-  if (user && hasPIN) {
-    // Returning user → go to PIN login
-    HB.user = user;
-    HB.authState = 'pin-login';
-    goToStep('pin');
-    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
-    const fp = document.getElementById('forgot-pin-btn');
-    if (fp) fp.style.display = 'block';
-    setTimeout(() => {
-      checkBiometricAvailable();
-      // Mobile: avvia biometrico automaticamente se già registrato
-      if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
-        setTimeout(tryBiometric, 700);
-      }
-    }, 300);
-  } else {
-    // New user → start from email
-    HB.authState = 'email';
-    goToStep('email');
-  }
+  // Firebase onAuthStateChanged gestisce il routing — qui mostriamo solo login
+  goToStep('login');
 }
 
 // ── Auth: Email OTP ────────────────────────────────────────
@@ -3386,6 +3365,8 @@ function pinClear() {
   HB.pinBuffer = HB.pinBuffer.slice(0, -1);
   updatePinDots();
 }
+
+function pinDelete() { pinClear(); }
 
 function updatePinDots() {
   for (let i = 0; i < 8; i++) {
@@ -8319,12 +8300,12 @@ document.addEventListener('click', function(e){
 //  console.firebase.google.com
 // ════════════════════════════════════════════════════════════
 const FB_CFG = {
-  apiKey:            "INSERISCI_API_KEY",
-  authDomain:        "INSERISCI_PROJECT.firebaseapp.com",
-  projectId:         "INSERISCI_PROJECT_ID",
-  storageBucket:     "INSERISCI_PROJECT.appspot.com",
-  messagingSenderId: "INSERISCI_SENDER_ID",
-  appId:             "INSERISCI_APP_ID"
+  apiKey:            "AIzaSyBr6t6gKmanpthFfyUBqfSOMVICc8Efyjs",
+  authDomain:        "homebull-f57fc.firebaseapp.com",
+  projectId:         "homebull-f57fc",
+  storageBucket:     "homebull-f57fc.firebasestorage.app",
+  messagingSenderId: "140879408214",
+  appId:             "1:140879408214:web:5aee6065b9895fbe471ff7"
 };
 
 let fbAuth=null, fbDb=null, fbReady=false;
@@ -8338,8 +8319,25 @@ function fbInit(){
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
     fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
     fbAuth.onAuthStateChanged(user=>{
-      if(user){ HB.user={email:user.email,uid:user.uid}; fbSyncLoad().then(()=>goToStep('pin')); }
-      else{ goToStep('login'); }
+      if(user){
+        HB.user={email:user.email,uid:user.uid};
+        const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+        if(hasPIN){
+          HB.authState = 'pin-login';
+          const fp = document.getElementById('forgot-pin-btn');
+          if(fp) fp.style.display = 'block';
+        } else {
+          HB.authState = 'pin-setup';
+          HB.pinMode = 'setup';
+        }
+        fbSyncLoad().then(()=>{
+          goToStep('pin');
+          const lbl = document.getElementById('pin-label');
+          if(lbl) lbl.textContent = hasPIN ? 'Inserisci il tuo PIN' : 'Scegli il tuo PIN Master';
+        });
+      } else {
+        goToStep('login');
+      }
     });
   }catch(e){ console.warn('Firebase:',e); fbReady=false; }
 }
