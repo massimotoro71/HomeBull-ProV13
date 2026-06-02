@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA146</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA147</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2100,7 +2100,7 @@ function cardsSearch(q) {
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
-      <button onclick="authLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
+      <button onclick="lockApp()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">🔒 Blocca</button>
     </div>
 
     <!-- STEP 4: BIOMETRIA OPZIONALE (solo primo accesso) -->
@@ -8407,7 +8407,7 @@ async function settingsToggleBio(){
 }
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
-function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();if(typeof logout==='function')logout();};}
+function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
 function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
 function settingsApplyOnLoad() {
@@ -8654,8 +8654,26 @@ function skipBioAndEnter() {
   unlockApp();
 }
 
-function authLogout() {
-  // Logout vero — cancella tutto
+// Blocca app senza logout — mostra solo PIN
+function lockApp() {
+  HB.authState = 'pin-login';
+  HB.pinBuffer = '';
+  if (typeof updatePinDots === 'function') updatePinDots();
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+  goToStep('pin');
+  const lbl = document.getElementById('pin-label');
+  if (lbl) lbl.textContent = 'Inserisci il tuo PIN';
+  const sub = document.getElementById('pin-sub');
+  if (sub) sub.textContent = '';
+  const fp = document.getElementById('forgot-pin-btn');
+  if (fp) fp.style.display = 'block';
+}
+
+// Logout completo — cancella tutto e richiede email+OTP
+async function authLogout() {
+  // Prima sincronizza i dati sul cloud
+  try { await fbSyncAll(); } catch(e) {}
   localStorage.removeItem('hb_last_user');
   localStorage.removeItem('hb12_pin_hash');
   localStorage.removeItem(HB_BIO_KEY);
@@ -8665,11 +8683,13 @@ function authLogout() {
   HB.user = null;
   _emailOtpCode = '';
   _emailOtpAddr = '';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
   goToStep('login');
   showToast('Disconnesso');
 }
 
-function fbLogout() { authLogout(); }
+function fbLogout() { lockApp(); }
 
 function fbMsg(c){
   return({'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata',
@@ -8680,25 +8700,61 @@ function fbMsg(c){
 }
 
 async function fbSyncLoad(){
-  if(!fbReady||!HB.user)return;
+  if(!fbReady||!HB.user||!fbDb)return;
   try{
-    const snap=await fbDb.collection('users').doc(HB.user.uid).collection('vault').get();
-    snap.forEach(doc=>{if(doc.data().v)localStorage.setItem(doc.id,doc.data().v);});
-    console.log('✓ Dati caricati dal cloud');
+    const uid=HB.user.uid;
+    const snap=await fbDb.collection('users').doc(uid).collection('vault').get();
+    if(!snap.empty){
+      snap.forEach(doc=>{
+        if(doc.data().v) {
+          // Usa patch di localStorage originale per non triggerare auto-sync
+          Object.getPrototypeOf(localStorage).setItem.call(localStorage, doc.id, doc.data().v);
+        }
+      });
+      console.log('✓ Dati caricati dal cloud:', snap.size, 'chiavi');
+    } else {
+      // Nessun dato sul cloud — carica dal locale e sincronizza
+      console.log('ℹ️ Cloud vuoto — upload dati locali');
+      await fbSyncAll(true);
+    }
   }catch(e){console.warn('SyncLoad:',e);}
 }
 
-async function fbSyncAll(){
-  if(!fbReady||!HB.user){showToast('Firebase non configurato');return;}
-  const keys=['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
-    'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists'];
-  for(const k of keys){
-    const v=localStorage.getItem(k);
-    if(v) try{await fbDb.collection('users').doc(HB.user.uid).collection('vault').doc(k)
-      .set({v,t:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){}
+const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
+  'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts'];
+
+async function fbSyncAll(silent=false){
+  if(!fbReady||!HB.user||!fbDb)return;
+  try{
+    const uid = HB.user.uid;
+    const batch = fbDb.batch();
+    HB_SYNC_KEYS.forEach(k=>{
+      const v=localStorage.getItem(k);
+      if(v){
+        const ref=fbDb.collection('users').doc(uid).collection('vault').doc(k);
+        batch.set(ref,{v,t:firebase.firestore.FieldValue.serverTimestamp()});
+      }
+    });
+    await batch.commit();
+    if(!silent) showToast('☁️ Dati sincronizzati');
+    console.log('✓ Sync completato');
+  }catch(e){
+    console.warn('SyncAll:',e);
+    if(!silent) showToast('⚠️ Sync fallito');
   }
-  showToast('☁️ Sync cloud completato');
 }
+
+// Auto-sync: intercetta localStorage.setItem per chiavi dati
+(function patchLocalStorage(){
+  const origSet = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    origSet(key, value);
+    if (HB_SYNC_KEYS.includes(key) && fbReady && HB.user) {
+      clearTimeout(window._syncDebounce);
+      window._syncDebounce = setTimeout(() => fbSyncAll(true), 2000);
+    }
+  };
+})();
 
 function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
@@ -9267,7 +9323,8 @@ function calRenderWeek() {
             </select>
           </div>
 
-          <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti / Reset PIN</button>
+          <button onclick="lockApp()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">🔒 Blocca app</button>
+            <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
         </div>
       </div>
 
