@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA141</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA142</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2243,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA141</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA142</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3296,7 +3296,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA141',
+  version: 'BETA142',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7071,18 +7071,23 @@ let backPressCount = 0;
 let backPressTimer = null;
 let _backHandlerActive = false;
 
-// Avvia subito il buffer history — non aspettare unlock
+// Avvia subito il buffer history E il listener — non aspettare unlock
 (function earlyBackHandler() {
   history.replaceState({ hb: 'root' }, '');
   for (let i = 0; i < 20; i++) history.pushState({ hb: 'app' }, '');
-})();
-
-function initBackHandler() {
-  if (_backHandlerActive) return;
-  _backHandlerActive = true;
 
   window.addEventListener('popstate', (e) => {
     history.pushState({ hb: 'app' }, '');
+    if (typeof handleBackPress === 'function') handleBackPress();
+  });
+})();
+
+function initBackHandler() {
+  // Il listener è già attivo — non fare nulla
+  _backHandlerActive = true;
+}
+
+function handleBackPress() {
 
     // Chiudi qualsiasi modal/overlay aperto
     if (document.getElementById('settings-overlay')?.style.display === 'flex') {
@@ -7121,7 +7126,6 @@ function initBackHandler() {
       showToast('Premi Home del dispositivo per uscire', 2000);
       backPressTimer = setTimeout(() => { backPressCount = 0; }, 2200);
     }
-  });
 }
 
 // ── Quick Access personalizzabile ─────────────────────────
@@ -9109,7 +9113,7 @@ function calRenderWeek() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA141</div>
+            <div style="font-size:13px;color:var(--text3);">BETA142</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
