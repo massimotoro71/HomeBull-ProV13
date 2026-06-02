@@ -3313,6 +3313,62 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(console.warn);
 }
 
+// ── PWA Install prompt ────────────────────────────────────
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  // Mostra card nelle impostazioni
+  const card = document.getElementById('install-settings-card');
+  if (card) card.style.display = 'block';
+  // Mostra il banner dopo 3 secondi
+  setTimeout(showInstallBanner, 3000);
+});
+
+function showInstallBanner() {
+  if (!_installPrompt) return;
+  // Non mostrare se già installata
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  // Non mostrare se già mostrata in questa sessione
+  if (sessionStorage.getItem('hb_install_shown')) return;
+  sessionStorage.setItem('hb_install_shown', '1');
+  
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:14px 20px; z-index:9999;
+    display:flex; align-items:center; gap:12px; max-width:320px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4); animation:slideUp .3s ease;
+  `;
+  banner.innerHTML = `
+    <span style="font-size:24px">📲</span>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:14px;color:var(--text1)">Installa HomeBull</div>
+      <div style="font-size:12px;color:var(--text3)">Accesso rapido dalla schermata home</div>
+    </div>
+    <button onclick="triggerInstall()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer">Installa</button>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px">✕</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+async function triggerInstall() {
+  if (!_installPrompt) return;
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+  _installPrompt.prompt();
+  const result = await _installPrompt.userChoice;
+  _installPrompt = null;
+  if (result.outcome === 'accepted') showToast('✅ HomeBull installato!');
+}
+
+window.addEventListener('appinstalled', () => {
+  _installPrompt = null;
+  showToast('✅ HomeBull installato con successo!');
+});
+
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('load', () => {
   // Nascondi loading dopo 800ms
@@ -9019,6 +9075,14 @@ function calRenderWeek() {
             </div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Face ID / Impronta digitale</div>
             <button id="bio-btn" onclick="settingsToggleBio()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Attiva biometria</button>
+          </div>
+
+          <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Aggiungi HomeBull alla schermata home</div>
+            <button onclick="triggerInstall()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Installa HomeBull</button>
           </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
