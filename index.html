@@ -8244,7 +8244,24 @@ function setFontSize(px){document.documentElement.style.fontSize=px+'px';localSt
 function settingsExport(){const keys=['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi','hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
 function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
-function settingsToggleBio(){const enabled=localStorage.getItem('hb_bio')==='1';localStorage.setItem('hb_bio',enabled?'0':'1');settingsCheckBio();showToast(enabled?'Biometria disattivata':'👆 Biometria attivata');}
+async function settingsToggleBio(){
+  const enabled=localStorage.getItem('hb_bio')==='1';
+  if(!enabled){
+    // Attivazione → registra impronta
+    const ok = await registerBiometric();
+    if(ok){
+      localStorage.setItem('hb_bio','1');
+      settingsCheckBio();
+    }
+  } else {
+    // Disattivazione → rimuovi credenziale
+    localStorage.setItem('hb_bio','0');
+    localStorage.removeItem(HB_BIO_KEY);
+    localStorage.removeItem(HB_BIO_PIN_KEY);
+    settingsCheckBio();
+    showToast('Biometria disattivata');
+  }
+}
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();if(typeof logout==='function')logout();};}
@@ -8447,28 +8464,13 @@ async function pinCheckBio() {
 }
 
 async function pinBioAuth() {
-  try {
-    // Usa WebAuthn per verifica biometrica
-    const challenge = new Uint8Array(32);
-    crypto.getRandomValues(challenge);
-    const credential = await navigator.credentials.get({
-      publicKey: {
-        challenge,
-        timeout: 60000,
-        userVerification: 'required',
-        rpId: window.location.hostname || 'localhost',
-      }
-    });
-    if (credential) {
-      // Autenticazione biometrica riuscita
-      showToast('👆 Accesso biometrico');
-      unlockApp();
-    }
-  } catch(e) {
-    if (e.name !== 'NotAllowedError') {
-      showToast('Biometria non disponibile');
-    }
+  // Usa tryBiometric() che ha il credId salvato e decifra il PIN
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  if (!credId) {
+    showToast('⚠️ Nessuna impronta registrata — vai in Impostazioni per registrarla');
+    return;
   }
+  await tryBiometric();
 }
 
 // ════════════════════════════════════════════════════════════
