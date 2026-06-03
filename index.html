@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA163</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA164</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2567,7 +2567,7 @@ function cardsSearch(q) {
             <div id="cal-month-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;"></div>
             <button onclick="calNext()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">›</button>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
+          <div id="cal-days-header" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
             <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Lu</div>
             <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Ma</div>
             <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Me</div>
@@ -9204,7 +9204,14 @@ function cal6mDayClick(dateStr) {
 function calRenderWeek() {
   const grid = document.getElementById('cal-week-grid');
   const label = document.getElementById('cal-month-label');
-  if (!grid || !_calWeekStart) return;
+  // Init _calWeekStart if null
+  if (!_calWeekStart) {
+    const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
+    const dow = (ref.getDay() + 6) % 7;
+    _calWeekStart = new Date(ref);
+    _calWeekStart.setDate(ref.getDate() - dow);
+  }
+  if (!grid) return;
 
   const today = new Date();
   const days = [];
