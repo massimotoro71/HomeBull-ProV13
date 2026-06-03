@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA173</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA174</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2564,15 +2564,7 @@ function cardsSearch(q) {
 
         <!-- Griglia mese (sfondo bianco) -->
         <div id="cal-grid-month" style="background:#fff;margin:0 14px;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
-          <div id="cal-days-header" style="display:grid!important;grid-template-columns:repeat(7,1fr)!important;background:#f3f4f6;border-bottom:1px solid #e5e7eb;">
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Lu</div>
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Ma</div>
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Me</div>
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Gi</div>
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Ve</div>
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Sa</div>
-            <div style="text-align:center;font-size:11px;font-weight:800;color:#ef4444;padding:8px 2px;">Do</div>
-          </div>
+          <div id="cal-days-header"></div>
           <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #e5e7eb;"></div>
         </div>
 
@@ -9117,11 +9109,9 @@ function calSetView(view) {
   const gm = document.getElementById('cal-grid-month');
   const gw = document.getElementById('cal-grid-week');
   const g6 = document.getElementById('cal-grid-6m');
-  const dh = document.getElementById('cal-days-header');
   if (gm) gm.style.display = view==='month' ? '' : 'none';
   if (gw) gw.style.display = view==='week' ? '' : 'none';
   if (g6) g6.style.display = view==='6m' ? '' : 'none';
-  if (dh) dh.style.display = view==='month' ? '' : 'none';
   if (view === 'week') {
     if (!_calWeekStart) {
       const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
@@ -9177,6 +9167,14 @@ function calRenderMonthNew() {
   const grid  = document.getElementById('cal-grid');
   if (!label || !grid) return;
   label.textContent = CAL_MONTHS[_calMonth] + ' ' + _calYear;
+
+  // Render header giorni
+  const dh = document.getElementById('cal-days-header');
+  if (dh) {
+    dh.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);background:#f3f4f6;border-bottom:1px solid #e5e7eb;';
+    const days = ['Lu','Ma','Me','Gi','Ve','Sa','Do'];
+    dh.innerHTML = days.map((d,i) => '<div style="text-align:center;font-size:11px;font-weight:800;color:'+(i===6?'#ef4444':'#6b7280')+';padding:8px 2px;">'+d+'</div>').join('');
+  }
 
   const firstDay = (new Date(_calYear, _calMonth, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(_calYear, _calMonth+1, 0).getDate();
