@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA167</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA169</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8025,11 +8025,17 @@ function cfGenBarcode(cf){
   setTimeout(()=>{
     try{
       const isMobile = window.innerWidth < 900;
+      const maxPx = isMobile ? 200 : 300;
       const barW = isMobile ? 1 : 2;
       const barH = isMobile ? 44 : 56;
       JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:barH,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:2});
       const svg=wrap.querySelector('svg');
-      if(svg){svg.style.width='100%';svg.style.maxWidth=isMobile?'220px':'300px';svg.style.height='auto';svg.style.display='block';svg.style.margin='0 auto';}
+      if(svg){
+        // Forza dimensioni sugli attributi SVG — CSS non basta
+        svg.setAttribute('width', maxPx);
+        svg.setAttribute('height', barH + 8);
+        svg.style.cssText = 'display:block;margin:0 auto;max-width:'+maxPx+'px;height:auto;';
+      }
       if(lbl)lbl.textContent=cf;
     }catch(e){console.warn(e);}
   },50);
@@ -8840,6 +8846,7 @@ async function fbSyncLoad(){
     await fbSyncAll(true);
     console.log('✓ Sync load completato');
   }catch(e){console.warn('SyncLoad:',e);}
+  finally { _syncInProgress = false; }
 }
 
 async function fbSyncAll(silent=false){
@@ -8864,15 +8871,16 @@ async function fbSyncAll(silent=false){
 }
 
 // Auto-sync: aggiorna timestamp locale e manda al cloud
+let _syncInProgress = false; // previene loop sync
 (function patchLocalStorage(){
   const origSet = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function(key, value) {
     origSet(key, value);
-    if(HB_SYNC_KEYS.includes(key)){
+    if(!_syncInProgress && HB_SYNC_KEYS.includes(key)){
       _setLocalTs(key, Date.now());
       if(fbReady && HB.user){
         clearTimeout(window._syncDebounce);
-        window._syncDebounce = setTimeout(() => fbSyncAll(true), 2000);
+        window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
       }
     }
   };
@@ -8892,7 +8900,7 @@ function fbStartRealtime(){
     });
     if(needLoad){
       console.log('🔄 Aggiornamento cloud rilevato');
-      fbSyncLoad();
+      setTimeout(fbSyncLoad, 1000); // delay per evitare loop
     }
   });
 }
