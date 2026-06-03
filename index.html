@@ -2034,7 +2034,11 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
+<<<<<<< HEAD
   <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA150</div>
+=======
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA149</div>
+>>>>>>> 43fa99004d2f6a279cfa21822d2cdcf7998655c2
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8611,10 +8615,13 @@ async function verifyEmailOTP() {
           const cred2 = await fbAuth.createUserWithEmailAndPassword(_emailOtpAddr, stablePass);
           _fbUid = cred2.user.uid;
         } catch(e2) { console.warn('Firebase create:', e2); }
+<<<<<<< HEAD
       } else if (e.code === 'auth/email-already-in-use') {
         // Email già registrata con altro provider — usa email come chiave diretta
         _fbUid = 'email_' + btoa(_emailOtpAddr).replace(/=/g,'').slice(0,20);
         console.log('Email già in uso con altro provider, uso chiave locale');
+=======
+>>>>>>> 43fa99004d2f6a279cfa21822d2cdcf7998655c2
       } else { console.warn('Firebase login:', e); }
     }
   }
