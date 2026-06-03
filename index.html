@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA151</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA152</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -3415,6 +3415,8 @@ function checkAuthStatus() {
   if (savedUser && hasPIN) {
     try {
       HB.user = JSON.parse(savedUser);
+      // Ripristina email per sync
+      _emailOtpAddr = HB.user.email || '';
       HB.authState = 'pin-login';
       goToStep('pin');
       const lbl = document.getElementById('pin-label');
@@ -3618,6 +3620,8 @@ function unlockApp() {
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
+  // Carica dati dal cloud ad ogni sblocco
+  setTimeout(() => fbSyncLoad().catch(()=>{}), 500);
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
   if (savedTheme) setTheme(savedTheme);
@@ -8719,7 +8723,9 @@ function fbMsg(c){
 
 async function fbSyncLoad(){
   if(!fbReady||!HB.user||!fbDb)return;
-  const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  const emailAddr = _emailOtpAddr || HB.user?.email || '';
+  if(!emailAddr){console.warn('SyncLoad: no email');return;}
+  const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
     const snap = await fbDb.ref('hb13/' + emailKey).get();
@@ -8746,7 +8752,9 @@ const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb1
 
 async function fbSyncAll(silent=false){
   if(!fbReady||!HB.user||!fbDb)return;
-  const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  const emailAddr = _emailOtpAddr || HB.user?.email || '';
+  if(!emailAddr){console.warn('SyncAll: no email');return;}
+  const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
     const data = { _ts: Date.now() };
