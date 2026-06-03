@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA154</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA155</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -3973,7 +3973,7 @@ function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
 
-  // ── Contatori reali ──────────────────────────────────
+  // ── Ricarica sempre da localStorage (importante dopo sync) ──
   try { pwLoad(); } catch(e) {}
   try { notesLoad(); } catch(e) {}
   try { otpLoad(); } catch(e) {}
@@ -3984,10 +3984,16 @@ function updateHomeStats() {
   const otp  = document.getElementById('stat-otp');
   const docs = document.getElementById('stat-docs');
 
-  if (pw)   pw.textContent   = _pwItems?.length  || 0;
-  if (nt)   nt.textContent   = _notes?.length     || 0;
-  const _otpListData = JSON.parse(localStorage.getItem('hb12_otp')||'[]'); if (otp) otp.textContent = _otpListData.length || 0;
-  if (docs) docs.textContent = _docs2?.length     || 0;
+  // Leggi sempre da localStorage per avere dati freschi
+  const pwCount  = JSON.parse(localStorage.getItem('hb12_passwords')||'[]').length;
+  const ntCount  = JSON.parse(localStorage.getItem('hb12_notes')||'[]').length;
+  const otpCount = JSON.parse(localStorage.getItem('hb12_otp')||'[]').length;
+  const docCount = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').length;
+
+  if (pw)   pw.textContent   = pwCount;
+  if (nt)   nt.textContent   = ntCount;
+  if (otp)  otp.textContent  = otpCount;
+  if (docs) docs.textContent = docCount;
 
   // ── Alert reali ──────────────────────────────────────
   const alertBox = document.getElementById('home-alerts');
@@ -4117,7 +4123,7 @@ function pwSave() {
   localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
-  if (badge) { badge.textContent = _pwItems.length; badge.classList.toggle('visible', _pwItems.length > 0); }
+  if (badge) { badge.style.display = 'none'; }  // Badge rimosso
   const sbCount = document.getElementById('sb-pass-count');
   if (sbCount) sbCount.textContent = _pwItems.length;
   const statEl = document.getElementById('stat-passwords');
@@ -8766,13 +8772,20 @@ async function fbSyncLoad(){
     });
     if(updated){
       showToast('☁️ Dati aggiornati dal cloud');
-      // Ricarica UI
+      // Ricarica tutto da localStorage
+      try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
+      try { if(typeof notesLoad==='function') notesLoad(); } catch(e){}
+      try { if(typeof otpLoad==='function') otpLoad(); } catch(e){}
+      try { if(typeof docsLoad2==='function') docsLoad2(); } catch(e){}
+      // Aggiorna UI
       if(typeof updateHomeStats==='function') updateHomeStats();
-      if(typeof pwLoad==='function') pwLoad();
-      if(HB.currentTab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
-      if(HB.currentTab === 'notes' && typeof renderNotes==='function') renderNotes();
-      if(HB.currentTab === 'shopping' && typeof shopRender==='function') shopRender();
-      if(typeof renderCurrentTab==='function') renderCurrentTab();
+      // Ricarica scheda corrente
+      const tab = HB.currentTab;
+      if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
+      else if(tab === 'notes' && typeof renderNotes==='function') renderNotes();
+      else if(tab === 'shopping' && typeof shopRender==='function') shopRender();
+      else if(tab === 'otp' && typeof otpRender==='function') otpRender();
+      else if(tab === 'cards' && typeof cardsRender==='function') cardsRender();
     }
     // Upload chiavi locali più recenti del cloud
     await fbSyncAll(true);
