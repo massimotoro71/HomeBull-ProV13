@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA148</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA149</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8590,10 +8590,6 @@ async function verifyEmailOTP() {
 
   // Verifica OTP localmente
   const valid = (_emailOtpCode && entered === _emailOtpCode);
-  // Login Firebase anonimo per avere UID
-  if (valid && fbReady && !fbAuth.currentUser) {
-    try { await fbAuth.signInAnonymously(); } catch(e) { console.warn(e); }
-  }
 
   if (!valid) {
     err.textContent = 'Codice non valido';
@@ -8718,19 +8714,21 @@ function fbMsg(c){
 
 async function fbSyncLoad(){
   if(!fbReady||!HB.user||!fbDb)return;
+  // Usa email come chiave (più stabile dell'UID)
+  const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
-    const uid=HB.user.uid;
-    const snap=await fbDb.collection('users').doc(uid).collection('vault').get();
-    if(!snap.empty){
-      snap.forEach(doc=>{
-        if(doc.data().v) {
-          // Usa patch di localStorage originale per non triggerare auto-sync
-          Object.getPrototypeOf(localStorage).setItem.call(localStorage, doc.id, doc.data().v);
+    const ref = fbDb.collection('hb_vault').doc(emailKey);
+    const snap = await ref.get();
+    if(snap.exists && snap.data()){
+      const data = snap.data();
+      Object.keys(data).forEach(k => {
+        if(k !== '_ts' && data[k]) {
+          Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, data[k]);
         }
       });
-      console.log('✓ Dati caricati dal cloud:', snap.size, 'chiavi');
+      console.log('✓ Dati caricati dal cloud');
     } else {
-      // Nessun dato sul cloud — carica dal locale e sincronizza
       console.log('ℹ️ Cloud vuoto — upload dati locali');
       await fbSyncAll(true);
     }
@@ -8742,22 +8740,20 @@ const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb1
 
 async function fbSyncAll(silent=false){
   if(!fbReady||!HB.user||!fbDb)return;
+  const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
-    const uid = HB.user.uid;
-    const batch = fbDb.batch();
+    const data = { _ts: Date.now() };
     HB_SYNC_KEYS.forEach(k=>{
       const v=localStorage.getItem(k);
-      if(v){
-        const ref=fbDb.collection('users').doc(uid).collection('vault').doc(k);
-        batch.set(ref,{v,t:firebase.firestore.FieldValue.serverTimestamp()});
-      }
+      if(v) data[k]=v;
     });
-    await batch.commit();
+    await fbDb.collection('hb_vault').doc(emailKey).set(data);
     if(!silent) showToast('☁️ Dati sincronizzati');
-    console.log('✓ Sync completato');
+    console.log('✓ Sync completato per', emailKey);
   }catch(e){
     console.warn('SyncAll:',e);
-    if(!silent) showToast('⚠️ Sync fallito');
+    if(!silent) showToast('⚠️ Sync fallito: ' + e.message);
   }
 }
 
