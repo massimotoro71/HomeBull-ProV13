@@ -2007,7 +2007,7 @@ function cardsSearch(q) {
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA150</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA151</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8482,7 +8482,8 @@ const FB_CFG = {
   projectId:         "homebull-f57fc",
   storageBucket:     "homebull-f57fc.firebasestorage.app",
   messagingSenderId: "140879408214",
-  appId:             "1:140879408214:web:5aee6065b9895fbe471ff7"
+  appId:             "1:140879408214:web:5aee6065b9895fbe471ff7",
+  databaseURL:       "https://homebull-f57fc-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 let fbAuth=null, fbDb=null, fbReady=false;
@@ -8494,8 +8495,8 @@ function fbInit(){
       fbReady=false; return;
     }
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
-    fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
-    // Mantieni sessione anche dopo chiusura browser — aspetta prima di registrare listener
+    fbAuth=firebase.auth(); fbDb=firebase.database(); fbReady=true;
+    // Mantieni sessione anche dopo chiusura browser
     fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn);
     // onAuthStateChanged — solo per sync Firestore, routing gestito da OTP
     fbAuth.onAuthStateChanged(user=>{
@@ -8718,20 +8719,21 @@ function fbMsg(c){
 
 async function fbSyncLoad(){
   if(!fbReady||!HB.user||!fbDb)return;
-  // Usa email come chiave (più stabile dell'UID)
   const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
-    const ref = fbDb.collection('hb_vault').doc(emailKey);
-    const snap = await ref.get();
-    if(snap.exists && snap.data()){
-      const data = snap.data();
-      Object.keys(data).forEach(k => {
-        if(k !== '_ts' && data[k]) {
-          Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, data[k]);
-        }
-      });
-      console.log('✓ Dati caricati dal cloud');
+    const snap = await fbDb.ref('hb13/' + emailKey).get();
+    if(snap.exists()){
+      const data = snap.val();
+      if(data){
+        Object.keys(data).forEach(k => {
+          if(k !== '_ts' && data[k]){
+            Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, data[k]);
+          }
+        });
+        console.log('✓ Dati caricati dal cloud:', Object.keys(data).length, 'chiavi');
+        showToast('☁️ Dati sincronizzati dal cloud');
+      }
     } else {
       console.log('ℹ️ Cloud vuoto — upload dati locali');
       await fbSyncAll(true);
@@ -8752,7 +8754,7 @@ async function fbSyncAll(silent=false){
       const v=localStorage.getItem(k);
       if(v) data[k]=v;
     });
-    await fbDb.collection('hb_vault').doc(emailKey).set(data);
+    await fbDb.ref('hb13/' + emailKey).set(data);
     if(!silent) showToast('☁️ Dati sincronizzati');
     console.log('✓ Sync completato per', emailKey);
   }catch(e){
