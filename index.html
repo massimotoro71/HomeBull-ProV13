@@ -860,9 +860,13 @@ html, body {
 
 /* ── Calendario ────────────────────────────────────────── */
 .cal-day {
-  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 0.85; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
-  position: relative; transition: all 0.15s;
+  position: relative; transition: all 0.15s; padding-top: 4px; overflow: hidden;
+}
+.cal-day .cal-shift-label {
+  font-size: 8px; font-weight: 800; opacity: 0.9; line-height: 1;
+  position: absolute; bottom: 3px; left: 0; right: 0; text-align: center;
 }
 .cal-day:active { transform: scale(0.9); }
 .cal-day.today { background: var(--accent); color: white; font-weight: 800; }
@@ -2034,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA158</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA159</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2553,6 +2557,9 @@ function cardsSearch(q) {
             <button id="cal-view-week" onclick="calSetView(&#39;week&#39;)" style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
               📆 Settimana
             </button>
+            <button id="cal-view-6m" onclick="calSetView(&#39;6m&#39;)" style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
+              🗓 6 Mesi
+            </button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <button onclick="calPrev()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
@@ -2570,12 +2577,22 @@ function cardsSearch(q) {
           </div>
           <!-- Griglia mese -->
           <div id="cal-grid-month">
-            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
+            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;"></div>
           </div>
           <!-- Griglia settimana -->
           <div id="cal-grid-week" style="display:none;">
             <div id="cal-week-grid"></div>
           </div>
+          <!-- Griglia 6 mesi -->
+          <div id="cal-grid-6m" style="display:none;">
+            <div id="cal-6m-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+          </div>
+        </div>
+
+        <!-- Riepilogo turni -->
+        <div id="cal-riepilogo" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:800;margin-bottom:8px;">📊 Riepilogo mese</div>
+          <div id="cal-riepilogo-content" style="font-size:12px;color:var(--text2);"></div>
         </div>
 
         <!-- Evento selezionato / form nuovo evento -->
@@ -5852,6 +5869,7 @@ function calOpen() {
   _calMonth = now.getMonth();
   calRenderMonth();
   calRenderEvents();
+  calRenderRiepilogo();
   document.getElementById('topbar-title').textContent = 'Calendario';
   document.getElementById('topbar-sub').textContent = _calEvents.length + ' eventi';
   document.getElementById('topbar-back').classList.remove('visible');
@@ -5920,9 +5938,26 @@ function calRenderMonth() {
     }
 
     const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-weight:700;';
+    num.style.cssText = 'position:relative;z-index:1;font-weight:700;font-size:12px;';
     num.textContent = d;
     el.appendChild(num);
+
+    // Mostra etichetta turno in fondo alla cella
+    if (dayShifts.length > 0) {
+      const t1 = _turniDef.find(t => t.id === dayShifts[0]);
+      const t2 = dayShifts.length > 1 ? _turniDef.find(t => t.id === dayShifts[1]) : null;
+      const lbl = document.createElement('div');
+      lbl.className = 'cal-shift-label';
+      lbl.style.cssText = 'position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;z-index:2;line-height:1;';
+      if (t2) {
+        lbl.innerHTML = `<span style="color:${t1.color}">${t1.label}</span><span style="color:var(--text3);">/</span><span style="color:${t2.color}">${t2.label}</span>`;
+      } else if (t1) {
+        lbl.style.color = t1.color;
+        lbl.textContent = t1.label;
+      }
+      el.appendChild(lbl);
+    }
+
     el.onclick = () => calSelectDate(dateStr);
     grid.appendChild(el);
   }
@@ -5932,19 +5967,20 @@ function calPrevMonth() {
   _calMonth--;
   if (_calMonth < 0) { _calMonth = 11; _calYear--; }
   _calSelectedDate = null;
-  calRenderMonth(); calRenderEvents();
+  calRenderMonth(); calRenderEvents(); calRenderRiepilogo();
 }
 function calNextMonth() {
   _calMonth++;
   if (_calMonth > 11) { _calMonth = 0; _calYear++; }
   _calSelectedDate = null;
-  calRenderMonth(); calRenderEvents();
+  calRenderMonth(); calRenderEvents(); calRenderRiepilogo();
 }
 
 function calSelectDate(dateStr) {
   _calSelectedDate = dateStr;
   calRenderMonth();
   calRenderEvents();
+  calRenderRiepilogo();
 }
 
 // ── Render eventi ────────────────────────────────────────
@@ -6046,6 +6082,7 @@ function calSaveEvent() {
   calCloseForm();
   calRenderMonth();
   calRenderEvents();
+  calRenderRiepilogo();
   showToast('✅ Evento salvato');
 }
 
@@ -9039,35 +9076,35 @@ function calSelectDate(dateStr) {
 // ════════════════════════════════════════════════════════════
 //  VISTA SETTIMANALE CALENDARIO
 // ════════════════════════════════════════════════════════════
-let _calView = 'month';  // 'month' | 'week'
+let _calView = 'month';  // 'month' | 'week' | '6m'
 let _calWeekStart = null; // Date del lunedì corrente
 
 function calSetView(view) {
   _calView = view;
-  // Update toggle buttons
-  const btnM = document.getElementById('cal-view-month');
-  const btnW = document.getElementById('cal-view-week');
-  const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
-  const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
-  if (btnM) btnM.style.cssText = btnM.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='month'?active:normal);
-  if (btnW) btnW.style.cssText = btnW.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='week'?active:normal);
-
-  // Show/hide grids
+  ['month','week','6m'].forEach(v => {
+    const btn = document.getElementById('cal-view-'+v);
+    const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
+    const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
+    if (btn) btn.style.cssText = btn.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (v===view?active:normal);
+  });
   const gm = document.getElementById('cal-grid-month');
   const gw = document.getElementById('cal-grid-week');
-  const daysRow = document.querySelector('#panel-calendar .cal-days-row');
+  const g6 = document.getElementById('cal-grid-6m');
   if (gm) gm.style.display = view==='month' ? '' : 'none';
   if (gw) gw.style.display = view==='week'  ? '' : 'none';
+  if (g6) g6.style.display = view==='6m'    ? '' : 'none';
 
   if (view==='week') {
-    // Inizia dalla settimana che contiene la data selezionata o oggi
     const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
-    const dow = (ref.getDay() + 6) % 7; // lunedì=0
+    const dow = (ref.getDay() + 6) % 7;
     _calWeekStart = new Date(ref);
     _calWeekStart.setDate(ref.getDate() - dow);
     calRenderWeek();
+  } else if (view==='6m') {
+    calRender6Months();
   } else {
     calRenderMonth();
+    calRenderRiepilogo();
   }
 }
 
@@ -9075,16 +9112,26 @@ function calPrev() {
   if (_calView === 'week') {
     _calWeekStart.setDate(_calWeekStart.getDate() - 7);
     calRenderWeek();
+  } else if (_calView === '6m') {
+    _calMonth -= 6;
+    if (_calMonth < 0) { _calMonth += 12; _calYear--; }
+    calRender6Months();
   } else {
     calPrevMonth();
+    calRenderRiepilogo();
   }
 }
 function calNext() {
   if (_calView === 'week') {
     _calWeekStart.setDate(_calWeekStart.getDate() + 7);
     calRenderWeek();
+  } else if (_calView === '6m') {
+    _calMonth += 6;
+    if (_calMonth > 11) { _calMonth -= 12; _calYear++; }
+    calRender6Months();
   } else {
     calNextMonth();
+    calRenderRiepilogo();
   }
 }
 
@@ -9464,4 +9511,107 @@ function calRenderWeek() {
 <button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
 
 
-</div></div></body></html>
+</div></div></body></html
+
+// ── Vista 6 Mesi ─────────────────────────────────────────
+function calRender6Months() {
+  const grid = document.getElementById('cal-6m-grid');
+  const label = document.getElementById('cal-month-label');
+  if (!grid) return;
+
+  const startYear = _calYear;
+  const startMonth = _calMonth;
+  const endDate = new Date(startYear, startMonth + 6, 1);
+  const endMonth = endDate.getMonth();
+  const endYear = endDate.getFullYear();
+
+  if (label) label.textContent = CAL_MONTHS[startMonth] + ' — ' + CAL_MONTHS[(startMonth+5)%12] + ' ' + (startMonth+5 > 11 ? startYear+1 : startYear);
+
+  let html = '';
+  for (let m = 0; m < 6; m++) {
+    let month = (startMonth + m) % 12;
+    let year  = startMonth + m > 11 ? startYear + 1 : startYear;
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+    const today = new Date();
+
+    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;">`;
+    html += `<div style="font-size:11px;font-weight:800;color:var(--accent);margin-bottom:6px;text-align:center;">${CAL_MONTHS[month]} ${year}</div>`;
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;">`;
+    ['L','M','M','G','V','S','D'].forEach((d,i) => {
+      html += `<div style="text-align:center;font-size:8px;font-weight:800;color:${i===6?'#ef4444':'var(--text3)'};">${d}</div>`;
+    });
+    html += `</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">`;
+
+    for (let pad = 0; pad < firstDay; pad++) html += '<div></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const shifts = (_calDayShifts && _calDayShifts[dateStr]) || [];
+      const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
+      const isWeekend = new Date(year,month,d).getDay() === 0 || new Date(year,month,d).getDay() === 6;
+      const shift0 = shifts[0] ? (_turniDef||[]).find(t=>t.id===shifts[0]) : null;
+      const bgColor = shift0 ? shift0.color : 'transparent';
+      const textColor = shift0 ? '#fff' : (isWeekend ? '#ef4444' : 'var(--text2)');
+
+      html += `<div onclick="calDayClick('${dateStr}')" style="text-align:center;font-size:9px;font-weight:${isToday?800:600};
+        border-radius:4px;padding:2px 0;cursor:pointer;
+        background:${isToday?'var(--accent)':bgColor};
+        color:${isToday?'#fff':textColor};
+        border:${isToday?'none':'1px solid transparent'};">
+        ${d}${shift0?'<br><span style="font-size:7px;opacity:0.9;">'+shift0.label+'</span>':''}
+      </div>`;
+    }
+    html += '</div></div>';
+  }
+  grid.innerHTML = html;
+}
+
+// ── Riepilogo ore mese ────────────────────────────────────
+function calRenderRiepilogo() {
+  const el = document.getElementById('cal-riepilogo-content');
+  const box = document.getElementById('cal-riepilogo');
+  if (!el || !_turniDef || _turniDef.length === 0) { if(box) box.style.display='none'; return; }
+
+  const year = _calYear, month = _calMonth;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const counts = {}; // turnoId → {giorni, minuti}
+  _turniDef.forEach(t => counts[t.id] = { label: t.label, color: t.color, giorni: 0, minuti: 0 });
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const shifts = (_calDayShifts && _calDayShifts[dateStr]) || [];
+    shifts.forEach(sid => {
+      if (!counts[sid]) return;
+      counts[sid].giorni++;
+      const t = _turniDef.find(x => x.id === sid);
+      if (t && t.start && t.end) {
+        const [sh,sm] = t.start.split(':').map(Number);
+        let [eh,em] = t.end.split(':').map(Number);
+        let mins = (eh*60+em) - (sh*60+sm);
+        if (mins < 0) mins += 24*60;
+        counts[sid].minuti += mins;
+      }
+    });
+  }
+
+  let html = '';
+  _turniDef.forEach(t => {
+    const c = counts[t.id];
+    if (!c || c.giorni === 0) return;
+    const ore = Math.floor(c.minuti/60);
+    const min = c.minuti % 60;
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div style="width:28px;height:20px;border-radius:6px;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">${t.label}</div>
+      <div style="flex:1;font-size:12px;color:var(--text2);">${c.giorni} giorni${c.minuti>0?' — '+ore+'h'+(min>0?' '+min+'m':''):''}</div>
+    </div>`;
+  });
+
+  if (html) {
+    el.innerHTML = html;
+    if (box) box.style.display = 'block';
+  } else {
+    if (box) box.style.display = 'none';
+  }
+}
+
+>
