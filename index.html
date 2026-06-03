@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA164</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA165</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2056,13 +2056,13 @@ function cardsSearch(q) {
         Controlla la tua email<br>
         <span id="otp-email-hint" style="color:var(--accent);font-weight:700;"></span>
       </div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
-        <input type="text" class="auth-input" id="otp-d1" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
-        <input type="text" class="auth-input" id="otp-d2" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
-        <input type="text" class="auth-input" id="otp-d3" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
-        <input type="text" class="auth-input" id="otp-d4" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
-        <input type="text" class="auth-input" id="otp-d5" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
-        <input type="text" class="auth-input" id="otp-d6" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;max-width:320px;margin-left:auto;margin-right:auto;">
+        <input type="text" class="auth-input" id="otp-d1" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input" id="otp-d2" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input" id="otp-d3" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input" id="otp-d4" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input" id="otp-d5" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input" id="otp-d6" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
       </div>
       <div id="otp-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
       <button class="auth-btn" onclick="verifyEmailOTP()">Verifica →</button>
@@ -8022,12 +8022,11 @@ function cfGenBarcode(cf){
   setTimeout(()=>{
     try{
       const isMobile = window.innerWidth < 900;
-      const availW = Math.min(isMobile ? 260 : 340, window.innerWidth*0.85) - 28;
-      const barW = Math.max(1, Math.min(2, Math.floor(availW/143)));
-      const barH = isMobile ? 48 : 60;
-      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:barH,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
+      const barW = isMobile ? 1 : 2;
+      const barH = isMobile ? 44 : 56;
+      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:barH,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:2});
       const svg=wrap.querySelector('svg');
-      if(svg){svg.style.width='100%';svg.style.maxWidth=isMobile?'240px':'320px';svg.style.height='auto';}
+      if(svg){svg.style.width='100%';svg.style.maxWidth=isMobile?'220px':'300px';svg.style.height='auto';svg.style.display='block';svg.style.margin='0 auto';}
       if(lbl)lbl.textContent=cf;
     }catch(e){console.warn(e);}
   },50);
