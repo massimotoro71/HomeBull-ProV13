@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA162</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA163</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8021,11 +8021,13 @@ function cfGenBarcode(cf){
   wrap.style.display='block';
   setTimeout(()=>{
     try{
-      const availW = Math.min(360, window.innerWidth*0.95) - 28;
-      const barW = Math.max(1, Math.floor(availW/143));
-      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:Math.min(barW*30,60),displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
+      const isMobile = window.innerWidth < 900;
+      const availW = Math.min(isMobile ? 260 : 340, window.innerWidth*0.85) - 28;
+      const barW = Math.max(1, Math.min(2, Math.floor(availW/143)));
+      const barH = isMobile ? 48 : 60;
+      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:barH,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
       const svg=wrap.querySelector('svg');
-      if(svg){svg.style.width='100%';svg.style.height='auto';}
+      if(svg){svg.style.width='100%';svg.style.maxWidth=isMobile?'240px':'320px';svg.style.height='auto';}
       if(lbl)lbl.textContent=cf;
     }catch(e){console.warn(e);}
   },50);
@@ -8772,7 +8774,7 @@ function fbMsg(c){
     'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
-const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
+const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_otp_accounts','hb12_cards','hb12_wifi',
   'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
   'hb12_pw_cats','hb12_shop_lists_v2'];
 
