@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#0a0a0f">
 <title>HomeBull Pro</title>
 <link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="apple-touch-icon" href="data:image/png;base64,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">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,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">
 <style>
@@ -2033,48 +2034,50 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA150</div>
   <div class="auth-card">
 
-    <!-- LOGIN -->
+    <!-- STEP 1: EMAIL -->
     <div class="auth-step active" id="step-login">
-      <div class="auth-label">Accedi al tuo account</div>
+      <div class="auth-label">Inserisci la tua email</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;text-align:center;">Riceverai un codice di verifica</div>
       <input type="email" class="auth-input" id="fb-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
       <div id="fb-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
-      <button class="auth-btn" onclick="fbLogin()">Accedi</button>
-      <div style="display:flex;align-items:center;gap:10px;margin:14px 0;">
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:12px;color:var(--text3);">oppure</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-      </div>
-      <button onclick="fbGoogleLogin()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;">
-        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Continua con Google
-      </button>
-      <div style="margin-top:16px;text-align:center;font-size:13px;color:var(--text3);">
-        Non hai un account? <span class="auth-link" onclick="goToStep('register')">Registrati</span>
-      </div>
+      <button class="auth-btn" id="send-otp-btn" onclick="sendEmailOTP()">Invia codice →</button>
       <div id="fb-config-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:10px;font-size:11px;color:#f97316;text-align:center;">
-        ⚠️ Firebase non configurato — modalità demo attiva
+        ⚠️ Firebase non configurato
       </div>
     </div>
 
-    <!-- REGISTRAZIONE -->
-    <div class="auth-step" id="step-register">
-      <div class="auth-label">Crea il tuo account</div>
-      <input type="email" class="auth-input" id="fb-reg-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
-      <input type="password" class="auth-input" id="fb-reg-pass" placeholder="Password (min. 6 caratteri)" autocomplete="new-password" style="margin-top:10px;">
-      <input type="password" class="auth-input" id="fb-reg-pass2" placeholder="Ripeti password" autocomplete="new-password" style="margin-top:10px;">
-      <div id="fb-reg-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
-      <button class="auth-btn" onclick="fbRegister()">Crea account</button>
-      <div style="margin-top:12px;text-align:center;font-size:13px;color:var(--text3);">
-        Hai già un account? <span class="auth-link" onclick="goToStep('login')">Accedi</span>
+    <!-- STEP 2: OTP CODE -->
+    <div class="auth-step" id="step-otp">
+      <div class="auth-label">Codice di verifica</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;text-align:center;">
+        Controlla la tua email<br>
+        <span id="otp-email-hint" style="color:var(--accent);font-weight:700;"></span>
       </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;">
+        <input type="text" class="auth-input" id="otp-d1" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d2" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d3" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d4" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d5" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+        <input type="text" class="auth-input" id="otp-d6" maxlength="1" inputmode="numeric" style="width:44px;text-align:center;font-size:22px;font-weight:700;padding:12px 0;">
+      </div>
+      <div id="otp-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
+      <button class="auth-btn" onclick="verifyEmailOTP()">Verifica →</button>
+      <div style="margin-top:12px;text-align:center;">
+        <button onclick="goToStep('login')" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia email</button>
+        <span style="color:var(--border);margin:0 8px;">|</span>
+        <button onclick="resendOTP()" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;font-family:inherit;" id="resend-btn">Reinvia codice</button>
+      </div>
+      <div id="otp-timer" style="text-align:center;font-size:11px;color:var(--text3);margin-top:6px;"></div>
     </div>
 
-    <!-- PIN MASTER -->
+    <!-- STEP 3: PIN MASTER -->
     <div class="auth-step" id="step-pin">
       <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center;" id="pin-sub">8 cifre — usato per sbloccare l'app</div>
       <div class="pin-row" id="pin-dots">
         <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
@@ -2097,7 +2100,20 @@ function cardsSearch(q) {
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
-      <button onclick="fbLogout()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia account</button>
+      <button onclick="lockApp()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">🔒 Blocca</button>
+    </div>
+
+    <!-- STEP 4: BIOMETRIA OPZIONALE (solo primo accesso) -->
+    <div class="auth-step" id="step-bio-setup">
+      <div style="font-size:48px;text-align:center;margin-bottom:16px;">👆</div>
+      <div class="auth-label">Abilita biometria?</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:24px;text-align:center;">
+        Accedi più velocemente con impronta digitale o Face ID
+      </div>
+      <button class="auth-btn" onclick="setupBioAndEnter()">Abilita impronta / Face ID</button>
+      <button onclick="skipBioAndEnter()" style="width:100%;padding:12px;margin-top:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">
+        Salta per ora
+      </button>
     </div>
 
   </div>
@@ -2120,7 +2136,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.0.0-beta</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA145</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2259,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.0.0-beta</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA145</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3296,7 +3312,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: '12.0.1-alpha',
+  version: 'BETA145',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3312,6 +3328,62 @@ const HB = {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(console.warn);
 }
+
+// ── PWA Install prompt ────────────────────────────────────
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  // Mostra card nelle impostazioni
+  const card = document.getElementById('install-settings-card');
+  if (card) card.style.display = 'block';
+  // Mostra il banner dopo 3 secondi
+  setTimeout(showInstallBanner, 3000);
+});
+
+function showInstallBanner() {
+  if (!_installPrompt) return;
+  // Non mostrare se già installata
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+  // Non mostrare se già mostrata in questa sessione
+  if (sessionStorage.getItem('hb_install_shown')) return;
+  sessionStorage.setItem('hb_install_shown', '1');
+  
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:14px 20px; z-index:9999;
+    display:flex; align-items:center; gap:12px; max-width:320px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.4); animation:slideUp .3s ease;
+  `;
+  banner.innerHTML = `
+    <span style="font-size:24px">📲</span>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:14px;color:var(--text1)">Installa HomeBull</div>
+      <div style="font-size:12px;color:var(--text3)">Accesso rapido dalla schermata home</div>
+    </div>
+    <button onclick="triggerInstall()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer">Installa</button>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px">✕</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+async function triggerInstall() {
+  if (!_installPrompt) return;
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+  _installPrompt.prompt();
+  const result = await _installPrompt.userChoice;
+  _installPrompt = null;
+  if (result.outcome === 'accepted') showToast('✅ HomeBull installato!');
+}
+
+window.addEventListener('appinstalled', () => {
+  _installPrompt = null;
+  showToast('✅ HomeBull installato con successo!');
+});
 
 // ── Init ───────────────────────────────────────────────────
 window.addEventListener('load', () => {
@@ -3338,7 +3410,29 @@ window.addEventListener('load', () => {
 });
 
 function checkAuthStatus() {
-  // Firebase onAuthStateChanged gestisce il routing — qui mostriamo solo login
+  const savedUser = localStorage.getItem('hb_last_user');
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+  if (savedUser && hasPIN) {
+    try {
+      HB.user = JSON.parse(savedUser);
+      HB.authState = 'pin-login';
+      goToStep('pin');
+      const lbl = document.getElementById('pin-label');
+      if (lbl) lbl.textContent = 'Inserisci il tuo PIN';
+      const sub = document.getElementById('pin-sub');
+      if (sub) sub.textContent = '';
+      const fp = document.getElementById('forgot-pin-btn');
+      if (fp) fp.style.display = 'block';
+      // Avvia biometria automatica su mobile
+      setTimeout(() => {
+        checkBiometricAvailable();
+        if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
+          setTimeout(tryBiometric, 600);
+        }
+      }, 300);
+      return;
+    } catch(e) {}
+  }
   goToStep('login');
 }
 
@@ -3419,7 +3513,12 @@ async function pinConfirm() {
       }
       HB._lastPin = HB.pinBuffer; // salva per registrazione biometrica
       await setupPIN(HB.pinBuffer);
-      unlockApp();
+      // Offri biometria se disponibile e non già configurata
+      if (window.PublicKeyCredential && !localStorage.getItem(HB_BIO_KEY)) {
+        goToStep('bio-setup');
+      } else {
+        unlockApp();
+      }
     }
   }
 
@@ -3614,7 +3713,7 @@ function switchTab(tab) {
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
     family:    () => typeof familyOpen === 'function' && familyOpen(),
-    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); if (window.innerWidth < 900) setTimeout(openMobileMenu, 120); }
+    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
 }
@@ -3808,8 +3907,14 @@ function handleDrawerClick(e) {
 function goToStep(step) {
   document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + step)?.classList.add('active');
-  if (step === 'pin') setTimeout(pinCheckBio, 100);
-  if (step === 'email') setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
+  HB.pinBuffer = '';
+  if (typeof updatePinDots === 'function') updatePinDots();
+  if (step === 'pin') {
+    setTimeout(pinCheckBio, 100);
+    document.getElementById('pin-error').textContent = '';
+  }
+  if (step === 'login') setTimeout(() => document.getElementById('fb-email')?.focus(), 200);
+  if (step === 'otp') setTimeout(() => document.getElementById('otp-d1')?.focus(), 200);
 }
 
 const HB_NAME_KEY = 'hb12_display_name';
@@ -3874,7 +3979,7 @@ function updateHomeStats() {
 
   if (pw)   pw.textContent   = _pwItems?.length  || 0;
   if (nt)   nt.textContent   = _notes?.length     || 0;
-  if (otp)  otp.textContent  = _otpList?.length   || 0;
+  const _otpListData = JSON.parse(localStorage.getItem('hb12_otp')||'[]'); if (otp) otp.textContent = _otpListData.length || 0;
   if (docs) docs.textContent = _docs2?.length     || 0;
 
   // ── Alert reali ──────────────────────────────────────
@@ -3896,8 +4001,9 @@ function updateHomeStats() {
   });
 
   // 2. OTP attivi
-  if ((_otpList||[]).length > 0) {
-    alerts.push({ icon:'🔑', color:'#10b981', text: (_otpList.length) + ' codici OTP / 2FA attivi', time: '' });
+  const _otpAlerts = JSON.parse(localStorage.getItem('hb12_otp')||'[]');
+  if (_otpAlerts.length > 0) {
+    alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '' });
   }
 
   // 3. Nessun dato
@@ -5569,7 +5675,7 @@ function otpSearch(q) { otpRenderList(q); }
 // ── Updater: rinnova codici ogni secondo ─────────────────
 function otpStartUpdater() {
   if (_otpTimer) clearInterval(_otpTimer);
-  _otpTimer = setInterval(() => {
+  _otpCountdownTimer = setInterval(() => {
     if (HB.currentTab !== 'otp') { clearInterval(_otpTimer); return; }
     const now  = Math.floor(Date.now()/1000);
     const rem  = 30 - (now % 30);
@@ -7015,16 +7121,23 @@ let backPressCount = 0;
 let backPressTimer = null;
 let _backHandlerActive = false;
 
-function initBackHandler() {
-  if (_backHandlerActive) return;
-  _backHandlerActive = true;
-  // Riempi la history con molti stati così il back non esce mai dall'app
+// Avvia subito il buffer history E il listener — non aspettare unlock
+(function earlyBackHandler() {
   history.replaceState({ hb: 'root' }, '');
-  for (let i = 0; i < 10; i++) history.pushState({ hb: 'app' }, '');
+  for (let i = 0; i < 20; i++) history.pushState({ hb: 'app' }, '');
 
   window.addEventListener('popstate', (e) => {
-    // Reinserisci subito per mantenere il buffer infinito
     history.pushState({ hb: 'app' }, '');
+    if (typeof handleBackPress === 'function') handleBackPress();
+  });
+})();
+
+function initBackHandler() {
+  // Il listener è già attivo — non fare nulla
+  _backHandlerActive = true;
+}
+
+function handleBackPress() {
 
     // Chiudi qualsiasi modal/overlay aperto
     if (document.getElementById('settings-overlay')?.style.display === 'flex') {
@@ -7063,7 +7176,6 @@ function initBackHandler() {
       showToast('Premi Home del dispositivo per uscire', 2000);
       backPressTimer = setTimeout(() => { backPressCount = 0; }, 2200);
     }
-  });
 }
 
 // ── Quick Access personalizzabile ─────────────────────────
@@ -8296,7 +8408,7 @@ async function settingsToggleBio(){
 }
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
-function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();if(typeof logout==='function')logout();};}
+function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
 function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
 function settingsApplyOnLoad() {
@@ -8383,67 +8495,218 @@ function fbInit(){
     }
     if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
     fbAuth=firebase.auth(); fbDb=firebase.firestore(); fbReady=true;
-    // Mantieni sessione anche dopo chiusura browser
+    // Mantieni sessione anche dopo chiusura browser — aspetta prima di registrare listener
     fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.warn);
+    // onAuthStateChanged — solo per sync Firestore, routing gestito da OTP
     fbAuth.onAuthStateChanged(user=>{
       if(user){
-        HB.user={email:user.email,uid:user.uid};
-        const hasPIN = !!localStorage.getItem('hb12_pin_hash');
-        if(hasPIN){
-          HB.authState = 'pin-login';
-          const fp = document.getElementById('forgot-pin-btn');
-          if(fp) fp.style.display = 'block';
-        } else {
-          HB.authState = 'pin-setup';
-          HB.pinMode = 'setup';
-        }
-        fbSyncLoad().then(()=>{
-          goToStep('pin');
-          const lbl = document.getElementById('pin-label');
-          if(lbl) lbl.textContent = hasPIN ? 'Inserisci il tuo PIN' : 'Scegli il tuo PIN Master';
-        });
-      } else {
-        goToStep('login');
+        HB.user={email:user.email||_emailOtpAddr,uid:user.uid};
+        localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
+        fbSyncLoad().catch(()=>{});
       }
     });
   }catch(e){ console.warn('Firebase:',e); fbReady=false; }
 }
 
-async function fbLogin(){
-  const email=document.getElementById('fb-email').value.trim();
-  const pass=document.getElementById('fb-password').value;
-  const err=document.getElementById('fb-error');
-  err.textContent='';
-  if(!email||!pass){err.textContent='Inserisci email e password';return;}
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.signInWithEmailAndPassword(email,pass); }
-  catch(e){err.textContent=fbMsg(e.code);}
+// ── OTP Email Auth ───────────────────────────────────────
+let _emailOtpCode = '';
+let _emailOtpAddr = '';
+let _otpCountdownTimer = null;
+let _emailOtpExpiry = 0;
+
+async function sendEmailOTP() {
+  const email = document.getElementById('fb-email').value.trim();
+  const err = document.getElementById('fb-error');
+  err.textContent = '';
+  if (!email || !email.includes('@')) { err.textContent = "Inserisci un'email valida"; return; }
+
+  const btn = document.getElementById('send-otp-btn');
+  btn.disabled = true; btn.textContent = 'Invio in corso...';
+
+  _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _emailOtpAddr = email;
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+
+  try {
+    emailjs.init('OGguPT8ZipdDXinUX');
+    await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
+      to_email: email,
+      otp_code: _emailOtpCode,
+      name: 'HomeBull'
+    });
+    showToast('📧 Codice inviato a ' + email);
+  } catch(e) {
+    console.warn('EmailJS error:', e);
+    err.textContent = 'Errore invio email — riprova';
+    btn.disabled = false; btn.textContent = 'Invia codice →';
+    return;
+  }
+
+  document.getElementById('otp-email-hint').textContent = email;
+  goToStep('otp');
+  startOTPTimer();
+  setTimeout(() => document.getElementById('otp-d1')?.focus(), 300);
+  setupOTPInputs();
+  btn.disabled = false; btn.textContent = 'Invia codice →';
 }
 
-async function fbGoogleLogin(){
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
-  catch(e){document.getElementById('fb-error').textContent=fbMsg(e.code);}
+function setupOTPInputs() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = '';
+    el.oninput = () => {
+      el.value = el.value.replace(/\D/g, '').slice(-1);
+      if (el.value && i < ids.length - 1) document.getElementById(ids[i+1])?.focus();
+      if (ids.every(x => document.getElementById(x)?.value)) verifyEmailOTP();
+    };
+    el.onkeydown = (e) => {
+      if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(ids[i-1])?.focus();
+    };
+  });
 }
 
-async function fbRegister(){
-  const email=document.getElementById('fb-reg-email').value.trim();
-  const p1=document.getElementById('fb-reg-pass').value;
-  const p2=document.getElementById('fb-reg-pass2').value;
-  const err=document.getElementById('fb-reg-error');
-  err.textContent='';
-  if(!email||!p1){err.textContent='Compila tutti i campi';return;}
-  if(p1!==p2){err.textContent='Le password non coincidono';return;}
-  if(p1.length<6){err.textContent='Password minimo 6 caratteri';return;}
-  if(!fbReady){unlockApp();return;}
-  try{ await fbAuth.createUserWithEmailAndPassword(email,p1); }
-  catch(e){err.textContent=fbMsg(e.code);}
+function startOTPTimer() {
+  if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
+  const timerEl = document.getElementById('otp-timer');
+  const resendBtn = document.getElementById('resend-btn');
+  _otpCountdownTimer = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((_emailOtpExpiry - Date.now()) / 1000));
+    if (timerEl) timerEl.textContent = remaining > 0 ? `Codice valido per ${remaining}s` : 'Codice scaduto';
+    if (resendBtn) resendBtn.disabled = remaining > 540; // disabilita reinvio per 1 minuto
+    if (remaining === 0) clearInterval(_otpCountdownTimer);
+  }, 1000);
 }
 
-function fbLogout(){
-  if(fbReady&&fbAuth) fbAuth.signOut();
-  HB.user=null; goToStep('login');
+async function verifyEmailOTP() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  const entered = ids.map(id => document.getElementById(id)?.value).join('');
+  const err = document.getElementById('otp-error');
+  err.textContent = '';
+
+  if (entered.length < 6) { err.textContent = 'Inserisci tutte le 6 cifre'; return; }
+  if (Date.now() > _emailOtpExpiry) { err.textContent = 'Codice scaduto — reinvia'; return; }
+
+  // Verifica OTP localmente
+  const valid = (_emailOtpCode && entered === _emailOtpCode);
+
+  if (!valid) {
+    err.textContent = 'Codice non valido';
+    ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.borderColor = '#ef4444'; });
+    setTimeout(() => ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.borderColor = ''; }), 1000);
+    return;
+  }
+
+  // Login Firebase con email+password stabile (deterministico)
+  let _fbUid = null;
+  if (fbReady) {
+    const stablePass = 'HB_' + btoa(_emailOtpAddr).replace(/=/g,'') + '_v1';
+    try {
+      const cred = await fbAuth.signInWithEmailAndPassword(_emailOtpAddr, stablePass);
+      _fbUid = cred.user.uid;
+    } catch(e) {
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+        try {
+          const cred2 = await fbAuth.createUserWithEmailAndPassword(_emailOtpAddr, stablePass);
+          _fbUid = cred2.user.uid;
+        } catch(e2) { console.warn('Firebase create:', e2); }
+      } else if (e.code === 'auth/email-already-in-use') {
+        // Email già registrata con altro provider — usa email come chiave diretta
+        _fbUid = 'email_' + btoa(_emailOtpAddr).replace(/=/g,'').slice(0,20);
+        console.log('Email già in uso con altro provider, uso chiave locale');
+      } else { console.warn('Firebase login:', e); }
+    }
+  }
+  // OTP verificato — salva utente con UID Firebase stabile
+  HB.user = { email: _emailOtpAddr, uid: _fbUid || ('local_' + btoa(_emailOtpAddr).slice(0,12)) };
+  localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
+  if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
+
+  // Vai al PIN
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+  if (hasPIN) {
+    HB.authState = 'pin-login';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
+    document.getElementById('pin-sub').textContent = '';
+    const fp = document.getElementById('forgot-pin-btn');
+    if (fp) fp.style.display = 'block';
+  } else {
+    HB.authState = 'pin-setup';
+    HB.pinMode = 'setup';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
+    document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
+  }
 }
+
+async function resendOTP() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+  startOTPTimer();
+  try {
+    emailjs.init('OGguPT8ZipdDXinUX');
+    await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
+      to_email: _emailOtpAddr,
+      otp_code: _emailOtpCode,
+      name: 'HomeBull'
+    });
+    showToast('📧 Nuovo codice inviato');
+  } catch(e) {
+    showToast('Errore reinvio — riprova');
+  }
+}
+
+
+async function setupBioAndEnter() {
+  const ok = await registerBiometric();
+  if (ok) showToast('✅ Biometria abilitata!');
+  unlockApp();
+}
+
+function skipBioAndEnter() {
+  unlockApp();
+}
+
+// Blocca app senza logout — mostra solo PIN
+function lockApp() {
+  HB.authState = 'pin-login';
+  HB.pinBuffer = '';
+  if (typeof updatePinDots === 'function') updatePinDots();
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+  goToStep('pin');
+  const lbl = document.getElementById('pin-label');
+  if (lbl) lbl.textContent = 'Inserisci il tuo PIN';
+  const sub = document.getElementById('pin-sub');
+  if (sub) sub.textContent = '';
+  const fp = document.getElementById('forgot-pin-btn');
+  if (fp) fp.style.display = 'block';
+}
+
+// Logout completo — cancella tutto e richiede email+OTP
+async function authLogout() {
+  // Prima sincronizza i dati sul cloud
+  try { await fbSyncAll(); } catch(e) {}
+  localStorage.removeItem('hb_last_user');
+  localStorage.removeItem('hb12_pin_hash');
+  localStorage.removeItem(HB_BIO_KEY);
+  localStorage.removeItem(HB_BIO_PIN_KEY);
+  localStorage.setItem('hb_bio', '0');
+  if (fbReady && fbAuth) fbAuth.signOut().catch(()=>{});
+  HB.user = null;
+  _emailOtpCode = '';
+  _emailOtpAddr = '';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+  goToStep('login');
+  showToast('Disconnesso');
+}
+
+function fbLogout() { lockApp(); }
 
 function fbMsg(c){
   return({'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata',
@@ -8454,25 +8717,61 @@ function fbMsg(c){
 }
 
 async function fbSyncLoad(){
-  if(!fbReady||!HB.user)return;
+  if(!fbReady||!HB.user||!fbDb)return;
+  // Usa email come chiave (più stabile dell'UID)
+  const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
-    const snap=await fbDb.collection('users').doc(HB.user.uid).collection('vault').get();
-    snap.forEach(doc=>{if(doc.data().v)localStorage.setItem(doc.id,doc.data().v);});
-    console.log('✓ Dati caricati dal cloud');
+    const ref = fbDb.collection('hb_vault').doc(emailKey);
+    const snap = await ref.get();
+    if(snap.exists && snap.data()){
+      const data = snap.data();
+      Object.keys(data).forEach(k => {
+        if(k !== '_ts' && data[k]) {
+          Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, data[k]);
+        }
+      });
+      console.log('✓ Dati caricati dal cloud');
+    } else {
+      console.log('ℹ️ Cloud vuoto — upload dati locali');
+      await fbSyncAll(true);
+    }
   }catch(e){console.warn('SyncLoad:',e);}
 }
 
-async function fbSyncAll(){
-  if(!fbReady||!HB.user){showToast('Firebase non configurato');return;}
-  const keys=['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
-    'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists'];
-  for(const k of keys){
-    const v=localStorage.getItem(k);
-    if(v) try{await fbDb.collection('users').doc(HB.user.uid).collection('vault').doc(k)
-      .set({v,t:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){}
+const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
+  'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts'];
+
+async function fbSyncAll(silent=false){
+  if(!fbReady||!HB.user||!fbDb)return;
+  const emailKey = btoa(_emailOtpAddr||HB.user.email||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  if(!emailKey){console.warn('SyncAll: no email key');return;}
+  try{
+    const data = { _ts: Date.now() };
+    HB_SYNC_KEYS.forEach(k=>{
+      const v=localStorage.getItem(k);
+      if(v) data[k]=v;
+    });
+    await fbDb.collection('hb_vault').doc(emailKey).set(data);
+    if(!silent) showToast('☁️ Dati sincronizzati');
+    console.log('✓ Sync completato per', emailKey);
+  }catch(e){
+    console.warn('SyncAll:',e);
+    if(!silent) showToast('⚠️ Sync fallito: ' + e.message);
   }
-  showToast('☁️ Sync cloud completato');
 }
+
+// Auto-sync: intercetta localStorage.setItem per chiavi dati
+(function patchLocalStorage(){
+  const origSet = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    origSet(key, value);
+    if (HB_SYNC_KEYS.includes(key) && fbReady && HB.user) {
+      clearTimeout(window._syncDebounce);
+      window._syncDebounce = setTimeout(() => fbSyncAll(true), 2000);
+    }
+  };
+})();
 
 function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
@@ -9021,6 +9320,14 @@ function calRenderWeek() {
             <button id="bio-btn" onclick="settingsToggleBio()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Attiva biometria</button>
           </div>
 
+          <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Aggiungi HomeBull alla schermata home</div>
+            <button onclick="triggerInstall()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Installa HomeBull</button>
+          </div>
+
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏱ Blocco automatico</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Blocca dopo inattività</div>
@@ -9033,7 +9340,8 @@ function calRenderWeek() {
             </select>
           </div>
 
-          <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti / Reset PIN</button>
+          <button onclick="lockApp()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">🔒 Blocca app</button>
+            <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
         </div>
       </div>
 
@@ -9043,7 +9351,7 @@ function calRenderWeek() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">v13.0.0-beta</div>
+            <div style="font-size:13px;color:var(--text3);">BETA145</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
