@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA156</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA157</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2191,7 +2191,7 @@ function cardsSearch(q) {
       <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
         <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="sidebar-item-label">Password</span>
-        <span class="sidebar-item-badge" id="sb-pass-count">0</span>
+
       </div>
 
       <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
@@ -4142,8 +4142,7 @@ function pwSave() {
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
-  const sbCount = document.getElementById('sb-pass-count');
-  if (sbCount) sbCount.textContent = _pwItems.length;
+
   const statEl = document.getElementById('stat-passwords');
   if (statEl) statEl.textContent = _pwItems.length || '—';
 }
