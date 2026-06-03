@@ -1577,7 +1577,7 @@ html, body {
 
 .mob-item{display:flex;align-items:center;gap:12px;padding:13px 20px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;}
 .mob-item:active{background:var(--surface);}
-#cf_barcode_wrap svg{width:100%!important;height:auto!important;}
+#cf_barcode_wrap{max-width:220px!important;margin:8px auto!important;} #cf_barcode_wrap svg{width:100%!important;max-width:220px!important;height:auto!important;display:block!important;}
 
 /* ══ MOBILE FIXES ════════════════════════════════════════ */
 @media (max-width: 899px) {
@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA166</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA167</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2475,7 +2475,7 @@ function cardsSearch(q) {
               <div class="pw-field-label" style="margin-bottom:5px;">Inserisci manualmente (comuni piccoli):</div>
               <input id="cf_manual" type="text" placeholder="RSSMRA80A01H501U" maxlength="16" oninput="this.value=this.value.toUpperCase();cfGenBarcode(this.value)" style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:monospace;letter-spacing:2px;">
             </div>
-            <div id="cf_barcode_wrap" style="display:none;background:white;border-radius:14px;padding:16px;text-align:center;margin-top:12px;">
+            <div id="cf_barcode_wrap" style="display:none;background:white;border-radius:14px;padding:8px;text-align:center;margin-top:12px;max-width:220px;margin-left:auto;margin-right:auto;">
               <svg id="cf_barcode"></svg>
               <div id="cf_barcode_label" style="font-size:13px;font-weight:700;letter-spacing:2px;color:#333;margin-top:8px;font-family:monospace;"></div>
             </div>
