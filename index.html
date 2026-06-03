@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA155</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA156</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -3409,7 +3409,24 @@ window.addEventListener('load', () => {
   checkAuthStatus();
 });
 
+// Pulizia dati v11 incompatibili al primo avvio v13
+function migrateFromV11() {
+  if (localStorage.getItem('hb_v13_migrated')) return;
+  // Verifica se ci sono password v11 (avevano campo 'site' invece di 'title')
+  try {
+    const pws = JSON.parse(localStorage.getItem('hb12_passwords') || '[]');
+    if (pws.length > 0 && pws[0].site && !pws[0].categoryId) {
+      // Sono dati v11 — rimuovi
+      localStorage.removeItem('hb12_passwords');
+      localStorage.removeItem('hb12_pw_cats');
+      console.log('ℹ️ Dati password v11 rimossi');
+    }
+  } catch(e) {}
+  localStorage.setItem('hb_v13_migrated', '1');
+}
+
 function checkAuthStatus() {
+  migrateFromV11();
   const savedUser = localStorage.getItem('hb_last_user');
   const hasPIN = !!localStorage.getItem('hb12_pin_hash');
   if (savedUser && hasPIN) {
@@ -3985,7 +4002,8 @@ function updateHomeStats() {
   const docs = document.getElementById('stat-docs');
 
   // Leggi sempre da localStorage per avere dati freschi
-  const pwCount  = JSON.parse(localStorage.getItem('hb12_passwords')||'[]').length;
+  try { pwLoad(); } catch(e) {}
+  const pwCount  = (_pwItems||[]).length;
   const ntCount  = JSON.parse(localStorage.getItem('hb12_notes')||'[]').length;
   const otpCount = JSON.parse(localStorage.getItem('hb12_otp')||'[]').length;
   const docCount = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').length;
@@ -8732,7 +8750,7 @@ function fbMsg(c){
 
 const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
   'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
-  'hb12_pw_cats'];
+  'hb12_pw_cats','hb12_shop_lists_v2'];
 
 // Salva timestamp locale per ogni chiave
 function _tsKey(k){ return 'hb_ts_' + k; }
@@ -8783,7 +8801,10 @@ async function fbSyncLoad(){
       const tab = HB.currentTab;
       if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
       else if(tab === 'notes' && typeof renderNotes==='function') renderNotes();
-      else if(tab === 'shopping' && typeof shopRender==='function') shopRender();
+      else if(tab === 'shopping' && typeof shopRenderAll==='function') { shopLoad(); shopRenderAll(); }
+      else if(tab === 'wifi' && typeof wifiRender==='function') wifiRender();
+      else if(tab === 'family' && typeof familyRender==='function') familyRender();
+      else if(tab === 'finance' && typeof financeRender==='function') financeRender();
       else if(tab === 'otp' && typeof otpRender==='function') otpRender();
       else if(tab === 'cards' && typeof cardsRender==='function') cardsRender();
     }
