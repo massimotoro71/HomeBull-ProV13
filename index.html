@@ -1577,7 +1577,7 @@ html, body {
 
 .mob-item{display:flex;align-items:center;gap:12px;padding:13px 20px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;}
 .mob-item:active{background:var(--surface);}
-#cf_barcode_wrap{max-width:220px!important;margin:8px auto!important;} #cf_barcode_wrap svg{width:100%!important;max-width:220px!important;height:auto!important;display:block!important;}
+#cf_barcode_wrap{max-width:260px!important;margin:8px auto!important;overflow:hidden!important;} #cf_barcode_wrap svg{width:100%!important;max-width:260px!important;height:auto!important;display:block!important;margin:0 auto!important;}
 
 /* ══ MOBILE FIXES ════════════════════════════════════════ */
 @media (max-width: 899px) {
@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA171</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA173</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2564,7 +2564,7 @@ function cardsSearch(q) {
 
         <!-- Griglia mese (sfondo bianco) -->
         <div id="cal-grid-month" style="background:#fff;margin:0 14px;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
-          <div id="cal-days-header" style="display:grid;grid-template-columns:repeat(7,1fr);background:#f3f4f6;border-bottom:1px solid #e5e7eb;">
+          <div id="cal-days-header" style="display:grid!important;grid-template-columns:repeat(7,1fr)!important;background:#f3f4f6;border-bottom:1px solid #e5e7eb;">
             <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Lu</div>
             <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Ma</div>
             <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Me</div>
@@ -2613,10 +2613,7 @@ function cardsSearch(q) {
           </div>
         </div>
 
-        <!-- Pulsante aggiungi evento -->
-        <div style="padding:12px 14px 0;">
-          <button onclick="calShowAddEvent()" style="width:100%;padding:12px;border-radius:12px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi evento</button>
-        </div>
+
 
         <!-- TURNI ACCORDION -->
         <div id="turni-accordion" style="margin:12px 14px 0;">
@@ -2624,7 +2621,7 @@ function cardsSearch(q) {
             <div style="font-weight:800;font-size:14px;">📋 Turni</div>
             <div id="turni-arrow" style="font-size:18px;transition:transform 0.2s;">›</div>
           </div>
-          <div id="turni-body" style="display:none;margin-top:8px;">
+          <div id="turni-body" style="margin-top:8px;">
             <div id="turni-day-label" style="font-size:12px;color:var(--text3);margin-bottom:10px;padding:0 2px;"></div>
             <div id="turni-list"></div>
             <button onclick="turnoShowAdd()" style="width:100%;padding:11px;border-radius:12px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">+ Aggiungi turno</button>
@@ -2656,9 +2653,7 @@ function cardsSearch(q) {
         <div style="padding:12px 14px 0;">
           <div id="cal-events-label" style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:0.05em;margin-bottom:8px;">PROSSIMI EVENTI</div>
           <div id="cal-events-list"></div>
-          <div style="text-align:center;margin-top:8px;">
-            <button onclick="calShowAddEvent()" style="padding:10px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi evento</button>
-          </div>
+
         </div>
 
       </div>
@@ -5887,7 +5882,7 @@ function calOpen() {
   const now = new Date();
   _calYear  = now.getFullYear();
   _calMonth = now.getMonth();
-  calSetView('month');
+  calRenderMonthNew();
   calRenderEvents();
   document.getElementById('topbar-title').textContent = 'Calendario';
   document.getElementById('topbar-sub').textContent = _calEvents.length + ' eventi';
@@ -8297,10 +8292,9 @@ function docsShowDetail(docId) {
   if (doc.type === 'cf' && doc.number?.length === 16) {
     setTimeout(() => {
       try {
-        const isMob = window.innerWidth < 900;
-        JsBarcode('#doc_detail_bc', doc.number, {format:'CODE128',width:isMob?1:2,height:isMob?44:55,displayValue:false,background:'#fff',lineColor:'#000',margin:2});
+        JsBarcode('#doc_detail_bc', doc.number, {format:'CODE128',width:1,height:44,displayValue:false,background:'#fff',lineColor:'#000',margin:2});
         const svg = document.querySelector('#doc_detail_bc');
-        if(svg){ svg.setAttribute('width', isMob?200:280); svg.style.cssText='display:block;margin:0 auto;max-width:'+(isMob?'200px':'280px')+';height:auto;'; }
+        if(svg){ svg.removeAttribute('width'); svg.removeAttribute('height'); svg.style.cssText='display:block;width:100%;max-width:256px;height:auto;margin:0 auto;'; }
       } catch(e) {}
     }, 100);
   }
@@ -9097,8 +9091,8 @@ function turniOreRender() {
 const _origCalSelect = typeof calSelectDate === 'function' ? calSelectDate : null;
 function calSelectDate(dateStr) {
   _calSelectedDate = dateStr;
-  if (_calView === 'week') calRenderWeek();
-  else calRenderMonth();
+  if (_calView === 'week') calRenderWeekNew();
+  else calRenderMonthNew();
   if (_turniOpen) turniRender();
   const form = document.getElementById('cal-event-form');
   if (form && form.style.display !== 'none') {
@@ -9135,11 +9129,11 @@ function calSetView(view) {
       _calWeekStart = new Date(ref);
       _calWeekStart.setDate(ref.getDate() - dow);
     }
-    calRenderWeek();
+    calRenderWeekNew();
   } else if (view === '6m') {
-    calRender6Months();
+    calRender6MonthsNew();
   } else {
-    calRenderMonth();
+    calRenderMonthNew();
   }
 }
 
@@ -9147,11 +9141,11 @@ function calPrev() {
   if (_calView === 'week') {
     _calWeekStart = new Date(_calWeekStart);
     _calWeekStart.setDate(_calWeekStart.getDate() - 7);
-    calRenderWeek();
+    calRenderWeekNew();
   } else if (_calView === '6m') {
     _calMonth -= 6;
     if (_calMonth < 0) { _calMonth += 12; _calYear--; }
-    calRender6Months();
+    calRender6MonthsNew();
   } else {
     _calMonth--;
     if (_calMonth < 0) { _calMonth = 11; _calYear--; }
@@ -9164,16 +9158,16 @@ function calNext() {
   if (_calView === 'week') {
     _calWeekStart = new Date(_calWeekStart);
     _calWeekStart.setDate(_calWeekStart.getDate() + 7);
-    calRenderWeek();
+    calRenderWeekNew();
   } else if (_calView === '6m') {
     _calMonth += 6;
     if (_calMonth > 11) { _calMonth -= 12; _calYear++; }
-    calRender6Months();
+    calRender6MonthsNew();
   } else {
     _calMonth++;
     if (_calMonth > 11) { _calMonth = 0; _calYear++; }
     _calSelectedDate = null;
-    calRenderMonth(); calRenderEvents();
+    calRenderMonthNew(); calRenderEvents();
   }
 }
 
