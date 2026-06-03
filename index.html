@@ -860,9 +860,9 @@ html, body {
 
 /* ── Calendario ────────────────────────────────────────── */
 .cal-day {
-  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 0.82; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
   border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
-  position: relative; transition: all 0.15s;
+  position: relative; transition: all 0.15s; padding-top: 4px; overflow: hidden;
 }
 .cal-day:active { transform: scale(0.9); }
 .cal-day.today { background: var(--accent); color: white; font-weight: 800; }
@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA157</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA162</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2557,6 +2557,10 @@ function cardsSearch(q) {
               style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
               📆 Settimana
             </button>
+            <button id="cal-view-6m" onclick="calSetView('6m')"
+              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
+              🗓 6 Mesi
+            </button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <button onclick="calPrev()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
@@ -2579,6 +2583,10 @@ function cardsSearch(q) {
           <!-- Griglia settimana -->
           <div id="cal-grid-week" style="display:none;">
             <div id="cal-week-grid"></div>
+          </div>
+          <!-- Griglia 6 mesi -->
+          <div id="cal-grid-6m" style="display:none;">
+            <div id="cal-6m-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
           </div>
         </div>
 
@@ -5956,9 +5964,26 @@ function calRenderMonth() {
     }
 
     const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-weight:700;';
+    num.style.cssText = 'position:relative;z-index:1;font-weight:700;font-size:12px;';
     num.textContent = d;
     el.appendChild(num);
+
+    if (dayShifts.length > 0) {
+      const t1 = _turniDef.find(t=>t.id===dayShifts[0]);
+      const t2 = dayShifts.length>1 ? _turniDef.find(t=>t.id===dayShifts[1]) : null;
+      if (t1) {
+        const lbl = document.createElement('div');
+        lbl.style.cssText = 'position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;z-index:2;line-height:1;';
+        if (t2) {
+          lbl.innerHTML = '<span style="color:'+t1.color+'">'+t1.label+'</span><span style="color:var(--text3);">/</span><span style="color:'+t2.color+'">'+t2.label+'</span>';
+        } else {
+          lbl.style.color = isToday ? '#fff' : t1.color;
+          lbl.textContent = t1.label;
+        }
+        el.appendChild(lbl);
+      }
+    }
+
     el.onclick = () => calSelectDate(dateStr);
     grid.appendChild(el);
   }
@@ -9073,7 +9098,7 @@ function calSelectDate(dateStr) {
 // ════════════════════════════════════════════════════════════
 //  VISTA SETTIMANALE CALENDARIO
 // ════════════════════════════════════════════════════════════
-let _calView = 'month';  // 'month' | 'week'
+let _calView = 'month';  // 'month' | 'week' | '6m'
 let _calWeekStart = null; // Date del lunedì corrente
 
 function calSetView(view) {
@@ -9109,17 +9134,69 @@ function calPrev() {
   if (_calView === 'week') {
     _calWeekStart.setDate(_calWeekStart.getDate() - 7);
     calRenderWeek();
-  } else {
-    calPrevMonth();
-  }
+  } else if (_calView === '6m') {
+    _calMonth -= 6; if (_calMonth < 0) { _calMonth += 12; _calYear--; }
+    calRender6Months();
+  } else { calPrevMonth(); }
 }
 function calNext() {
   if (_calView === 'week') {
     _calWeekStart.setDate(_calWeekStart.getDate() + 7);
     calRenderWeek();
-  } else {
-    calNextMonth();
+  } else if (_calView === '6m') {
+    _calMonth += 6; if (_calMonth > 11) { _calMonth -= 12; _calYear++; }
+    calRender6Months();
+  } else { calNextMonth(); }
+}
+
+// ── Vista 6 Mesi ─────────────────────────────────────────
+function calRender6Months() {
+  const grid = document.getElementById('cal-6m-grid');
+  const label = document.getElementById('cal-month-label');
+  if (!grid) return;
+  const endMonth = (_calMonth + 5) % 12;
+  const endYear  = _calMonth + 5 > 11 ? _calYear + 1 : _calYear;
+  if (label) label.textContent = CAL_MONTHS[_calMonth] + ' — ' + CAL_MONTHS[endMonth] + ' ' + endYear;
+  const today = new Date();
+  let html = '';
+  for (let m = 0; m < 6; m++) {
+    const month = (_calMonth + m) % 12;
+    const year  = _calMonth + m > 11 ? _calYear + 1 : _calYear;
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+    html += '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:6px;">';
+    html += '<div style="font-size:10px;font-weight:800;color:var(--accent);margin-bottom:4px;text-align:center;">' + CAL_MONTHS[month] + ' ' + year + '</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;">';
+    ['L','M','M','G','V','S','D'].forEach((d,i) => {
+      html += '<div style="text-align:center;font-size:7px;font-weight:800;color:' + (i===6?'#ef4444':'var(--text3)') + ';">' + d + '</div>';
+    });
+    html += '</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">';
+    for (let p = 0; p < firstDay; p++) html += '<div></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+      const shifts = (_calDayShifts && _calDayShifts[dateStr]) || [];
+      const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
+      const isWeekend = [0,6].includes(new Date(year,month,d).getDay());
+      const t0 = shifts[0] ? (_turniDef||[]).find(t=>t.id===shifts[0]) : null;
+      const t1 = shifts[1] ? (_turniDef||[]).find(t=>t.id===shifts[1]) : null;
+      const bg = isToday ? 'var(--accent)' : (t0 ? t0.color+'88' : 'transparent');
+      const col = isToday ? '#fff' : (t0 ? '#fff' : (isWeekend ? '#ef4444' : 'var(--text3)'));
+      let inner = d;
+      if (t0) inner += '<br><span style="font-size:6px;opacity:.95;">' + t0.label + (t1 ? '/'+t1.label : '') + '</span>';
+      html += '<div data-ds="' + dateStr + '" onclick="cal6mDayClick(this.getAttribute(\"data-ds\"))" style="text-align:center;font-size:8px;font-weight:' + (isToday?800:600) + ';border-radius:3px;padding:2px 0;cursor:pointer;background:' + bg + ';color:' + col + ';">' + inner + '</div>';
+    }
+    html += '</div></div>';
   }
+  grid.innerHTML = html;
+}
+
+function cal6mDayClick(dateStr) {
+  const d = new Date(dateStr);
+  _calYear = d.getFullYear();
+  _calMonth = d.getMonth();
+  _calSelectedDate = dateStr;
+  calSetView('month');
+  setTimeout(() => calSelectDate && calSelectDate(dateStr), 100);
 }
 
 function calRenderWeek() {
