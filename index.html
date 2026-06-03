@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA169</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA170</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8294,9 +8294,9 @@ function docsShowDetail(docId) {
 
   // Barcode per CF
   if (doc.type === 'cf' && doc.number?.length === 16) {
-    content += '<div id="doc_detail_bc_wrap" style="background:white;border-radius:12px;padding:14px;text-align:center;margin-top:14px;">'
-      +'<svg id="doc_detail_bc"></svg>'
-      +'<div style="font-size:12px;font-weight:700;letter-spacing:2px;color:#333;margin-top:6px;font-family:monospace;">'+doc.number+'</div>'
+    content += '<div id="doc_detail_bc_wrap" style="background:white;border-radius:12px;padding:10px;text-align:center;margin-top:14px;max-width:220px;margin-left:auto;margin-right:auto;">'
+      +'<svg id="doc_detail_bc" style="display:block;margin:0 auto;"></svg>'
+      +'<div style="font-size:11px;font-weight:700;letter-spacing:1px;color:#333;margin-top:6px;font-family:monospace;">'+doc.number+'</div>'
       +'</div>';
   }
 
@@ -8305,8 +8305,12 @@ function docsShowDetail(docId) {
   // Genera barcode CF nel dettaglio
   if (doc.type === 'cf' && doc.number?.length === 16) {
     setTimeout(() => {
-      try { JsBarcode('#doc_detail_bc', doc.number, {format:'CODE128',width:2,height:55,displayValue:false,background:'#fff',lineColor:'#000'}); }
-      catch(e) {}
+      try {
+        const isMob = window.innerWidth < 900;
+        JsBarcode('#doc_detail_bc', doc.number, {format:'CODE128',width:isMob?1:2,height:isMob?44:55,displayValue:false,background:'#fff',lineColor:'#000',margin:2});
+        const svg = document.querySelector('#doc_detail_bc');
+        if(svg){ svg.setAttribute('width', isMob?200:280); svg.style.cssText='display:block;margin:0 auto;max-width:'+(isMob?'200px':'280px')+';height:auto;'; }
+      } catch(e) {}
     }, 100);
   }
 
