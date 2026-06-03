@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA170</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA171</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2546,78 +2546,66 @@ function cardsSearch(q) {
     <!-- CALENDARIO -->
     <!-- CALENDARIO -->
     <div class="tab-panel" id="panel-calendar">
-      <div style="padding:14px 14px 100px;max-width:600px;margin:0 auto;">
+      <div style="padding:0 0 100px;max-width:640px;margin:0 auto;">
 
-        <!-- Mini calendario -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
-          <!-- Toggle Mese/Settimana -->
-          <div style="display:flex;gap:6px;margin-bottom:12px;">
-            <button id="cal-view-month" onclick="calSetView('month')"
-              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);">
-              📅 Mese
-            </button>
-            <button id="cal-view-week" onclick="calSetView('week')"
-              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
-              📆 Settimana
-            </button>
-            <button id="cal-view-6m" onclick="calSetView('6m')"
-              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
-              🗓 6 Mesi
-            </button>
-          </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <button onclick="calPrev()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
-            <div id="cal-month-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;"></div>
-            <button onclick="calNext()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">›</button>
-          </div>
-          <div id="cal-days-header" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
-            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Lu</div>
-            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Ma</div>
-            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Me</div>
-            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Gi</div>
-            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);padding:4px;">Ve</div>
-            <div style="text-align:center;font-size:10px;font-weight:800;color:var(--text3);">Sa</div>
-            <div style="text-align:center;font-size:10px;font-weight:800;color:#ef4444;">Do</div>
-          </div>
-          <!-- Griglia mese -->
-          <div id="cal-grid-month">
-            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
-          </div>
-          <!-- Griglia settimana -->
-          <div id="cal-grid-week" style="display:none;">
-            <div id="cal-week-grid"></div>
-          </div>
-          <!-- Griglia 6 mesi -->
-          <div id="cal-grid-6m" style="display:none;">
-            <div id="cal-6m-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
-          </div>
+        <!-- Barra navigazione -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;">
+          <button onclick="calPrev()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:20px;font-weight:700;">‹</button>
+          <div id="cal-month-label" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;text-align:center;flex:1;"></div>
+          <button onclick="calNext()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:20px;font-weight:700;">›</button>
         </div>
 
-        <!-- Evento selezionato / form nuovo evento -->
-        <div id="cal-event-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:12px;" id="cal-form-title">Nuovo evento</div>
-          <div style="margin-bottom:10px;">
-            <input id="cal-ev-title" type="text" placeholder="Titolo evento *"
-              style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+        <!-- Tabs vista -->
+        <div style="display:flex;gap:0;margin:0 14px 10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <button id="cal-view-month" onclick="calSetView('month')" style="flex:1;padding:9px 4px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:none;background:var(--accent);color:#fff;">📅 Mese</button>
+          <button id="cal-view-week" onclick="calSetView('week')" style="flex:1;padding:9px 4px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:none;background:transparent;color:var(--text2);">📆 Settimana</button>
+          <button id="cal-view-6m" onclick="calSetView('6m')" style="flex:1;padding:9px 4px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:none;background:transparent;color:var(--text2);">🗓 6 Mesi</button>
+        </div>
+
+        <!-- Griglia mese (sfondo bianco) -->
+        <div id="cal-grid-month" style="background:#fff;margin:0 14px;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+          <div id="cal-days-header" style="display:grid;grid-template-columns:repeat(7,1fr);background:#f3f4f6;border-bottom:1px solid #e5e7eb;">
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Lu</div>
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Ma</div>
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Me</div>
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Gi</div>
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Ve</div>
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#6b7280;padding:8px 2px;">Sa</div>
+            <div style="text-align:center;font-size:11px;font-weight:800;color:#ef4444;padding:8px 2px;">Do</div>
           </div>
+          <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #e5e7eb;"></div>
+        </div>
+
+        <!-- Griglia settimana -->
+        <div id="cal-grid-week" style="display:none;background:#fff;margin:0 14px;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;">
+          <div id="cal-week-grid"></div>
+        </div>
+
+        <!-- Griglia 6 mesi -->
+        <div id="cal-grid-6m" style="display:none;padding:0 14px;">
+          <div id="cal-6m-grid"></div>
+        </div>
+
+        <!-- Form evento -->
+        <div id="cal-event-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin:12px 14px 0;">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:12px;" id="cal-form-title">Nuovo evento</div>
+          <input id="cal-ev-title" type="text" placeholder="Titolo evento *" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:10px;">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
             <div>
-              <div class="pw-field-label" style="margin-bottom:5px;">Data</div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Data</div>
               <input id="cal-ev-date" type="date" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div>
-              <div class="pw-field-label" style="margin-bottom:5px;">Ora</div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Ora</div>
               <input id="cal-ev-time" type="time" style="width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
           </div>
-          <div style="margin-bottom:12px;">
-            <div style="display:flex;gap:8px;flex-wrap:wrap;" id="cal-cat-btns">
-              <button class="cal-cat-btn active" data-cat="personale" data-color="#6366f1" onclick="calSelectCat(this)">💼 Personale</button>
-              <button class="cal-cat-btn" data-cat="lavoro" data-color="#10b981" onclick="calSelectCat(this)">💼 Lavoro</button>
-              <button class="cal-cat-btn" data-cat="salute" data-color="#ef4444" onclick="calSelectCat(this)">❤️ Salute</button>
-              <button class="cal-cat-btn" data-cat="famiglia" data-color="#f59e0b" onclick="calSelectCat(this)">👨‍👩‍👧 Famiglia</button>
-              <button class="cal-cat-btn" data-cat="scadenza" data-color="#8b5cf6" onclick="calSelectCat(this)">⏰ Scadenza</button>
-            </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="cal-cat-btns">
+            <button class="cal-cat-btn active" data-cat="personale" data-color="#6366f1" onclick="calSelectCat(this)">💼 Personale</button>
+            <button class="cal-cat-btn" data-cat="lavoro" data-color="#10b981" onclick="calSelectCat(this)">💼 Lavoro</button>
+            <button class="cal-cat-btn" data-cat="salute" data-color="#ef4444" onclick="calSelectCat(this)">❤️ Salute</button>
+            <button class="cal-cat-btn" data-cat="famiglia" data-color="#f59e0b" onclick="calSelectCat(this)">👨‍👩‍👧 Famiglia</button>
+            <button class="cal-cat-btn" data-cat="scadenza" data-color="#8b5cf6" onclick="calSelectCat(this)">⏰ Scadenza</button>
           </div>
           <div style="display:flex;gap:10px;">
             <button onclick="calCloseForm()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
@@ -2625,27 +2613,26 @@ function cardsSearch(q) {
           </div>
         </div>
 
-        <!-- ═══ TURNI ACCORDION ═══ -->
-        <div id="turni-accordion">
-          <div id="turni-header" onclick="turniToggle()">
-            <div>📋 Turni</div>
+        <!-- Pulsante aggiungi evento -->
+        <div style="padding:12px 14px 0;">
+          <button onclick="calShowAddEvent()" style="width:100%;padding:12px;border-radius:12px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi evento</button>
+        </div>
+
+        <!-- TURNI ACCORDION -->
+        <div id="turni-accordion" style="margin:12px 14px 0;">
+          <div id="turni-header" onclick="turniToggle()" style="display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;">
+            <div style="font-weight:800;font-size:14px;">📋 Turni</div>
             <div id="turni-arrow" style="font-size:18px;transition:transform 0.2s;">›</div>
           </div>
-          <div id="turni-body">
-            <!-- Giorno selezionato -->
+          <div id="turni-body" style="display:none;margin-top:8px;">
             <div id="turni-day-label" style="font-size:12px;color:var(--text3);margin-bottom:10px;padding:0 2px;"></div>
-            <!-- Lista turni -->
             <div id="turni-list"></div>
-            <!-- Aggiungi turno -->
             <button onclick="turnoShowAdd()" style="width:100%;padding:11px;border-radius:12px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">+ Aggiungi turno</button>
-            <!-- Form nuovo turno (hidden) -->
             <div id="turno-form" style="display:none;margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px;">
               <div style="font-size:13px;font-weight:800;margin-bottom:10px;">Nuovo turno</div>
               <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;">
-                <input type="color" id="turno-color" value="#6366f1"
-                  style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:var(--surface);">
-                <input type="text" id="turno-label" placeholder="Etichetta (es. Matt.)"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
+                <input type="color" id="turno-color" value="#6366f1" style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:var(--surface);">
+                <input type="text" id="turno-label" placeholder="Etichetta (es. Matt.)" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
                 <div>
@@ -2658,18 +2645,21 @@ function cardsSearch(q) {
                 </div>
               </div>
               <div style="display:flex;gap:8px;">
-                <button onclick="turnoHideAdd()" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-                <button onclick="turnoSave()" style="flex:2;padding:10px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+                <button onclick="document.getElementById('turno-form').style.display='none'" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+                <button onclick="turnoSave()" style="flex:2;padding:10px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva turno</button>
               </div>
             </div>
-            <!-- Ore mensili -->
-            <div id="turni-ore-mese"></div>
           </div>
         </div>
 
-        <!-- Lista eventi del mese -->
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:10px;" id="cal-events-label">Prossimi eventi</div>
-        <div id="cal-events-list"></div>
+        <!-- Lista eventi -->
+        <div style="padding:12px 14px 0;">
+          <div id="cal-events-label" style="font-size:11px;font-weight:800;color:var(--text3);letter-spacing:0.05em;margin-bottom:8px;">PROSSIMI EVENTI</div>
+          <div id="cal-events-list"></div>
+          <div style="text-align:center;margin-top:8px;">
+            <button onclick="calShowAddEvent()" style="padding:10px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi evento</button>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -5897,7 +5887,7 @@ function calOpen() {
   const now = new Date();
   _calYear  = now.getFullYear();
   _calMonth = now.getMonth();
-  calRenderMonth();
+  calSetView('month');
   calRenderEvents();
   document.getElementById('topbar-title').textContent = 'Calendario';
   document.getElementById('topbar-sub').textContent = _calEvents.length + ' eventi';
@@ -5907,6 +5897,7 @@ function calOpen() {
 
 // ── Render calendario ────────────────────────────────────
 function calRenderMonth() {
+  calRenderMonthNew(); return;
   const label = document.getElementById('cal-month-label');
   const grid  = document.getElementById('cal-grid');
   if (!label || !grid) return;
@@ -9106,41 +9097,47 @@ function turniOreRender() {
 const _origCalSelect = typeof calSelectDate === 'function' ? calSelectDate : null;
 function calSelectDate(dateStr) {
   _calSelectedDate = dateStr;
-  calRenderMonth();
-  if (typeof calShowForm === 'function') calShowForm(dateStr);
+  if (_calView === 'week') calRenderWeek();
+  else calRenderMonth();
   if (_turniOpen) turniRender();
+  const form = document.getElementById('cal-event-form');
+  if (form && form.style.display !== 'none') {
+    document.getElementById('cal-ev-date').value = dateStr;
+  }
 }
 
 // ════════════════════════════════════════════════════════════
 //  VISTA SETTIMANALE CALENDARIO
 // ════════════════════════════════════════════════════════════
-let _calView = 'month';  // 'month' | 'week' | '6m'
-let _calWeekStart = null; // Date del lunedì corrente
-
+let _calView = 'month';
+let _calWeekStart = null;
+// ── calSetView ────────────────────────────────────────────
 function calSetView(view) {
   _calView = view;
-  // Update toggle buttons
-  const btnM = document.getElementById('cal-view-month');
-  const btnW = document.getElementById('cal-view-week');
-  const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
-  const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
-  if (btnM) btnM.style.cssText = btnM.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='month'?active:normal);
-  if (btnW) btnW.style.cssText = btnW.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='week'?active:normal);
-
-  // Show/hide grids
+  ['month','week','6m'].forEach(v => {
+    const btn = document.getElementById('cal-view-'+v);
+    if (!btn) return;
+    btn.style.background = v===view ? 'var(--accent)' : 'transparent';
+    btn.style.color = v===view ? '#fff' : 'var(--text2)';
+  });
   const gm = document.getElementById('cal-grid-month');
   const gw = document.getElementById('cal-grid-week');
-  const daysRow = document.querySelector('#panel-calendar .cal-days-row');
+  const g6 = document.getElementById('cal-grid-6m');
+  const dh = document.getElementById('cal-days-header');
   if (gm) gm.style.display = view==='month' ? '' : 'none';
-  if (gw) gw.style.display = view==='week'  ? '' : 'none';
-
-  if (view==='week') {
-    // Inizia dalla settimana che contiene la data selezionata o oggi
-    const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
-    const dow = (ref.getDay() + 6) % 7; // lunedì=0
-    _calWeekStart = new Date(ref);
-    _calWeekStart.setDate(ref.getDate() - dow);
+  if (gw) gw.style.display = view==='week' ? '' : 'none';
+  if (g6) g6.style.display = view==='6m' ? '' : 'none';
+  if (dh) dh.style.display = view==='month' ? '' : 'none';
+  if (view === 'week') {
+    if (!_calWeekStart) {
+      const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
+      const dow = (ref.getDay() + 6) % 7;
+      _calWeekStart = new Date(ref);
+      _calWeekStart.setDate(ref.getDate() - dow);
+    }
     calRenderWeek();
+  } else if (view === '6m') {
+    calRender6Months();
   } else {
     calRenderMonth();
   }
@@ -9148,84 +9145,134 @@ function calSetView(view) {
 
 function calPrev() {
   if (_calView === 'week') {
+    _calWeekStart = new Date(_calWeekStart);
     _calWeekStart.setDate(_calWeekStart.getDate() - 7);
     calRenderWeek();
   } else if (_calView === '6m') {
-    _calMonth -= 6; if (_calMonth < 0) { _calMonth += 12; _calYear--; }
+    _calMonth -= 6;
+    if (_calMonth < 0) { _calMonth += 12; _calYear--; }
     calRender6Months();
-  } else { calPrevMonth(); }
+  } else {
+    _calMonth--;
+    if (_calMonth < 0) { _calMonth = 11; _calYear--; }
+    _calSelectedDate = null;
+    calRenderMonth(); calRenderEvents();
+  }
 }
+
 function calNext() {
   if (_calView === 'week') {
+    _calWeekStart = new Date(_calWeekStart);
     _calWeekStart.setDate(_calWeekStart.getDate() + 7);
     calRenderWeek();
   } else if (_calView === '6m') {
-    _calMonth += 6; if (_calMonth > 11) { _calMonth -= 12; _calYear++; }
+    _calMonth += 6;
+    if (_calMonth > 11) { _calMonth -= 12; _calYear++; }
     calRender6Months();
-  } else { calNextMonth(); }
-}
-
-// ── Vista 6 Mesi ─────────────────────────────────────────
-function calRender6Months() {
-  const grid = document.getElementById('cal-6m-grid');
-  const label = document.getElementById('cal-month-label');
-  if (!grid) return;
-  const endMonth = (_calMonth + 5) % 12;
-  const endYear  = _calMonth + 5 > 11 ? _calYear + 1 : _calYear;
-  if (label) label.textContent = CAL_MONTHS[_calMonth] + ' — ' + CAL_MONTHS[endMonth] + ' ' + endYear;
-  const today = new Date();
-  let html = '';
-  for (let m = 0; m < 6; m++) {
-    const month = (_calMonth + m) % 12;
-    const year  = _calMonth + m > 11 ? _calYear + 1 : _calYear;
-    const daysInMonth = new Date(year, month+1, 0).getDate();
-    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
-    html += '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:6px;">';
-    html += '<div style="font-size:10px;font-weight:800;color:var(--accent);margin-bottom:4px;text-align:center;">' + CAL_MONTHS[month] + ' ' + year + '</div>';
-    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;">';
-    ['L','M','M','G','V','S','D'].forEach((d,i) => {
-      html += '<div style="text-align:center;font-size:7px;font-weight:800;color:' + (i===6?'#ef4444':'var(--text3)') + ';">' + d + '</div>';
-    });
-    html += '</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">';
-    for (let p = 0; p < firstDay; p++) html += '<div></div>';
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
-      const shifts = (_calDayShifts && _calDayShifts[dateStr]) || [];
-      const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
-      const isWeekend = [0,6].includes(new Date(year,month,d).getDay());
-      const t0 = shifts[0] ? (_turniDef||[]).find(t=>t.id===shifts[0]) : null;
-      const t1 = shifts[1] ? (_turniDef||[]).find(t=>t.id===shifts[1]) : null;
-      const bg = isToday ? 'var(--accent)' : (t0 ? t0.color+'88' : 'transparent');
-      const col = isToday ? '#fff' : (t0 ? '#fff' : (isWeekend ? '#ef4444' : 'var(--text3)'));
-      let inner = d;
-      if (t0) inner += '<br><span style="font-size:6px;opacity:.95;">' + t0.label + (t1 ? '/'+t1.label : '') + '</span>';
-      html += '<div data-ds="' + dateStr + '" onclick="cal6mDayClick(this.getAttribute(\"data-ds\"))" style="text-align:center;font-size:8px;font-weight:' + (isToday?800:600) + ';border-radius:3px;padding:2px 0;cursor:pointer;background:' + bg + ';color:' + col + ';">' + inner + '</div>';
-    }
-    html += '</div></div>';
+  } else {
+    _calMonth++;
+    if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+    _calSelectedDate = null;
+    calRenderMonth(); calRenderEvents();
   }
-  grid.innerHTML = html;
 }
 
-function cal6mDayClick(dateStr) {
-  const d = new Date(dateStr);
-  _calYear = d.getFullYear();
-  _calMonth = d.getMonth();
-  _calSelectedDate = dateStr;
-  calSetView('month');
-  setTimeout(() => calSelectDate && calSelectDate(dateStr), 100);
+// ── Vista Mese ────────────────────────────────────────────
+function calRenderMonthNew() {
+  const label = document.getElementById('cal-month-label');
+  const grid  = document.getElementById('cal-grid');
+  if (!label || !grid) return;
+  label.textContent = CAL_MONTHS[_calMonth] + ' ' + _calYear;
+
+  const firstDay = (new Date(_calYear, _calMonth, 1).getDay() + 6) % 7;
+  const daysInMonth = new Date(_calYear, _calMonth+1, 0).getDate();
+  const today = new Date();
+
+  grid.innerHTML = '';
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);';
+
+  // Giorni mese precedente
+  for (let i = 0; i < firstDay; i++) {
+    const d = new Date(_calYear, _calMonth, -firstDay+i+1);
+    const el = document.createElement('div');
+    el.style.cssText = 'border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;padding:4px 2px;min-height:52px;background:#f9fafb;color:#d1d5db;font-size:12px;font-weight:600;text-align:right;';
+    el.textContent = d.getDate();
+    grid.appendChild(el);
+  }
+
+  // Giorni del mese
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = _calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday = d===today.getDate() && _calMonth===today.getMonth() && _calYear===today.getFullYear();
+    const isSelected = _calSelectedDate === dateStr;
+    const isSun = new Date(_calYear,_calMonth,d).getDay() === 0;
+    const isSat = new Date(_calYear,_calMonth,d).getDay() === 6;
+    const shifts = (_calDayShifts[dateStr]||[]).slice(0,2);
+    const hasEvent = _calEvents.some(e=>e.date&&e.date.startsWith(dateStr));
+
+    const el = document.createElement('div');
+    el.style.cssText = 'border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;min-height:52px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;';
+    if (isSelected) el.style.outline = '2px solid var(--accent)';
+    if (isToday) el.style.background = '#eff6ff';
+    else el.style.background = '#fff';
+
+    // Sfondo turni
+    if (shifts.length === 1) {
+      const t = _turniDef.find(x=>x.id===shifts[0]);
+      if (t) {
+        const bg = document.createElement('div');
+        bg.style.cssText = 'position:absolute;inset:0;background:'+t.color+'33;';
+        el.appendChild(bg);
+      }
+    } else if (shifts.length === 2) {
+      const t1 = _turniDef.find(x=>x.id===shifts[0]);
+      const t2 = _turniDef.find(x=>x.id===shifts[1]);
+      if(t1){const b=document.createElement('div');b.style.cssText='position:absolute;inset:0;background:'+t1.color+'44;clip-path:polygon(0 0,100% 0,0 100%);';el.appendChild(b);}
+      if(t2){const b=document.createElement('div');b.style.cssText='position:absolute;inset:0;background:'+t2.color+'44;clip-path:polygon(100% 0,100% 100%,0 100%);';el.appendChild(b);}
+    }
+
+    // Numero
+    const num = document.createElement('div');
+    num.style.cssText = 'position:relative;z-index:1;font-size:12px;font-weight:'+(isToday?800:600)+';color:'+(isSun?'#ef4444':isSat?'#f97316':'#111')+';padding:3px 4px;text-align:right;';
+    if (isToday) {
+      num.innerHTML = '<span style="background:var(--accent);color:#fff;border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;">'+d+'</span>';
+    } else {
+      num.textContent = d;
+    }
+    el.appendChild(num);
+
+    // Etichette turni
+    if (shifts.length > 0) {
+      const lblDiv = document.createElement('div');
+      lblDiv.style.cssText = 'position:relative;z-index:1;display:flex;flex-direction:column;gap:1px;padding:0 2px 2px;flex:1;justify-content:flex-end;';
+      shifts.forEach(sid => {
+        const t = _turniDef.find(x=>x.id===sid);
+        if (!t) return;
+        const tag = document.createElement('div');
+        tag.style.cssText = 'font-size:8px;font-weight:800;color:#fff;background:'+t.color+';border-radius:3px;padding:1px 3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+        tag.textContent = t.label;
+        lblDiv.appendChild(tag);
+      });
+      el.appendChild(lblDiv);
+    }
+
+    // Punto evento
+    if (hasEvent) {
+      const dot = document.createElement('div');
+      dot.style.cssText = 'position:absolute;top:3px;left:3px;width:5px;height:5px;border-radius:50%;background:var(--accent);z-index:2;';
+      el.appendChild(dot);
+    }
+
+    el.onclick = () => calSelectDate(dateStr);
+    grid.appendChild(el);
+  }
 }
 
-function calRenderWeek() {
+// ── Vista Settimana ───────────────────────────────────────
+function calRenderWeekNew() {
   const grid = document.getElementById('cal-week-grid');
   const label = document.getElementById('cal-month-label');
-  // Init _calWeekStart if null
-  if (!_calWeekStart) {
-    const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
-    const dow = (ref.getDay() + 6) % 7;
-    _calWeekStart = new Date(ref);
-    _calWeekStart.setDate(ref.getDate() - dow);
-  }
-  if (!grid) return;
+  if (!grid || !_calWeekStart) return;
 
   const today = new Date();
   const days = [];
@@ -9235,108 +9282,139 @@ function calRenderWeek() {
     days.push(d);
   }
 
-  // Label: "Lun 2 – Dom 8 Giugno"
   const start = days[0], end = days[6];
-  const opts = { day:'numeric', month:'long' };
-  label.textContent = start.toLocaleDateString('it-IT',{day:'numeric'}) + ' – ' +
-    end.toLocaleDateString('it-IT', opts) + ' ' + end.getFullYear();
+  if (label) label.textContent = start.toLocaleDateString('it-IT',{day:'numeric'}) + ' – ' + end.toLocaleDateString('it-IT',{day:'numeric',month:'long'}) + ' ' + end.getFullYear();
 
   const DAY_NAMES = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
-
   grid.innerHTML = '';
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:4px;';
+  grid.style.cssText = '';
 
-  days.forEach((d, i) => {
-    const dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  // Header giorni
+  const header = document.createElement('div');
+  header.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);background:#f3f4f6;border-bottom:1px solid #e5e7eb;';
+  days.forEach((d,i) => {
     const isToday = d.toDateString() === today.toDateString();
+    const h = document.createElement('div');
+    h.style.cssText = 'text-align:center;padding:6px 2px;';
+    h.innerHTML = '<div style="font-size:10px;font-weight:800;color:'+(i===6?'#ef4444':'#6b7280')+';">'+DAY_NAMES[i]+'</div>'
+      +'<div style="font-size:16px;font-weight:800;color:'+(isToday?'#fff':'#111')+';">'
+      +(isToday?'<span style="background:var(--accent);border-radius:50%;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;">'+d.getDate()+'</span>':d.getDate())
+      +'</div>';
+    header.appendChild(h);
+  });
+  grid.appendChild(header);
+
+  // Celle giorni
+  const cellRow = document.createElement('div');
+  cellRow.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);';
+  days.forEach((d,i) => {
+    const dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
     const isSelected = _calSelectedDate === dateStr;
-    const shifts = (_calDayShifts[dateStr] || []).slice(0, 2);
-    const hasEvent = _calEvents.some(e => e.date && e.date.startsWith(dateStr));
+    const shifts = (_calDayShifts[dateStr]||[]).slice(0,2);
+    const hasEvent = _calEvents.some(e=>e.date&&e.date.startsWith(dateStr));
 
-    const col = document.createElement('div');
-    col.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
-
-    // Header giorno
-    const head = document.createElement('div');
-    head.style.cssText = `text-align:center;font-size:10px;font-weight:800;color:${i===6?'#ef4444':'var(--text3)'};padding-bottom:2px;`;
-    head.textContent = DAY_NAMES[i];
-    col.appendChild(head);
-
-    // Cella giorno
     const cell = document.createElement('div');
-    cell.style.cssText = `
-      position:relative;overflow:hidden;border-radius:10px;
-      min-height:64px;cursor:pointer;
-      border:${isSelected?'2px solid var(--accent)':isToday?'2px solid var(--accent-bg)':'1px solid var(--border)'};
-      background:${isToday?'var(--accent-bg)':'var(--surface)'};
-      display:flex;flex-direction:column;align-items:center;padding:6px 2px;gap:2px;
-    `;
+    cell.style.cssText = 'border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;min-height:80px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:4px 2px;'
+      +(isSelected?'outline:2px solid var(--accent);':'');
+    if (i===6) cell.style.borderRight='none';
 
-    // Colori turni
-    if (shifts.length === 1) {
-      const t = _turniDef.find(t=>t.id===shifts[0]);
-      if (t) {
-        const bg = document.createElement('div');
-        bg.style.cssText = `position:absolute;inset:0;background:${t.color}55;z-index:0;`;
-        cell.appendChild(bg);
-      }
-    } else if (shifts.length === 2) {
-      const t1 = _turniDef.find(t=>t.id===shifts[0]);
-      const t2 = _turniDef.find(t=>t.id===shifts[1]);
-      if (t1) { const b=document.createElement('div'); b.style.cssText=`position:absolute;inset:0;background:${t1.color}66;z-index:0;clip-path:polygon(0 0,100% 0,0 100%);`; cell.appendChild(b); }
-      if (t2) { const b=document.createElement('div'); b.style.cssText=`position:absolute;inset:0;background:${t2.color}66;z-index:0;clip-path:polygon(100% 0,100% 100%,0 100%);`; cell.appendChild(b); }
+    // Turni
+    if (shifts.length===1) {
+      const t=_turniDef.find(x=>x.id===shifts[0]);
+      if(t){const bg=document.createElement('div');bg.style.cssText='position:absolute;inset:0;background:'+t.color+'33;';cell.appendChild(bg);}
+    } else if (shifts.length===2) {
+      const t1=_turniDef.find(x=>x.id===shifts[0]),t2=_turniDef.find(x=>x.id===shifts[1]);
+      if(t1){const b=document.createElement('div');b.style.cssText='position:absolute;inset:0;background:'+t1.color+'44;clip-path:polygon(0 0,100% 0,0 100%);';cell.appendChild(b);}
+      if(t2){const b=document.createElement('div');b.style.cssText='position:absolute;inset:0;background:'+t2.color+'44;clip-path:polygon(100% 0,100% 100%,0 100%);';cell.appendChild(b);}
     }
 
-    // Numero giorno
-    const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-size:16px;font-weight:800;';
-    num.textContent = d.getDate();
-    cell.appendChild(num);
-
-    // Etichette turni
-    shifts.forEach(id => {
-      const t = _turniDef.find(t=>t.id===id);
-      if (!t) return;
-      const tag = document.createElement('span');
-      tag.style.cssText = `position:relative;z-index:1;font-size:9px;font-weight:800;color:white;background:${t.color};border-radius:4px;padding:1px 4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;`;
-      tag.textContent = t.label;
+    shifts.forEach(sid => {
+      const t=_turniDef.find(x=>x.id===sid);
+      if(!t)return;
+      const tag=document.createElement('div');
+      tag.style.cssText='position:relative;z-index:1;font-size:9px;font-weight:800;color:#fff;background:'+t.color+';border-radius:4px;padding:2px 4px;margin-top:2px;width:90%;text-align:center;';
+      tag.textContent=t.label;
       cell.appendChild(tag);
     });
 
-    // Punto evento
-    if (hasEvent) {
-      const dot = document.createElement('div');
-      dot.style.cssText = 'position:absolute;bottom:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--accent);z-index:1;';
-      cell.appendChild(dot);
-    }
-
+    if(hasEvent){const dot=document.createElement('div');dot.style.cssText='position:absolute;bottom:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--accent);';cell.appendChild(dot);}
     cell.onclick = () => calSelectDate(dateStr);
-    col.appendChild(cell);
-    grid.appendChild(col);
+    cellRow.appendChild(cell);
   });
+  grid.appendChild(cellRow);
 
-  // Lista eventi della settimana
-  const evLabel = document.getElementById('cal-events-label');
-  const evList  = document.getElementById('cal-events-list');
-  if (evLabel) evLabel.textContent = 'Eventi settimana';
+  // Lista eventi settimana
+  const evList = document.getElementById('cal-events-list');
   if (evList) {
-    const weekEvents = _calEvents.filter(e => {
-      const d = new Date(e.date);
-      return d >= days[0] && d <= days[6];
-    }).sort((a,b) => new Date(a.date)-new Date(b.date));
-    if (!weekEvents.length) {
-      evList.innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:16px;">Nessun evento questa settimana</div>';
-    } else {
-      evList.innerHTML = weekEvents.map(e => `
-        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${e.color||'var(--accent)'};border-radius:12px;margin-bottom:6px;">
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:700;">${e.title}</div>
-            <div style="font-size:11px;color:var(--text3);">${new Date(e.date).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})}${e.time?' · '+e.time:''}</div>
-          </div>
-        </div>`).join('');
-    }
+    const weekEvents = _calEvents.filter(e=>{const d=new Date(e.date);return d>=days[0]&&d<=days[6];}).sort((a,b)=>new Date(a.date)-new Date(b.date));
+    evList.innerHTML = weekEvents.length ? weekEvents.map(e=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${e.color||'var(--accent)'};border-radius:12px;margin-bottom:6px;"><div style="flex:1;"><div style="font-size:13px;font-weight:700;">${e.title}</div><div style="font-size:11px;color:var(--text3);">${new Date(e.date).toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})}${e.time?' · '+e.time:''}</div></div></div>`).join('')
+      : '<div style="text-align:center;color:var(--text3);font-size:13px;padding:16px;">Nessun evento questa settimana</div>';
   }
 }
+
+// ── Vista 6 Mesi ──────────────────────────────────────────
+function calRender6MonthsNew() {
+  const grid = document.getElementById('cal-6m-grid');
+  const label = document.getElementById('cal-month-label');
+  if (!grid) return;
+
+  const endM = (_calMonth+5)%12, endY = _calMonth+5>11?_calYear+1:_calYear;
+  if (label) label.textContent = CAL_MONTHS[_calMonth]+' — '+CAL_MONTHS[endM]+' '+endY;
+
+  const today = new Date();
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+
+  for (let m=0; m<6; m++) {
+    const month=(_calMonth+m)%12, year=_calMonth+m>11?_calYear+1:_calYear;
+    const daysInMonth=new Date(year,month+1,0).getDate();
+    const firstDay=(new Date(year,month,1).getDay()+6)%7;
+
+    html += '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">';
+    html += '<div style="background:#f3f4f6;padding:6px;text-align:center;font-size:11px;font-weight:800;color:#374151;border-bottom:1px solid #e5e7eb;">'+CAL_MONTHS[month]+' '+year+'</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);background:#f9fafb;border-bottom:1px solid #e5e7eb;">';
+    ['L','M','M','G','V','S','D'].forEach((d,i)=>{ html+='<div style="text-align:center;font-size:7px;font-weight:800;color:'+(i===6?'#ef4444':'#9ca3af')+'padding:3px 0;">'+d+'</div>'; });
+    html += '</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(7,1fr);">';
+
+    for(let p=0;p<firstDay;p++) html+='<div style="border-right:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;min-height:22px;background:#f9fafb;"></div>';
+    for(let d=1;d<=daysInMonth;d++){
+      const dateStr=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const isToday=today.getFullYear()===year&&today.getMonth()===month&&today.getDate()===d;
+      const isSun=new Date(year,month,d).getDay()===0;
+      const shifts=(_calDayShifts&&_calDayShifts[dateStr])||[];
+      const t0=shifts[0]?(_turniDef||[]).find(t=>t.id===shifts[0]):null;
+      const bg=isToday?'var(--accent)':(t0?t0.color+'66':'#fff');
+      const col=isToday?'#fff':(t0?'#fff':(isSun?'#ef4444':'#374151'));
+      html+='<div data-ds="'+dateStr+'" onclick="cal6mClick(this.getAttribute(&quot;data-ds&quot;))" style="border-right:1px solid #f3f4f6;border-bottom:1px solid #f3f4f6;min-height:22px;text-align:center;font-size:9px;font-weight:'+(isToday?800:500)+';color:'+col+';background:'+bg+';cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1px 0;">'+d+(t0?'<span style="font-size:6px;line-height:1;display:block;">'+t0.label+'</span>':'')+'</div>';
+        +d+(t0?'<span style="font-size:6px;line-height:1;display:block;">'+t0.label+'</span>':'')+'</div>';
+    }
+    html += '</div></div>';
+  }
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function cal6mClick(dateStr) {
+  const d = new Date(dateStr);
+  _calYear = d.getFullYear();
+  _calMonth = d.getMonth();
+  _calSelectedDate = dateStr;
+  calSetView('month');
+  setTimeout(()=>calSelectDate&&calSelectDate(dateStr),100);
+}
+
+function calShowAddEvent() {
+  const form = document.getElementById('cal-event-form');
+  if (!form) return;
+  form.style.display = 'block';
+  document.getElementById('cal-form-title').textContent = 'Nuovo evento';
+  document.getElementById('cal-ev-title').value = '';
+  document.getElementById('cal-ev-date').value = _calSelectedDate || new Date().toISOString().slice(0,10);
+  document.getElementById('cal-ev-time').value = '';
+  _calEditId = null;
+  form.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
 </script>
 
 
