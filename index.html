@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA153</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA154</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -4431,7 +4431,7 @@ async function pwHandleImport(event) {
 function pwNewItem() {
   if (!_pwCats.length) { showToast('Crea prima una categoria 📁'); return; }
   const catOpts = _pwCats.map(c =>
-    '<option value="'+c.id+'">'+(c.icon||'📁')+' '+c.name+'</option>'
+    '<option value="'+c.id+'">'+getCatIcon(c.id,c.name,c.icon)+' '+c.name+'</option>'
   ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
@@ -7736,7 +7736,7 @@ function pwEditItem(itemId) {
   const item = _pwItems.find(i => i.id === itemId);
   if (!item) return;
   const catOpts = _pwCats.map(c =>
-    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+( c.icon||'📁')+' '+c.name+'</option>'
+    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+getCatIcon(c.id,c.name,c.icon)+' '+c.name+'</option>'
   ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
@@ -8725,7 +8725,8 @@ function fbMsg(c){
 }
 
 const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
-  'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts'];
+  'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
+  'hb12_pw_cats'];
 
 // Salva timestamp locale per ogni chiave
 function _tsKey(k){ return 'hb_ts_' + k; }
@@ -8767,8 +8768,11 @@ async function fbSyncLoad(){
       showToast('☁️ Dati aggiornati dal cloud');
       // Ricarica UI
       if(typeof updateHomeStats==='function') updateHomeStats();
+      if(typeof pwLoad==='function') pwLoad();
+      if(HB.currentTab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
+      if(HB.currentTab === 'notes' && typeof renderNotes==='function') renderNotes();
+      if(HB.currentTab === 'shopping' && typeof shopRender==='function') shopRender();
       if(typeof renderCurrentTab==='function') renderCurrentTab();
-      else if(HB.currentTab && typeof switchTab==='function') switchTab(HB.currentTab);
     }
     // Upload chiavi locali più recenti del cloud
     await fbSyncAll(true);
