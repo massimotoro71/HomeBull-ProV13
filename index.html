@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)https://massimotoro71.github.io/HomeBull-ProV13/ -->
-<html lang="it" data-theme="dark" style="font-size: 15px; --card-radius: 14px; --card-shadow: none; --anim-speed: 0.18s;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="it" data-theme="dark">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0f">
 <title>HomeBull Pro</title>
-<link rel="manifest" href="https://massimotoro71.github.io/HomeBull-ProV13/manifest.json">
-<script src="./HomeBull Pro_files/email.min.js.download"></script>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="apple-touch-icon" href="data:image/png;base64,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">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,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">
 <style>
@@ -860,13 +860,9 @@ html, body {
 
 /* ── Calendario ────────────────────────────────────────── */
 .cal-day {
-  aspect-ratio: 0.85; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
   border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
-  position: relative; transition: all 0.15s; padding-top: 4px; overflow: hidden;
-}
-.cal-day .cal-shift-label {
-  font-size: 8px; font-weight: 800; opacity: 0.9; line-height: 1;
-  position: absolute; bottom: 3px; left: 0; right: 0; text-align: center;
+  position: relative; transition: all 0.15s;
 }
 .cal-day:active { transform: scale(0.9); }
 .cal-day.today { background: var(--accent); color: white; font-weight: 800; }
@@ -1887,7 +1883,7 @@ html, body {
   }
 }
 </style>
-<script src="./HomeBull Pro_files/qrious.min.js.download">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
@@ -2006,22 +2002,22 @@ function cardsSearch(q) {
 }
 
 </script>
-<script src="./HomeBull Pro_files/jsQR.min.js.download"></script>
-  <script src="./HomeBull Pro_files/JsBarcode.all.min.js.download"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <!-- Firebase SDK -->
-  <script src="./HomeBull Pro_files/firebase-app-compat.js.download"></script>
-  <script src="./HomeBull Pro_files/firebase-auth-compat.js.download"></script>
-  <script src="./HomeBull Pro_files/firebase-database-compat.js.download"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, sans-serif;">
+<body>
 
 <!-- Loading -->
-<div id="loading-overlay" class="hidden">
+<div id="loading-overlay">
   <div class="loading-logo">
     <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="12" width="20" height="16" rx="3"></rect>
-      <path d="M12 12V9a6 6 0 0 1 12 0v3"></path>
-      <circle cx="18" cy="20" r="2" fill="white" stroke="none"></circle>
+      <rect x="8" y="12" width="20" height="16" rx="3"/>
+      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
+      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
     </svg>
   </div>
   <div class="loading-spinner"></div>
@@ -2031,18 +2027,18 @@ function cardsSearch(q) {
 <div id="auth-screen">
   <div class="auth-logo">
     <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="12" width="20" height="16" rx="3"></rect>
-      <path d="M12 12V9a6 6 0 0 1 12 0v3"></path>
-      <circle cx="18" cy="20" r="2" fill="white" stroke="none"></circle>
+      <rect x="8" y="12" width="20" height="16" rx="3"/>
+      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
+      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
     </svg>
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA159</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA157</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
-    <div class="auth-step" id="step-login">
+    <div class="auth-step active" id="step-login">
       <div class="auth-label">Inserisci la tua email</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:14px;text-align:center;">Riceverai un codice di verifica</div>
       <input type="email" class="auth-input" id="fb-email" placeholder="nome@email.com" autocomplete="email" inputmode="email">
@@ -2071,7 +2067,7 @@ function cardsSearch(q) {
       <div id="otp-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
       <button class="auth-btn" onclick="verifyEmailOTP()">Verifica →</button>
       <div style="margin-top:12px;text-align:center;">
-        <button onclick="goToStep(&#39;login&#39;)" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia email</button>
+        <button onclick="goToStep('login')" style="background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">← Cambia email</button>
         <span style="color:var(--border);margin:0 8px;">|</span>
         <button onclick="resendOTP()" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;font-family:inherit;" id="resend-btn">Reinvia codice</button>
       </div>
@@ -2079,9 +2075,9 @@ function cardsSearch(q) {
     </div>
 
     <!-- STEP 3: PIN MASTER -->
-    <div class="auth-step active" id="step-pin">
-      <div class="auth-label" id="pin-label">Inserisci il tuo PIN</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center;" id="pin-sub"></div>
+    <div class="auth-step" id="step-pin">
+      <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center;" id="pin-sub">8 cifre — usato per sbloccare l'app</div>
       <div class="pin-row" id="pin-dots">
         <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
         <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
@@ -2089,18 +2085,18 @@ function cardsSearch(q) {
         <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
       </div>
       <div class="pin-numpad" id="pin-numpad">
-        <button class="pin-key" onclick="pinPress(&#39;1&#39;)">1</button>
-        <button class="pin-key" onclick="pinPress(&#39;2&#39;)">2</button>
-        <button class="pin-key" onclick="pinPress(&#39;3&#39;)">3</button>
-        <button class="pin-key" onclick="pinPress(&#39;4&#39;)">4</button>
-        <button class="pin-key" onclick="pinPress(&#39;5&#39;)">5</button>
-        <button class="pin-key" onclick="pinPress(&#39;6&#39;)">6</button>
-        <button class="pin-key" onclick="pinPress(&#39;7&#39;)">7</button>
-        <button class="pin-key" onclick="pinPress(&#39;8&#39;)">8</button>
-        <button class="pin-key" onclick="pinPress(&#39;9&#39;)">9</button>
-        <button class="pin-key bio-btn" id="pin-bio-btn" onclick="pinBioAuth()" style="display: flex;">👆</button>
-        <button class="pin-key ghost" id="pin-bio-ghost" style="display: none;"></button>
-        <button class="pin-key" onclick="pinPress(&#39;0&#39;)">0</button>
+        <button class="pin-key" onclick="pinPress('1')">1</button>
+        <button class="pin-key" onclick="pinPress('2')">2</button>
+        <button class="pin-key" onclick="pinPress('3')">3</button>
+        <button class="pin-key" onclick="pinPress('4')">4</button>
+        <button class="pin-key" onclick="pinPress('5')">5</button>
+        <button class="pin-key" onclick="pinPress('6')">6</button>
+        <button class="pin-key" onclick="pinPress('7')">7</button>
+        <button class="pin-key" onclick="pinPress('8')">8</button>
+        <button class="pin-key" onclick="pinPress('9')">9</button>
+        <button class="pin-key bio-btn" id="pin-bio-btn" onclick="pinBioAuth()" style="display:none;">👆</button>
+        <button class="pin-key ghost" id="pin-bio-ghost"></button>
+        <button class="pin-key" onclick="pinPress('0')">0</button>
         <button class="pin-key" onclick="pinDelete()">⌫</button>
       </div>
       <div class="auth-error" id="pin-error"></div>
@@ -2131,9 +2127,9 @@ function cardsSearch(q) {
     <div class="sidebar-logo">
       <div class="sidebar-logo-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-          <rect x="5" y="8" width="14" height="11" rx="2"></rect>
-          <path d="M8 8V6a4 4 0 0 1 8 0v2"></path>
-          <circle cx="12" cy="14" r="1.5" fill="white" stroke="none"></circle>
+          <rect x="5" y="8" width="14" height="11" rx="2"/>
+          <path d="M8 8V6a4 4 0 0 1 8 0v2"/>
+          <circle cx="12" cy="14" r="1.5" fill="white" stroke="none"/>
         </svg>
       </div>
       <div>
@@ -2146,65 +2142,65 @@ function cardsSearch(q) {
     </div>
 
     <div class="sidebar-nav">
-      <div class="sidebar-item active" data-tab="home" onclick="switchTab(&#39;home&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <div class="sidebar-item active" data-tab="home" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span class="sidebar-item-label">Home</span>
       </div>
 
-      <div class="sidebar-item" data-tab="calendar" onclick="switchTab(&#39;calendar&#39;)">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      <div class="sidebar-item" data-tab="calendar" onclick="switchTab('calendar')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <span class="sidebar-item-label">Calendario</span>
       </div>
 
-      <div class="sidebar-item" data-tab="cards" onclick="switchTab(&#39;cards&#39;)">
-        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+      <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
+        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <span class="sidebar-item-label">Carte</span>
       </div>
 
-      <div class="sidebar-item" data-tab="documents" onclick="switchTab(&#39;documents&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <span class="sidebar-item-label">Documenti</span>
       </div>
 
-      <div class="sidebar-item" data-tab="family" onclick="switchTab(&#39;family&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      <div class="sidebar-item" data-tab="family" onclick="switchTab('family')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span class="sidebar-item-label">Famiglia</span>
       </div>
 
-      <div class="sidebar-item" data-tab="finance" onclick="switchTab(&#39;finance&#39;)">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+      <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span class="sidebar-item-label">Finanze</span>
       </div>
 
-      <div class="sidebar-item" data-tab="shopping" onclick="switchTab(&#39;shopping&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <div class="sidebar-item" data-tab="shopping" onclick="switchTab('shopping')">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="sidebar-item-label">Lista Spesa</span>
       </div>
 
-      <div class="sidebar-item" data-tab="notes" onclick="switchTab(&#39;notes&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <span class="sidebar-item-label">Note</span>
       </div>
 
-      <div class="sidebar-item" data-tab="otp" onclick="switchTab(&#39;otp&#39;)">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      <div class="sidebar-item" data-tab="otp" onclick="switchTab('otp')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="sidebar-item-label">OTP / 2FA</span>
       </div>
 
 
-      <div class="sidebar-item" data-tab="passwords" onclick="switchTab(&#39;passwords&#39;)">
-        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="sidebar-item-label">Password</span>
 
       </div>
 
-      <div class="sidebar-item" data-tab="server" onclick="switchTab(&#39;server&#39;)">
-        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"></rect><rect x="2" y="14" width="20" height="8" rx="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+      <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Server / IT</span>
       </div>
 
-      <div class="sidebar-item" data-tab="wifi" onclick="switchTab(&#39;wifi&#39;)">
-        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+      <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
+        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
         <span class="sidebar-item-label">Wi-Fi</span>
       </div>
 
@@ -2212,11 +2208,11 @@ function cardsSearch(q) {
 
     <div class="sidebar-footer">
       <div class="sidebar-item" onclick="openSettings()">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <span class="sidebar-item-label">Impostazioni</span>
       </div>
       <div class="sidebar-item" onclick="logout()">
-        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         <span class="sidebar-item-label">Esci</span>
       </div>
     </div>
@@ -2226,7 +2222,7 @@ function cardsSearch(q) {
   <header id="topbar">
     <div class="topbar-back" id="topbar-back" onclick="topbarBack()">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
+        <polyline points="15 18 9 12 15 6"/>
       </svg>
     </div>
     <div class="topbar-title">
@@ -2248,18 +2244,18 @@ function cardsSearch(q) {
       <div class="tab-inner">
 
         <div style="margin-bottom:2px;">
-          <div style="font-size:14px;font-weight:700;color:var(--text3);" id="home-saluto">Buonasera,</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text3);" id="home-saluto">Buon pomeriggio,</div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:1px;">
-            <div class="home-welcome" id="home-greeting" style="font-size:clamp(22px,7vw,34px);line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100% - 30px);font-weight:900;">Utente</div>
+            <div class="home-welcome" id="home-greeting" style="font-size:clamp(22px,7vw,34px);line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100% - 30px);font-weight:900;"></div>
             <button onclick="editDisplayName()" title="Cambia nome" style="background:none;border:none;cursor:pointer;padding:4px;opacity:0.35;flex-shrink:0;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.35">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </button>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin:4px 0 0;">
-          <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);">Mercoledì 3 giugno</div>
+          <div class="home-date" id="home-date" style="font-size:13px;font-weight:600;color:var(--text2);"></div>
           <div style="width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
-          <div id="home-time" style="font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">20:30</div>
+          <div id="home-time" style="font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;"></div>
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
@@ -2268,7 +2264,7 @@ function cardsSearch(q) {
 
         <!-- Ricerca globale -->
         <div id="home-search-bar" onclick="openGlobalSearch()" style="display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 16px;margin-bottom:20px;cursor:pointer;transition:border-color 0.2s;">
-          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <span style="color:var(--text3);font-size:14px;font-weight:500;flex:1;">Cerca in tutto HomeBull...</span>
           <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--text3);font-family:inherit;">⌘K</kbd>
         </div>
@@ -2284,22 +2280,22 @@ function cardsSearch(q) {
         <div id="home-stats-section" style="margin-bottom:20px;">
           <div class="home-section-title" style="margin-bottom:10px;">📊 Il tuo vault</div>
           <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;" id="home-stats-grid">
-            <div class="stat-card" onclick="switchTab(&#39;passwords&#39;)">
+            <div class="stat-card" onclick="switchTab('passwords')">
               <div class="stat-icon">🔐</div>
               <div class="stat-num" id="stat-passwords">0</div>
               <div class="stat-label">Password</div>
             </div>
-            <div class="stat-card" onclick="switchTab(&#39;notes&#39;)">
+            <div class="stat-card" onclick="switchTab('notes')">
               <div class="stat-icon">📝</div>
               <div class="stat-num" id="stat-notes">0</div>
               <div class="stat-label">Note</div>
             </div>
-            <div class="stat-card" onclick="switchTab(&#39;otp&#39;)">
+            <div class="stat-card" onclick="switchTab('otp')">
               <div class="stat-icon">🔑</div>
               <div class="stat-num" id="stat-otp">0</div>
               <div class="stat-label">OTP / 2FA</div>
             </div>
-            <div class="stat-card" onclick="switchTab(&#39;documents&#39;)">
+            <div class="stat-card" onclick="switchTab('documents')">
               <div class="stat-icon">📄</div>
               <div class="stat-num" id="stat-docs">0</div>
               <div class="stat-label">Documenti</div>
@@ -2323,7 +2319,7 @@ function cardsSearch(q) {
       <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
           <div class="pw-search-bar">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
@@ -2335,19 +2331,19 @@ function cardsSearch(q) {
         <div style="padding:12px 14px 8px;flex-shrink:0;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
             <button onclick="pwBack()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <div style="flex:1;min-width:0;">
-              <div id="pw-cat-name" style="font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;"></div>
+              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;"></div>
               <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
             </div>
             <button onclick="pwToggleSearch()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </button>
           </div>
           <div id="pw-item-search-wrap" style="display:none;">
             <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
               <input id="pw-item-search" type="text" placeholder="Cerca password..." oninput="pwFilterItems(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
           </div>
@@ -2359,9 +2355,9 @@ function cardsSearch(q) {
       <div id="pw-view-detail" style="display:none;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
           <button onclick="pwBackToItems()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div id="pw-detail-title" style="flex:1;font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+          <div id="pw-detail-title" style="flex:1;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
         </div>
         <div id="pw-detail-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;"></div>
       </div>
@@ -2370,7 +2366,7 @@ function cardsSearch(q) {
       <div id="pw-import-banner" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg);z-index:10;">
         <div style="text-align:center;padding:32px 24px;max-width:320px;">
           <div style="font-size:48px;margin-bottom:16px;">🔐</div>
-          <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
           <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
           <button onclick="pwImportBackup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
           <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
@@ -2402,7 +2398,7 @@ function cardsSearch(q) {
           <!-- Header -->
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
             <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <div style="font-size:17px;font-weight:800;">Nuovo Documento</div>
           </div>
@@ -2411,12 +2407,12 @@ function cardsSearch(q) {
           <div style="margin-bottom:18px;">
             <div class="pw-field-label" style="margin-bottom:10px;">Tipo documento</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="docs-type-grid">
-              <button class="doc-type-btn active" data-type="ci" onclick="docsPickType(this,&#39;ci&#39;,&#39;🪪&#39;,&#39;C. Identità&#39;)" style="padding:12px 8px;border-radius:12px;border:2px solid var(--accent);background:var(--accent-bg);cursor:pointer;font-size:11px;font-weight:800;color:var(--accent);font-family:inherit;text-align:center;">🪪<br>C. Identità</button>
-              <button class="doc-type-btn" data-type="pass" onclick="docsPickType(this,&#39;pass&#39;,&#39;🛂&#39;,&#39;Passaporto&#39;)" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🛂<br>Passaporto</button>
-              <button class="doc-type-btn" data-type="pat" onclick="docsPickType(this,&#39;pat&#39;,&#39;🚗&#39;,&#39;Patente&#39;)" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🚗<br>Patente</button>
-              <button class="doc-type-btn" data-type="ts" onclick="docsPickType(this,&#39;ts&#39;,&#39;🏥&#39;,&#39;Tessera San.&#39;)" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🏥<br>Tessera San.</button>
-              <button class="doc-type-btn" data-type="cf" onclick="docsPickType(this,&#39;cf&#39;,&#39;📋&#39;,&#39;Cod. Fiscale&#39;)" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📋<br>Cod. Fiscale</button>
-              <button class="doc-type-btn" data-type="alt" onclick="docsPickType(this,&#39;alt&#39;,&#39;📄&#39;,&#39;Altro&#39;)" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📄<br>Altro</button>
+              <button class="doc-type-btn active" data-type="ci"   onclick="docsPickType(this,'ci','🪪','C. Identità')"   style="padding:12px 8px;border-radius:12px;border:2px solid var(--accent);background:var(--accent-bg);cursor:pointer;font-size:11px;font-weight:800;color:var(--accent);font-family:inherit;text-align:center;">🪪<br>C. Identità</button>
+              <button class="doc-type-btn"        data-type="pass" onclick="docsPickType(this,'pass','🛂','Passaporto')"  style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🛂<br>Passaporto</button>
+              <button class="doc-type-btn"        data-type="pat"  onclick="docsPickType(this,'pat','🚗','Patente')"      style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🚗<br>Patente</button>
+              <button class="doc-type-btn"        data-type="ts"   onclick="docsPickType(this,'ts','🏥','Tessera San.')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🏥<br>Tessera San.</button>
+              <button class="doc-type-btn"        data-type="cf"   onclick="docsPickType(this,'cf','📋','Cod. Fiscale')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📋<br>Cod. Fiscale</button>
+              <button class="doc-type-btn"        data-type="alt"  onclick="docsPickType(this,'alt','📄','Altro')"       style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📄<br>Altro</button>
             </div>
           </div>
 
@@ -2455,10 +2451,10 @@ function cardsSearch(q) {
               <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  📸 Fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,&#39;fronte&#39;)" style="display:none;">
+                  📸 Fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
                 </label>
                 <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  📸 Retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,&#39;retro&#39;)" style="display:none;">
+                  📸 Retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
                 </label>
               </div>
               <div id="dnew_photos_preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
@@ -2493,7 +2489,7 @@ function cardsSearch(q) {
         <div id="docs-view-detail" style="display:none;flex:1;overflow-y:auto;padding:14px 14px 100px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
             <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <div id="docs-detail-title" style="font-size:17px;font-weight:800;flex:1;"></div>
             <button id="docs-detail-del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">🗑</button>
@@ -2512,11 +2508,11 @@ function cardsSearch(q) {
           <div style="padding:12px 14px 8px;flex-shrink:0;">
             <div style="display:flex;gap:8px;align-items:center;">
               <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
               <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Nuova
               </button>
             </div>
@@ -2528,15 +2524,17 @@ function cardsSearch(q) {
         <div id="note-view-editor" style="display:none;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
             <button onclick="noteCloseEditor()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <input id="note-title-inp" type="text" placeholder="Titolo nota..." maxlength="100" style="flex:1;background:none;border:none;outline:none;font-family:&#39;Syne&#39;,sans-serif;font-size:18px;font-weight:800;color:var(--text);">
+            <input id="note-title-inp" type="text" placeholder="Titolo nota..." maxlength="100"
+              style="flex:1;background:none;border:none;outline:none;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);">
             <button onclick="noteSave()" style="padding:8px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Salva</button>
           </div>
           <div style="padding:6px 14px;flex-shrink:0;">
             <span id="note-editor-date" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
           </div>
-          <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..." style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:&#39;DM Sans&#39;,sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
+          <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..."
+            style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
         </div>
 
       </div>
@@ -2551,19 +2549,18 @@ function cardsSearch(q) {
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
           <!-- Toggle Mese/Settimana -->
           <div style="display:flex;gap:6px;margin-bottom:12px;">
-            <button id="cal-view-month" onclick="calSetView(&#39;month&#39;)" style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);">
+            <button id="cal-view-month" onclick="calSetView('month')"
+              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);">
               📅 Mese
             </button>
-            <button id="cal-view-week" onclick="calSetView(&#39;week&#39;)" style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
+            <button id="cal-view-week" onclick="calSetView('week')"
+              style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
               📆 Settimana
-            </button>
-            <button id="cal-view-6m" onclick="calSetView(&#39;6m&#39;)" style="flex:1;padding:8px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;border:1px solid var(--border);background:var(--surface);color:var(--text2);">
-              🗓 6 Mesi
             </button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
             <button onclick="calPrev()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">‹</button>
-            <div id="cal-month-label" style="font-family:&#39;Syne&#39;,sans-serif;font-size:16px;font-weight:800;"></div>
+            <div id="cal-month-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;"></div>
             <button onclick="calNext()" style="width:34px;height:34px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:16px;">›</button>
           </div>
           <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;">
@@ -2577,29 +2574,20 @@ function cardsSearch(q) {
           </div>
           <!-- Griglia mese -->
           <div id="cal-grid-month">
-            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;"></div>
+            <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;"></div>
           </div>
           <!-- Griglia settimana -->
           <div id="cal-grid-week" style="display:none;">
             <div id="cal-week-grid"></div>
           </div>
-          <!-- Griglia 6 mesi -->
-          <div id="cal-grid-6m" style="display:none;">
-            <div id="cal-6m-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
-          </div>
-        </div>
-
-        <!-- Riepilogo turni -->
-        <div id="cal-riepilogo" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:12px;">
-          <div style="font-size:13px;font-weight:800;margin-bottom:8px;">📊 Riepilogo mese</div>
-          <div id="cal-riepilogo-content" style="font-size:12px;color:var(--text2);"></div>
         </div>
 
         <!-- Evento selezionato / form nuovo evento -->
         <div id="cal-event-form" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;">
-          <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:15px;font-weight:800;margin-bottom:12px;" id="cal-form-title">Nuovo evento</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:12px;" id="cal-form-title">Nuovo evento</div>
           <div style="margin-bottom:10px;">
-            <input id="cal-ev-title" type="text" placeholder="Titolo evento *" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input id="cal-ev-title" type="text" placeholder="Titolo evento *"
+              style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
             <div>
@@ -2643,8 +2631,10 @@ function cardsSearch(q) {
             <div id="turno-form" style="display:none;margin-top:12px;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px;">
               <div style="font-size:13px;font-weight:800;margin-bottom:10px;">Nuovo turno</div>
               <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;">
-                <input type="color" id="turno-color" value="#6366f1" style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:var(--surface);">
-                <input type="text" id="turno-label" placeholder="Etichetta (es. Matt.)" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
+                <input type="color" id="turno-color" value="#6366f1"
+                  style="width:44px;height:44px;border:none;border-radius:10px;cursor:pointer;padding:2px;background:var(--surface);">
+                <input type="text" id="turno-label" placeholder="Etichetta (es. Matt.)"
+                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
                 <div>
@@ -2681,11 +2671,11 @@ function cardsSearch(q) {
           <div style="padding:12px 14px 8px;flex-shrink:0;">
             <div style="display:flex;gap:8px;align-items:center;">
               <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
               <button onclick="otpShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Aggiungi
               </button>
             </div>
@@ -2697,37 +2687,41 @@ function cardsSearch(q) {
         <div id="otp-view-add" style="display:none;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
             <button onclick="otpShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;">Aggiungi Account 2FA</div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Account 2FA</div>
           </div>
           <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Nome account *</div>
-              <input id="otp-add-name" type="text" placeholder="es. Google, GitHub, Amazon..." style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <input id="otp-add-name" type="text" placeholder="es. Google, GitHub, Amazon..."
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Email / Username</div>
-              <input id="otp-add-user" type="text" placeholder="es. nome@email.com" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <input id="otp-add-user" type="text" placeholder="es. nome@email.com"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:14px;">
               <button onclick="otpScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">📷 Scansiona QR Code 2FA</button>
               <div class="pw-field-label" style="margin-bottom:6px;">Oppure inserisci manualmente — Chiave segreta *</div>
-              <input id="otp-add-secret" type="text" placeholder="es. JBSWY3DPEHPK3PXP" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z2-7=]/g,&#39;&#39;)">
+              <input id="otp-add-secret" type="text" placeholder="es. JBSWY3DPEHPK3PXP"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;text-transform:uppercase;"
+                oninput="this.value=this.value.toUpperCase().replace(/[^A-Z2-7=]/g,'')">
             </div>
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Icona</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;" id="otp-icon-picker">
-                <button class="otp-icon-btn selected" data-icon="🔐" onclick="otpSelectIcon(this,&#39;🔐&#39;)">🔐</button>
-                <button class="otp-icon-btn" data-icon="📧" onclick="otpSelectIcon(this,&#39;📧&#39;)">📧</button>
-                <button class="otp-icon-btn" data-icon="💼" onclick="otpSelectIcon(this,&#39;💼&#39;)">💼</button>
-                <button class="otp-icon-btn" data-icon="🏦" onclick="otpSelectIcon(this,&#39;🏦&#39;)">🏦</button>
-                <button class="otp-icon-btn" data-icon="☁️" onclick="otpSelectIcon(this,&#39;☁️&#39;)">☁️</button>
-                <button class="otp-icon-btn" data-icon="🛒" onclick="otpSelectIcon(this,&#39;🛒&#39;)">🛒</button>
-                <button class="otp-icon-btn" data-icon="🎮" onclick="otpSelectIcon(this,&#39;🎮&#39;)">🎮</button>
-                <button class="otp-icon-btn" data-icon="📱" onclick="otpSelectIcon(this,&#39;📱&#39;)">📱</button>
-                <button class="otp-icon-btn" data-icon="🔑" onclick="otpSelectIcon(this,&#39;🔑&#39;)">🔑</button>
-                <button class="otp-icon-btn" data-icon="🌐" onclick="otpSelectIcon(this,&#39;🌐&#39;)">🌐</button>
+                <button class="otp-icon-btn selected" data-icon="🔐" onclick="otpSelectIcon(this,'🔐')">🔐</button>
+                <button class="otp-icon-btn" data-icon="📧" onclick="otpSelectIcon(this,'📧')">📧</button>
+                <button class="otp-icon-btn" data-icon="💼" onclick="otpSelectIcon(this,'💼')">💼</button>
+                <button class="otp-icon-btn" data-icon="🏦" onclick="otpSelectIcon(this,'🏦')">🏦</button>
+                <button class="otp-icon-btn" data-icon="☁️" onclick="otpSelectIcon(this,'☁️')">☁️</button>
+                <button class="otp-icon-btn" data-icon="🛒" onclick="otpSelectIcon(this,'🛒')">🛒</button>
+                <button class="otp-icon-btn" data-icon="🎮" onclick="otpSelectIcon(this,'🎮')">🎮</button>
+                <button class="otp-icon-btn" data-icon="📱" onclick="otpSelectIcon(this,'📱')">📱</button>
+                <button class="otp-icon-btn" data-icon="🔑" onclick="otpSelectIcon(this,'🔑')">🔑</button>
+                <button class="otp-icon-btn" data-icon="🌐" onclick="otpSelectIcon(this,'🌐')">🌐</button>
               </div>
             </div>
             <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:20px;">
@@ -2750,11 +2744,11 @@ function cardsSearch(q) {
           <div style="padding:12px 14px 8px;flex-shrink:0;">
             <div style="display:flex;gap:8px;align-items:center;">
               <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
               <button onclick="cardsShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Aggiungi
               </button>
             </div>
@@ -2766,9 +2760,9 @@ function cardsSearch(q) {
         <div id="cards-view-add" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
           <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
             <button onclick="cardsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;">Aggiungi Carta</div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Carta</div>
           </div>
           <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
 
@@ -2777,11 +2771,11 @@ function cardsSearch(q) {
               <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);"></div>
               <div style="position:absolute;bottom:-30px;left:-10px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
               <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.1em;" id="preview-label">Nome carta</div>
+                <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.1em;" id="preview-label">Nome carta</div>
                 <div style="font-size:24px;" id="preview-circuit">💳</div>
               </div>
               <div>
-                <div style="font-family:&#39;DM Sans&#39;,monospace;font-size:18px;font-weight:700;color:white;letter-spacing:0.12em;margin-bottom:12px;font-variant-numeric:tabular-nums;" id="preview-number">•••• •••• •••• ••••</div>
+                <div style="font-family:'DM Sans',monospace;font-size:18px;font-weight:700;color:white;letter-spacing:0.12em;margin-bottom:12px;font-variant-numeric:tabular-nums;" id="preview-number">•••• •••• •••• ••••</div>
                 <div style="display:flex;gap:24px;">
                   <div>
                     <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
@@ -2797,35 +2791,44 @@ function cardsSearch(q) {
 
             <div style="margin-bottom:12px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
-              <input id="card-add-label" type="text" placeholder="es. Visa Principale, Mastercard Lavoro" oninput="cardUpdatePreview()" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <input id="card-add-label" type="text" placeholder="es. Visa Principale, Mastercard Lavoro"
+                oninput="cardUpdatePreview()"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:12px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Numero carta *</div>
-              <input id="card-add-number" type="text" inputmode="numeric" maxlength="19" placeholder="•••• •••• •••• ••••" oninput="cardFormatNumber(this);cardUpdatePreview()" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;letter-spacing:0.1em;font-variant-numeric:tabular-nums;">
+              <input id="card-add-number" type="text" inputmode="numeric" maxlength="19" placeholder="•••• •••• •••• ••••"
+                oninput="cardFormatNumber(this);cardUpdatePreview()"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;letter-spacing:0.1em;font-variant-numeric:tabular-nums;">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
               <div>
                 <div class="pw-field-label" style="margin-bottom:6px;">Scadenza *</div>
-                <input id="card-add-exp" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA" oninput="cardFormatExp(this);cardUpdatePreview()" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;font-variant-numeric:tabular-nums;">
+                <input id="card-add-exp" type="text" inputmode="numeric" maxlength="5" placeholder="MM/AA"
+                  oninput="cardFormatExp(this);cardUpdatePreview()"
+                  style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;font-variant-numeric:tabular-nums;">
               </div>
               <div>
                 <div class="pw-field-label" style="margin-bottom:6px;">CVV</div>
-                <input id="card-add-cvv" type="password" inputmode="numeric" maxlength="4" placeholder="•••" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;">
+                <input id="card-add-cvv" type="password" inputmode="numeric" maxlength="4" placeholder="•••"
+                  style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;">
               </div>
             </div>
             <div style="margin-bottom:12px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
-              <input id="card-add-holder" type="text" placeholder="NOME COGNOME" oninput="cardUpdatePreview()" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;text-transform:uppercase;">
+              <input id="card-add-holder" type="text" placeholder="NOME COGNOME"
+                oninput="cardUpdatePreview()"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;text-transform:uppercase;">
             </div>
             <div style="margin-bottom:20px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <div class="card-color-btn active" data-color="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="cardSelectColor(this,&#39;linear-gradient(135deg,#6366f1,#8b5cf6)&#39;)" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="cardSelectColor(this,&#39;linear-gradient(135deg,#0f172a,#1e3a5f)&#39;)" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#065f46,#10b981)" onclick="cardSelectColor(this,&#39;linear-gradient(135deg,#065f46,#10b981)&#39;)" style="background:linear-gradient(135deg,#065f46,#10b981);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#7c2d12,#f97316)" onclick="cardSelectColor(this,&#39;linear-gradient(135deg,#7c2d12,#f97316)&#39;)" style="background:linear-gradient(135deg,#7c2d12,#f97316);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#1a1a1a,#374151)" onclick="cardSelectColor(this,&#39;linear-gradient(135deg,#1a1a1a,#374151)&#39;)" style="background:linear-gradient(135deg,#1a1a1a,#374151);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#92400e,#d97706)" onclick="cardSelectColor(this,&#39;linear-gradient(135deg,#92400e,#d97706)&#39;)" style="background:linear-gradient(135deg,#92400e,#d97706);"></div>
+                <div class="card-color-btn active" data-color="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#6366f1,#8b5cf6)')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="cardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e3a5f)')" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#065f46,#10b981)" onclick="cardSelectColor(this,'linear-gradient(135deg,#065f46,#10b981)')" style="background:linear-gradient(135deg,#065f46,#10b981);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#7c2d12,#f97316)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7c2d12,#f97316)')" style="background:linear-gradient(135deg,#7c2d12,#f97316);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#1a1a1a,#374151)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1a1a1a,#374151)')" style="background:linear-gradient(135deg,#1a1a1a,#374151);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#92400e,#d97706)" onclick="cardSelectColor(this,'linear-gradient(135deg,#92400e,#d97706)')" style="background:linear-gradient(135deg,#92400e,#d97706);"></div>
               </div>
             </div>
             <button onclick="cardSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Carta</button>
@@ -2842,7 +2845,7 @@ function cardsSearch(q) {
         <div id="wifi-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:8px 14px;flex-shrink:0;">
             <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
               <input type="text" id="wifi-search-inp" placeholder="Cerca rete..." oninput="wifiSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
           </div>
@@ -2853,9 +2856,9 @@ function cardsSearch(q) {
         <div id="wifi-view-add" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
           <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
             <button onclick="wifiShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;">Aggiungi Rete Wi-Fi</div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Rete Wi-Fi</div>
           </div>
           <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
             <div style="margin-bottom:12px;">
@@ -2864,21 +2867,23 @@ function cardsSearch(q) {
             <div style="margin-bottom:10px;text-align:center;font-size:11px;color:var(--text3);font-weight:600;">— oppure inserisci manualmente —</div>
           <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Nome rete (SSID) *</div>
-              <input id="wifi-add-ssid" type="text" placeholder="es. Casa-5G" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <input id="wifi-add-ssid" type="text" placeholder="es. Casa-5G"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
               <div style="position:relative;">
-                <input id="wifi-add-pw" type="password" placeholder="Password rete" style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                <input id="wifi-add-pw" type="password" placeholder="Password rete"
+                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
                 <button onclick="wifiToggleAddPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;" id="wifi-add-pw-eye">👁</button>
               </div>
             </div>
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Sicurezza</div>
               <div style="display:flex;gap:8px;">
-                <button class="wifi-sec-btn active" data-sec="WPA" onclick="wifiSelectSec(this,&#39;WPA&#39;)">WPA/WPA2</button>
-                <button class="wifi-sec-btn" data-sec="WEP" onclick="wifiSelectSec(this,&#39;WEP&#39;)">WEP</button>
-                <button class="wifi-sec-btn" data-sec="nopass" onclick="wifiSelectSec(this,&#39;nopass&#39;)">Aperta</button>
+                <button class="wifi-sec-btn active" data-sec="WPA" onclick="wifiSelectSec(this,'WPA')">WPA/WPA2</button>
+                <button class="wifi-sec-btn" data-sec="WEP" onclick="wifiSelectSec(this,'WEP')">WEP</button>
+                <button class="wifi-sec-btn" data-sec="nopass" onclick="wifiSelectSec(this,'nopass')">Aperta</button>
               </div>
             </div>
             <button onclick="wifiSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;">Salva Rete</button>
@@ -2901,56 +2906,64 @@ function cardsSearch(q) {
         <div id="finance-view-add" style="display:none;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
             <button onclick="financeShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;">Aggiungi Conto</div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Conto</div>
           </div>
 
           <!-- Tipo conto -->
           <div style="margin-bottom:14px;">
             <div class="pw-field-label" style="margin-bottom:8px;">Tipo</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-type-grid">
-              <button class="finance-type-btn active" data-type="conto" onclick="financeSelectType(this,&#39;conto&#39;,&#39;🏦&#39;,&#39;Conto Corrente&#39;)">🏦<br>Corrente</button>
-              <button class="finance-type-btn" data-type="risparmio" onclick="financeSelectType(this,&#39;risparmio&#39;,&#39;💰&#39;,&#39;Conto Risparmio&#39;)">💰<br>Risparmio</button>
-              <button class="finance-type-btn" data-type="investimento" onclick="financeSelectType(this,&#39;investimento&#39;,&#39;📈&#39;,&#39;Investimento&#39;)">📈<br>Investimento</button>
-              <button class="finance-type-btn" data-type="paypal" onclick="financeSelectType(this,&#39;paypal&#39;,&#39;🅿️&#39;,&#39;PayPal&#39;)">🅿️<br>PayPal</button>
-              <button class="finance-type-btn" data-type="crypto" onclick="financeSelectType(this,&#39;crypto&#39;,&#39;₿&#39;,&#39;Crypto&#39;)">₿<br>Crypto</button>
-              <button class="finance-type-btn" data-type="altro" onclick="financeSelectType(this,&#39;altro&#39;,&#39;💼&#39;,&#39;Altro&#39;)">💼<br>Altro</button>
+              <button class="finance-type-btn active" data-type="conto" onclick="financeSelectType(this,'conto','🏦','Conto Corrente')">🏦<br>Corrente</button>
+              <button class="finance-type-btn" data-type="risparmio" onclick="financeSelectType(this,'risparmio','💰','Conto Risparmio')">💰<br>Risparmio</button>
+              <button class="finance-type-btn" data-type="investimento" onclick="financeSelectType(this,'investimento','📈','Investimento')">📈<br>Investimento</button>
+              <button class="finance-type-btn" data-type="paypal" onclick="financeSelectType(this,'paypal','🅿️','PayPal')">🅿️<br>PayPal</button>
+              <button class="finance-type-btn" data-type="crypto" onclick="financeSelectType(this,'crypto','₿','Crypto')">₿<br>Crypto</button>
+              <button class="finance-type-btn" data-type="altro" onclick="financeSelectType(this,'altro','💼','Altro')">💼<br>Altro</button>
             </div>
           </div>
 
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
-            <input id="fin-label" type="text" placeholder="es. Intesa, Fineco, Revolut..." style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input id="fin-label" type="text" placeholder="es. Intesa, Fineco, Revolut..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">IBAN</div>
-            <input id="fin-iban" type="text" placeholder="IT60 X054 2811 1010 0000 0123 456" oninput="financeFormatIBAN(this)" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;letter-spacing:0.05em;text-transform:uppercase;">
+            <input id="fin-iban" type="text" placeholder="IT60 X054 2811 1010 0000 0123 456"
+              oninput="financeFormatIBAN(this)"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;letter-spacing:0.05em;text-transform:uppercase;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">BIC / SWIFT</div>
-              <input id="fin-bic" type="text" placeholder="BCITITMM" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;text-transform:uppercase;">
+              <input id="fin-bic" type="text" placeholder="BCITITMM"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;text-transform:uppercase;">
             </div>
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
-              <input id="fin-holder" type="text" placeholder="Nome Cognome" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <input id="fin-holder" type="text" placeholder="Nome Cognome"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
             </div>
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Username / Email accesso</div>
-            <input id="fin-user" type="text" placeholder="Username home banking" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input id="fin-user" type="text" placeholder="Username home banking"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Password accesso</div>
             <div style="position:relative;">
-              <input id="fin-pw" type="password" placeholder="Password home banking" style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+              <input id="fin-pw" type="password" placeholder="Password home banking"
+                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
               <button onclick="financeTogglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
             </div>
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Note aggiuntive</div>
-            <textarea id="fin-notes" placeholder="PIN, informazioni aggiuntive..." style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
+            <textarea id="fin-notes" placeholder="PIN, informazioni aggiuntive..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
           </div>
           <button onclick="financeSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Conto</button>
         </div>
@@ -2971,52 +2984,58 @@ function cardsSearch(q) {
         <div id="server-view-add" style="display:none;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
             <button onclick="serverShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:17px;font-weight:800;">Aggiungi Credenziale</div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Credenziale</div>
           </div>
 
           <!-- Tipo -->
           <div style="margin-bottom:14px;">
             <div class="pw-field-label" style="margin-bottom:8px;">Tipo</div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-              <button class="finance-type-btn active" data-type="ssh" onclick="serverSelectType(this,&#39;ssh&#39;,&#39;🔐&#39;,&#39;SSH&#39;)">🔐<br>SSH</button>
-              <button class="finance-type-btn" data-type="api" onclick="serverSelectType(this,&#39;api&#39;,&#39;🔑&#39;,&#39;API Key&#39;)">🔑<br>API Key</button>
-              <button class="finance-type-btn" data-type="db" onclick="serverSelectType(this,&#39;db&#39;,&#39;🗄️&#39;,&#39;Database&#39;)">🗄️<br>Database</button>
-              <button class="finance-type-btn" data-type="ftp" onclick="serverSelectType(this,&#39;ftp&#39;,&#39;📁&#39;,&#39;FTP/SFTP&#39;)">📁<br>FTP</button>
-              <button class="finance-type-btn" data-type="vpn" onclick="serverSelectType(this,&#39;vpn&#39;,&#39;🛡️&#39;,&#39;VPN&#39;)">🛡️<br>VPN</button>
-              <button class="finance-type-btn" data-type="altro" onclick="serverSelectType(this,&#39;altro&#39;,&#39;💻&#39;,&#39;Altro&#39;)">💻<br>Altro</button>
+              <button class="finance-type-btn active" data-type="ssh" onclick="serverSelectType(this,'ssh','🔐','SSH')">🔐<br>SSH</button>
+              <button class="finance-type-btn" data-type="api" onclick="serverSelectType(this,'api','🔑','API Key')">🔑<br>API Key</button>
+              <button class="finance-type-btn" data-type="db" onclick="serverSelectType(this,'db','🗄️','Database')">🗄️<br>Database</button>
+              <button class="finance-type-btn" data-type="ftp" onclick="serverSelectType(this,'ftp','📁','FTP/SFTP')">📁<br>FTP</button>
+              <button class="finance-type-btn" data-type="vpn" onclick="serverSelectType(this,'vpn','🛡️','VPN')">🛡️<br>VPN</button>
+              <button class="finance-type-btn" data-type="altro" onclick="serverSelectType(this,'altro','💻','Altro')">💻<br>Altro</button>
             </div>
           </div>
 
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
-            <input id="srv-label" type="text" placeholder="es. Server produzione, AWS, GitHub..." style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            <input id="srv-label" type="text" placeholder="es. Server produzione, AWS, GitHub..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Host / URL / Endpoint</div>
-            <input id="srv-host" type="text" placeholder="es. 192.168.1.1 o api.example.com" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;">
+            <input id="srv-host" type="text" placeholder="es. 192.168.1.1 o api.example.com"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Porta</div>
-              <input id="srv-port" type="text" inputmode="numeric" placeholder="22" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+              <input id="srv-port" type="text" inputmode="numeric" placeholder="22"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
             </div>
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Username</div>
-              <input id="srv-user" type="text" placeholder="root, admin..." style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+              <input id="srv-user" type="text" placeholder="root, admin..."
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
             </div>
           </div>
           <div style="margin-bottom:12px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Password / Token / API Key</div>
             <div style="position:relative;">
-              <input id="srv-pw" type="password" placeholder="Password, token o chiave API" style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+              <input id="srv-pw" type="password" placeholder="Password, token o chiave API"
+                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
               <button onclick="serverTogglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
             </div>
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Note / Connection String</div>
-            <textarea id="srv-notes" placeholder="Comandi, connection string, note..." style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:&#39;DM Sans&#39;,monospace;outline:none;box-sizing:border-box;resize:none;height:100px;line-height:1.6;"></textarea>
+            <textarea id="srv-notes" placeholder="Comandi, connection string, note..."
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;resize:none;height:100px;line-height:1.6;"></textarea>
           </div>
           <button onclick="serverSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Credenziale</button>
         </div>
@@ -3070,7 +3089,7 @@ function cardsSearch(q) {
         <!-- Ricerca -->
         <div style="margin-bottom:12px;">
           <div class="pw-search-bar">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input type="text" id="shop-search" placeholder="Cerca prodotto..." oninput="shopSearchProducts(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
@@ -3092,7 +3111,7 @@ function cardsSearch(q) {
           </div>
           <!-- Ricerca prodotto -->
           <div class="pw-search-bar" style="padding:8px 12px;">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input type="text" id="shop-search" placeholder="Cerca prodotto..." oninput="shopSearchProducts(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:13px;color:var(--text);font-family:inherit;">
             <button id="shop-add-custom" onclick="shopAddCustom()" style="display:none;padding:4px 10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi</button>
           </div>
@@ -3110,35 +3129,35 @@ function cardsSearch(q) {
     <div class="drawer-handle"></div>
     <div class="drawer-title">Altre schede</div>
     <div class="drawer-grid">
-      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer(&#39;documents&#39;)">
+      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
         <div class="drawer-item-icon">📄</div>
         <div class="drawer-item-label">Documenti</div>
       </div>
-      <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer(&#39;notes&#39;)">
+      <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
         <div class="drawer-item-icon">📝</div>
         <div class="drawer-item-label">Note</div>
       </div>
-      <div class="drawer-item" data-tab="cards" onclick="switchTabFromDrawer(&#39;cards&#39;)">
+      <div class="drawer-item" data-tab="cards" onclick="switchTabFromDrawer('cards')">
         <div class="drawer-item-icon">💳</div>
         <div class="drawer-item-label">Carte</div>
       </div>
-      <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer(&#39;wifi&#39;)">
+      <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer('wifi')">
         <div class="drawer-item-icon">🌐</div>
         <div class="drawer-item-label">Wi-Fi</div>
       </div>
-      <div class="drawer-item" data-tab="finance" onclick="switchTabFromDrawer(&#39;finance&#39;)">
+      <div class="drawer-item" data-tab="finance" onclick="switchTabFromDrawer('finance')">
         <div class="drawer-item-icon">📊</div>
         <div class="drawer-item-label">Finanze</div>
       </div>
-      <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer(&#39;server&#39;)">
+      <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
         <div class="drawer-item-icon">📡</div>
         <div class="drawer-item-label">Server/IT</div>
       </div>
-      <div class="drawer-item" data-tab="shopping" onclick="switchTabFromDrawer(&#39;shopping&#39;)">
+      <div class="drawer-item" data-tab="shopping" onclick="switchTabFromDrawer('shopping')">
         <div class="drawer-item-icon">🛒</div>
         <div class="drawer-item-label">Lista Spesa</div>
       </div>
-      <div class="drawer-item" data-tab="family" onclick="switchTabFromDrawer(&#39;family&#39;)">
+      <div class="drawer-item" data-tab="family" onclick="switchTabFromDrawer('family')">
         <div class="drawer-item-icon">👨‍👩‍👧</div>
         <div class="drawer-item-label">Famiglia</div>
       </div>
@@ -3161,7 +3180,7 @@ function cardsSearch(q) {
       <div style="font-size:36px;" id="shop-detail-icon">🧴</div>
       <div style="flex:1;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:4px;">Aggiungi alla lista</div>
-        <input id="shop-detail-name" type="text" style="width:100%;background:none;border:none;outline:none;font-size:17px;font-weight:800;color:var(--text);font-family:&#39;Syne&#39;,sans-serif;">
+        <input id="shop-detail-name" type="text" style="width:100%;background:none;border:none;outline:none;font-size:17px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">
       </div>
     </div>
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:8px;">Varianti rapide</div>
@@ -3177,7 +3196,7 @@ function cardsSearch(q) {
 <div id="wifi-qr-modal" onclick="wifiCloseQR()">
   <div style="background:white;border-radius:24px;padding:28px;text-align:center;max-width:300px;width:90%;position:relative;" onclick="event.stopPropagation()">
     <button onclick="wifiCloseQR()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:#f0f0f5;color:#333;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>
-    <div id="wifi-qr-ssid-label" style="font-family:&#39;DM Sans&#39;,sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;margin-right:20px;"></div>
+    <div id="wifi-qr-ssid-label" style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:800;color:#0a0a0f;margin-bottom:4px;margin-right:20px;"></div>
     <div style="font-size:12px;color:#9090b0;margin-bottom:16px;">Scansiona per connetterti</div>
     <canvas id="wifi-qr-canvas" style="border-radius:12px;max-width:100%;"></canvas>
     <div style="margin-top:16px;">
@@ -3196,7 +3215,7 @@ function cardsSearch(q) {
     </div>
     <!-- Camera -->
     <div style="position:relative;width:360px;max-width:95vw;height:300px;overflow:hidden;background:#000;">
-      <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline="" autoplay="" muted=""></video>
+      <video id="qr-video" style="width:100%;height:100%;object-fit:cover;" playsinline autoplay muted></video>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
         <div style="width:160px;height:160px;border:3px solid #6366f1;border-radius:16px;box-shadow:0 0 0 1000px rgba(0,0,0,0.45);"></div>
       </div>
@@ -3216,7 +3235,7 @@ function cardsSearch(q) {
 <div id="home-custom-modal" onclick="if(event.target===this)closeHomeCustom()" style="position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:none;align-items:flex-end;justify-content:center;">
   <div style="width:100%;max-width:540px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(24px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-      <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:20px;font-weight:800;">✨ Personalizza Home</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;">✨ Personalizza Home</div>
       <button onclick="closeHomeCustom()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;">✕</button>
     </div>
 
@@ -3224,18 +3243,18 @@ function cardsSearch(q) {
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Sezioni visibili</div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;" id="home-sections-list">
       <label style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:12px;cursor:pointer;">
-        <input type="checkbox" id="hc-search" checked="" style="width:18px;height:18px;accent-color:var(--accent);">
+        <input type="checkbox" id="hc-search" checked style="width:18px;height:18px;accent-color:var(--accent);">
         <span>🔍</span>
         <div><div style="font-size:14px;font-weight:600;">Barra di ricerca</div><div style="font-size:11px;color:var(--text3);">Ricerca globale in cima</div></div>
       </label>
       <label style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:12px;cursor:pointer;">
-        <input type="checkbox" id="hc-quick" checked="" style="width:18px;height:18px;accent-color:var(--accent);">
+        <input type="checkbox" id="hc-quick" checked style="width:18px;height:18px;accent-color:var(--accent);">
         <span>⚡</span>
         <div><div style="font-size:14px;font-weight:600;">Accesso rapido</div><div style="font-size:11px;color:var(--text3);">4 schede personalizzabili</div></div>
       </label>
 
       <label style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:12px;cursor:pointer;">
-        <input type="checkbox" id="hc-alerts" checked="" style="width:18px;height:18px;accent-color:var(--accent);">
+        <input type="checkbox" id="hc-alerts" checked style="width:18px;height:18px;accent-color:var(--accent);">
         <span>🔔</span>
         <div><div style="font-size:14px;font-weight:600;">Alert e notifiche</div><div style="font-size:11px;color:var(--text3);">Scadenze e avvisi</div></div>
       </label>
@@ -3248,8 +3267,8 @@ function cardsSearch(q) {
     <!-- Tema -->
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Tema</div>
     <div style="display:flex;gap:10px;margin-bottom:24px;">
-      <button onclick="setTheme(&#39;dark&#39;)" id="theme-dark-btn" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--accent);background:var(--surface2);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🌙 Scuro</button>
-      <button onclick="setTheme(&#39;light&#39;)" id="theme-light-btn" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">☀️ Chiaro</button>
+      <button onclick="setTheme('dark')" id="theme-dark-btn" style="flex:1;padding:12px;border-radius:12px;border:2px solid var(--accent);background:var(--surface2);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🌙 Scuro</button>
+      <button onclick="setTheme('light')" id="theme-light-btn" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">☀️ Chiaro</button>
     </div>
 
     <button onclick="saveHomeCustom()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva personalizzazione</button>
@@ -3260,7 +3279,7 @@ function cardsSearch(q) {
 <div id="search-overlay" onclick="handleSearchOverlayClick(event)">
   <div class="search-box">
     <div class="search-input-row">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input id="search-input" type="text" placeholder="Cerca in tutto HomeBull..." oninput="runSearch(this.value)" autocomplete="off">
       <button class="search-close-btn" onclick="closeGlobalSearch()">ESC</button>
     </div>
@@ -3275,7 +3294,7 @@ function cardsSearch(q) {
 <div id="qa-edit-modal" onclick="if(event.target===this)closeQaEdit()">
   <div class="qa-edit-sheet">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-family:&#39;Syne&#39;,sans-serif;font-size:18px;font-weight:800;">Personalizza accesso rapido</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">Personalizza accesso rapido</div>
       <button onclick="closeQaEdit()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;">✕</button>
     </div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Seleziona fino a 6 schede da mostrare nella home</div>
@@ -5869,7 +5888,6 @@ function calOpen() {
   _calMonth = now.getMonth();
   calRenderMonth();
   calRenderEvents();
-  calRenderRiepilogo();
   document.getElementById('topbar-title').textContent = 'Calendario';
   document.getElementById('topbar-sub').textContent = _calEvents.length + ' eventi';
   document.getElementById('topbar-back').classList.remove('visible');
@@ -5938,26 +5956,9 @@ function calRenderMonth() {
     }
 
     const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-weight:700;font-size:12px;';
+    num.style.cssText = 'position:relative;z-index:1;font-weight:700;';
     num.textContent = d;
     el.appendChild(num);
-
-    // Mostra etichetta turno in fondo alla cella
-    if (dayShifts.length > 0) {
-      const t1 = _turniDef.find(t => t.id === dayShifts[0]);
-      const t2 = dayShifts.length > 1 ? _turniDef.find(t => t.id === dayShifts[1]) : null;
-      const lbl = document.createElement('div');
-      lbl.className = 'cal-shift-label';
-      lbl.style.cssText = 'position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;z-index:2;line-height:1;';
-      if (t2) {
-        lbl.innerHTML = `<span style="color:${t1.color}">${t1.label}</span><span style="color:var(--text3);">/</span><span style="color:${t2.color}">${t2.label}</span>`;
-      } else if (t1) {
-        lbl.style.color = t1.color;
-        lbl.textContent = t1.label;
-      }
-      el.appendChild(lbl);
-    }
-
     el.onclick = () => calSelectDate(dateStr);
     grid.appendChild(el);
   }
@@ -5967,20 +5968,19 @@ function calPrevMonth() {
   _calMonth--;
   if (_calMonth < 0) { _calMonth = 11; _calYear--; }
   _calSelectedDate = null;
-  calRenderMonth(); calRenderEvents(); calRenderRiepilogo();
+  calRenderMonth(); calRenderEvents();
 }
 function calNextMonth() {
   _calMonth++;
   if (_calMonth > 11) { _calMonth = 0; _calYear++; }
   _calSelectedDate = null;
-  calRenderMonth(); calRenderEvents(); calRenderRiepilogo();
+  calRenderMonth(); calRenderEvents();
 }
 
 function calSelectDate(dateStr) {
   _calSelectedDate = dateStr;
   calRenderMonth();
   calRenderEvents();
-  calRenderRiepilogo();
 }
 
 // ── Render eventi ────────────────────────────────────────
@@ -6082,7 +6082,6 @@ function calSaveEvent() {
   calCloseForm();
   calRenderMonth();
   calRenderEvents();
-  calRenderRiepilogo();
   showToast('✅ Evento salvato');
 }
 
@@ -7998,12 +7997,10 @@ function cfGenBarcode(cf){
   setTimeout(()=>{
     try{
       const availW = Math.min(360, window.innerWidth*0.95) - 28;
-      const isMobile = window.innerWidth < 900;
-      const barW = Math.max(1, Math.min(2, Math.floor(availW/143)));
-      const barH = isMobile ? 48 : 60;
-      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:barH,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
+      const barW = Math.max(1, Math.floor(availW/143));
+      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:Math.min(barW*30,60),displayValue:false,background:'#ffffff',lineColor:'#000000',margin:4});
       const svg=wrap.querySelector('svg');
-      if(svg){svg.style.width='100%';svg.style.maxWidth=isMobile?'260px':'340px';svg.style.height='auto';}
+      if(svg){svg.style.width='100%';svg.style.height='auto';}
       if(lbl)lbl.textContent=cf;
     }catch(e){console.warn(e);}
   },50);
@@ -8750,7 +8747,7 @@ function fbMsg(c){
     'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
-const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_otp_accounts','hb12_cards','hb12_wifi',
+const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
   'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
   'hb12_pw_cats','hb12_shop_lists_v2'];
 
@@ -9076,35 +9073,35 @@ function calSelectDate(dateStr) {
 // ════════════════════════════════════════════════════════════
 //  VISTA SETTIMANALE CALENDARIO
 // ════════════════════════════════════════════════════════════
-let _calView = 'month';  // 'month' | 'week' | '6m'
+let _calView = 'month';  // 'month' | 'week'
 let _calWeekStart = null; // Date del lunedì corrente
 
 function calSetView(view) {
   _calView = view;
-  ['month','week','6m'].forEach(v => {
-    const btn = document.getElementById('cal-view-'+v);
-    const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
-    const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
-    if (btn) btn.style.cssText = btn.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (v===view?active:normal);
-  });
+  // Update toggle buttons
+  const btnM = document.getElementById('cal-view-month');
+  const btnW = document.getElementById('cal-view-week');
+  const active = 'border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);';
+  const normal = 'border:1px solid var(--border);background:var(--surface);color:var(--text2);';
+  if (btnM) btnM.style.cssText = btnM.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='month'?active:normal);
+  if (btnW) btnW.style.cssText = btnW.style.cssText.replace(/border:[^;]+;background:[^;]+;color:[^;]+;/g,'') + (view==='week'?active:normal);
+
+  // Show/hide grids
   const gm = document.getElementById('cal-grid-month');
   const gw = document.getElementById('cal-grid-week');
-  const g6 = document.getElementById('cal-grid-6m');
+  const daysRow = document.querySelector('#panel-calendar .cal-days-row');
   if (gm) gm.style.display = view==='month' ? '' : 'none';
   if (gw) gw.style.display = view==='week'  ? '' : 'none';
-  if (g6) g6.style.display = view==='6m'    ? '' : 'none';
 
   if (view==='week') {
+    // Inizia dalla settimana che contiene la data selezionata o oggi
     const ref = _calSelectedDate ? new Date(_calSelectedDate) : new Date();
-    const dow = (ref.getDay() + 6) % 7;
+    const dow = (ref.getDay() + 6) % 7; // lunedì=0
     _calWeekStart = new Date(ref);
     _calWeekStart.setDate(ref.getDate() - dow);
     calRenderWeek();
-  } else if (view==='6m') {
-    calRender6Months();
   } else {
     calRenderMonth();
-    calRenderRiepilogo();
   }
 }
 
@@ -9112,26 +9109,16 @@ function calPrev() {
   if (_calView === 'week') {
     _calWeekStart.setDate(_calWeekStart.getDate() - 7);
     calRenderWeek();
-  } else if (_calView === '6m') {
-    _calMonth -= 6;
-    if (_calMonth < 0) { _calMonth += 12; _calYear--; }
-    calRender6Months();
   } else {
     calPrevMonth();
-    calRenderRiepilogo();
   }
 }
 function calNext() {
   if (_calView === 'week') {
     _calWeekStart.setDate(_calWeekStart.getDate() + 7);
     calRenderWeek();
-  } else if (_calView === '6m') {
-    _calMonth += 6;
-    if (_calMonth > 11) { _calMonth -= 12; _calYear++; }
-    calRender6Months();
   } else {
     calNextMonth();
-    calRenderRiepilogo();
   }
 }
 
@@ -9277,25 +9264,25 @@ function calRenderWeek() {
       <div id="set-page-main" style="padding:20px 16px;">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
 
-          <button onclick="settingsPage(&#39;grafica&#39;)" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
+          <button onclick="settingsPage('grafica')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">🎨</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Grafica</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Tema, colori, sfondo, animazioni, font</div>
           </button>
 
-          <button onclick="settingsPage(&#39;backup&#39;)" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
+          <button onclick="settingsPage('backup')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">💾</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Backup</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Esporta e importa i tuoi dati</div>
           </button>
 
-          <button onclick="settingsPage(&#39;sicurezza&#39;)" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
+          <button onclick="settingsPage('sicurezza')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">🔐</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Sicurezza</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">PIN, biometria, accesso</div>
           </button>
 
-          <button onclick="settingsPage(&#39;info&#39;)" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
+          <button onclick="settingsPage('info')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">ℹ️</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Info</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Versione, crediti, roadmap</div>
@@ -9311,9 +9298,9 @@ function calRenderWeek() {
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🌙 Tema</div>
           <div style="display:flex;gap:8px;">
-            <button id="set-dark" onclick="setTheme(&#39;dark&#39;)" style="flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🌙 Dark</button>
-            <button id="set-light" onclick="setTheme(&#39;light&#39;)" style="flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☀️ Light</button>
-            <button id="set-auto" onclick="setTheme(&#39;auto&#39;)" style="flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔁 Auto</button>
+            <button id="set-dark"  onclick="setTheme('dark')"  style="flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🌙 Dark</button>
+            <button id="set-light" onclick="setTheme('light')" style="flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☀️ Light</button>
+            <button id="set-auto"  onclick="setTheme('auto')"  style="flex:1;padding:11px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔁 Auto</button>
           </div>
         </div>
 
@@ -9321,14 +9308,14 @@ function calRenderWeek() {
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🎨 Colore principale</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button onclick="setAccent(&#39;#6366f1&#39;,&#39;indigo&#39;)" data-ac="indigo" style="width:38px;height:38px;border-radius:50%;background:#6366f1;cursor:pointer;border:3px solid white;box-shadow:0 0 0 2px #6366f1;"></button>
-            <button onclick="setAccent(&#39;#10b981&#39;,&#39;green&#39;)" data-ac="green" style="width:38px;height:38px;border-radius:50%;background:#10b981;cursor:pointer;border:3px solid transparent;"></button>
-            <button onclick="setAccent(&#39;#f59e0b&#39;,&#39;amber&#39;)" data-ac="amber" style="width:38px;height:38px;border-radius:50%;background:#f59e0b;cursor:pointer;border:3px solid transparent;"></button>
-            <button onclick="setAccent(&#39;#ef4444&#39;,&#39;red&#39;)" data-ac="red" style="width:38px;height:38px;border-radius:50%;background:#ef4444;cursor:pointer;border:3px solid transparent;"></button>
-            <button onclick="setAccent(&#39;#8b5cf6&#39;,&#39;purple&#39;)" data-ac="purple" style="width:38px;height:38px;border-radius:50%;background:#8b5cf6;cursor:pointer;border:3px solid transparent;"></button>
-            <button onclick="setAccent(&#39;#06b6d4&#39;,&#39;cyan&#39;)" data-ac="cyan" style="width:38px;height:38px;border-radius:50%;background:#06b6d4;cursor:pointer;border:3px solid transparent;"></button>
-            <button onclick="setAccent(&#39;#f97316&#39;,&#39;orange&#39;)" data-ac="orange" style="width:38px;height:38px;border-radius:50%;background:#f97316;cursor:pointer;border:3px solid transparent;"></button>
-            <button onclick="setAccent(&#39;#ec4899&#39;,&#39;pink&#39;)" data-ac="pink" style="width:38px;height:38px;border-radius:50%;background:#ec4899;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#6366f1','indigo')" data-ac="indigo" style="width:38px;height:38px;border-radius:50%;background:#6366f1;cursor:pointer;border:3px solid white;box-shadow:0 0 0 2px #6366f1;"></button>
+            <button onclick="setAccent('#10b981','green')"  data-ac="green"  style="width:38px;height:38px;border-radius:50%;background:#10b981;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#f59e0b','amber')"  data-ac="amber"  style="width:38px;height:38px;border-radius:50%;background:#f59e0b;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#ef4444','red')"    data-ac="red"    style="width:38px;height:38px;border-radius:50%;background:#ef4444;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#8b5cf6','purple')" data-ac="purple" style="width:38px;height:38px;border-radius:50%;background:#8b5cf6;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#06b6d4','cyan')"   data-ac="cyan"   style="width:38px;height:38px;border-radius:50%;background:#06b6d4;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#f97316','orange')" data-ac="orange" style="width:38px;height:38px;border-radius:50%;background:#f97316;cursor:pointer;border:3px solid transparent;"></button>
+            <button onclick="setAccent('#ec4899','pink')"   data-ac="pink"   style="width:38px;height:38px;border-radius:50%;background:#ec4899;cursor:pointer;border:3px solid transparent;"></button>
           </div>
         </div>
 
@@ -9336,12 +9323,12 @@ function calRenderWeek() {
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🖼 Sfondo</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-            <button id="bg-none" onclick="setBg(&#39;none&#39;)" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◻ Nessuno</button>
-            <button id="bg-grad1" onclick="setBg(&#39;grad1&#39;)" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;">🌅 Viola</button>
-            <button id="bg-grad2" onclick="setBg(&#39;grad2&#39;)" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:white;border:none;">🌊 Oceano</button>
-            <button id="bg-grad3" onclick="setBg(&#39;grad3&#39;)" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#064e3b,#065f46);color:white;border:none;">🌿 Foresta</button>
-            <button id="bg-dots" onclick="setBg(&#39;dots&#39;)" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚫ Punti</button>
-            <button id="bg-grid" onclick="setBg(&#39;grid&#39;)" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▦ Griglia</button>
+            <button id="bg-none"  onclick="setBg('none')"  style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◻ Nessuno</button>
+            <button id="bg-grad1" onclick="setBg('grad1')" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;">🌅 Viola</button>
+            <button id="bg-grad2" onclick="setBg('grad2')" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:white;border:none;">🌊 Oceano</button>
+            <button id="bg-grad3" onclick="setBg('grad3')" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#064e3b,#065f46);color:white;border:none;">🌿 Foresta</button>
+            <button id="bg-dots"  onclick="setBg('dots')"  style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚫ Punti</button>
+            <button id="bg-grid"  onclick="setBg('grid')"  style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▦ Griglia</button>
           </div>
         </div>
 
@@ -9349,15 +9336,15 @@ function calRenderWeek() {
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🔲 Bordi card</div>
           <div style="display:flex;gap:8px;margin-bottom:10px;">
-            <button id="rd-sharp" onclick="setRadius(&#39;sharp&#39;)" style="flex:1;padding:10px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">■ Sharp</button>
-            <button id="rd-normal" onclick="setRadius(&#39;normal&#39;)" style="flex:1;padding:10px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▢ Normal</button>
-            <button id="rd-round" onclick="setRadius(&#39;round&#39;)" style="flex:1;padding:10px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◯ Round</button>
+            <button id="rd-sharp"  onclick="setRadius('sharp')"  style="flex:1;padding:10px;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">■ Sharp</button>
+            <button id="rd-normal" onclick="setRadius('normal')" style="flex:1;padding:10px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▢ Normal</button>
+            <button id="rd-round"  onclick="setRadius('round')"  style="flex:1;padding:10px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◯ Round</button>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:13px;color:var(--text2);">Ombra card</span>
             <div style="display:flex;gap:8px;">
-              <button id="sh-off" onclick="setShadow(&#39;off&#39;)" style="padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Off</button>
-              <button id="sh-on" onclick="setShadow(&#39;on&#39;)" style="padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">On</button>
+              <button id="sh-off" onclick="setShadow('off')" style="padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Off</button>
+              <button id="sh-on"  onclick="setShadow('on')"  style="padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">On</button>
             </div>
           </div>
         </div>
@@ -9366,10 +9353,10 @@ function calRenderWeek() {
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">✨ Animazioni</div>
           <div style="display:flex;gap:8px;">
-            <button id="an-off" onclick="setAnim(&#39;off&#39;)" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚡ Off</button>
-            <button id="an-fast" onclick="setAnim(&#39;fast&#39;)" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🚀 Fast</button>
-            <button id="an-normal" onclick="setAnim(&#39;normal&#39;)" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✨ Normal</button>
-            <button id="an-slow" onclick="setAnim(&#39;slow&#39;)" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🌊 Slow</button>
+            <button id="an-off"    onclick="setAnim('off')"    style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚡ Off</button>
+            <button id="an-fast"   onclick="setAnim('fast')"   style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🚀 Fast</button>
+            <button id="an-normal" onclick="setAnim('normal')" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">✨ Normal</button>
+            <button id="an-slow"   onclick="setAnim('slow')"   style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🌊 Slow</button>
           </div>
         </div>
 
@@ -9377,10 +9364,10 @@ function calRenderWeek() {
         <div style="padding:16px 20px;">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🔡 Font</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-            <button id="ff-system" onclick="setFont(&#39;system&#39;)" style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;">Sistema</button>
-            <button id="ff-serif" onclick="setFont(&#39;serif&#39;)" style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">Serif</button>
-            <button id="ff-mono" onclick="setFont(&#39;mono&#39;)" style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:monospace;">Mono</button>
-            <button id="ff-round" onclick="setFont(&#39;round&#39;)" style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Round</button>
+            <button id="ff-system" onclick="setFont('system')" style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;">Sistema</button>
+            <button id="ff-serif"  onclick="setFont('serif')"  style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:Georgia,serif;">Serif</button>
+            <button id="ff-mono"   onclick="setFont('mono')"   style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:monospace;">Mono</button>
+            <button id="ff-round"  onclick="setFont('round')"  style="padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">Round</button>
           </div>
           <div style="display:flex;align-items:center;gap:12px;">
             <span style="font-size:11px;color:var(--text3);flex-shrink:0;">A piccolo</span>
@@ -9489,18 +9476,18 @@ function calRenderWeek() {
     </div>
   </div>
   <div style="padding:6px 0;flex:1;overflow-y:auto;">
-    <div class="mob-item" onclick="switchTab(&#39;home&#39;);closeMobileMenu()">🏠 Home</div>
-    <div class="mob-item" onclick="switchTab(&#39;passwords&#39;);closeMobileMenu()">🔐 Password</div>
-    <div class="mob-item" onclick="switchTab(&#39;documents&#39;);closeMobileMenu()">📄 Documenti</div>
-    <div class="mob-item" onclick="switchTab(&#39;notes&#39;);closeMobileMenu()">📝 Note</div>
-    <div class="mob-item" onclick="switchTab(&#39;otp&#39;);closeMobileMenu()">🔑 OTP / 2FA</div>
-    <div class="mob-item" onclick="switchTab(&#39;cards&#39;);closeMobileMenu()">💳 Carte</div>
-    <div class="mob-item" onclick="switchTab(&#39;wifi&#39;);closeMobileMenu()">📶 Wi-Fi</div>
-    <div class="mob-item" onclick="switchTab(&#39;finance&#39;);closeMobileMenu()">💰 Finanze</div>
-    <div class="mob-item" onclick="switchTab(&#39;calendar&#39;);closeMobileMenu()">📅 Calendario</div>
-    <div class="mob-item" onclick="switchTab(&#39;server&#39;);closeMobileMenu()">📡 Server/IT</div>
-    <div class="mob-item" onclick="switchTab(&#39;family&#39;);closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
-    <div class="mob-item" onclick="switchTab(&#39;shopping&#39;);closeMobileMenu()">🛒 Lista Spesa</div>
+    <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
+    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
+    <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
+    <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
+    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
+    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
+    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
+    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
+    <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
+    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
   </div>
   <div style="padding:10px 14px;border-top:1px solid var(--border);">
     <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
@@ -9509,109 +9496,5 @@ function calRenderWeek() {
 </div>
 
 <button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
-
-
-</div></div></body></html
-
-// ── Vista 6 Mesi ─────────────────────────────────────────
-function calRender6Months() {
-  const grid = document.getElementById('cal-6m-grid');
-  const label = document.getElementById('cal-month-label');
-  if (!grid) return;
-
-  const startYear = _calYear;
-  const startMonth = _calMonth;
-  const endDate = new Date(startYear, startMonth + 6, 1);
-  const endMonth = endDate.getMonth();
-  const endYear = endDate.getFullYear();
-
-  if (label) label.textContent = CAL_MONTHS[startMonth] + ' — ' + CAL_MONTHS[(startMonth+5)%12] + ' ' + (startMonth+5 > 11 ? startYear+1 : startYear);
-
-  let html = '';
-  for (let m = 0; m < 6; m++) {
-    let month = (startMonth + m) % 12;
-    let year  = startMonth + m > 11 ? startYear + 1 : startYear;
-    const daysInMonth = new Date(year, month+1, 0).getDate();
-    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
-    const today = new Date();
-
-    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;">`;
-    html += `<div style="font-size:11px;font-weight:800;color:var(--accent);margin-bottom:6px;text-align:center;">${CAL_MONTHS[month]} ${year}</div>`;
-    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:2px;">`;
-    ['L','M','M','G','V','S','D'].forEach((d,i) => {
-      html += `<div style="text-align:center;font-size:8px;font-weight:800;color:${i===6?'#ef4444':'var(--text3)'};">${d}</div>`;
-    });
-    html += `</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">`;
-
-    for (let pad = 0; pad < firstDay; pad++) html += '<div></div>';
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const shifts = (_calDayShifts && _calDayShifts[dateStr]) || [];
-      const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===d;
-      const isWeekend = new Date(year,month,d).getDay() === 0 || new Date(year,month,d).getDay() === 6;
-      const shift0 = shifts[0] ? (_turniDef||[]).find(t=>t.id===shifts[0]) : null;
-      const bgColor = shift0 ? shift0.color : 'transparent';
-      const textColor = shift0 ? '#fff' : (isWeekend ? '#ef4444' : 'var(--text2)');
-
-      html += `<div onclick="calDayClick('${dateStr}')" style="text-align:center;font-size:9px;font-weight:${isToday?800:600};
-        border-radius:4px;padding:2px 0;cursor:pointer;
-        background:${isToday?'var(--accent)':bgColor};
-        color:${isToday?'#fff':textColor};
-        border:${isToday?'none':'1px solid transparent'};">
-        ${d}${shift0?'<br><span style="font-size:7px;opacity:0.9;">'+shift0.label+'</span>':''}
-      </div>`;
-    }
-    html += '</div></div>';
-  }
-  grid.innerHTML = html;
-}
-
-// ── Riepilogo ore mese ────────────────────────────────────
-function calRenderRiepilogo() {
-  const el = document.getElementById('cal-riepilogo-content');
-  const box = document.getElementById('cal-riepilogo');
-  if (!el || !_turniDef || _turniDef.length === 0) { if(box) box.style.display='none'; return; }
-
-  const year = _calYear, month = _calMonth;
-  const daysInMonth = new Date(year, month+1, 0).getDate();
-  const counts = {}; // turnoId → {giorni, minuti}
-  _turniDef.forEach(t => counts[t.id] = { label: t.label, color: t.color, giorni: 0, minuti: 0 });
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const shifts = (_calDayShifts && _calDayShifts[dateStr]) || [];
-    shifts.forEach(sid => {
-      if (!counts[sid]) return;
-      counts[sid].giorni++;
-      const t = _turniDef.find(x => x.id === sid);
-      if (t && t.start && t.end) {
-        const [sh,sm] = t.start.split(':').map(Number);
-        let [eh,em] = t.end.split(':').map(Number);
-        let mins = (eh*60+em) - (sh*60+sm);
-        if (mins < 0) mins += 24*60;
-        counts[sid].minuti += mins;
-      }
-    });
-  }
-
-  let html = '';
-  _turniDef.forEach(t => {
-    const c = counts[t.id];
-    if (!c || c.giorni === 0) return;
-    const ore = Math.floor(c.minuti/60);
-    const min = c.minuti % 60;
-    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-      <div style="width:28px;height:20px;border-radius:6px;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">${t.label}</div>
-      <div style="flex:1;font-size:12px;color:var(--text2);">${c.giorni} giorni${c.minuti>0?' — '+ore+'h'+(min>0?' '+min+'m':''):''}</div>
-    </div>`;
-  });
-
-  if (html) {
-    el.innerHTML = html;
-    if (box) box.style.display = 'block';
-  } else {
-    if (box) box.style.display = 'none';
-  }
-}
-
->
+</body>
+</html>
