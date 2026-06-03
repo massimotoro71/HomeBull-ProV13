@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA152</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA153</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -3620,8 +3620,11 @@ function unlockApp() {
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
-  // Carica dati dal cloud ad ogni sblocco
-  setTimeout(() => fbSyncLoad().catch(()=>{}), 500);
+  // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
+  setTimeout(() => {
+    fbSyncLoad().catch(()=>{});
+    fbStartRealtime();
+  }, 500);
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
   if (savedTheme) setTheme(savedTheme);
@@ -8721,67 +8724,112 @@ function fbMsg(c){
     'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
-async function fbSyncLoad(){
-  if(!fbReady||!HB.user||!fbDb)return;
-  const emailAddr = _emailOtpAddr || HB.user?.email || '';
-  if(!emailAddr){console.warn('SyncLoad: no email');return;}
-  const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-  if(!emailKey){console.warn('SyncLoad: no email key');return;}
-  try{
-    const snap = await fbDb.ref('hb13/' + emailKey).get();
-    if(snap.exists()){
-      const data = snap.val();
-      if(data){
-        Object.keys(data).forEach(k => {
-          if(k !== '_ts' && data[k]){
-            Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, data[k]);
-          }
-        });
-        console.log('✓ Dati caricati dal cloud:', Object.keys(data).length, 'chiavi');
-        showToast('☁️ Dati sincronizzati dal cloud');
-      }
-    } else {
-      console.log('ℹ️ Cloud vuoto — upload dati locali');
-      await fbSyncAll(true);
-    }
-  }catch(e){console.warn('SyncLoad:',e);}
-}
-
 const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_cards','hb12_wifi',
   'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts'];
 
+// Salva timestamp locale per ogni chiave
+function _tsKey(k){ return 'hb_ts_' + k; }
+function _getLocalTs(k){ return parseInt(localStorage.getItem(_tsKey(k))||'0'); }
+function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(localStorage,_tsKey(k),t||Date.now()); }
+
+function _getSyncKey(){
+  const emailAddr = _emailOtpAddr || HB.user?.email || '';
+  if(!emailAddr) return null;
+  return btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+}
+
+// Merge intelligente — vince chi ha il timestamp più recente per ogni chiave
+async function fbSyncLoad(){
+  if(!fbReady||!HB.user||!fbDb)return;
+  const emailKey = _getSyncKey();
+  if(!emailKey){console.warn('SyncLoad: no email key');return;}
+  try{
+    const snap = await fbDb.ref('hb13/' + emailKey).get();
+    if(!snap.exists()){ await fbSyncAll(true); return; }
+    const cloud = snap.val() || {};
+    const cloudTs = cloud._ts || {};
+    let updated = false;
+    HB_SYNC_KEYS.forEach(k => {
+      const localTs = _getLocalTs(k);
+      const remoteTs = cloudTs[k] || 0;
+      if(remoteTs > localTs && cloud[k]){
+        // Cloud più recente — sovrascrivi locale
+        Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, cloud[k]);
+        _setLocalTs(k, remoteTs);
+        updated = true;
+        console.log('↓ Dal cloud:', k, new Date(remoteTs).toLocaleTimeString());
+      } else if(localTs > remoteTs){
+        // Locale più recente — sarà caricato dal prossimo fbSyncAll
+        console.log('↑ Locale più recente:', k);
+      }
+    });
+    if(updated){
+      showToast('☁️ Dati aggiornati dal cloud');
+      // Ricarica UI
+      if(typeof updateHomeStats==='function') updateHomeStats();
+      if(typeof renderCurrentTab==='function') renderCurrentTab();
+      else if(HB.currentTab && typeof switchTab==='function') switchTab(HB.currentTab);
+    }
+    // Upload chiavi locali più recenti del cloud
+    await fbSyncAll(true);
+    console.log('✓ Sync load completato');
+  }catch(e){console.warn('SyncLoad:',e);}
+}
+
 async function fbSyncAll(silent=false){
   if(!fbReady||!HB.user||!fbDb)return;
-  const emailAddr = _emailOtpAddr || HB.user?.email || '';
-  if(!emailAddr){console.warn('SyncAll: no email');return;}
-  const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
-    const data = { _ts: Date.now() };
+    const data = {};
+    const tsMap = {};
     HB_SYNC_KEYS.forEach(k=>{
       const v=localStorage.getItem(k);
-      if(v) data[k]=v;
+      if(v){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
     });
-    await fbDb.ref('hb13/' + emailKey).set(data);
+    if(Object.keys(data).length === 0) return;
+    await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('☁️ Dati sincronizzati');
-    console.log('✓ Sync completato per', emailKey);
+    console.log('✓ Sync upload completato');
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('⚠️ Sync fallito: ' + e.message);
   }
 }
 
-// Auto-sync: intercetta localStorage.setItem per chiavi dati
+// Auto-sync: aggiorna timestamp locale e manda al cloud
 (function patchLocalStorage(){
   const origSet = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function(key, value) {
     origSet(key, value);
-    if (HB_SYNC_KEYS.includes(key) && fbReady && HB.user) {
-      clearTimeout(window._syncDebounce);
-      window._syncDebounce = setTimeout(() => fbSyncAll(true), 2000);
+    if(HB_SYNC_KEYS.includes(key)){
+      _setLocalTs(key, Date.now());
+      if(fbReady && HB.user){
+        clearTimeout(window._syncDebounce);
+        window._syncDebounce = setTimeout(() => fbSyncAll(true), 2000);
+      }
     }
   };
 })();
+
+// Realtime listener — aggiornamento automatico quando il cloud cambia
+function fbStartRealtime(){
+  if(!fbReady||!HB.user||!fbDb)return;
+  const emailKey = _getSyncKey();
+  if(!emailKey) return;
+  fbDb.ref('hb13/' + emailKey + '/_ts').on('value', snap => {
+    if(!snap.exists()) return;
+    const cloudTs = snap.val() || {};
+    let needLoad = false;
+    HB_SYNC_KEYS.forEach(k => {
+      if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true;
+    });
+    if(needLoad){
+      console.log('🔄 Aggiornamento cloud rilevato');
+      fbSyncLoad();
+    }
+  });
+}
 
 function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
