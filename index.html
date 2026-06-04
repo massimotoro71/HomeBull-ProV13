@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA196</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA191</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA196</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA191</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA196</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA191</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,12 +3315,11 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA196',
+  version: 'BETA191',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
   sessionKey: null,     // AES-256 key — never persisted
-  ready: false,         // true solo dopo PIN verificato
   pinBuffer: '',
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
@@ -3565,8 +3564,7 @@ function showPinError(msg) {
 
 async function setupPIN(pin) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  const saltB64 = btoa(String.fromCharCode(...salt));
-  localStorage.setItem('hb12_salt', saltB64);
+  localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
   HB.sessionKey = await deriveKey(pin, salt);
   // Save PIN hash (PBKDF2 output — not the PIN itself)
   const hashBuf = await crypto.subtle.exportKey('raw', HB.sessionKey);
@@ -3574,42 +3572,11 @@ async function setupPIN(pin) {
   let h = '';
   hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
   localStorage.setItem('hb12_pin_hash', h);
-  HB.ready = true;
-  // Salva salt su Firebase — stesso salt su tutti i dispositivi
-  if(fbReady && fbDb) {
-    const emailKey = _getSyncKey();
-    if(emailKey) {
-      fbDb.ref('hb13/' + emailKey + '/_meta').set({
-        salt: saltB64,
-        pinHash: h,
-        updatedAt: Date.now()
-      }).catch(e => console.warn('Salt save:', e));
-    }
-  }
 }
 
 async function verifyPIN(pin) {
   try {
-    let saltB64 = localStorage.getItem('hb12_salt');
-    let pinHash = localStorage.getItem('hb12_pin_hash');
-    // Se non in locale, scarica da Firebase
-    if((!saltB64 || !pinHash) && fbReady && fbDb) {
-      try {
-        const emailKey = _getSyncKey();
-        if(emailKey) {
-          const snap = await fbDb.ref('hb13/' + emailKey + '/_meta').get();
-          if(snap.exists()) {
-            const meta = snap.val();
-            saltB64 = meta.salt;
-            pinHash = meta.pinHash;
-            // Salva in locale per uso futuro
-            if(saltB64) localStorage.setItem('hb12_salt', saltB64);
-            if(pinHash) localStorage.setItem('hb12_pin_hash', pinHash);
-            console.log('✅ Salt sincronizzato da Firebase');
-          }
-        }
-      } catch(e) { console.warn('Salt fetch:', e); }
-    }
+    const saltB64 = localStorage.getItem('hb12_salt');
     if (!saltB64) return false;
     const salt = new Uint8Array(atob(saltB64).split('').map(c => c.charCodeAt(0)));
     const key = await deriveKey(pin, salt);
@@ -3617,9 +3584,8 @@ async function verifyPIN(pin) {
     const hashArr = new Uint8Array(hashBuf).slice(0, 16);
     let h = '';
     hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
-    if (h === (pinHash || localStorage.getItem('hb12_pin_hash'))) {
+    if (h === localStorage.getItem('hb12_pin_hash')) {
       HB.sessionKey = key;
-      HB.ready = true;
       return true;
     }
     return false;
@@ -3679,12 +3645,10 @@ function unlockApp() {
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
-  // 1. Carica vault cifrato locale (IDB), 2. poi sync Firebase
-  // Carica vault IDB locale, poi Firebase
-  idbLoadAll().then(hasLocal => {
-    if (hasLocal) unlockAndLoadAll().then(() => updateHomeStats());
-    else updateHomeStats();
-  }).catch(() => updateHomeStats());
+  // Carica dati cifrati localmente, poi sync cloud
+  unlockAndLoadAll().then(() => {
+    updateHomeStats();
+  });
   // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
   setTimeout(() => {
     fbSyncLoad().catch(()=>{});
@@ -8861,122 +8825,6 @@ function fbMsg(c){
     'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
-
-// ═══════════════════════════════════════════════════════════
-//  INDEXED DB — VAULT CIFRATO LOCALE
-// ═══════════════════════════════════════════════════════════
-const IDB_NAME    = 'homebull_vault';
-const IDB_VERSION = 1;
-const IDB_STORE   = 'vault';
-let _idb = null;
-
-// Apre (o crea) il database
-function idbOpen() {
-  return new Promise((resolve, reject) => {
-    if (_idb) { resolve(_idb); return; }
-    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
-    req.onupgradeneeded = e => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(IDB_STORE)) {
-        db.createObjectStore(IDB_STORE, { keyPath: 'k' });
-      }
-    };
-    req.onsuccess = e => { _idb = e.target.result; resolve(_idb); };
-    req.onerror  = e => { console.warn('IDB open error:', e); reject(e); };
-  });
-}
-
-// Salva un valore cifrato in IDB
-async function idbSet(key, value) {
-  try {
-    const db = await idbOpen();
-    const encrypted = HB.sessionKey ? await hbEncrypt(value) : value;
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(IDB_STORE, 'readwrite');
-      tx.objectStore(IDB_STORE).put({ k: key, v: encrypted, ts: Date.now() });
-      tx.oncomplete = resolve;
-      tx.onerror    = reject;
-    });
-  } catch(e) { console.warn('idbSet:', e); }
-}
-
-// Legge e decifra un valore da IDB
-async function idbGet(key) {
-  try {
-    const db = await idbOpen();
-    return new Promise((resolve) => {
-      const tx  = db.transaction(IDB_STORE, 'readonly');
-      const req = tx.objectStore(IDB_STORE).get(key);
-      req.onsuccess = async () => {
-        if (!req.result) { resolve(null); return; }
-        let val = req.result.v;
-        if (HB.sessionKey && typeof val === 'string' && (val.startsWith('hb13enc:') || val.startsWith('hb12:'))) {
-          val = await hbDecrypt(val);
-        }
-        resolve(val);
-      };
-      req.onerror = () => resolve(null);
-    });
-  } catch(e) { console.warn('idbGet:', e); return null; }
-}
-
-// Salva TUTTI i dati cifrati in IDB (chiamato ad ogni modifica)
-async function idbSaveAll() {
-  if (!HB.sessionKey) return;
-  try {
-    for (const k of HB_SYNC_KEYS) {
-      const v = localStorage.getItem(k);
-      if (v) await idbSet(k, v);
-    }
-    await idbSet('_hb_vault_ts', String(Date.now()));
-    console.log('🔒 Vault locale aggiornato');
-  } catch(e) { console.warn('idbSaveAll:', e); }
-}
-
-// Carica tutti i dati da IDB (all'apertura, prima di Firebase)
-async function idbLoadAll() {
-  if (!HB.sessionKey) return false;
-  try {
-    const tsRaw = await idbGet('_hb_vault_ts');
-    if (!tsRaw) { console.log('IDB: nessun vault locale'); return false; }
-    let loaded = 0;
-    for (const k of HB_SYNC_KEYS) {
-      const val = await idbGet(k);
-      if (val) {
-        try {
-          JSON.parse(val); // verifica JSON valido
-          localStorage.setItem(k, val);
-          loaded++;
-        } catch(e) { console.warn('IDB skip non-JSON:', k); }
-      }
-    }
-    console.log(`🔓 Vault locale caricato: ${loaded} chiavi (ts: ${new Date(parseInt(tsRaw)).toLocaleTimeString()})`);
-    return loaded > 0;
-  } catch(e) { console.warn('idbLoadAll:', e); return false; }
-}
-
-// Cancella il vault locale (al logout)
-async function idbClear() {
-  try {
-    const db = await idbOpen();
-    return new Promise((resolve) => {
-      const tx = db.transaction(IDB_STORE, 'readwrite');
-      tx.objectStore(IDB_STORE).clear();
-      tx.oncomplete = resolve;
-    });
-  } catch(e) { console.warn('idbClear:', e); }
-}
-
-// Auto-save cifrato ad ogni modifica con debounce
-let _idbDebounce = null;
-function idbScheduleSave() {
-  clearTimeout(_idbDebounce);
-  _idbDebounce = setTimeout(() => idbSaveAll(), 2000);
-}
-
-// Apre IDB subito dopo la dichiarazione (variabili già inizializzate)
-setTimeout(() => idbOpen().catch(e => console.warn('IDB init:', e)), 0);
-
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
   'hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
   'hb13_pw_cats','hb13_shop_lists_v2'];
@@ -9037,7 +8885,7 @@ async function hbLoadSecure(key, fallback='[]') {
 }
 
 async function fbSyncLoad(){
-  if(!fbReady||!HB.user||!fbDb||!HB.ready)return;
+  if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
@@ -9093,15 +8941,13 @@ async function fbSyncLoad(){
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
     await fbSyncAll(true);
-    // Aggiorna vault locale IDB dopo sync
-    if(HB.sessionKey) idbSaveAll().catch(()=>{});
     console.log('\u2713 Sync load completato');
   }catch(e){console.warn('SyncLoad:',e);}
   finally { _syncInProgress = false; }
 }
 
 async function fbSyncAll(silent=false){
-  if(!fbReady||!HB.user||!fbDb||!HB.ready)return;
+  if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
@@ -9116,13 +8962,9 @@ async function fbSyncAll(silent=false){
       } else {
         data[k] = v;
       }
-      const now = Date.now();
-      tsMap[k] = Math.max(_getLocalTs(k), now); // sempre aggiornato
+      tsMap[k] = _getLocalTs(k) || Date.now();
     }
     if(Object.keys(data).length === 0) return;
-    const uploadTs = Date.now();
-    // Aggiorna tutti i timestamp con il momento attuale dell'upload
-    Object.keys(tsMap).forEach(k => { tsMap[k] = uploadTs; _setLocalTs(k, uploadTs); });
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
@@ -9139,9 +8981,7 @@ let _syncInProgress = false;
     origSet(key, value);
     if(!_syncInProgress && HB_SYNC_KEYS.includes(key)){
       _setLocalTs(key, Date.now());
-      // Salva cifrato in IDB locale
-      if(HB.sessionKey) idbScheduleSave();
-      if(fbReady && HB.user && HB.ready){
+      if(fbReady && HB.user){
         clearTimeout(window._syncDebounce);
         window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
       }
@@ -9178,7 +9018,7 @@ async function hbGetSecure(key) {
 
 let _realtimeRef = null;
 function fbStartRealtime(){
-  if(!fbReady||!HB.user||!fbDb||!HB.ready)return;
+  if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey) return;
   if(_realtimeRef) { try { _realtimeRef.off(); } catch(e){} }
@@ -9187,34 +9027,16 @@ function fbStartRealtime(){
     if(!snap.exists()) return;
     const cloudTs = snap.val() || {};
     let needLoad = false;
-    const keysToUpdate = [];
-    HB_SYNC_KEYS.forEach(k => {
-      if((cloudTs[k]||0) > _getLocalTs(k)) {
-        needLoad = true;
-        keysToUpdate.push(k);
-      }
-    });
+    HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true; });
     if(needLoad){
-      console.log('\ud83d\udd04 Aggiornamento cloud rilevato:', keysToUpdate.join(', '));
-      // Resetta i timestamp locali delle chiavi da aggiornare
-      keysToUpdate.forEach(k => _setLocalTs(k, 0));
-      setTimeout(fbSyncLoad, 800);
+      console.log('\ud83d\udd04 Aggiornamento cloud rilevato');
+      setTimeout(fbSyncLoad, 1000);
     }
   });
   document.removeEventListener('visibilitychange', _onVisibilityChange);
   document.addEventListener('visibilitychange', _onVisibilityChange);
   console.log('\u2705 Realtime listener attivo:', emailKey);
 }
-// Salva vault cifrato alla chiusura/cambio tab
-window.addEventListener('beforeunload', () => {
-  if (HB.sessionKey) idbSaveAll();
-});
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden' && HB.sessionKey) {
-    idbSaveAll();
-  }
-});
-
 function _onVisibilityChange(){
   if(document.visibilityState === 'visible' && fbReady && HB.user) fbStartRealtime();
 }
@@ -9411,29 +9233,13 @@ function gcalUpdateUI(){
 
 
 function logout(){
-  idbClear().catch(()=>{});
-  fbLogout(); HB.sessionKey=null; HB.user=null; HB.ready=false; location.reload();
+  fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
 
 let _lastSyncTime = null;
 
 function cloudPageOpen(){
   gcalUpdateUI();
-  // Mostra stato vault locale
-  idbOpen().then(db => {
-    idbGet('_hb_vault_ts').then(ts => {
-      const el = document.getElementById('cloud-status-txt');
-      const dot = document.getElementById('cloud-status-dot');
-      if (ts) {
-        const d = new Date(parseInt(ts));
-        if (el) el.textContent = 'Vault locale: ' + d.toLocaleTimeString('it-IT');
-        if (dot) dot.style.background = '#10b981';
-      } else {
-        if (el) el.textContent = 'Vault locale non ancora creato';
-        if (dot) dot.style.background = '#f59e0b';
-      }
-    });
-  }).catch(()=>{});
   const online = navigator.onLine && fbReady;
   const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
   const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -10249,7 +10055,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA196</div>
+            <div style="font-size:13px;color:var(--text3);">BETA191</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
