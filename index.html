@@ -2038,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA185</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA186</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2141,7 +2141,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA185</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA186</div>
         </div>
       </div>
     </div>
@@ -2264,7 +2264,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA185</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA186</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3307,7 +3307,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA185',
+  version: 'BETA186',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9736,7 +9736,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA185</div>
+            <div style="font-size:13px;color:var(--text3);">BETA186</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -9744,7 +9744,7 @@ function calShowAddEvent() {
               <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Password, Note, OTP, Carte, WiFi</span></div>
               <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Documenti con Codice Fiscale</span></div>
               <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Famiglia, Lista spesa, Server</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Firebase Auth + Sync cloud</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Firebase Auth + Sync cloud</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Drive backup</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Calendar sync</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Condivisione famiglia reale</span></div>
@@ -9767,17 +9767,17 @@ function calShowAddEvent() {
   </div>
   <div style="padding:6px 0;flex:1;overflow-y:auto;">
     <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
-    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
+    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
     <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
+    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
+    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
     <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
     <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
-    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
-    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
-    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
-    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
     <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
-    <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
-    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
+    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
   </div>
   <div style="padding:10px 14px;border-top:1px solid var(--border);">
     <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
