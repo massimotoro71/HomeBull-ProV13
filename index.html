@@ -2041,7 +2041,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA188</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA189</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2144,7 +2144,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA188</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA189</div>
         </div>
       </div>
     </div>
@@ -2267,7 +2267,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA188</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA189</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3310,7 +3310,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA188',
+  version: 'BETA189',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3609,13 +3609,18 @@ async function hbEncrypt(text) {
   combined.set(new Uint8Array(enc), 12);
   let bin = '';
   for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
-  return 'hb12:' + btoa(bin);
+  return 'hb13enc:' + btoa(bin);
 }
 
 async function hbDecrypt(data) {
-  if (!HB.sessionKey || !data.startsWith('hb12:')) return data;
+  if (!HB.sessionKey) return data;
+  // Supporta sia il prefisso nuovo hb13enc: che quello legacy hb12:
+  let payload = null;
+  if (typeof data === 'string' && data.startsWith('hb13enc:')) payload = data.slice(8);
+  else if (typeof data === 'string' && data.startsWith('hb12:')) payload = data.slice(5);
+  else return data; // non cifrato
   try {
-    const combined = new Uint8Array(atob(data.slice(5)).split('').map(c => c.charCodeAt(0)));
+    const combined = new Uint8Array(atob(payload).split('').map(c => c.charCodeAt(0)));
     const dec = await crypto.subtle.decrypt(
       { name: 'AES-GCM', iv: combined.slice(0, 12) },
       HB.sessionKey, combined.slice(12)
@@ -3635,6 +3640,10 @@ function unlockApp() {
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
+  // Carica dati cifrati localmente, poi sync cloud
+  unlockAndLoadAll().then(() => {
+    updateHomeStats();
+  });
   // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
   setTimeout(() => {
     fbSyncLoad().catch(()=>{});
@@ -4135,8 +4144,8 @@ function pwLoad() {
 
 // Salva
 function pwSave() {
-  localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
-  localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
+  hbSetSecure(PW_CATS, JSON.stringify(_pwCats));
+  hbSetSecure(PW_KEY,  JSON.stringify(_pwItems));
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -4882,7 +4891,7 @@ function noteLoad() {
   try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
 }
 function noteSaveAll() {
-  localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
+  hbSetSecure(NOTE_KEY, JSON.stringify(_notes));
   const el = document.getElementById('stat-notes');
   if (el) el.textContent = _notes.length || '—';
 }
@@ -5045,7 +5054,7 @@ let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
 }
-function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
+function cardsSaveAll() { hbSetSecure(CARDS_KEY, JSON.stringify(_cards)); }
 
 function cardsOpen() {
   cardsLoad(); cardsShowList();
@@ -5306,7 +5315,7 @@ let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 function financeLoad() {
   try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
 }
-function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
+function financeSaveAll() { hbSetSecure(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -5480,7 +5489,7 @@ let _wifiSec  = 'WPA';
 function wifiLoad() {
   try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
 }
-function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); }
+function wifiSaveAll() { hbSetSecure(WIFI_KEY, JSON.stringify(_wifiNets)); }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -5625,7 +5634,7 @@ let _otpIcon     = '🔐';
 function otpLoad() {
   try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
 }
-function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); }
+function otpSaveAll() { hbSetSecure(OTP_KEY, JSON.stringify(_otpAccounts)); }
 
 function otpOpen() {
   otpLoad();
@@ -5880,7 +5889,7 @@ const CAL_MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug
 function calLoad() {
   try { _calEvents = JSON.parse(localStorage.getItem(CAL_KEY)||'[]'); } catch(e) { _calEvents=[]; }
 }
-function calSaveAll() { localStorage.setItem(CAL_KEY, JSON.stringify(_calEvents)); }
+function calSaveAll() { hbSetSecure(CAL_KEY, JSON.stringify(_calEvents)); }
 
 function calOpen() {
   turniLoad();
@@ -6134,7 +6143,7 @@ function familyLoad() {
   try { _family = JSON.parse(localStorage.getItem(FAMILY_KEY)) || []; }
   catch(e) { _family = []; }
 }
-function familySave() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_family)); }
+function familySave() { hbSetSecure(FAMILY_KEY, JSON.stringify(_family)); }
 
 function familyOpen() {
   familyLoad();
@@ -6249,7 +6258,7 @@ let _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
 function docsLoad() {
   try { _docs = JSON.parse(localStorage.getItem(DOCS_KEY)||'[]'); } catch(e) { _docs=[]; }
 }
-function docsSaveAll() { localStorage.setItem(DOCS_KEY, JSON.stringify(_docs)); }
+function docsSaveAll() { hbSetSecure(DOCS_KEY, JSON.stringify(_docs)); }
 
 function docsOpen() {
   docsLoad(); docsShowList();
@@ -6505,7 +6514,7 @@ let _serverType  = { id:'ssh', icon:'🔐', label:'SSH' };
 function serverLoad() {
   try { _serverItems = JSON.parse(localStorage.getItem(SERVER_KEY)||'[]'); } catch(e) { _serverItems=[]; }
 }
-function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
+function serverSaveAll() { hbSetSecure(SERVER_KEY, JSON.stringify(_serverItems)); }
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -6783,7 +6792,7 @@ function shopSave() {
   if (_shopCurId && _shopLists[_shopCurId]) {
     _shopLists[_shopCurId].items = _shopList;
   }
-  localStorage.setItem(SHOP_LISTS_KEY, JSON.stringify(_shopLists));
+  hbSetSecure(SHOP_LISTS_KEY, JSON.stringify(_shopLists));
   localStorage.setItem(SHOP_RECENT, JSON.stringify(_shopRecent));
 }
 
@@ -8105,7 +8114,7 @@ function docsLoad2() {
   try { _docs2 = JSON.parse(localStorage.getItem(DOCS_KEY2)) || []; }
   catch(e) { _docs2 = []; }
 }
-function docsSaveAll2() { localStorage.setItem(DOCS_KEY2, JSON.stringify(_docs2)); }
+function docsSaveAll2() { hbSetSecure(DOCS_KEY2, JSON.stringify(_docs2)); }
 
 function docsOpen() {
   docsLoad2();
@@ -8825,6 +8834,49 @@ function _getSyncKey(){
   return btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
 }
 
+// ── Carica tutti i dati cifrati all'unlock ──────────────────
+async function unlockAndLoadAll() {
+  try {
+    // Password
+    _pwCats  = await hbLoadSecure(PW_CATS, '[]');
+    _pwItems = await hbLoadSecure(PW_KEY, '[]');
+    // Note
+    if(typeof _notes !== 'undefined') _notes = await hbLoadSecure(NOTE_KEY, '[]');
+    // Cards
+    if(typeof _cards !== 'undefined') _cards = await hbLoadSecure(CARDS_KEY, '[]');
+    // WiFi
+    if(typeof _wifiNets !== 'undefined') _wifiNets = await hbLoadSecure(WIFI_KEY, '[]');
+    // Finance
+    if(typeof _financeAccounts !== 'undefined') _financeAccounts = await hbLoadSecure(FINANCE_KEY, '[]');
+    // OTP
+    if(typeof _otpAccounts !== 'undefined') _otpAccounts = await hbLoadSecure(OTP_KEY, '[]');
+    // Server
+    if(typeof _serverItems !== 'undefined') _serverItems = await hbLoadSecure(SERVER_KEY, '[]');
+    // Shop
+    if(typeof _shopLists !== 'undefined') _shopLists = await hbLoadSecure(SHOP_LISTS_KEY, '{}');
+    // Family
+    if(typeof _family !== 'undefined') _family = await hbLoadSecure(FAMILY_KEY, '{}');
+    // Calendario
+    if(typeof _calEvents !== 'undefined') _calEvents = await hbLoadSecure(CAL_KEY, '[]');
+    // Turni
+    if(typeof _turniDef !== 'undefined') _turniDef = await hbLoadSecure(TURNI_DEF_KEY, '[]');
+    if(typeof _calDayShifts !== 'undefined') _calDayShifts = await hbLoadSecure(TURNI_DAYS_KEY, '{}');
+    console.log('✅ Dati caricati e decifrati');
+  } catch(e) { console.warn('unlockAndLoadAll:', e); }
+}
+
+// ── Load sicuro: legge e decifra da localStorage ────────────
+async function hbLoadSecure(key, fallback='[]') {
+  const raw = localStorage.getItem(key);
+  if(!raw) return JSON.parse(fallback);
+  if(HB.sessionKey && typeof raw === 'string' && (raw.startsWith('hb13enc:') || raw.startsWith('hb12:'))) {
+    const dec = await hbDecrypt(raw);
+    if(!dec) return JSON.parse(fallback);
+    try { return JSON.parse(dec); } catch(e) { return JSON.parse(fallback); }
+  }
+  try { return JSON.parse(raw); } catch(e) { return JSON.parse(fallback); }
+}
+
 async function fbSyncLoad(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
@@ -8840,7 +8892,12 @@ async function fbSyncLoad(){
       const remoteTs = cloudTs[k] || 0;
       if(remoteTs > localTs && cloud[k]){
         let value = cloud[k];
-        if(typeof value === 'string' && value.startsWith('hb12:')) { console.warn('Skip legacy:', k); continue; }
+        // Decifra se cifrato
+        if(typeof value === 'string' && (value.startsWith('hb13enc:') || value.startsWith('hb12:'))) {
+          if(!HB.sessionKey) { console.warn('Skip cifrato (no key):', k); continue; }
+          value = await hbDecrypt(value);
+          if(!value) { console.warn('Decifratura fallita:', k); continue; }
+        }
         try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
         _syncInProgress = true;
         localStorage.setItem(k, value);
@@ -8888,10 +8945,18 @@ async function fbSyncAll(silent=false){
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
     const data = {}; const tsMap = {};
-    HB_SYNC_KEYS.forEach(k=>{
-      const v=localStorage.getItem(k);
-      if(v){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
-    });
+    for(const k of HB_SYNC_KEYS){
+      const v = localStorage.getItem(k);
+      if(!v) continue;
+      // Cifra se sessionKey disponibile
+      if(HB.sessionKey){
+        const encrypted = await hbEncrypt(v);
+        data[k] = encrypted;
+      } else {
+        data[k] = v;
+      }
+      tsMap[k] = _getLocalTs(k) || Date.now();
+    }
     if(Object.keys(data).length === 0) return;
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
@@ -8916,6 +8981,33 @@ let _syncInProgress = false;
     }
   };
 })();
+
+// ── Helpers per lettura/scrittura cifrata in localStorage ───
+async function hbSetSecure(key, value) {
+  if(!HB_SYNC_KEYS.includes(key)) { localStorage.setItem(key, value); return; }
+  if(HB.sessionKey) {
+    const enc = await hbEncrypt(value);
+    _syncInProgress = true;
+    localStorage.setItem(key, enc);
+    _syncInProgress = false;
+  } else {
+    localStorage.setItem(key, value);
+  }
+  _setLocalTs(key, Date.now());
+  if(fbReady && HB.user){
+    clearTimeout(window._syncDebounce);
+    window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
+  }
+}
+
+async function hbGetSecure(key) {
+  const raw = localStorage.getItem(key);
+  if(!raw) return null;
+  if(HB.sessionKey && typeof raw === 'string' && (raw.startsWith('hb13enc:') || raw.startsWith('hb12:'))) {
+    return await hbDecrypt(raw);
+  }
+  return raw;
+}
 
 let _realtimeRef = null;
 function fbStartRealtime(){
@@ -9215,8 +9307,8 @@ function turniLoad() {
   try { _calDayShifts = JSON.parse(localStorage.getItem(TURNI_DAYS_KEY)) || {}; } catch(e) { _calDayShifts = {}; }
 }
 function turniSave() {
-  localStorage.setItem(TURNI_DEF_KEY,  JSON.stringify(_turniDef));
-  localStorage.setItem(TURNI_DAYS_KEY, JSON.stringify(_calDayShifts));
+  hbSetSecure(TURNI_DEF_KEY,  JSON.stringify(_turniDef));
+  hbSetSecure(TURNI_DAYS_KEY, JSON.stringify(_calDayShifts));
 }
 
 function turniToggle() {
@@ -9956,7 +10048,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA188</div>
+            <div style="font-size:13px;color:var(--text3);">BETA189</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
