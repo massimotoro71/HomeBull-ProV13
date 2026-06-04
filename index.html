@@ -1111,11 +1111,15 @@ html, body {
 .shop-accordion {
   border: 1px solid var(--border); border-radius: 14px;
   margin-bottom: 8px; overflow: hidden;
+  transition: border-color 0.2s;
 }
+.shop-accordion:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
 .shop-accordion-header {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 14px; cursor: pointer;
   background: var(--surface); user-select: none;
+  border-left: 3px solid var(--accent);
+  transition: background 0.15s;
 }
 .shop-accordion-header:active { background: var(--surface2); }
 .shop-accordion-body {
@@ -1736,6 +1740,7 @@ html, body {
 }
 .stat-card:hover { border-color: var(--accent); transform: translateY(-1px); }
 .stat-card:active { transform: scale(0.97); }
+.stat-card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent); }
 .stat-icon { font-size: 24px; margin-bottom: 2px; }
 .stat-num {
   font-size: 28px;
@@ -2041,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA189</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA190</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2142,9 +2147,9 @@ function cardsSearch(q) {
       <div>
         <div class="sidebar-logo-text" style="background:linear-gradient(90deg,var(--text),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">HomeBull</div>
         <div style="display:flex;align-items:center;gap:5px;">
-          <div class="sidebar-logo-ver">Pro v13</div>
+          <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA189</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA190</div>
         </div>
       </div>
     </div>
@@ -2267,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA189</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA190</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2614,7 +2619,7 @@ function cardsSearch(q) {
 
         <!-- Bottone aggiungi evento -->
         <div style="margin:12px 14px 0;">
-          <button onclick="calShowAddEvent()" style="width:100%;padding:13px;border-radius:14px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi evento</button>
+          <button onclick="calShowAddEvent()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;" onmouseenter="this.style.background='var(--accent)';this.style.color='#fff'" onmouseleave="this.style.background='transparent';this.style.color='var(--accent)'">📅 Aggiungi evento</button>
         </div>
 
         <!-- TURNI ACCORDION -->
@@ -3310,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA189',
+  version: 'BETA190',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3952,7 +3957,7 @@ const HB_NAME_KEY = 'hb12_display_name';
 
 function getDisplayName() {
   return localStorage.getItem(HB_NAME_KEY) ||
-         (HB.user?.email?.split('@')[0] || 'Utente');
+         (HB.user?.email?.split('@')[0]?.replace(/[._-]/g,' ')?.replace(/\b\w/g, c=>c.toUpperCase())?.trim() || 'Utente');
 }
 
 function editDisplayName() {
@@ -4196,7 +4201,7 @@ function pwRenderCats(q='') {
     const div = document.createElement('div');
     const ci = cats.indexOf(cat);
     const color = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'][ci % 8];
-    div.style.cssText = 'display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-bottom:8px;transition:background 0.15s;';
+    div.style.cssText = `display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};cursor:pointer;margin-bottom:8px;transition:background 0.15s;`;
     div.onmouseenter = () => div.style.background = 'var(--surface2,var(--bg3))';
     div.onmouseleave = () => div.style.background = 'var(--surface)';
     div.onclick = () => pwShowItems(cat.id, cat.name);
@@ -6961,7 +6966,9 @@ function shopRenderCategories(q='') {
     accordion.className = 'shop-accordion';
 
     const header = document.createElement('div');
+    const shopColors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899','#14b8a6','#a855f7','#84cc16','#fb923c'];
     header.className = 'shop-accordion-header';
+    header.style.borderLeftColor = shopColors[idx % shopColors.length];
     header.onclick = () => {
       _shopOpenCats[idx] = !isOpen;
       shopRenderCategories(q);
@@ -10048,7 +10055,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA189</div>
+            <div style="font-size:13px;color:var(--text3);">BETA190</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
