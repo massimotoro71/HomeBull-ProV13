@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA178</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA179</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8797,20 +8797,30 @@ async function fbSyncLoad(){
     const cloud = snap.val() || {};
     const cloudTs = cloud._ts || {};
     let updated = false;
-    HB_SYNC_KEYS.forEach(k => {
+    for(const k of HB_SYNC_KEYS) {
       const localTs = _getLocalTs(k);
       const remoteTs = cloudTs[k] || 0;
       if(remoteTs > localTs && cloud[k]){
-        // Cloud più recente — sovrascrivi locale
-        Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, cloud[k]);
+        // Cloud più recente — gestisci dati cifrati legacy
+        let value = cloud[k];
+        // Se il valore è cifrato (hb12:...) prova a decifrare, altrimenti salta
+        if(typeof value === 'string' && value.startsWith('hb12:')) {
+          if(HB.sessionKey) {
+            try { value = await hbDecrypt(value); } catch(e2) { console.warn('Skip cifrato:', k); continue; }
+          } else {
+            console.warn('Skip cifrato (no key):', k); continue;
+          }
+        }
+        // Verifica che sia JSON valido prima di salvare
+        try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
+        Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, value);
         _setLocalTs(k, remoteTs);
         updated = true;
         console.log('↓ Dal cloud:', k, new Date(remoteTs).toLocaleTimeString());
       } else if(localTs > remoteTs){
-        // Locale più recente — sarà caricato dal prossimo fbSyncAll
         console.log('↑ Locale più recente:', k);
       }
-    });
+    }
     if(updated){
       showToast('☁️ Dati aggiornati dal cloud');
       // Ricarica tutto da localStorage
