@@ -8657,17 +8657,49 @@ async function verifyEmailOTP() {
     try {
       const cred = await fbAuth.signInWithEmailAndPassword(_emailOtpAddr, stablePass);
       _fbUid = cred.user.uid;
+      console.log('✅ Firebase login OK:', _fbUid);
     } catch(e) {
-      if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+      console.warn('Firebase signIn fallito:', e.code);
+      if (e.code === 'auth/user-not-found') {
+        // Utente non esiste → crea
         try {
           const cred2 = await fbAuth.createUserWithEmailAndPassword(_emailOtpAddr, stablePass);
           _fbUid = cred2.user.uid;
-        } catch(e2) { console.warn('Firebase create:', e2); }
+          console.log('✅ Firebase nuovo utente creato:', _fbUid);
+        } catch(e2) {
+          if (e2.code === 'auth/email-already-in-use') {
+            // Race condition: usa uid deterministico basato sull'email
+            _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+            console.warn('Race condition auth, uso uid derivato:', _fbUid);
+          } else { console.warn('Firebase create:', e2); }
+        }
+      } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') {
+        // Account esiste ma password non corrisponde (creato con versione diversa)
+        // Tenta reset password silenziosa tramite re-autenticazione non disponibile
+        // → usa uid deterministico stabile basato su email
+        try {
+          // Ultima chance: aggiorna password se loggato con altro metodo
+          const currentUser = fbAuth.currentUser;
+          if (currentUser && currentUser.email === _emailOtpAddr) {
+            await currentUser.updatePassword(stablePass);
+            _fbUid = currentUser.uid;
+            console.log('✅ Password aggiornata, uid:', _fbUid);
+          } else {
+            // Usa uid deterministico — il sync userà la stessa chiave email-based
+            _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+            console.warn('Password mismatch, uso uid derivato:', _fbUid);
+          }
+        } catch(e3) {
+          _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+          console.warn('Fallback uid derivato:', _fbUid);
+        }
       } else if (e.code === 'auth/email-already-in-use') {
-        // Email già registrata con altro provider — usa email come chiave diretta
-        _fbUid = 'email_' + btoa(_emailOtpAddr).replace(/=/g,'').slice(0,20);
-        console.log('Email già in uso con altro provider, uso chiave locale');
-      } else { console.warn('Firebase login:', e); }
+        _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+        console.warn('Email già in uso con altro provider, uid derivato:', _fbUid);
+      } else if (e.code === 'auth/too-many-requests') {
+        err.textContent = 'Troppi tentativi — riprova tra qualche minuto';
+        return;
+      } else { console.warn('Firebase login errore:', e); }
     }
   }
   // OTP verificato — salva utente con UID Firebase stabile
