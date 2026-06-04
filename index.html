@@ -2041,7 +2041,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA187</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA188</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2144,7 +2144,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA187</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA188</div>
         </div>
       </div>
     </div>
@@ -2267,7 +2267,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA187</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA188</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3310,7 +3310,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA187',
+  version: 'BETA188',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8942,6 +8942,197 @@ function _onVisibilityChange(){
   if(document.visibilityState === 'visible' && fbReady && HB.user) fbStartRealtime();
 }
 
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE OAUTH + CALENDAR SYNC
+// ═══════════════════════════════════════════════════════════
+const GCAL_CLIENT_ID = '140879408214-fih8n3ed3jp0hre6ujso7lcq2mkbss1d.apps.googleusercontent.com';
+const GCAL_SCOPE = 'https://www.googleapis.com/auth/calendar';
+const GCAL_CAL_ID = 'primary'; // calendario principale Google
+let _gToken = null;   // access token Google
+let _gUser  = null;   // info utente Google
+
+// ── Carica Google Identity Services ─────────────────────────
+function gcalLoadGIS(){
+  return new Promise(resolve => {
+    if(window.google?.accounts) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = resolve;
+    document.head.appendChild(s);
+  });
+}
+
+// ── Login Google (popup) ─────────────────────────────────────
+async function gcalLogin(){
+  await gcalLoadGIS();
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GCAL_CLIENT_ID,
+      scope: GCAL_SCOPE,
+      callback: (resp) => {
+        if(resp.error){ reject(resp.error); return; }
+        _gToken = resp.access_token;
+        localStorage.setItem('hb_gtoken_exp', Date.now() + (resp.expires_in * 1000));
+        gcalGetUserInfo().then(resolve).catch(resolve);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+// ── Info utente Google ───────────────────────────────────────
+async function gcalGetUserInfo(){
+  if(!_gToken) return;
+  try {
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { 'Authorization': 'Bearer ' + _gToken }
+    });
+    _gUser = await r.json();
+    localStorage.setItem('hb_guser', JSON.stringify(_gUser));
+    console.log('Google user:', _gUser.email);
+  } catch(e) { console.warn('gcalGetUserInfo:', e); }
+}
+
+// ── Logout Google ────────────────────────────────────────────
+function gcalLogout(){
+  if(_gToken && window.google?.accounts) {
+    google.accounts.oauth2.revoke(_gToken);
+  }
+  _gToken = null; _gUser = null;
+  localStorage.removeItem('hb_gtoken_exp');
+  localStorage.removeItem('hb_guser');
+  showToast('Disconnesso da Google');
+  gcalUpdateUI();
+}
+
+// ── Stato connessione ────────────────────────────────────────
+function gcalIsConnected(){
+  const exp = parseInt(localStorage.getItem('hb_gtoken_exp')||'0');
+  return _gToken && Date.now() < exp;
+}
+
+// ── ESPORTA eventi HomeBull → Google Calendar ────────────────
+async function gcalExportToGoogle(){
+  if(!gcalIsConnected()){ showToast('Prima connetti Google Calendar'); return; }
+  showToast('⏳ Esportazione in corso...');
+  let ok=0, fail=0;
+  // Esporta eventi calendario
+  for(const ev of _calEvents){
+    try{
+      const start = ev.time ? ev.date+'T'+ev.time+':00' : ev.date;
+      const end   = ev.time ? ev.date+'T'+ev.time.replace(/(\d+):(\d+)/,(_,h,m)=>`${String(+h+1).padStart(2,'0')}:${m}`)+':00' : ev.date;
+      const body  = {
+        summary: ev.title,
+        start: ev.time ? {dateTime: start, timeZone:'Europe/Rome'} : {date: start},
+        end:   ev.time ? {dateTime: end,   timeZone:'Europe/Rome'} : {date: end},
+        source: { title:'HomeBull', url: location.href }
+      };
+      const r = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${GCAL_CAL_ID}/events`, {
+        method:'POST', headers:{'Authorization':'Bearer '+_gToken,'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      if(r.ok) ok++; else fail++;
+    } catch(e){ fail++; }
+  }
+  // Esporta turni
+  for(const [date, shifts] of Object.entries(_calDayShifts)){
+    for(const sid of shifts){
+      const turno = _turniDef.find(t=>t.id===sid);
+      if(!turno) continue;
+      try{
+        const startT = turno.start || '08:00';
+        const endT   = turno.end   || '20:00';
+        const body   = {
+          summary: '🔄 ' + turno.label,
+          start: { dateTime: date+'T'+startT+':00', timeZone:'Europe/Rome' },
+          end:   { dateTime: date+'T'+endT+':00',   timeZone:'Europe/Rome' },
+          colorId: gcalColorId(turno.color),
+          source: { title:'HomeBull', url: location.href }
+        };
+        const r = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${GCAL_CAL_ID}/events`, {
+          method:'POST', headers:{'Authorization':'Bearer '+_gToken,'Content-Type':'application/json'},
+          body: JSON.stringify(body)
+        });
+        if(r.ok) ok++; else fail++;
+      } catch(e){ fail++; }
+    }
+  }
+  showToast(`✅ Esportati ${ok} eventi${fail?' ('+fail+' errori)':''}`);
+}
+
+// ── IMPORTA eventi Google Calendar → HomeBull ────────────────
+async function gcalImportFromGoogle(){
+  if(!gcalIsConnected()){ showToast('Prima connetti Google Calendar'); return; }
+  showToast('⏳ Importazione in corso...');
+  try{
+    const now   = new Date();
+    const min   = new Date(now.getFullYear()-1, now.getMonth(), now.getDate()).toISOString();
+    const max   = new Date(now.getFullYear()+1, now.getMonth(), now.getDate()).toISOString();
+    const url   = `https://www.googleapis.com/calendar/v3/calendars/${GCAL_CAL_ID}/events?timeMin=${min}&timeMax=${max}&singleEvents=true&orderBy=startTime&maxResults=500`;
+    const r     = await fetch(url, { headers:{'Authorization':'Bearer '+_gToken} });
+    const data  = await r.json();
+    const items = data.items || [];
+    let added=0;
+    for(const item of items){
+      if(item.source?.title === 'HomeBull') continue; // salta quelli già esportati da noi
+      const date  = (item.start?.dateTime || item.start?.date || '').slice(0,10);
+      const time  = item.start?.dateTime ? item.start.dateTime.slice(11,16) : '';
+      const title = item.summary || 'Evento Google';
+      if(!date) continue;
+      const exists = _calEvents.some(e => e.title===title && e.date===date);
+      if(!exists){
+        _calEvents.push({ id:'gcal_'+item.id, title, date, time, cat:'', color:'#4285F4' });
+        added++;
+      }
+    }
+    if(added){
+      calSaveAll();
+      if(typeof calRender==='function') calRender();
+    }
+    showToast(`✅ Importati ${added} nuovi eventi`);
+  }catch(e){ console.warn('gcalImport:', e); showToast('Errore importazione: ' + e.message); }
+}
+
+// ── Mappa colore HEX → Google colorId ────────────────────────
+function gcalColorId(hex){
+  const map = { '#6366f1':'9','#22c55e':'2','#ef4444':'11','#f59e0b':'5','#3b82f6':'1','#ec4899':'4','#8b5cf6':'3' };
+  return map[hex?.toLowerCase()] || '7';
+}
+
+// ── Aggiorna UI sezione Google Calendar ──────────────────────
+function gcalUpdateUI(){
+  const connected = gcalIsConnected();
+  const user = _gUser || JSON.parse(localStorage.getItem('hb_guser')||'null');
+  const statusEl  = document.getElementById('gcal-status');
+  const emailEl   = document.getElementById('gcal-email');
+  const loginBtn  = document.getElementById('gcal-login-btn');
+  const logoutBtn = document.getElementById('gcal-logout-btn');
+  const actionsEl = document.getElementById('gcal-actions');
+  if(!statusEl) return;
+  if(connected){
+    statusEl.textContent  = '🟢 Connesso';
+    emailEl.textContent   = user?.email || '';
+    loginBtn.style.display  = 'none';
+    logoutBtn.style.display = 'inline-flex';
+    actionsEl.style.display = 'flex';
+  } else {
+    statusEl.textContent  = '⚪ Non connesso';
+    emailEl.textContent   = '';
+    loginBtn.style.display  = 'inline-flex';
+    logoutBtn.style.display = 'none';
+    actionsEl.style.display = 'none';
+  }
+}
+
+// ── Init: ripristina utente salvato ──────────────────────────
+(function gcalInit(){
+  try {
+    const saved = localStorage.getItem('hb_guser');
+    if(saved) _gUser = JSON.parse(saved);
+  } catch(e){}
+})();
+
+
 function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
@@ -8949,6 +9140,7 @@ function logout(){
 let _lastSyncTime = null;
 
 function cloudPageOpen(){
+  gcalUpdateUI();
   const online = navigator.onLine && fbReady;
   const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
   const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -9667,6 +9859,31 @@ function calShowAddEvent() {
             </div>
           </div>
         </div>
+        <!-- Google Calendar -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">📅</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:800;">Google Calendar</div>
+              <div style="font-size:11px;color:var(--text3);" id="gcal-status">⚪ Non connesso</div>
+              <div style="font-size:11px;color:var(--accent);font-weight:600;" id="gcal-email"></div>
+            </div>
+            <button id="gcal-login-btn" onclick="gcalLogin().then(()=>{gcalUpdateUI();showToast('✅ Google connesso!')})" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;">
+              <svg width="14" height="14" viewBox="0 0 24 24"><path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+              Connetti
+            </button>
+            <button id="gcal-logout-btn" onclick="gcalLogout()" style="padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:none;align-items:center;">Disconnetti</button>
+          </div>
+          <div id="gcal-actions" style="padding:14px 16px;display:none;flex-direction:column;gap:8px;">
+            <button onclick="gcalExportToGoogle()" style="width:100%;padding:11px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+              📤 Esporta HomeBull → Google Calendar
+            </button>
+            <button onclick="gcalImportFromGoogle()" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+              📥 Importa Google Calendar → HomeBull
+            </button>
+          </div>
+        </div>
+
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
         <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
       </div>
@@ -9739,7 +9956,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA187</div>
+            <div style="font-size:13px;color:var(--text3);">BETA188</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -9749,7 +9966,7 @@ function calShowAddEvent() {
               <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Famiglia, Lista spesa, Server</span></div>
               <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Firebase Auth + Sync cloud</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Drive backup</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Calendar sync</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Google Calendar sync</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Condivisione famiglia reale</span></div>
             </div>
           </div>
