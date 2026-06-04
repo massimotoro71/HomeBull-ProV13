@@ -2082,7 +2082,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">HomeBull Pro v13 · BETA183</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">HomeBull Pro v13 · BETA178</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2184,7 +2184,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA183</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA178</div>
         </div>
       </div>
     </div>
@@ -2305,15 +2305,9 @@ function cardsSearch(q) {
           <div style="width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
           <div id="home-time" style="font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin:10px 0 18px;flex-wrap:wrap;justify-content:center;">
-          <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;">
-            <div style="width:6px;height:6px;border-radius:50%;background:#10b981;" id="home-sync-dot"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13 BETA183</span>
-          </div>
-          <button onclick="homeSyncNow(this)" style="display:inline-flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 12px;cursor:pointer;font-family:inherit;">
-            <span style="font-size:12px;">☁️</span>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);" id="home-sync-label">Sincronizza</span>
-          </button>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13 BETA178</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3356,7 +3350,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA183',
+  version: 'BETA178',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5930,8 +5924,7 @@ function calOpen() {
   const now = new Date();
   _calYear  = now.getFullYear();
   _calMonth = now.getMonth();
-  _calView = 'month';
-  calSetView('month');
+  calRenderMonthNew();
   calRenderEvents();
   document.getElementById('topbar-title').textContent = 'Calendario';
   document.getElementById('topbar-sub').textContent = _calEvents.length + ' eventi';
@@ -8821,7 +8814,7 @@ function fbMsg(c){
     'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
-const HB_SYNC_KEYS = ['hb12_passwords','hb12_pw_cats','hb12_notes','hb12_otp','hb12_otp_accounts','hb12_cards','hb12_wifi','hb12_calendar','hb13_turni_def','hb13_turni_days',
+const HB_SYNC_KEYS = ['hb12_passwords','hb12_notes','hb12_otp','hb12_otp_accounts','hb12_cards','hb12_wifi','hb12_calendar','hb13_turni_def','hb13_turni_days',
   'hb13_docs2','hb12_finance','hb12_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
   'hb12_pw_cats','hb12_shop_lists_v2'];
 
@@ -9006,27 +8999,7 @@ function settingsCloudOpen() {
   if (mainDot) mainDot.style.background = (navigator.onLine && fbReady) ? '#10b981' : '#ef4444';
 }
 
-async function homeSyncNow(btn) {
-  const label = document.getElementById('home-sync-label');
-  const dot   = document.getElementById('home-sync-dot');
-  if (btn) btn.disabled = true;
-  if (label) label.textContent = 'Sync...';
-  if (dot) dot.style.background = '#f59e0b';
-  try {
-    await fbSyncAll(false);
-    if (label) label.textContent = 'Sincronizzato ✓';
-    if (dot) dot.style.background = '#10b981';
-    setTimeout(() => { if(label) label.textContent = 'Sincronizza'; }, 3000);
-  } catch(e) {
-    if (label) label.textContent = 'Errore ✗';
-    if (dot) dot.style.background = '#ef4444';
-    setTimeout(() => { if(label) label.textContent = 'Sincronizza'; }, 3000);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
-}
-
-function cloudSyncNow() {
+async function cloudSyncNow() {
   const btn = event?.target;
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Sync...'; }
   try {
@@ -9865,7 +9838,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA183</div>
+            <div style="font-size:13px;color:var(--text3);">BETA178</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
