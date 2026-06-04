@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA178</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA177</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8795,23 +8795,20 @@ async function fbSyncLoad(){
     const cloud = snap.val() || {};
     const cloudTs = cloud._ts || {};
     let updated = false;
-    for(const k of HB_SYNC_KEYS) {
+    HB_SYNC_KEYS.forEach(k => {
       const localTs = _getLocalTs(k);
       const remoteTs = cloudTs[k] || 0;
       if(remoteTs > localTs && cloud[k]){
-        // Cloud più recente — decifra e sovrascrivi locale
-        let value = cloud[k];
-        if(value && value.startsWith('hb12:') && HB.sessionKey) {
-          try { value = await hbDecrypt(value); } catch(e2) { console.warn('Decrypt failed for', k); }
-        }
-        Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, value);
+        // Cloud più recente — sovrascrivi locale
+        Object.getPrototypeOf(localStorage).setItem.call(localStorage, k, cloud[k]);
         _setLocalTs(k, remoteTs);
         updated = true;
         console.log('↓ Dal cloud:', k, new Date(remoteTs).toLocaleTimeString());
       } else if(localTs > remoteTs){
+        // Locale più recente — sarà caricato dal prossimo fbSyncAll
         console.log('↑ Locale più recente:', k);
       }
-    }
+    });
     if(updated){
       showToast('☁️ Dati aggiornati dal cloud');
       // Ricarica tutto da localStorage
@@ -8846,24 +8843,15 @@ async function fbSyncAll(silent=false){
   try{
     const data = {};
     const tsMap = {};
-    // Cifra ogni chiave con AES-256 prima di inviare al cloud
-    for(const k of HB_SYNC_KEYS){
-      const v = localStorage.getItem(k);
-      if(!v) continue;
-      try {
-        const encrypted = HB.sessionKey ? await hbEncrypt(v) : v;
-        data[k] = encrypted;
-        tsMap[k] = _getLocalTs(k)||Date.now();
-      } catch(e2) {
-        data[k] = v; // fallback non cifrato
-        tsMap[k] = _getLocalTs(k)||Date.now();
-      }
-    }
+    HB_SYNC_KEYS.forEach(k=>{
+      const v=localStorage.getItem(k);
+      if(v){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
+    });
     if(Object.keys(data).length === 0) return;
-    await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap, _encrypted: !!HB.sessionKey });
+    await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('☁️ Dati sincronizzati');
     _lastSyncTime = new Date();
-    console.log('✓ Sync upload completato' + (HB.sessionKey ? ' (cifrato 🔐)' : ''));
+    console.log('✓ Sync upload completato');
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('⚠️ Sync fallito: ' + e.message);
