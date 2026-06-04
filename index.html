@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA190</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA191</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA190</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA191</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA190</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA191</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA190',
+  version: 'BETA191',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4149,8 +4149,8 @@ function pwLoad() {
 
 // Salva
 function pwSave() {
-  hbSetSecure(PW_CATS, JSON.stringify(_pwCats));
-  hbSetSecure(PW_KEY,  JSON.stringify(_pwItems));
+  localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
+  localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -4896,7 +4896,7 @@ function noteLoad() {
   try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
 }
 function noteSaveAll() {
-  hbSetSecure(NOTE_KEY, JSON.stringify(_notes));
+  localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
   const el = document.getElementById('stat-notes');
   if (el) el.textContent = _notes.length || '—';
 }
@@ -5059,7 +5059,7 @@ let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
 }
-function cardsSaveAll() { hbSetSecure(CARDS_KEY, JSON.stringify(_cards)); }
+function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
 
 function cardsOpen() {
   cardsLoad(); cardsShowList();
@@ -5320,7 +5320,7 @@ let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 function financeLoad() {
   try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
 }
-function financeSaveAll() { hbSetSecure(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
+function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -5494,7 +5494,7 @@ let _wifiSec  = 'WPA';
 function wifiLoad() {
   try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
 }
-function wifiSaveAll() { hbSetSecure(WIFI_KEY, JSON.stringify(_wifiNets)); }
+function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -5639,7 +5639,7 @@ let _otpIcon     = '🔐';
 function otpLoad() {
   try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
 }
-function otpSaveAll() { hbSetSecure(OTP_KEY, JSON.stringify(_otpAccounts)); }
+function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); }
 
 function otpOpen() {
   otpLoad();
@@ -5894,7 +5894,7 @@ const CAL_MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug
 function calLoad() {
   try { _calEvents = JSON.parse(localStorage.getItem(CAL_KEY)||'[]'); } catch(e) { _calEvents=[]; }
 }
-function calSaveAll() { hbSetSecure(CAL_KEY, JSON.stringify(_calEvents)); }
+function calSaveAll() { localStorage.setItem(CAL_KEY, JSON.stringify(_calEvents)); }
 
 function calOpen() {
   turniLoad();
@@ -6148,7 +6148,7 @@ function familyLoad() {
   try { _family = JSON.parse(localStorage.getItem(FAMILY_KEY)) || []; }
   catch(e) { _family = []; }
 }
-function familySave() { hbSetSecure(FAMILY_KEY, JSON.stringify(_family)); }
+function familySave() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_family)); }
 
 function familyOpen() {
   familyLoad();
@@ -6263,7 +6263,7 @@ let _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
 function docsLoad() {
   try { _docs = JSON.parse(localStorage.getItem(DOCS_KEY)||'[]'); } catch(e) { _docs=[]; }
 }
-function docsSaveAll() { hbSetSecure(DOCS_KEY, JSON.stringify(_docs)); }
+function docsSaveAll() { localStorage.setItem(DOCS_KEY, JSON.stringify(_docs)); }
 
 function docsOpen() {
   docsLoad(); docsShowList();
@@ -6519,7 +6519,7 @@ let _serverType  = { id:'ssh', icon:'🔐', label:'SSH' };
 function serverLoad() {
   try { _serverItems = JSON.parse(localStorage.getItem(SERVER_KEY)||'[]'); } catch(e) { _serverItems=[]; }
 }
-function serverSaveAll() { hbSetSecure(SERVER_KEY, JSON.stringify(_serverItems)); }
+function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -6797,7 +6797,7 @@ function shopSave() {
   if (_shopCurId && _shopLists[_shopCurId]) {
     _shopLists[_shopCurId].items = _shopList;
   }
-  hbSetSecure(SHOP_LISTS_KEY, JSON.stringify(_shopLists));
+  localStorage.setItem(SHOP_LISTS_KEY, JSON.stringify(_shopLists));
   localStorage.setItem(SHOP_RECENT, JSON.stringify(_shopRecent));
 }
 
@@ -8121,7 +8121,7 @@ function docsLoad2() {
   try { _docs2 = JSON.parse(localStorage.getItem(DOCS_KEY2)) || []; }
   catch(e) { _docs2 = []; }
 }
-function docsSaveAll2() { hbSetSecure(DOCS_KEY2, JSON.stringify(_docs2)); }
+function docsSaveAll2() { localStorage.setItem(DOCS_KEY2, JSON.stringify(_docs2)); }
 
 function docsOpen() {
   docsLoad2();
@@ -9314,8 +9314,8 @@ function turniLoad() {
   try { _calDayShifts = JSON.parse(localStorage.getItem(TURNI_DAYS_KEY)) || {}; } catch(e) { _calDayShifts = {}; }
 }
 function turniSave() {
-  hbSetSecure(TURNI_DEF_KEY,  JSON.stringify(_turniDef));
-  hbSetSecure(TURNI_DAYS_KEY, JSON.stringify(_calDayShifts));
+  localStorage.setItem(TURNI_DEF_KEY,  JSON.stringify(_turniDef));
+  localStorage.setItem(TURNI_DAYS_KEY, JSON.stringify(_calDayShifts));
 }
 
 function turniToggle() {
@@ -10055,7 +10055,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA190</div>
+            <div style="font-size:13px;color:var(--text3);">BETA191</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
