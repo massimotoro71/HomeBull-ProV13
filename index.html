@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA183</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA184</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA183</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA184</div>
         </div>
       </div>
     </div>
@@ -2262,7 +2262,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA183</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA184</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3305,7 +3305,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA183',
+  version: 'BETA184',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8804,21 +8804,18 @@ const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_account
   'hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
   'hb13_pw_cats','hb13_shop_lists_v2'];
 
-// Salva timestamp locale per ogni chiave
+// Timestamp helpers
 function _tsKey(k){ return 'hb_ts_' + k; }
 function _getLocalTs(k){ return parseInt(localStorage.getItem(_tsKey(k))||'0'); }
 function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(localStorage,_tsKey(k),t||Date.now()); }
 
 function _getSyncKey(){
   let emailAddr = _emailOtpAddr || HB.user?.email || '';
-  if(!emailAddr){
-    try { emailAddr = JSON.parse(localStorage.getItem('hb_last_user')||'{}').email||''; } catch(e){}
-  }
+  if(!emailAddr){ try { emailAddr = JSON.parse(localStorage.getItem('hb_last_user')||'{}').email||''; } catch(e){} }
   if(!emailAddr) return null;
   return btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
 }
 
-// Merge intelligente — vince chi ha il timestamp più recente per ogni chiave
 async function fbSyncLoad(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
@@ -8834,26 +8831,20 @@ async function fbSyncLoad(){
       const remoteTs = cloudTs[k] || 0;
       if(remoteTs > localTs && cloud[k]){
         let value = cloud[k];
-        // Salta dati cifrati legacy hb12 (non più supportati)
-        if(typeof value === 'string' && value.startsWith('hb12:')) {
-          console.warn('Skip dati legacy cifrati:', k); continue;
-        }
-        // Verifica che sia JSON valido prima di salvare
+        if(typeof value === 'string' && value.startsWith('hb12:')) { console.warn('Skip legacy:', k); continue; }
         try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
-        // Salva direttamente senza triggherare il patch (evita loop sync)
         _syncInProgress = true;
         localStorage.setItem(k, value);
         _syncInProgress = false;
         _setLocalTs(k, remoteTs);
         updated = true;
-        console.log('↓ Dal cloud:', k, new Date(remoteTs).toLocaleTimeString());
+        console.log('\u2193 Dal cloud:', k, new Date(remoteTs).toLocaleTimeString());
       } else if(localTs > remoteTs){
-        console.log('↑ Locale più recente:', k);
+        console.log('\u2191 Locale piu recente:', k);
       }
     }
     if(updated){
-      showToast('☁️ Dati aggiornati dal cloud');
-      // Ricarica tutto da localStorage
+      showToast('\u2601\ufe0f Dati aggiornati dal cloud');
       try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
       try { if(typeof notesLoad==='function') notesLoad(); } catch(e){}
       try { if(typeof otpLoad==='function') otpLoad(); } catch(e){}
@@ -8862,13 +8853,11 @@ async function fbSyncLoad(){
       try { if(typeof cardsLoad==='function') cardsLoad(); } catch(e){}
       try { if(typeof wifiLoad==='function') wifiLoad(); } catch(e){}
       try { if(typeof financeLoad==='function') financeLoad(); } catch(e){}
-      // Aggiorna UI
       if(typeof updateHomeStats==='function') updateHomeStats();
-      // Ricarica scheda corrente
       const tab = HB.currentTab;
       if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
       else if(tab === 'notes' && typeof renderNotes==='function') renderNotes();
-      else if(tab === 'shopping' && typeof shopRenderAll==='function') shopRenderAll();
+      else if(tab === 'shopping' && typeof shopRenderAll==='function') { shopLoad(); shopRenderAll(); }
       else if(tab === 'wifi' && typeof wifiRender==='function') wifiRender();
       else if(tab === 'family' && typeof familyRender==='function') familyRender();
       else if(tab === 'finance' && typeof financeRender==='function') financeRender();
@@ -8878,9 +8867,8 @@ async function fbSyncLoad(){
       else if(tab === 'documents' && typeof docsRender2==='function') docsRender2();
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
-    // Upload chiavi locali più recenti del cloud
     await fbSyncAll(true);
-    console.log('✓ Sync load completato');
+    console.log('\u2713 Sync load completato');
   }catch(e){console.warn('SyncLoad:',e);}
   finally { _syncInProgress = false; }
 }
@@ -8890,24 +8878,22 @@ async function fbSyncAll(silent=false){
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
-    const data = {};
-    const tsMap = {};
+    const data = {}; const tsMap = {};
     HB_SYNC_KEYS.forEach(k=>{
       const v=localStorage.getItem(k);
       if(v){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
     });
     if(Object.keys(data).length === 0) return;
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
-    if(!silent) showToast('☁️ Dati sincronizzati');
-    console.log('✓ Sync upload completato'); _lastSyncTime = new Date();
+    if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
+    console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
   }catch(e){
     console.warn('SyncAll:',e);
-    if(!silent) showToast('⚠️ Sync fallito: ' + e.message);
+    if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
   }
 }
 
-// Auto-sync: aggiorna timestamp locale e manda al cloud
-let _syncInProgress = false; // previene loop sync
+let _syncInProgress = false;
 (function patchLocalStorage(){
   const origSet = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function(key, value) {
@@ -8922,38 +8908,29 @@ let _syncInProgress = false; // previene loop sync
   };
 })();
 
-// Realtime listener — aggiornamento automatico quando il cloud cambia
 let _realtimeRef = null;
 function fbStartRealtime(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey) return;
-  // Disconnetti listener precedente se esiste
   if(_realtimeRef) { try { _realtimeRef.off(); } catch(e){} }
   _realtimeRef = fbDb.ref('hb13/' + emailKey + '/_ts');
   _realtimeRef.on('value', snap => {
     if(!snap.exists()) return;
     const cloudTs = snap.val() || {};
     let needLoad = false;
-    HB_SYNC_KEYS.forEach(k => {
-      if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true;
-    });
+    HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true; });
     if(needLoad){
-      console.log('🔄 Aggiornamento cloud rilevato');
-      HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) _setLocalTs(k, 0); });
-      setTimeout(fbSyncLoad, 800);
+      console.log('\ud83d\udd04 Aggiornamento cloud rilevato');
+      setTimeout(fbSyncLoad, 1000);
     }
   });
-  // Quando app torna in foreground riconnette il listener (mobile)
   document.removeEventListener('visibilitychange', _onVisibilityChange);
   document.addEventListener('visibilitychange', _onVisibilityChange);
-  console.log('✅ Realtime listener attivo:', emailKey);
+  console.log('\u2705 Realtime listener attivo:', emailKey);
 }
 function _onVisibilityChange(){
-  if(document.visibilityState === 'visible' && fbReady && HB.user){
-    console.log('📱 App in foreground — riconnetto listener');
-    fbStartRealtime(); // Riconnette senza resettare timestamp
-  }
+  if(document.visibilityState === 'visible' && fbReady && HB.user) fbStartRealtime();
 }
 
 function logout(){
@@ -9753,7 +9730,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA183</div>
+            <div style="font-size:13px;color:var(--text3);">BETA184</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
