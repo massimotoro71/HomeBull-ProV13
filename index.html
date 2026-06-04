@@ -2037,7 +2037,11 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
+<<<<<<< HEAD
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA177</div>
+=======
   <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA176</div>
+>>>>>>> 524cf916a8b718e6e0b3fbff8f0d902d17dcd523
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -8396,7 +8400,7 @@ function closeSettings() {
 }
 function settingsBack() { settingsPage('main'); }
 function settingsPage(page) {
-  ['main','grafica','backup','sicurezza','info'].forEach(p => {
+  ['main','grafica','backup','sicurezza','info','cloud'].forEach(p => {
     const el = document.getElementById('set-page-'+p);
     if(el) el.style.display = p===page ? 'block' : 'none';
   });
@@ -8778,7 +8782,10 @@ function _getLocalTs(k){ return parseInt(localStorage.getItem(_tsKey(k))||'0'); 
 function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(localStorage,_tsKey(k),t||Date.now()); }
 
 function _getSyncKey(){
-  const emailAddr = _emailOtpAddr || HB.user?.email || '';
+  let emailAddr = _emailOtpAddr || HB.user?.email || '';
+  if(!emailAddr){
+    try { emailAddr = JSON.parse(localStorage.getItem('hb_last_user')||'{}').email||''; } catch(e){}
+  }
   if(!emailAddr) return null;
   return btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
 }
@@ -8849,7 +8856,7 @@ async function fbSyncAll(silent=false){
     if(Object.keys(data).length === 0) return;
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('☁️ Dati sincronizzati');
-    console.log('✓ Sync upload completato');
+    console.log('✓ Sync upload completato'); _lastSyncTime = new Date();
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('⚠️ Sync fallito: ' + e.message);
@@ -8893,6 +8900,39 @@ function fbStartRealtime(){
 
 function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
+}
+
+let _lastSyncTime = null;
+
+function cloudPageOpen(){
+  const online = navigator.onLine && fbReady;
+  const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
+  const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  const setStyle = (id,k,v) => { const e=document.getElementById(id); if(e) e.style[k]=v; };
+  setEl('cloud-email', email);
+  setEl('set-cloud-summary', email);
+  setEl('cloud-status-txt', online ? 'Online ✅' : 'Offline ❌');
+  setEl('cloud-last-sync-txt', _lastSyncTime ? 'Oggi ' + _lastSyncTime.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : 'Mai');
+  setStyle('cloud-status-dot','background', online ? '#10b981' : '#ef4444');
+  setStyle('set-cloud-dot','background', online ? '#10b981' : '#ef4444');
+  const auto = localStorage.getItem('hb_auto_sync') !== '0';
+  setStyle('cloud-auto-toggle','background', auto ? '#10b981' : '#6b7280');
+  setStyle('cloud-auto-thumb','right', auto ? '3px' : '25px');
+}
+
+async function cloudSyncNow(){
+  const btn = document.getElementById('cloud-sync-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳...';}
+  try{ await fbSyncAll(false); _lastSyncTime=new Date(); cloudPageOpen(); showToast('✅ Sync completato!'); }
+  catch(e){ showToast('⚠️ Sync fallito'); }
+  finally{ if(btn){btn.disabled=false;btn.textContent='↑↓ Sync ora';} }
+}
+
+function cloudToggleAutoSync(){
+  const auto = localStorage.getItem('hb_auto_sync') !== '0';
+  localStorage.setItem('hb_auto_sync', auto ? '0' : '1');
+  cloudPageOpen();
+  showToast(auto ? 'Sync automatico OFF' : '✅ Sync automatico ON');
 }
 
 fbInit();
@@ -9462,7 +9502,13 @@ function calShowAddEvent() {
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Info</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Versione, crediti, roadmap</div>
           </button>
-
+          <button onclick="settingsPage('cloud')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--accent);background:var(--accent-bg);cursor:pointer;text-align:left;font-family:inherit;grid-column:span 2;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="font-size:32px;">☁️</div>
+              <div style="flex:1;"><div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Cloud & Sync</div><div style="font-size:12px;color:var(--text3);" id="set-cloud-summary">—</div></div>
+              <div id="set-cloud-dot" style="width:10px;height:10px;border-radius:50%;background:#10b981;flex-shrink:0;"></div>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -9551,6 +9597,34 @@ function calShowAddEvent() {
           </div>
         </div>
 
+      </div>
+
+      <!-- ── PAGINA CLOUD ── -->
+      <div id="set-page-cloud" style="display:none;padding:20px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;border-bottom:1px solid var(--border);">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px;">Account connesso</div>
+            <div style="font-size:14px;font-weight:700;" id="cloud-email">—</div>
+          </div>
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-size:13px;font-weight:700;">Stato</div><div style="font-size:11px;" id="cloud-status-txt">—</div></div>
+            <div id="cloud-status-dot" style="width:10px;height:10px;border-radius:50%;background:#6b7280;"></div>
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);">
+            <div><div style="font-size:13px;font-weight:700;">Ultimo sync</div><div style="font-size:11px;color:var(--text3);" id="cloud-last-sync-txt">—</div></div>
+            <button id="cloud-sync-btn" onclick="cloudSyncNow()" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">↑↓ Sync ora</button>
+          </div>
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div><div style="font-size:13px;font-weight:700;">Sync automatico</div><div style="font-size:11px;color:var(--text3);">Salva ad ogni modifica</div></div>
+            <div onclick="cloudToggleAutoSync()" id="cloud-auto-toggle" style="width:48px;height:26px;border-radius:99px;background:#10b981;cursor:pointer;position:relative;transition:background .2s;">
+              <div id="cloud-auto-thumb" style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:right .2s;"></div>
+            </div>
+          </div>
+        </div>
+        <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
+        <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
       </div>
 
       <!-- ── PAGINA BACKUP ── -->
