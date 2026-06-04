@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA181</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA182</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA181</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA182</div>
         </div>
       </div>
     </div>
@@ -2262,7 +2262,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA181</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA182</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3305,7 +3305,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA181',
+  version: 'BETA182',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3634,6 +3634,11 @@ function unlockApp() {
   setTimeout(() => {
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
+    // Sync periodico ogni 30s come fallback mobile
+    clearInterval(window._syncInterval);
+    window._syncInterval = setInterval(() => {
+      if(fbReady && HB.user) fbSyncLoad().catch(()=>{});
+    }, 30000);
   }, 500);
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
@@ -8923,11 +8928,15 @@ let _syncInProgress = false; // previene loop sync
 })();
 
 // Realtime listener — aggiornamento automatico quando il cloud cambia
+let _realtimeRef = null;
 function fbStartRealtime(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey) return;
-  fbDb.ref('hb13/' + emailKey + '/_ts').on('value', snap => {
+  // Disconnetti listener precedente se esiste
+  if(_realtimeRef) { try { _realtimeRef.off(); } catch(e){} }
+  _realtimeRef = fbDb.ref('hb13/' + emailKey + '/_ts');
+  _realtimeRef.on('value', snap => {
     if(!snap.exists()) return;
     const cloudTs = snap.val() || {};
     let needLoad = false;
@@ -8936,11 +8945,22 @@ function fbStartRealtime(){
     });
     if(needLoad){
       console.log('🔄 Aggiornamento cloud rilevato');
-      // Reset timestamp locali per forzare download
       HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) _setLocalTs(k, 0); });
       setTimeout(fbSyncLoad, 800);
     }
   });
+  // Quando l'app torna in foreground (mobile) forza sync
+  document.removeEventListener('visibilitychange', _onVisibilityChange);
+  document.addEventListener('visibilitychange', _onVisibilityChange);
+  console.log('✅ Realtime listener attivo:', emailKey);
+}
+function _onVisibilityChange(){
+  if(document.visibilityState === 'visible' && fbReady && HB.user){
+    console.log('📱 App in foreground — forzo sync');
+    // Resetta tutti i timestamp locali per forzare confronto fresco
+    HB_SYNC_KEYS.forEach(k => _setLocalTs(k, 0));
+    setTimeout(fbSyncLoad, 500);
+  }
 }
 
 function logout(){
@@ -9740,7 +9760,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA181</div>
+            <div style="font-size:13px;color:var(--text3);">BETA182</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
