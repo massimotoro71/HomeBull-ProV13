@@ -1280,7 +1280,7 @@ html, body {
   /* ── Root override mobile ─────────────────────────────── */
   :root {
     --topbar-h:    56px;
-    --bottombar-h: calc(64px + env(safe-area-inset-bottom, 0px));
+    --bottombar-h: calc(54px + env(safe-area-inset-bottom, 0px));
     --radius:      14px;
   }
 
@@ -1428,7 +1428,7 @@ html, body {
 
 /* ── Samsung Galaxy: niente notch, schermo alto 19.3:9 ───── */
 @media (max-width: 430px) and (min-aspect-ratio: 18/9) {
-  :root { --bottombar-h: calc(62px + env(safe-area-inset-bottom, 0px)); }
+  :root { --bottombar-h: calc(52px + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (max-width: 899px) {
@@ -1663,18 +1663,21 @@ html, body {
 
 /* ══ FAB CENTRO + FIX SPAZIO ═══════════════════════════ */
 @media (max-width: 899px) {
-  /* FAB centrato */
+  /* FAB centrato — compatto */
   #mob-fab {
     left: 50% !important;
     transform: translateX(-50%) !important;
-    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 8px) !important;
-    border-radius: 22px !important;
+    bottom: calc(var(--bottombar-h, 70px) + env(safe-area-inset-bottom, 0px) + 6px) !important;
+    border-radius: 16px !important;
     width: auto !important;
-    padding: 0 20px !important;
-    font-size: 14px !important;
+    padding: 0 14px !important;
+    height: 34px !important;
+    font-size: 12px !important;
     font-weight: 700 !important;
-    letter-spacing: 0.04em !important;
-    gap: 6px !important;
+    letter-spacing: 0.03em !important;
+    gap: 5px !important;
+    opacity: 0.88 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
   }
 
   /* Fix home panel — riempi lo spazio */
@@ -2038,7 +2041,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA186</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA187</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2141,7 +2144,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA186</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA187</div>
         </div>
       </div>
     </div>
@@ -2264,7 +2267,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA186</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA187</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3307,7 +3310,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA186',
+  version: 'BETA187',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9736,7 +9739,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA186</div>
+            <div style="font-size:13px;color:var(--text3);">BETA187</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
