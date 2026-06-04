@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA195</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA196</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA195</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA196</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA195</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA196</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,11 +3315,12 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA195',
+  version: 'BETA196',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
   sessionKey: null,     // AES-256 key — never persisted
+  ready: false,         // true solo dopo PIN verificato
   pinBuffer: '',
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
@@ -3573,6 +3574,7 @@ async function setupPIN(pin) {
   let h = '';
   hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
   localStorage.setItem('hb12_pin_hash', h);
+  HB.ready = true;
   // Salva salt su Firebase — stesso salt su tutti i dispositivi
   if(fbReady && fbDb) {
     const emailKey = _getSyncKey();
@@ -3617,6 +3619,7 @@ async function verifyPIN(pin) {
     hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
     if (h === (pinHash || localStorage.getItem('hb12_pin_hash'))) {
       HB.sessionKey = key;
+      HB.ready = true;
       return true;
     }
     return false;
@@ -9034,7 +9037,7 @@ async function hbLoadSecure(key, fallback='[]') {
 }
 
 async function fbSyncLoad(){
-  if(!fbReady||!HB.user||!fbDb)return;
+  if(!fbReady||!HB.user||!fbDb||!HB.ready)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
@@ -9098,7 +9101,7 @@ async function fbSyncLoad(){
 }
 
 async function fbSyncAll(silent=false){
-  if(!fbReady||!HB.user||!fbDb)return;
+  if(!fbReady||!HB.user||!fbDb||!HB.ready)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
@@ -9138,7 +9141,7 @@ let _syncInProgress = false;
       _setLocalTs(key, Date.now());
       // Salva cifrato in IDB locale
       if(HB.sessionKey) idbScheduleSave();
-      if(fbReady && HB.user){
+      if(fbReady && HB.user && HB.ready){
         clearTimeout(window._syncDebounce);
         window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
       }
@@ -9175,7 +9178,7 @@ async function hbGetSecure(key) {
 
 let _realtimeRef = null;
 function fbStartRealtime(){
-  if(!fbReady||!HB.user||!fbDb)return;
+  if(!fbReady||!HB.user||!fbDb||!HB.ready)return;
   const emailKey = _getSyncKey();
   if(!emailKey) return;
   if(_realtimeRef) { try { _realtimeRef.off(); } catch(e){} }
@@ -9409,7 +9412,7 @@ function gcalUpdateUI(){
 
 function logout(){
   idbClear().catch(()=>{});
-  fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
+  fbLogout(); HB.sessionKey=null; HB.user=null; HB.ready=false; location.reload();
 }
 
 let _lastSyncTime = null;
@@ -10246,7 +10249,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA195</div>
+            <div style="font-size:13px;color:var(--text3);">BETA196</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
