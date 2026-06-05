@@ -1951,7 +1951,7 @@ function wifiShowAdd() {
 function wifiDelete(id) {
   const net = _wifiNets.find(n => n.id === id);
   if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
-  _wifiNets = _wifiNets.filter(n => n.id !== id);
+  _wifiNets = markDeleted(_wifiNets, id);
   wifiSaveAll(); wifiRender();
   showToast('Rete rimossa');
 }
@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA201</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA202</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA201</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA202</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA201</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA202</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA201',
+  version: 'BETA202',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5051,6 +5051,14 @@ function noteCloseEditor() {
   noteShowList(document.getElementById('note-search-inp')?.value || '');
 }
 
+
+// Marca elemento come eliminato (tombstone) invece di rimuoverlo
+function markDeleted(arr, id) {
+  return arr.map(item => {
+    if(item.id === id) return {...item, deleted: true, deletedAt: new Date().toISOString()};
+    return item;
+  });
+}
 function noteDelete(id) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -5069,7 +5077,7 @@ function noteDelete(id) {
   document.getElementById('_nd_cancel').onclick = () => overlay.remove();
   document.getElementById('_nd_ok').onclick = () => {
     overlay.remove();
-    _notes = _notes.filter(n => n.id !== id);
+    _notes = markDeleted(_notes, id);
     noteSaveAll();
     noteRenderList('');
     showToast('Nota eliminata');
@@ -5260,7 +5268,7 @@ function cardsDelete(id) {
     overlay.remove();
     // Chiudi il dettaglio se aperto
     document.getElementById('card-detail-overlay')?.remove();
-    _cards = _cards.filter(c => c.id !== id);
+    _cards = markDeleted(_cards, id);
     cardsSaveAll(); cardsRender();
     showToast('Carta rimossa');
   };
@@ -5470,7 +5478,7 @@ function financeDelete(id) {
   setTimeout(() => {
     const acc = _financeAccounts.find(a => a.id === id);
     if (!confirm('Eliminare "' + (acc?.label||'conto') + '"?')) return;
-    _financeAccounts = _financeAccounts.filter(a => a.id !== id);
+    _financeAccounts = markDeleted(_financeAccounts, id);
     financeSaveAll(); financeRender();
     showToast('Conto rimosso');
   }, 50);
@@ -5917,7 +5925,7 @@ function otpDeleteConfirm(id) {
   setTimeout(() => {
     const acc = _otpAccounts.find(a => a.id === id);
     if (!confirm('Rimuovere ' + (acc?.name || 'account') + '?')) return;
-    _otpAccounts = _otpAccounts.filter(a => a.id !== id);
+    _otpAccounts = markDeleted(_otpAccounts, id);
     otpSaveAll();
     otpRenderList('');
     showToast('Account rimosso');
@@ -6665,7 +6673,7 @@ async function serverCopy(id, field) {
 }
 
 function serverDelete(id) {
-  _serverItems = _serverItems.filter(i => i.id !== id);
+  _serverItems = markDeleted(_serverItems, id);
   serverSaveAll(); serverRender();
   showToast('Credenziale rimossa');
 }
@@ -8386,7 +8394,7 @@ function docsDeleteDoc(docId) {
   overlay.appendChild(box); document.body.appendChild(overlay);
   document.getElementById('_ddel_cancel').onclick = () => overlay.remove();
   document.getElementById('_ddel_ok').onclick = () => {
-    _docs2 = _docs2.filter(d => d.id !== docId);
+    _docs2 = markDeleted(_docs2, docId);
     docsSaveAll2(); overlay.remove(); docsShowList();
     showToast('Documento eliminato');
   };
@@ -8941,7 +8949,32 @@ async function hbLoadSecure(key, fallback='[]') {
 }
 
 // Merge intelligente per array con ID — unisce senza perdere elementi
+// Supporta tombstone: {id, deleted: true, deletedAt: timestamp}
 function mergeArraysById(local, cloud, tsField='updatedAt') {
+  if(!local || !Array.isArray(local)) return (cloud||[]).filter(i=>!i.deleted);
+  if(!cloud || !Array.isArray(cloud)) return (local||[]).filter(i=>!i.deleted);
+  const map = {};
+  // Prima tutti i locali
+  local.forEach(item => { if(item.id) map[item.id] = item; });
+  // Poi merge con cloud
+  cloud.forEach(item => {
+    if(!item.id) return;
+    if(!map[item.id]) {
+      map[item.id] = item; // nuovo dal cloud
+    } else {
+      const localItem = map[item.id];
+      // Usa deletedAt o updatedAt per confronto
+      const localTs = new Date(localItem.deletedAt || localItem[tsField] || 0).getTime();
+      const cloudTs = new Date(item.deletedAt || item[tsField] || 0).getTime();
+      if(cloudTs > localTs) map[item.id] = item; // cloud più recente (anche se deleted)
+    }
+  });
+  // Rimuovi tombstone dalla lista finale (ma mantienili nel sync)
+  return Object.values(map).filter(i => !i.deleted);
+}
+
+// Merge che mantiene anche i tombstone per il sync
+function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
   if(!local || !Array.isArray(local)) return cloud || [];
   if(!cloud || !Array.isArray(cloud)) return local || [];
   const map = {};
@@ -8951,8 +8984,9 @@ function mergeArraysById(local, cloud, tsField='updatedAt') {
     if(!map[item.id]) {
       map[item.id] = item;
     } else {
-      const localTs = new Date(map[item.id][tsField]||0).getTime();
-      const cloudTs = new Date(item[tsField]||0).getTime();
+      const localItem = map[item.id];
+      const localTs = new Date(localItem.deletedAt || localItem[tsField] || 0).getTime();
+      const cloudTs = new Date(item.deletedAt || item[tsField] || 0).getTime();
       if(cloudTs > localTs) map[item.id] = item;
     }
   });
@@ -8994,7 +9028,8 @@ async function fbSyncLoad(){
             const cloudArr = JSON.parse(value);
             const localRaw = localStorage.getItem(k);
             const localArr = localRaw ? JSON.parse(localRaw) : [];
-            const merged = mergeArraysById(localArr, cloudArr);
+            // mergeArraysByIdFull mantiene i tombstone per propagare le eliminazioni
+            const merged = mergeArraysByIdFull(localArr, cloudArr);
             value = JSON.stringify(merged);
           } catch(e2) { /* usa valore cloud originale */ }
         }
@@ -10170,7 +10205,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA201</div>
+            <div style="font-size:13px;color:var(--text3);">BETA202</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
