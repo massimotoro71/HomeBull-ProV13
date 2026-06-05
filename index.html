@@ -1951,7 +1951,7 @@ function wifiShowAdd() {
 function wifiDelete(id) {
   const net = _wifiNets.find(n => n.id === id);
   if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
-  _wifiNets = markDeleted(_wifiNets, id);
+  _wifiNets = _wifiNets.filter(n => n.id !== id);
   wifiSaveAll(); wifiRender();
   showToast('Rete rimossa');
 }
@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA209</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA194</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2058,9 +2058,6 @@ function cardsSearch(q) {
       <button class="auth-btn" id="send-otp-btn" onclick="sendEmailOTP()">Invia codice →</button>
       <div id="fb-config-warning" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.4);border-radius:10px;font-size:11px;color:#f97316;text-align:center;">
         ⚠️ Firebase non configurato
-      </div>
-      <div style="margin-top:16px;text-align:center;">
-        <button onclick="quickDeviceReset()" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:inherit;opacity:0.5;">🗑️ Reset dispositivo</button>
       </div>
     </div>
 
@@ -2152,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA209</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA194</div>
         </div>
       </div>
     </div>
@@ -2275,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA209</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA194</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3318,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA209',
+  version: 'BETA194',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3570,56 +3567,43 @@ async function setupPIN(pin) {
   const saltB64 = btoa(String.fromCharCode(...salt));
   localStorage.setItem('hb12_salt', saltB64);
   HB.sessionKey = await deriveKey(pin, salt);
+  // Save PIN hash (PBKDF2 output — not the PIN itself)
   const hashBuf = await crypto.subtle.exportKey('raw', HB.sessionKey);
   const hashArr = new Uint8Array(hashBuf).slice(0, 16);
   let h = '';
   hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
   localStorage.setItem('hb12_pin_hash', h);
-  // Salva salt su Firebase SOLO se non esiste già — non sovrascrivere!
-  try {
-    const emailAddr = _emailOtpAddr || HB.user?.email || '';
-    if(fbReady && fbDb && emailAddr) {
-      const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-      fbDb.ref('hb13/' + emailKey + '/_meta').get().then(snap => {
-        if(snap.exists() && snap.val().salt) {
-          // Salt già presente su Firebase — usa quello, non sovrascrivere
-          const existing = snap.val();
-          localStorage.setItem('hb12_salt', existing.salt);
-          if(existing.pinHash) localStorage.setItem('hb12_pin_hash', existing.pinHash);
-          console.log('ℹ️ Salt già su Firebase, uso quello esistente');
-          // Rideriva la chiave con il salt corretto
-          const existingSalt = new Uint8Array(atob(existing.salt).split('').map(c=>c.charCodeAt(0)));
-          deriveKey(pin, existingSalt).then(k => { HB.sessionKey = k; });
-        } else {
-          // Primo dispositivo — salva il salt
-          fbDb.ref('hb13/' + emailKey + '/_meta').set({ salt: saltB64, pinHash: h })
-            .then(() => console.log('✅ Salt salvato su Firebase (primo dispositivo)'))
-            .catch(e => console.warn('Salt save:', e));
-        }
-      });
+  // Salva salt su Firebase — stesso salt su tutti i dispositivi
+  if(fbReady && fbDb) {
+    const emailKey = _getSyncKey();
+    if(emailKey) {
+      fbDb.ref('hb13/' + emailKey + '/_meta').set({
+        salt: saltB64,
+        pinHash: h,
+        updatedAt: Date.now()
+      }).catch(e => console.warn('Salt save:', e));
     }
-  } catch(e) { console.warn('Salt save error:', e); }
+  }
 }
 
 async function verifyPIN(pin) {
   try {
     let saltB64 = localStorage.getItem('hb12_salt');
     let pinHash = localStorage.getItem('hb12_pin_hash');
-    // Scarica SEMPRE il salt da Firebase — fonte unica di verità
-    if(fbReady && fbDb) {
+    // Se non in locale, scarica da Firebase
+    if((!saltB64 || !pinHash) && fbReady && fbDb) {
       try {
         const emailKey = _getSyncKey();
         if(emailKey) {
           const snap = await fbDb.ref('hb13/' + emailKey + '/_meta').get();
           if(snap.exists()) {
             const meta = snap.val();
-            if(meta.salt) {
-              saltB64 = meta.salt;
-              pinHash = meta.pinHash;
-              localStorage.setItem('hb12_salt', saltB64);
-              if(pinHash) localStorage.setItem('hb12_pin_hash', pinHash);
-              console.log('✅ Salt sincronizzato da Firebase:', saltB64.slice(0,8)+'...');
-            }
+            saltB64 = meta.salt;
+            pinHash = meta.pinHash;
+            // Salva in locale per uso futuro
+            if(saltB64) localStorage.setItem('hb12_salt', saltB64);
+            if(pinHash) localStorage.setItem('hb12_pin_hash', pinHash);
+            console.log('✅ Salt sincronizzato da Firebase');
           }
         }
       } catch(e) { console.warn('Salt fetch:', e); }
@@ -3692,21 +3676,16 @@ function unlockApp() {
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
-  // Carica dati cifrati localmente, poi sync cloud
-  unlockAndLoadAll().then(() => {
-    updateHomeStats();
-  });
+  // 1. Carica vault cifrato locale (IDB), 2. poi sync Firebase
+  // Carica vault IDB locale, poi Firebase
+  idbLoadAll().then(hasLocal => {
+    if (hasLocal) unlockAndLoadAll().then(() => updateHomeStats());
+    else updateHomeStats();
+  }).catch(() => updateHomeStats());
   // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
   setTimeout(() => {
-    if(localStorage.getItem('hb_force_upload') === '1') {
-      localStorage.removeItem('hb_force_upload');
-      // Forza upload completo dopo import backup
-      console.log('📤 Force upload dopo import backup');
-      fbSyncAll(true, true).then(() => fbStartRealtime()).catch(()=>{}); // force=true
-    } else {
-      fbSyncLoad().catch(()=>{});
-      fbStartRealtime();
-    }
+    fbSyncLoad().catch(()=>{});
+    fbStartRealtime();
   }, 500);
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
@@ -4069,11 +4048,10 @@ function updateHomeStats() {
 
   // Leggi sempre da localStorage per avere dati freschi
   try { pwLoad(); } catch(e) {}
-  // Conta solo elementi non eliminati
-  const pwCount  = (_pwItems||[]).filter(i=>!i.deleted).length;
-  const ntCount  = (_notes||[]).filter(i=>!i.deleted).length;
-  const otpCount = (_otpAccounts||[]).filter(i=>!i.deleted).length;
-  const docCount = (_docs2||[]).filter(i=>!i.deleted).length;
+  const pwCount  = (_pwItems||[]).length;
+  const ntCount  = JSON.parse(localStorage.getItem('hb13_notes')||'[]').length;
+  const otpCount = JSON.parse(localStorage.getItem('hb13_otp')||'[]').length;
+  const docCount = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').length;
 
   if (pw)   pw.textContent   = pwCount;
   if (nt)   nt.textContent   = ntCount;
@@ -4960,7 +4938,7 @@ function noteOpen() {
   noteLoad();
   noteShowList();
   document.getElementById('topbar-title').textContent = 'Note';
-  document.getElementById('topbar-sub').textContent = _notes.filter(n=>!n.deleted).length + ' note';
+  document.getElementById('topbar-sub').textContent = _notes.length + ' note';
   document.getElementById('topbar-back').classList.remove('visible');
 }
 
@@ -4977,7 +4955,7 @@ function noteShowList(q='') {
 function noteRenderList(q='') {
   const list = document.getElementById('note-list');
   if (!list) return;
-  let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  let notes = [..._notes].sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   if (q) notes = notes.filter(n =>
     (n.title+n.content).toLowerCase().includes(q.toLowerCase())
   );
@@ -5060,14 +5038,6 @@ function noteCloseEditor() {
   noteShowList(document.getElementById('note-search-inp')?.value || '');
 }
 
-
-// Marca elemento come eliminato (tombstone) invece di rimuoverlo
-function markDeleted(arr, id) {
-  return arr.map(item => {
-    if(item.id === id) return {...item, deleted: true, deletedAt: new Date().toISOString()};
-    return item;
-  });
-}
 function noteDelete(id) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -5086,7 +5056,7 @@ function noteDelete(id) {
   document.getElementById('_nd_cancel').onclick = () => overlay.remove();
   document.getElementById('_nd_ok').onclick = () => {
     overlay.remove();
-    _notes = markDeleted(_notes, id);
+    _notes = _notes.filter(n => n.id !== id);
     noteSaveAll();
     noteRenderList('');
     showToast('Nota eliminata');
@@ -5152,7 +5122,7 @@ function cardsRender() {
     return;
   }
   list.innerHTML = '';
-  _cards.filter(c=>!c.deleted).forEach(card => {
+  _cards.forEach(card => {
     const num = card.number ? card.number.replace(/\d(?=\d{4})/g,'•') : '•••• •••• •••• ••••';
     const expiring = cardIsExpiring(card.exp);
     const tile = document.createElement('div');
@@ -5277,7 +5247,7 @@ function cardsDelete(id) {
     overlay.remove();
     // Chiudi il dettaglio se aperto
     document.getElementById('card-detail-overlay')?.remove();
-    _cards = markDeleted(_cards, id);
+    _cards = _cards.filter(c => c.id !== id);
     cardsSaveAll(); cardsRender();
     showToast('Carta rimossa');
   };
@@ -5403,7 +5373,7 @@ function financeShowList() {
 function financeRender() {
   const list = document.getElementById('finance-list');
   if (!list) return;
-  if (!_financeAccounts.filter(a=>!a.deleted).length) {
+  if (!_financeAccounts.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:48px;margin-bottom:12px;">💰</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun conto salvato</div>
@@ -5413,7 +5383,7 @@ function financeRender() {
     return;
   }
   list.innerHTML = '';
-  _financeAccounts.filter(a=>!a.deleted).forEach(acc => {
+  _financeAccounts.forEach(acc => {
     const card = document.createElement('div');
     card.className = 'finance-card';
     card.onclick = () => financeShowDetail(acc.id);
@@ -5463,10 +5433,7 @@ function financeShowDetail(id) {
       </div>
     </div>
     <div style="padding:16px;">${fields}
-      <div style="display:flex;gap:8px;margin-top:8px;">
-        <button onclick="document.getElementById('finance-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
-        <button onclick="document.getElementById('finance-detail-overlay').remove();financeDelete('${acc.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑️ Elimina</button>
-      </div>
+      <button onclick="document.getElementById('finance-detail-overlay').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;">Chiudi</button>
     </div>
   </div>`;
   document.body.appendChild(overlay);
@@ -5490,7 +5457,7 @@ function financeDelete(id) {
   setTimeout(() => {
     const acc = _financeAccounts.find(a => a.id === id);
     if (!confirm('Eliminare "' + (acc?.label||'conto') + '"?')) return;
-    _financeAccounts = markDeleted(_financeAccounts, id);
+    _financeAccounts = _financeAccounts.filter(a => a.id !== id);
     financeSaveAll(); financeRender();
     showToast('Conto rimosso');
   }, 50);
@@ -5590,7 +5557,7 @@ function wifiRender() {
     return;
   }
   list.innerHTML = '';
-  _wifiNets.filter(n=>!n.deleted).forEach(net => {
+  _wifiNets.forEach(net => {
     const card = document.createElement('div');
     card.className = 'wifi-card';
     const secColor = net.sec === 'nopass' ? '#f97316' : '#84cc16';
@@ -5728,7 +5695,7 @@ function otpShowList(q='') {
 function otpRenderList(q='') {
   const list = document.getElementById('otp-list');
   if (!list) return;
-  let accounts = _otpAccounts.filter(a=>!a.deleted);
+  let accounts = _otpAccounts;
   if (q) accounts = accounts.filter(a =>
     (a.name+a.user).toLowerCase().includes(q.toLowerCase())
   );
@@ -5937,7 +5904,7 @@ function otpDeleteConfirm(id) {
   setTimeout(() => {
     const acc = _otpAccounts.find(a => a.id === id);
     if (!confirm('Rimuovere ' + (acc?.name || 'account') + '?')) return;
-    _otpAccounts = markDeleted(_otpAccounts, id);
+    _otpAccounts = _otpAccounts.filter(a => a.id !== id);
     otpSaveAll();
     otpRenderList('');
     showToast('Account rimosso');
@@ -6590,7 +6557,7 @@ function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serv
 function serverOpen() {
   serverLoad(); serverShowList();
   document.getElementById('topbar-title').textContent = 'Server / IT';
-  document.getElementById('topbar-sub').textContent = _serverItems.filter(i=>!i.deleted).length + ' credenziali';
+  document.getElementById('topbar-sub').textContent = _serverItems.length + ' credenziali';
   document.getElementById('topbar-back').classList.remove('visible');
 }
 
@@ -6605,8 +6572,7 @@ function serverShowList() {
 function serverRender() {
   const list = document.getElementById('server-list');
   if (!list) return;
-  const activeItems = _serverItems.filter(i=>!i.deleted);
-  if (!activeItems.length) {
+  if (!_serverItems.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:48px;margin-bottom:12px;">📡</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna credenziale</div>
@@ -6616,7 +6582,7 @@ function serverRender() {
     return;
   }
   list.innerHTML = '';
-  _serverItems.filter(i=>!i.deleted).forEach(item => {
+  _serverItems.forEach(item => {
     const card = document.createElement('div');
     card.className = 'pw-item-card';
     card.onclick = () => serverShowDetail(item.id);
@@ -6686,7 +6652,7 @@ async function serverCopy(id, field) {
 }
 
 function serverDelete(id) {
-  _serverItems = markDeleted(_serverItems, id);
+  _serverItems = _serverItems.filter(i => i.id !== id);
   serverSaveAll(); serverRender();
   showToast('Credenziale rimossa');
 }
@@ -6720,7 +6686,6 @@ function serverTogglePw() {
 function serverSave() {
   const label = document.getElementById('srv-label')?.value.trim();
   if (!label) { showToast('Inserisci un nome'); return; }
-  const now = new Date().toISOString();
   _serverItems.push({
     id: 'srv_' + Date.now(),
     type: _serverType.id, icon: _serverType.icon, label_type: _serverType.label,
@@ -6730,7 +6695,6 @@ function serverSave() {
     user:  document.getElementById('srv-user')?.value.trim() || '',
     pw:    document.getElementById('srv-pw')?.value || '',
     notes: document.getElementById('srv-notes')?.value.trim() || '',
-    createdAt: now, updatedAt: now,
   });
   serverSaveAll();
   showToast('✅ ' + label + ' salvato');
@@ -8196,7 +8160,7 @@ function docsOpen() {
   docsLoad2();
   docsShowList();
   document.getElementById('topbar-title').textContent = 'Documenti';
-  document.getElementById('topbar-sub').textContent = _docs2.filter(d=>!d.deleted).length + ' documenti';
+  document.getElementById('topbar-sub').textContent = _docs2.length + ' documenti';
 }
 
 function docsShowList() {
@@ -8304,14 +8268,14 @@ function docsRender2() {
   const empty = document.getElementById('docs-empty');
   if (!list) return;
   document.getElementById('topbar-sub').textContent = _docs2.length + ' documenti';
-  if (!_docs2.filter(d=>!d.deleted).length) {
+  if (!_docs2.length) {
     list.innerHTML = '';
     if (empty) empty.style.display = 'block';
     return;
   }
   if (empty) empty.style.display = 'none';
   list.innerHTML = '';
-  _docs2.filter(d=>!d.deleted).forEach(doc => {
+  _docs2.forEach(doc => {
     const isExpiring = doc.expiry && (new Date(doc.expiry) - new Date()) < 90*24*60*60*1000 && new Date(doc.expiry) > new Date();
     const isExpired  = doc.expiry && new Date(doc.expiry) < new Date();
     const card = document.createElement('div');
@@ -8409,7 +8373,7 @@ function docsDeleteDoc(docId) {
   overlay.appendChild(box); document.body.appendChild(overlay);
   document.getElementById('_ddel_cancel').onclick = () => overlay.remove();
   document.getElementById('_ddel_ok').onclick = () => {
-    _docs2 = markDeleted(_docs2, docId);
+    _docs2 = _docs2.filter(d => d.id !== docId);
     docsSaveAll2(); overlay.remove(); docsShowList();
     showToast('Documento eliminato');
   };
@@ -8530,18 +8494,8 @@ function setShadow(s){document.documentElement.style.setProperty('--card-shadow'
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 function setFontSize(px){document.documentElement.style.fontSize=px+'px';localStorage.setItem('hb_fs',px);}
-function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
-function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{
-  Object.entries(bk.data).forEach(([k,v])=>{
-    const val = JSON.stringify(v);
-    localStorage.setItem(k, val);
-    // Imposta timestamp locale alto per forzare upload al prossimo sync
-    localStorage.setItem('hb_ts_' + k, Date.now());
-  });
-  // Flag per forzare upload completo al prossimo avvio
-  localStorage.setItem('hb_force_upload', '1');
-  ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);
-};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
+function settingsExport(){const keys=['hb13_passwords','hb13_notes','hb13_otp','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
+function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 async function settingsToggleBio(){
   const enabled=localStorage.getItem('hb_bio')==='1';
@@ -8563,67 +8517,6 @@ async function settingsToggleBio(){
 }
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
-
-// Reset rapido — accessibile dalla schermata login
-async function quickDeviceReset() {
-  if(!confirm('Reset completo dispositivo?\nI dati su Firebase rimangono intatti.\nDovrai rifare il login.')) return;
-  try {
-    localStorage.clear();
-    sessionStorage.clear();
-    try { await indexedDB.deleteDatabase('homebull_vault'); } catch(e){}
-    if('serviceWorker' in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for(const reg of regs) await reg.unregister();
-    }
-    if('caches' in window) {
-      const keys = await caches.keys();
-      for(const k of keys) await caches.delete(k);
-    }
-    alert('Reset completato! La pagina si ricaricherà.');
-    location.reload(true);
-  } catch(e) {
-    localStorage.clear();
-    location.reload(true);
-  }
-}
-
-// Reset completo dispositivo — pulisce tutto
-async function fullDeviceReset() {
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid #ef4444;">
-    <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
-    <div style="font-size:15px;font-weight:800;margin-bottom:8px;">Reset completo dispositivo</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Cancella TUTTI i dati locali — i dati su Firebase rimangono intatti</div>
-    <div style="display:flex;gap:10px;">
-      <button id="_rc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_ro" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Reset</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  document.getElementById('_rc').onclick = () => ov.remove();
-  document.getElementById('_ro').onclick = async () => {
-    ov.remove();
-    // 1. Pulisce localStorage
-    localStorage.clear();
-    // 2. Pulisce sessionStorage
-    sessionStorage.clear();
-    // 3. Pulisce IndexedDB
-    try { indexedDB.deleteDatabase('homebull_vault'); } catch(e){}
-    // 4. Deregistra Service Worker
-    if('serviceWorker' in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      for(const reg of regs) await reg.unregister();
-    }
-    // 5. Pulisce cache
-    if('caches' in window) {
-      const keys = await caches.keys();
-      for(const k of keys) await caches.delete(k);
-    }
-    showToast('✅ Reset completato — ricarico...');
-    setTimeout(() => location.reload(true), 1500);
-  };
-}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
 function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
@@ -8872,45 +8765,22 @@ async function verifyEmailOTP() {
   localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
   if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
 
-  // Vai al PIN — controlla Firebase prima di decidere setup vs login
-  const hasPINlocal = !!localStorage.getItem('hb12_pin_hash');
-  
-  // Controlla se esiste già un PIN su Firebase (secondo dispositivo)
-  async function checkPINAndProceed() {
-    let hasPIN = hasPINlocal;
-    if (!hasPIN && fbReady && fbDb) {
-      try {
-        const emailAddr = _emailOtpAddr || HB.user?.email || '';
-        if (emailAddr) {
-          const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-          const snap = await fbDb.ref('hb13/' + emailKey + '/_meta').get();
-          if (snap.exists() && snap.val()?.pinHash) {
-            // Esiste già un PIN su Firebase — vai in login
-            localStorage.setItem('hb12_pin_hash', snap.val().pinHash);
-            localStorage.setItem('hb12_salt', snap.val().salt);
-            hasPIN = true;
-            console.log('✅ PIN trovato su Firebase — modalità login');
-          }
-        }
-      } catch(e) { console.warn('PIN check Firebase:', e); }
-    }
-    
-    if (hasPIN) {
-      HB.authState = 'pin-login';
-      goToStep('pin');
-      document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
-      document.getElementById('pin-sub').textContent = '';
-      const fp = document.getElementById('forgot-pin-btn');
-      if (fp) fp.style.display = 'block';
-    } else {
-      HB.authState = 'pin-setup';
-      HB.pinMode = 'setup';
-      goToStep('pin');
-      document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
-      document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
-    }
+  // Vai al PIN
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+  if (hasPIN) {
+    HB.authState = 'pin-login';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
+    document.getElementById('pin-sub').textContent = '';
+    const fp = document.getElementById('forgot-pin-btn');
+    if (fp) fp.style.display = 'block';
+  } else {
+    HB.authState = 'pin-setup';
+    HB.pinMode = 'setup';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
+    document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
   }
-  checkPINAndProceed();
 }
 
 async function resendOTP() {
@@ -8988,6 +8858,122 @@ function fbMsg(c){
     'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  INDEXED DB — VAULT CIFRATO LOCALE
+// ═══════════════════════════════════════════════════════════
+const IDB_NAME    = 'homebull_vault';
+const IDB_VERSION = 1;
+const IDB_STORE   = 'vault';
+let _idb = null;
+
+// Apre (o crea) il database
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    if (_idb) { resolve(_idb); return; }
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE, { keyPath: 'k' });
+      }
+    };
+    req.onsuccess = e => { _idb = e.target.result; resolve(_idb); };
+    req.onerror  = e => { console.warn('IDB open error:', e); reject(e); };
+  });
+}
+
+// Salva un valore cifrato in IDB
+async function idbSet(key, value) {
+  try {
+    const db = await idbOpen();
+    const encrypted = HB.sessionKey ? await hbEncrypt(value) : value;
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put({ k: key, v: encrypted, ts: Date.now() });
+      tx.oncomplete = resolve;
+      tx.onerror    = reject;
+    });
+  } catch(e) { console.warn('idbSet:', e); }
+}
+
+// Legge e decifra un valore da IDB
+async function idbGet(key) {
+  try {
+    const db = await idbOpen();
+    return new Promise((resolve) => {
+      const tx  = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(key);
+      req.onsuccess = async () => {
+        if (!req.result) { resolve(null); return; }
+        let val = req.result.v;
+        if (HB.sessionKey && typeof val === 'string' && (val.startsWith('hb13enc:') || val.startsWith('hb12:'))) {
+          val = await hbDecrypt(val);
+        }
+        resolve(val);
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch(e) { console.warn('idbGet:', e); return null; }
+}
+
+// Salva TUTTI i dati cifrati in IDB (chiamato ad ogni modifica)
+async function idbSaveAll() {
+  if (!HB.sessionKey) return;
+  try {
+    for (const k of HB_SYNC_KEYS) {
+      const v = localStorage.getItem(k);
+      if (v) await idbSet(k, v);
+    }
+    await idbSet('_hb_vault_ts', String(Date.now()));
+    console.log('🔒 Vault locale aggiornato');
+  } catch(e) { console.warn('idbSaveAll:', e); }
+}
+
+// Carica tutti i dati da IDB (all'apertura, prima di Firebase)
+async function idbLoadAll() {
+  if (!HB.sessionKey) return false;
+  try {
+    const tsRaw = await idbGet('_hb_vault_ts');
+    if (!tsRaw) { console.log('IDB: nessun vault locale'); return false; }
+    let loaded = 0;
+    for (const k of HB_SYNC_KEYS) {
+      const val = await idbGet(k);
+      if (val) {
+        try {
+          JSON.parse(val); // verifica JSON valido
+          localStorage.setItem(k, val);
+          loaded++;
+        } catch(e) { console.warn('IDB skip non-JSON:', k); }
+      }
+    }
+    console.log(`🔓 Vault locale caricato: ${loaded} chiavi (ts: ${new Date(parseInt(tsRaw)).toLocaleTimeString()})`);
+    return loaded > 0;
+  } catch(e) { console.warn('idbLoadAll:', e); return false; }
+}
+
+// Cancella il vault locale (al logout)
+async function idbClear() {
+  try {
+    const db = await idbOpen();
+    return new Promise((resolve) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).clear();
+      tx.oncomplete = resolve;
+    });
+  } catch(e) { console.warn('idbClear:', e); }
+}
+
+// Auto-save cifrato ad ogni modifica con debounce
+let _idbDebounce = null;
+function idbScheduleSave() {
+  clearTimeout(_idbDebounce);
+  _idbDebounce = setTimeout(() => idbSaveAll(), 2000);
+}
+
+// Apre IDB subito dopo la dichiarazione (variabili già inizializzate)
+setTimeout(() => idbOpen().catch(e => console.warn('IDB init:', e)), 0);
+
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
   'hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
   'hb13_pw_cats','hb13_shop_lists_v2'];
@@ -9047,65 +9033,13 @@ async function hbLoadSecure(key, fallback='[]') {
   try { return JSON.parse(raw); } catch(e) { return JSON.parse(fallback); }
 }
 
-// Merge intelligente per array con ID — unisce senza perdere elementi
-// Supporta tombstone: {id, deleted: true, deletedAt: timestamp}
-function mergeArraysById(local, cloud, tsField='updatedAt') {
-  if(!local || !Array.isArray(local)) return (cloud||[]).filter(i=>!i.deleted);
-  if(!cloud || !Array.isArray(cloud)) return (local||[]).filter(i=>!i.deleted);
-  const map = {};
-  // Prima tutti i locali
-  local.forEach(item => { if(item.id) map[item.id] = item; });
-  // Poi merge con cloud
-  cloud.forEach(item => {
-    if(!item.id) return;
-    if(!map[item.id]) {
-      map[item.id] = item; // nuovo dal cloud
-    } else {
-      const localItem = map[item.id];
-      // Usa deletedAt o updatedAt per confronto
-      const localTs = new Date(localItem.deletedAt || localItem[tsField] || 0).getTime();
-      const cloudTs = new Date(item.deletedAt || item[tsField] || 0).getTime();
-      if(cloudTs > localTs) map[item.id] = item; // cloud più recente (anche se deleted)
-    }
-  });
-  // Rimuovi tombstone dalla lista finale (ma mantienili nel sync)
-  return Object.values(map).filter(i => !i.deleted);
-}
-
-// Merge che mantiene anche i tombstone per il sync
-function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
-  if(!local || !Array.isArray(local)) return cloud || [];
-  if(!cloud || !Array.isArray(cloud)) return local || [];
-  const map = {};
-  local.forEach(item => { if(item.id) map[item.id] = item; });
-  cloud.forEach(item => {
-    if(!item.id) return;
-    if(!map[item.id]) {
-      map[item.id] = item;
-    } else {
-      const localItem = map[item.id];
-      const localTs = new Date(localItem.deletedAt || localItem[tsField] || 0).getTime();
-      const cloudTs = new Date(item.deletedAt || item[tsField] || 0).getTime();
-      if(cloudTs > localTs) map[item.id] = item;
-    }
-  });
-  return Object.values(map);
-}
-
-// Chiavi che supportano merge per ID
-const MERGE_KEYS = {
-  'hb13_notes': true, 'hb13_passwords': true, 'hb13_otp_accounts': true,
-  'hb13_cards': true, 'hb13_wifi': true, 'hb13_docs2': true,
-  'hb13_finance': true, 'hb13_server': true,
-};
-
 async function fbSyncLoad(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
     const snap = await fbDb.ref('hb13/' + emailKey).get();
-    if(!snap.exists()){ console.log('Database vuoto — nessun upload automatico'); return; }
+    if(!snap.exists()){ await fbSyncAll(true); return; }
     const cloud = snap.val() || {};
     const cloudTs = cloud._ts || {};
     let updated = false;
@@ -9121,17 +9055,6 @@ async function fbSyncLoad(){
           if(!value) { console.warn('Decifratura fallita:', k); continue; }
         }
         try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
-        // Merge per array con ID invece di sovrascrittura
-        if(MERGE_KEYS[k]) {
-          try {
-            const cloudArr = JSON.parse(value);
-            const localRaw = localStorage.getItem(k);
-            const localArr = localRaw ? JSON.parse(localRaw) : [];
-            // mergeArraysByIdFull mantiene i tombstone per propagare le eliminazioni
-            const merged = mergeArraysByIdFull(localArr, cloudArr);
-            value = JSON.stringify(merged);
-          } catch(e2) { /* usa valore cloud originale */ }
-        }
         _syncInProgress = true;
         localStorage.setItem(k, value);
         _syncInProgress = false;
@@ -9145,7 +9068,7 @@ async function fbSyncLoad(){
     if(updated){
       showToast('\u2601\ufe0f Dati aggiornati dal cloud');
       try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
-      try { if(typeof notesLoad==='function') { notesLoad(); if(HB.currentTab==='notes' && typeof noteOpen==='function') setTimeout(noteOpen, 50); } } catch(e){}
+      try { if(typeof notesLoad==='function') notesLoad(); } catch(e){}
       try { if(typeof otpLoad==='function') otpLoad(); } catch(e){}
       try { if(typeof docsLoad2==='function') docsLoad2(); } catch(e){}
       try { if(typeof shopLoad==='function') shopLoad(); } catch(e){}
@@ -9166,43 +9089,36 @@ async function fbSyncLoad(){
       else if(tab === 'documents' && typeof docsRender2==='function') docsRender2();
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
-    // NON chiamare fbSyncAll qui — evita sovrascrittura dati cloud con locale vuoto
+    await fbSyncAll(true);
+    // Aggiorna vault locale IDB dopo sync
+    if(HB.sessionKey) idbSaveAll().catch(()=>{});
     console.log('\u2713 Sync load completato');
   }catch(e){console.warn('SyncLoad:',e);}
   finally { _syncInProgress = false; }
 }
 
-async function fbSyncAll(silent=false, force=false){
+async function fbSyncAll(silent=false){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
     const data = {}; const tsMap = {};
-    const uploadTs = Date.now();
     for(const k of HB_SYNC_KEYS){
       const v = localStorage.getItem(k);
       if(!v) continue;
-      // Carica solo chiavi modificate localmente (ts locale > ts cloud noto)
-      // oppure tutte se force=true (dopo import backup)
-      if(!force){
-        const localTs = _getLocalTs(k);
-        const knownCloudTs = _lastKnownCloudTs[k] || 0;
-        if(localTs <= knownCloudTs) continue;
-      }
+      // Cifra se sessionKey disponibile
       if(HB.sessionKey){
         const encrypted = await hbEncrypt(v);
         data[k] = encrypted;
       } else {
         data[k] = v;
       }
-      tsMap[k] = uploadTs;
+      tsMap[k] = _getLocalTs(k) || Date.now();
     }
     if(Object.keys(data).length === 0) return;
-    // Aggiorna timestamp
-    Object.keys(tsMap).forEach(k => { _setLocalTs(k, tsMap[k]); _lastKnownCloudTs[k] = tsMap[k]; });
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
-    console.log('\u2713 Sync upload completato', Object.keys(data).join(', ')); _lastSyncTime = new Date();
+    console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
@@ -9216,6 +9132,8 @@ let _syncInProgress = false;
     origSet(key, value);
     if(!_syncInProgress && HB_SYNC_KEYS.includes(key)){
       _setLocalTs(key, Date.now());
+      // Salva cifrato in IDB locale
+      if(HB.sessionKey) idbScheduleSave();
       if(fbReady && HB.user){
         clearTimeout(window._syncDebounce);
         window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
@@ -9252,7 +9170,6 @@ async function hbGetSecure(key) {
 }
 
 let _realtimeRef = null;
-let _lastKnownCloudTs = {}; // timestamp cloud visti l'ultima volta dal listener
 function fbStartRealtime(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
@@ -9263,29 +9180,26 @@ function fbStartRealtime(){
     if(!snap.exists()) return;
     const cloudTs = snap.val() || {};
     let needLoad = false;
-    const keysChanged = [];
-    HB_SYNC_KEYS.forEach(k => {
-      const cloudT = cloudTs[k] || 0;
-      const lastSeen = _lastKnownCloudTs[k] || 0;
-      // Scarica se il cloud ha un timestamp più nuovo di quello che avevamo visto
-      if(cloudT > lastSeen && cloudT > _getLocalTs(k)) {
-        needLoad = true;
-        keysChanged.push(k);
-      } else if(cloudT > lastSeen) {
-        // Aggiorna lastKnown anche se non serve scaricare
-        _lastKnownCloudTs[k] = cloudT;
-      }
-    });
+    HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true; });
     if(needLoad){
-      console.log('\ud83d\udd04 Aggiornamento cloud rilevato:', keysChanged.join(', '));
-      keysChanged.forEach(k => { _lastKnownCloudTs[k] = cloudTs[k]; });
-      setTimeout(fbSyncLoad, 800);
+      console.log('\ud83d\udd04 Aggiornamento cloud rilevato');
+      setTimeout(fbSyncLoad, 1000);
     }
   });
   document.removeEventListener('visibilitychange', _onVisibilityChange);
   document.addEventListener('visibilitychange', _onVisibilityChange);
   console.log('\u2705 Realtime listener attivo:', emailKey);
 }
+// Salva vault cifrato alla chiusura/cambio tab
+window.addEventListener('beforeunload', () => {
+  if (HB.sessionKey) idbSaveAll();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && HB.sessionKey) {
+    idbSaveAll();
+  }
+});
+
 function _onVisibilityChange(){
   if(document.visibilityState === 'visible' && fbReady && HB.user) fbStartRealtime();
 }
@@ -9482,6 +9396,7 @@ function gcalUpdateUI(){
 
 
 function logout(){
+  idbClear().catch(()=>{});
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
 
@@ -9489,6 +9404,21 @@ let _lastSyncTime = null;
 
 function cloudPageOpen(){
   gcalUpdateUI();
+  // Mostra stato vault locale
+  idbOpen().then(db => {
+    idbGet('_hb_vault_ts').then(ts => {
+      const el = document.getElementById('cloud-status-txt');
+      const dot = document.getElementById('cloud-status-dot');
+      if (ts) {
+        const d = new Date(parseInt(ts));
+        if (el) el.textContent = 'Vault locale: ' + d.toLocaleTimeString('it-IT');
+        if (dot) dot.style.background = '#10b981';
+      } else {
+        if (el) el.textContent = 'Vault locale non ancora creato';
+        if (dot) dot.style.background = '#f59e0b';
+      }
+    });
+  }).catch(()=>{});
   const online = navigator.onLine && fbReady;
   const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
   const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -10233,8 +10163,7 @@ function calShowAddEvent() {
         </div>
 
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
-        <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🚪 Disconnetti account</button>
-        <button onclick="fullDeviceReset()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑️ Reset completo dispositivo</button>
+        <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
       </div>
 
       <!-- ── PAGINA BACKUP ── -->
@@ -10305,7 +10234,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA209</div>
+            <div style="font-size:13px;color:var(--text3);">BETA194</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
