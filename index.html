@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA206</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA207</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA206</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA207</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA206</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA207</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA206',
+  version: 'BETA207',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3572,15 +3572,28 @@ async function setupPIN(pin) {
   let h = '';
   hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
   localStorage.setItem('hb12_pin_hash', h);
-  // Salva salt su Firebase — condiviso tra tutti i dispositivi
-  // Usa email diretta perché HB.user è già impostato
+  // Salva salt su Firebase SOLO se non esiste già — non sovrascrivere!
   try {
     const emailAddr = _emailOtpAddr || HB.user?.email || '';
     if(fbReady && fbDb && emailAddr) {
       const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-      fbDb.ref('hb13/' + emailKey + '/_meta').set({ salt: saltB64, pinHash: h })
-        .then(() => console.log('✅ Salt salvato su Firebase'))
-        .catch(e => console.warn('Salt save:', e));
+      fbDb.ref('hb13/' + emailKey + '/_meta').get().then(snap => {
+        if(snap.exists() && snap.val().salt) {
+          // Salt già presente su Firebase — usa quello, non sovrascrivere
+          const existing = snap.val();
+          localStorage.setItem('hb12_salt', existing.salt);
+          if(existing.pinHash) localStorage.setItem('hb12_pin_hash', existing.pinHash);
+          console.log('ℹ️ Salt già su Firebase, uso quello esistente');
+          // Rideriva la chiave con il salt corretto
+          const existingSalt = new Uint8Array(atob(existing.salt).split('').map(c=>c.charCodeAt(0)));
+          deriveKey(pin, existingSalt).then(k => { HB.sessionKey = k; });
+        } else {
+          // Primo dispositivo — salva il salt
+          fbDb.ref('hb13/' + emailKey + '/_meta').set({ salt: saltB64, pinHash: h })
+            .then(() => console.log('✅ Salt salvato su Firebase (primo dispositivo)'))
+            .catch(e => console.warn('Salt save:', e));
+        }
+      });
     }
   } catch(e) { console.warn('Salt save error:', e); }
 }
@@ -8795,22 +8808,45 @@ async function verifyEmailOTP() {
   localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
   if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
 
-  // Vai al PIN
-  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
-  if (hasPIN) {
-    HB.authState = 'pin-login';
-    goToStep('pin');
-    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
-    document.getElementById('pin-sub').textContent = '';
-    const fp = document.getElementById('forgot-pin-btn');
-    if (fp) fp.style.display = 'block';
-  } else {
-    HB.authState = 'pin-setup';
-    HB.pinMode = 'setup';
-    goToStep('pin');
-    document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
-    document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
+  // Vai al PIN — controlla Firebase prima di decidere setup vs login
+  const hasPINlocal = !!localStorage.getItem('hb12_pin_hash');
+  
+  // Controlla se esiste già un PIN su Firebase (secondo dispositivo)
+  async function checkPINAndProceed() {
+    let hasPIN = hasPINlocal;
+    if (!hasPIN && fbReady && fbDb) {
+      try {
+        const emailAddr = _emailOtpAddr || HB.user?.email || '';
+        if (emailAddr) {
+          const emailKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+          const snap = await fbDb.ref('hb13/' + emailKey + '/_meta').get();
+          if (snap.exists() && snap.val()?.pinHash) {
+            // Esiste già un PIN su Firebase — vai in login
+            localStorage.setItem('hb12_pin_hash', snap.val().pinHash);
+            localStorage.setItem('hb12_salt', snap.val().salt);
+            hasPIN = true;
+            console.log('✅ PIN trovato su Firebase — modalità login');
+          }
+        }
+      } catch(e) { console.warn('PIN check Firebase:', e); }
+    }
+    
+    if (hasPIN) {
+      HB.authState = 'pin-login';
+      goToStep('pin');
+      document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
+      document.getElementById('pin-sub').textContent = '';
+      const fp = document.getElementById('forgot-pin-btn');
+      if (fp) fp.style.display = 'block';
+    } else {
+      HB.authState = 'pin-setup';
+      HB.pinMode = 'setup';
+      goToStep('pin');
+      document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
+      document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
+    }
   }
+  checkPINAndProceed();
 }
 
 async function resendOTP() {
@@ -10204,7 +10240,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA206</div>
+            <div style="font-size:13px;color:var(--text3);">BETA207</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
