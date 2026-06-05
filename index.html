@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA207</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA208</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA207</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA208</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA207</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA208</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA207',
+  version: 'BETA208',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8560,6 +8560,44 @@ async function settingsToggleBio(){
 }
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
+
+// Reset completo dispositivo — pulisce tutto
+async function fullDeviceReset() {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid #ef4444;">
+    <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:8px;">Reset completo dispositivo</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Cancella TUTTI i dati locali — i dati su Firebase rimangono intatti</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_rc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_ro" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Reset</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_rc').onclick = () => ov.remove();
+  document.getElementById('_ro').onclick = async () => {
+    ov.remove();
+    // 1. Pulisce localStorage
+    localStorage.clear();
+    // 2. Pulisce sessionStorage
+    sessionStorage.clear();
+    // 3. Pulisce IndexedDB
+    try { indexedDB.deleteDatabase('homebull_vault'); } catch(e){}
+    // 4. Deregistra Service Worker
+    if('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs) await reg.unregister();
+    }
+    // 5. Pulisce cache
+    if('caches' in window) {
+      const keys = await caches.keys();
+      for(const k of keys) await caches.delete(k);
+    }
+    showToast('✅ Reset completato — ricarico...');
+    setTimeout(() => location.reload(true), 1500);
+  };
+}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
 function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
@@ -10169,7 +10207,8 @@ function calShowAddEvent() {
         </div>
 
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
-        <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
+        <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🚪 Disconnetti account</button>
+        <button onclick="fullDeviceReset()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑️ Reset completo dispositivo</button>
       </div>
 
       <!-- ── PAGINA BACKUP ── -->
@@ -10240,7 +10279,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA207</div>
+            <div style="font-size:13px;color:var(--text3);">BETA208</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
