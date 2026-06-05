@@ -2046,15 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-<<<<<<< HEAD
-<<<<<<< HEAD
   <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA209</div>
-=======
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA208</div>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
-=======
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA208</div>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2160,15 +2152,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-<<<<<<< HEAD
-<<<<<<< HEAD
           <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA209</div>
-=======
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA208</div>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
-=======
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA208</div>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
         </div>
       </div>
     </div>
@@ -2291,15 +2275,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-<<<<<<< HEAD
-<<<<<<< HEAD
           <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA209</span>
-=======
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA208</span>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
-=======
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA208</span>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
         </div>
 
         <!-- Ricerca globale -->
@@ -3342,15 +3318,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-<<<<<<< HEAD
-<<<<<<< HEAD
   version: 'BETA209',
-=======
-  version: 'BETA208',
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
-=======
-  version: 'BETA208',
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8596,8 +8564,6 @@ async function settingsToggleBio(){
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 // Reset rapido — accessibile dalla schermata login
 async function quickDeviceReset() {
   if(!confirm('Reset completo dispositivo?\nI dati su Firebase rimangono intatti.\nDovrai rifare il login.')) return;
@@ -8621,10 +8587,6 @@ async function quickDeviceReset() {
   }
 }
 
-=======
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
-=======
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
 // Reset completo dispositivo — pulisce tutto
 async function fullDeviceReset() {
   const ov = document.createElement('div');
@@ -10343,15 +10305,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-<<<<<<< HEAD
-<<<<<<< HEAD
             <div style="font-size:13px;color:var(--text3);">BETA209</div>
-=======
-            <div style="font-size:13px;color:var(--text3);">BETA208</div>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
-=======
-            <div style="font-size:13px;color:var(--text3);">BETA208</div>
->>>>>>> 5b1de1e65ca544515967dd4da321d2e2a6d81c02
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
