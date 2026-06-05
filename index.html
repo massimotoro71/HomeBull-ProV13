@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA204</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA205</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA204</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA205</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA204</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA205</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA204',
+  version: 'BETA205',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4053,18 +4053,11 @@ function updateHomeStats() {
 
   // Leggi sempre da localStorage per avere dati freschi
   try { pwLoad(); } catch(e) {}
-  const pwCount  = (_pwItems||[]).length;
-  // Leggi in modo sicuro — salta se cifrato
-  function _safeCount(key) {
-    try {
-      const v = localStorage.getItem(key)||'[]';
-      if(v.startsWith('hb13enc:') || v.startsWith('hb12:')) return (_notes||_otpAccounts||[]).length || 0;
-      return JSON.parse(v).length;
-    } catch(e) { return 0; }
-  }
-  const ntCount  = (_notes||[]).length || _safeCount('hb13_notes');
-  const otpCount = (_otpAccounts||[]).length || _safeCount('hb13_otp_accounts');
-  const docCount = (_docs2||[]).length || _safeCount('hb13_docs2');
+  // Conta solo elementi non eliminati
+  const pwCount  = (_pwItems||[]).filter(i=>!i.deleted).length;
+  const ntCount  = (_notes||[]).filter(i=>!i.deleted).length;
+  const otpCount = (_otpAccounts||[]).filter(i=>!i.deleted).length;
+  const docCount = (_docs2||[]).filter(i=>!i.deleted).length;
 
   if (pw)   pw.textContent   = pwCount;
   if (nt)   nt.textContent   = ntCount;
@@ -10208,7 +10201,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA204</div>
+            <div style="font-size:13px;color:var(--text3);">BETA205</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
