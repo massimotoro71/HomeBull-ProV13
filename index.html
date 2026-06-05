@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA196</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA197</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA196</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA197</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA196</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA197</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA196',
+  version: 'BETA197',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8929,7 +8929,7 @@ async function fbSyncLoad(){
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
     const snap = await fbDb.ref('hb13/' + emailKey).get();
-    if(!snap.exists()){ await fbSyncAll(true); return; }
+    if(!snap.exists()){ console.log('Database vuoto — nessun upload automatico'); return; }
     const cloud = snap.val() || {};
     const cloudTs = cloud._ts || {};
     let updated = false;
@@ -8979,7 +8979,7 @@ async function fbSyncLoad(){
       else if(tab === 'documents' && typeof docsRender2==='function') docsRender2();
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
-    await fbSyncAll(true);
+    // NON chiamare fbSyncAll qui — evita sovrascrittura dati cloud con locale vuoto
     console.log('\u2713 Sync load completato');
   }catch(e){console.warn('SyncLoad:',e);}
   finally { _syncInProgress = false; }
@@ -8991,24 +8991,28 @@ async function fbSyncAll(silent=false){
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
     const data = {}; const tsMap = {};
+    const uploadTs = Date.now();
     for(const k of HB_SYNC_KEYS){
       const v = localStorage.getItem(k);
       if(!v) continue;
-      // Cifra se sessionKey disponibile
+      // Carica solo chiavi modificate localmente (ts locale > ts cloud noto)
+      const localTs = _getLocalTs(k);
+      const knownCloudTs = _lastKnownCloudTs[k] || 0;
+      if(localTs <= knownCloudTs) continue; // non modificato localmente
       if(HB.sessionKey){
         const encrypted = await hbEncrypt(v);
         data[k] = encrypted;
       } else {
         data[k] = v;
       }
-      tsMap[k] = Date.now(); // sempre timestamp fresco per trigger listener
+      tsMap[k] = uploadTs;
     }
     if(Object.keys(data).length === 0) return;
-    // Aggiorna timestamp locali con quelli che mandiamo
+    // Aggiorna timestamp
     Object.keys(tsMap).forEach(k => { _setLocalTs(k, tsMap[k]); _lastKnownCloudTs[k] = tsMap[k]; });
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
-    console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
+    console.log('\u2713 Sync upload completato', Object.keys(data).join(', ')); _lastSyncTime = new Date();
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
@@ -10110,7 +10114,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA196</div>
+            <div style="font-size:13px;color:var(--text3);">BETA197</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
