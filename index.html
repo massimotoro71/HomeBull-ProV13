@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA198</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA199</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2149,7 +2149,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA198</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA199</div>
         </div>
       </div>
     </div>
@@ -2272,7 +2272,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA198</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA199</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3315,7 +3315,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA198',
+  version: 'BETA199',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3682,8 +3682,15 @@ function unlockApp() {
   });
   // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
   setTimeout(() => {
-    fbSyncLoad().catch(()=>{});
-    fbStartRealtime();
+    if(localStorage.getItem('hb_force_upload') === '1') {
+      localStorage.removeItem('hb_force_upload');
+      // Forza upload completo dopo import backup
+      console.log('📤 Force upload dopo import backup');
+      fbSyncAll(true, true).then(() => fbStartRealtime()).catch(()=>{}); // force=true
+    } else {
+      fbSyncLoad().catch(()=>{});
+      fbStartRealtime();
+    }
   }, 500);
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
@@ -8501,7 +8508,17 @@ function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};d
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 function setFontSize(px){document.documentElement.style.fontSize=px+'px';localStorage.setItem('hb_fs',px);}
 function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
-function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
+function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{
+  Object.entries(bk.data).forEach(([k,v])=>{
+    const val = JSON.stringify(v);
+    localStorage.setItem(k, val);
+    // Imposta timestamp locale alto per forzare upload al prossimo sync
+    localStorage.setItem('hb_ts_' + k, Date.now());
+  });
+  // Flag per forzare upload completo al prossimo avvio
+  localStorage.setItem('hb_force_upload', '1');
+  ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);
+};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 async function settingsToggleBio(){
   const enabled=localStorage.getItem('hb_bio')==='1';
@@ -8985,7 +9002,7 @@ async function fbSyncLoad(){
   finally { _syncInProgress = false; }
 }
 
-async function fbSyncAll(silent=false){
+async function fbSyncAll(silent=false, force=false){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
@@ -8996,9 +9013,12 @@ async function fbSyncAll(silent=false){
       const v = localStorage.getItem(k);
       if(!v) continue;
       // Carica solo chiavi modificate localmente (ts locale > ts cloud noto)
-      const localTs = _getLocalTs(k);
-      const knownCloudTs = _lastKnownCloudTs[k] || 0;
-      if(localTs <= knownCloudTs) continue; // non modificato localmente
+      // oppure tutte se force=true (dopo import backup)
+      if(!force){
+        const localTs = _getLocalTs(k);
+        const knownCloudTs = _lastKnownCloudTs[k] || 0;
+        if(localTs <= knownCloudTs) continue;
+      }
       if(HB.sessionKey){
         const encrypted = await hbEncrypt(v);
         data[k] = encrypted;
@@ -10114,7 +10134,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA198</div>
+            <div style="font-size:13px;color:var(--text3);">BETA199</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
