@@ -2038,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA226</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA227</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2140,7 +2140,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA226</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA227</div>
         </div>
       </div>
     </div>
@@ -2260,7 +2260,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA226</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA227</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA226',
+  version: 'BETA227',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7439,7 +7439,6 @@ const ALL_TABS_META = [
   { id:'wifi',      icon:'🌐', label:'Wi-Fi' },
   { id:'finance',   icon:'📊', label:'Finanze' },
   { id:'server',    icon:'📡', label:'Server/IT' },
-  { id:'family',    icon:'👨‍👩‍👧', label:'Famiglia' },
   { id:'shopping',  icon:'🛒', label:'Lista Spesa' },
 ];
 
@@ -8636,7 +8635,7 @@ function settingsRefreshUI() {
 }
 function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',th);localStorage.setItem('hb_theme',t);settingsRefreshUI();showToast(th==='dark'?'🌙 Dark':'☀️ Light');}
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
-function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgs[t]||'';tc.style.backgroundSize=sz[t]||'';}localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
+function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const targets=[document.getElementById('tab-container'),document.getElementById('app'),document.querySelector('.app-main')];targets.forEach(tc=>{if(tc){tc.style.backgroundImage=bgs[t]||'';tc.style.backgroundSize=sz[t]||'';tc.style.backgroundAttachment='fixed';}});localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
 function setRadius(r){const m={sharp:'4px',normal:'14px',round:'22px'};document.documentElement.style.setProperty('--card-radius',m[r]);localStorage.setItem('hb_radius',r);settingsRefreshUI();}
 function setShadow(s){document.documentElement.style.setProperty('--card-shadow',s==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');localStorage.setItem('hb_shadow',s);settingsRefreshUI();}
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
@@ -9956,7 +9955,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA226</div>
+            <div style="font-size:13px;color:var(--text3);">BETA227</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
