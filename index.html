@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA220</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA221</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA220</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA221</div>
         </div>
       </div>
     </div>
@@ -2262,7 +2262,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA220</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA221</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2495,6 +2495,7 @@ function cardsSearch(q) {
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
             <div id="docs-detail-title" style="font-size:17px;font-weight:800;flex:1;"></div>
+            <button id="docs-detail-edit" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px;">✏️</button>
             <button id="docs-detail-del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">🗑</button>
           </div>
           <div id="docs-detail-content"></div>
@@ -3305,7 +3306,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA220',
+  version: 'BETA221',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5152,6 +5153,7 @@ function cardsShowDetail(id) {
       <div style="padding:16px;">${fields}
         <div style="display:flex;gap:10px;margin-top:8px;">
           <button onclick="document.getElementById('card-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
+          <button onclick="document.getElementById('card-detail-overlay').remove();cardsEdit('${id}')" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
           <button onclick="cardsDelete('${id}');document.getElementById('card-detail-overlay').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
         </div>
       </div>
@@ -5173,6 +5175,38 @@ async function cardsCopyNumber(id) {
   if (!card?.number) return;
   try { await navigator.clipboard.writeText(card.number.replace(/\s/g,'')); showToast('📋 Numero copiato'); }
   catch(e) { showToast('Copia non disponibile'); }
+}
+
+function cardsEdit(id) {
+  const card = _cards.find(c => c.id === id);
+  if (!card) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Carta</div>
+    ${[['_ce_label','Nome carta',card.label||''],['_ce_number','Numero carta',card.number||''],['_ce_exp','Scadenza (MM/AA)',card.exp||''],['_ce_cvv','CVV',card.cvv||''],['_ce_holder','Intestatario',card.holder||'']].map(([id,label,val])=>`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
+    <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_ce_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_ce_save').onclick = () => {
+    const label = document.getElementById('_ce_label').value.trim();
+    if (!label) { showToast('Inserisci il nome'); return; }
+    const idx = _cards.findIndex(c => c.id === id);
+    if (idx !== -1) { _cards[idx] = {..._cards[idx],
+      label, number: document.getElementById('_ce_number').value.trim(),
+      exp: document.getElementById('_ce_exp').value.trim(),
+      cvv: document.getElementById('_ce_cvv').value.trim(),
+      holder: document.getElementById('_ce_holder').value.trim(),
+      updatedAt: new Date().toISOString()
+    }; }
+    cardsSaveAll(); cardsRender(); ov.remove();
+    showToast('✅ Carta aggiornata');
+  };
 }
 
 function cardsDelete(id) {
@@ -5401,6 +5435,39 @@ async function financeCopy(id, field) {
   catch(e) { showToast('Copia non disponibile'); }
 }
 
+function financeEdit(id) {
+  const acc = _financeAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Conto</div>
+    ${[['_fe_label','Nome conto',acc.label||''],['_fe_iban','IBAN',acc.iban||''],['_fe_bic','BIC/SWIFT',acc.bic||''],['_fe_holder','Intestatario',acc.holder||''],['_fe_user','Username',acc.user||''],['_fe_notes','Note',acc.notes||'']].map(([id,label,val])=>`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
+    <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_fe_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_fe_save').onclick = () => {
+    const label = document.getElementById('_fe_label').value.trim();
+    if (!label) { showToast('Inserisci il nome'); return; }
+    const idx = _financeAccounts.findIndex(a => a.id === id);
+    if (idx !== -1) { _financeAccounts[idx] = {..._financeAccounts[idx],
+      label, iban: document.getElementById('_fe_iban').value.trim(),
+      bic: document.getElementById('_fe_bic').value.trim(),
+      holder: document.getElementById('_fe_holder').value.trim(),
+      user: document.getElementById('_fe_user').value.trim(),
+      notes: document.getElementById('_fe_notes').value.trim(),
+      updatedAt: new Date().toISOString()
+    }; }
+    financeSaveAll(); financeRender(); ov.remove();
+    showToast('✅ Conto aggiornato');
+  };
+}
+
 function financeDelete(id) {
   const acc = _financeAccounts.find(a => a.id === id);
   if (!confirm('Eliminare "' + acc?.label + '"?')) return;
@@ -5515,7 +5582,8 @@ function wifiRender() {
           <div class="wifi-ssid">${net.ssid}</div>
           <div style="margin-top:4px;"><span class="wifi-sec-badge" style="background:${secColor}20;color:${secColor};">${secLabel}</span></div>
         </div>
-        <button onclick="wifiDelete('${net.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:16px;">✕</button>
+        <button onclick="wifiEdit('${net.id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:4px;font-size:16px;" title="Modifica">✏️</button>
+        <button onclick="wifiDelete('${net.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:16px;" title="Elimina">🗑️</button>
       </div>
       <div class="wifi-actions">
         <button class="wifi-action-btn" onclick="wifiCopyPw('${net.id}')">📋 Copia password</button>
@@ -5548,6 +5616,34 @@ function wifiSelectSec(btn, sec) {
 function wifiToggleAddPw() {
   const inp = document.getElementById('wifi-add-pw');
   inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function wifiEdit(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!net) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:360px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Rete Wi-Fi</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Nome rete (SSID)</div>
+    <input id="_we_ssid" value="${net.ssid}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Password</div>
+    <input id="_we_pw" value="${net.pw||''}" type="password" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_we_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_we_save').onclick = () => {
+    const ssid = document.getElementById('_we_ssid').value.trim();
+    const pw = document.getElementById('_we_pw').value;
+    if (!ssid) { showToast('Inserisci il nome della rete'); return; }
+    const idx = _wifiNets.findIndex(n => n.id === id);
+    if (idx !== -1) { _wifiNets[idx] = {..._wifiNets[idx], ssid, pw, updatedAt: new Date().toISOString()}; }
+    wifiSaveAll(); wifiRender(); ov.remove();
+    showToast('✅ Rete aggiornata');
+  };
 }
 
 function wifiSave() {
@@ -5671,7 +5767,8 @@ function otpRenderList(q='') {
           <div class="otp-card-name">${acc.name}</div>
           ${acc.user ? `<div class="otp-card-user">${acc.user}</div>` : ''}
         </div>
-        <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:16px;">✕</button>
+        <button onclick="event.stopPropagation();otpEdit('${acc.id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:4px;font-size:16px;" title="Modifica">✏️</button>
+        <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:16px;" title="Elimina">🗑️</button>
       </div>
       <div class="otp-code-row">
         <div class="otp-code ${expiring?'expiring':''}" id="otp-code-${acc.id}">${otpFormat(code)}</div>
@@ -5844,6 +5941,37 @@ async function otpCopy(id) {
   const code = String(otpGenerate(acc.secret)).padStart(6,'0');
   try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
   catch(e) { showToast('Copia non disponibile'); }
+}
+
+function otpEdit(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:360px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica OTP</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Nome servizio</div>
+    <input id="_oe_name" value="${acc.name}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Username / Email</div>
+    <input id="_oe_user" value="${acc.user||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Chiave segreta (TOTP)</div>
+    <input id="_oe_secret" value="${acc.secret||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_oe_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_oe_save').onclick = () => {
+    const name = document.getElementById('_oe_name').value.trim();
+    const user = document.getElementById('_oe_user').value.trim();
+    const secret = document.getElementById('_oe_secret').value.trim();
+    if (!name) { showToast('Inserisci il nome'); return; }
+    const idx = _otpAccounts.findIndex(a => a.id === id);
+    if (idx !== -1) { _otpAccounts[idx] = {..._otpAccounts[idx], name, user, secret, updatedAt: new Date().toISOString()}; }
+    otpSaveAll(); otpRenderList(''); ov.remove();
+    showToast('✅ Account aggiornato');
+  };
 }
 
 function otpDeleteConfirm(id) {
@@ -6348,6 +6476,47 @@ async function docsCopy(id, field) {
   catch(e) { showToast('Copia non disponibile'); }
 }
 
+function docsEdit(id) {
+  const doc = _docs2.find(d => d.id === id);
+  if (!doc) return;
+  // Chiudi dettaglio overlay se aperto
+  document.getElementById('docs-detail-overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Documento</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Etichetta</div>
+    <input id="_de_label" value="${doc.label||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Cognome</div>
+    <input id="_de_cognome" value="${doc.cognome||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Nome</div>
+    <input id="_de_nome" value="${doc.nome||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Numero documento</div>
+    <input id="_de_number" value="${doc.number||doc.cf||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Scadenza</div>
+    <input id="_de_exp" value="${doc.expiry||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_de_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_de_save').onclick = () => {
+    const idx = _docs2.findIndex(d => d.id === id);
+    if (idx !== -1) { _docs2[idx] = {..._docs2[idx],
+      label: document.getElementById('_de_label').value.trim(),
+      cognome: document.getElementById('_de_cognome').value.trim(),
+      nome: document.getElementById('_de_nome').value.trim(),
+      number: document.getElementById('_de_number').value.trim(),
+      cf: document.getElementById('_de_number').value.trim(),
+      expiry: document.getElementById('_de_exp').value.trim(),
+      updatedAt: new Date().toISOString()
+    }; }
+    docsSaveAll2(); docsRender2(); ov.remove();
+    showToast('✅ Documento aggiornato');
+  };
+}
+
 function docsDelete(id) {
   const doc = _docs.find(d => d.id === id);
   if (!confirm('Eliminare documento di ' + doc?.holder + '?')) return;
@@ -6575,6 +6744,7 @@ function serverShowDetail(id) {
     <div style="padding:14px;">${fields}
       <div style="display:flex;gap:10px;margin-top:8px;">
         <button onclick="document.getElementById('server-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
+        <button onclick="document.getElementById('server-detail-overlay').remove();serverEdit('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
         <button onclick="serverDelete('${item.id}');document.getElementById('server-detail-overlay').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
       </div>
     </div>
@@ -6593,6 +6763,39 @@ async function serverCopy(id, field) {
   if (!item) return;
   try { await navigator.clipboard.writeText(item[field]||''); showToast('📋 Copiato!'); }
   catch(e) { showToast('Copia non disponibile'); }
+}
+
+function serverEdit(id) {
+  const item = _serverItems.find(i => i.id === id);
+  if (!item) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Server</div>
+    ${[['_se_label','Nome/Etichetta',item.label||''],['_se_host','Host/IP',item.host||''],['_se_port','Porta',item.port||''],['_se_user','Username',item.user||''],['_se_pw','Password',item.pw||''],['_se_notes','Note',item.notes||'']].map(([id,label,val])=>`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
+    <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_se_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_se_save').onclick = () => {
+    const label = document.getElementById('_se_label').value.trim();
+    if (!label) { showToast('Inserisci il nome'); return; }
+    const idx = _serverItems.findIndex(i => i.id === id);
+    if (idx !== -1) { _serverItems[idx] = {..._serverItems[idx],
+      label, host: document.getElementById('_se_host').value.trim(),
+      port: document.getElementById('_se_port').value.trim(),
+      user: document.getElementById('_se_user').value.trim(),
+      pw: document.getElementById('_se_pw').value,
+      notes: document.getElementById('_se_notes').value.trim(),
+      updatedAt: new Date().toISOString()
+    }; }
+    serverSaveAll(); serverRender(); ov.remove();
+    showToast('✅ Server aggiornato');
+  };
 }
 
 function serverDelete(id) {
@@ -8296,6 +8499,9 @@ function docsShowDetail(docId) {
     }, 100);
   }
 
+  // Modifica
+  const editBtn = document.getElementById('docs-detail-edit');
+  if(editBtn) editBtn.onclick = () => docsEdit(docId);
   // Elimina
   const delBtn = document.getElementById('docs-detail-del');
   delBtn.onclick = () => docsDeleteDoc(docId);
@@ -9750,7 +9956,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA220</div>
+            <div style="font-size:13px;color:var(--text3);">BETA221</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
