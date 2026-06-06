@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA224</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA225</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA224</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA225</div>
         </div>
       </div>
     </div>
@@ -2259,7 +2259,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA224</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA225</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3333,7 +3333,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA224',
+  version: 'BETA225',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5396,6 +5396,17 @@ function financeShowList() {
   document.getElementById('finance-view-add').style.display  = 'none';
   document.getElementById('topbar-back').classList.remove('visible');
   document.getElementById('topbar-title').textContent = 'Finanze';
+  // Pulsante + nella topbar
+  const addBtn = document.getElementById('topbar-add-finance');
+  if(!addBtn) {
+    const btn = document.createElement('button');
+    btn.id = 'topbar-add-finance';
+    btn.onclick = financeShowAdd;
+    btn.style.cssText = 'position:absolute;right:16px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    btn.textContent = '+';
+    const topbar = document.querySelector('.topbar') || document.getElementById('topbar');
+    if(topbar) { topbar.style.position='relative'; topbar.appendChild(btn); }
+  } else { addBtn.style.display='flex'; }
   financeRender();
 }
 
@@ -5530,6 +5541,8 @@ function financeDelete(id) {
 
 // ── Aggiungi ─────────────────────────────────────────────
 function financeShowAdd() {
+  const addBtn = document.getElementById('topbar-add-finance');
+  if(addBtn) addBtn.style.display = 'none';
   document.getElementById('finance-view-list').style.display = 'none';
   document.getElementById('finance-view-add').style.display  = 'block';
   document.getElementById('topbar-back').classList.add('visible');
@@ -10008,7 +10021,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA224</div>
+            <div style="font-size:13px;color:var(--text3);">BETA225</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
