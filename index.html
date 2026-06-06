@@ -2046,7 +2046,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA217</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA218</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2152,7 +2152,7 @@ function cardsSearch(q) {
         <div style="display:flex;align-items:center;gap:5px;">
           <div class="sidebar-logo-ver">Pro v13 🔐</div>
           <div style="width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:0.6;"></div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA217</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA218</div>
         </div>
       </div>
     </div>
@@ -2275,7 +2275,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA217</span>
+          <span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:0.06em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 8px;border-radius:20px;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);" id="home-version-badge">BETA218</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3318,7 +3318,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA217',
+  version: 'BETA218',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3693,24 +3693,25 @@ function unlockApp() {
   updateHomeStats();
   initBackHandler();
   applyHomePrefs();
+  // Controlla se primo accesso PRIMA di caricare dati locali
+  const _isFirstAccess = !HB_SYNC_KEYS.some(k => localStorage.getItem(k));
+  if(_isFirstAccess) {
+    console.log('🆕 Primo accesso — azzero timestamp per forzare download');
+    HB_SYNC_KEYS.forEach(k => _setLocalTs(k, 0));
+  }
+
   // Carica dati cifrati localmente, poi sync cloud
   unlockAndLoadAll().then(() => {
     updateHomeStats();
   });
+
   // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
   setTimeout(() => {
     if(localStorage.getItem('hb_force_upload') === '1') {
       localStorage.removeItem('hb_force_upload');
-      // Forza upload completo dopo import backup
       console.log('📤 Force upload dopo import backup');
-      fbSyncAll(true, true).then(() => fbStartRealtime()).catch(()=>{}); // force=true
+      fbSyncAll(true, true).then(() => fbStartRealtime()).catch(()=>{});
     } else {
-      // Se è il primo accesso (nessun dato locale), forza download dal cloud
-      const hasLocalData = HB_SYNC_KEYS.some(k => localStorage.getItem(k));
-      if(!hasLocalData) {
-        console.log('🆕 Primo accesso — forzo download dal cloud');
-        HB_SYNC_KEYS.forEach(k => _setLocalTs(k, 0));
-      }
       fbSyncLoad().catch(()=>{});
       fbStartRealtime();
     }
@@ -10320,7 +10321,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA217</div>
+            <div style="font-size:13px;color:var(--text3);">BETA218</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
