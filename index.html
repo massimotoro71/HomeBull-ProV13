@@ -2038,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA227</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA228</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2140,7 +2140,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA227</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA228</div>
         </div>
       </div>
     </div>
@@ -2260,7 +2260,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA227</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA228</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA227',
+  version: 'BETA228',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8635,7 +8635,7 @@ function settingsRefreshUI() {
 }
 function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',th);localStorage.setItem('hb_theme',t);settingsRefreshUI();showToast(th==='dark'?'🌙 Dark':'☀️ Light');}
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
-function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const targets=[document.getElementById('tab-container'),document.getElementById('app'),document.querySelector('.app-main')];targets.forEach(tc=>{if(tc){tc.style.backgroundImage=bgs[t]||'';tc.style.backgroundSize=sz[t]||'';tc.style.backgroundAttachment='fixed';}});localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
+function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const r=document.documentElement;r.style.setProperty('--app-bg-image',bgs[t]||'none');r.style.setProperty('--app-bg-size',sz[t]||'');document.body.style.backgroundImage=bgs[t]||'';document.body.style.backgroundSize=sz[t]||'';document.body.style.backgroundAttachment='fixed';localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
 function setRadius(r){const m={sharp:'4px',normal:'14px',round:'22px'};document.documentElement.style.setProperty('--card-radius',m[r]);localStorage.setItem('hb_radius',r);settingsRefreshUI();}
 function setShadow(s){document.documentElement.style.setProperty('--card-shadow',s==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');localStorage.setItem('hb_shadow',s);settingsRefreshUI();}
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
@@ -8665,7 +8665,7 @@ async function settingsToggleBio(){
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
-function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};setTimeout(()=>{const tc=document.getElementById('tab-container');if(tc){tc.style.backgroundImage=bgMap[bg];tc.style.backgroundSize=sz[bg]||'';}},300);}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
+function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
 
 function settingsApplyOnLoad() {
   // Tema
@@ -9955,7 +9955,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA227</div>
+            <div style="font-size:13px;color:var(--text3);">BETA228</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
