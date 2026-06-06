@@ -2038,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA228</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA229</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2140,7 +2140,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA228</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA229</div>
         </div>
       </div>
     </div>
@@ -2260,7 +2260,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA228</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA229</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA228',
+  version: 'BETA229',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8635,6 +8635,15 @@ function settingsRefreshUI() {
 }
 function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',th);localStorage.setItem('hb_theme',t);settingsRefreshUI();showToast(th==='dark'?'🌙 Dark':'☀️ Light');}
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
+function setBgColor(c){document.documentElement.style.setProperty('--bg',c);document.documentElement.style.setProperty('--bg2',c);document.body.style.background=c;localStorage.setItem('hb_bg_color',c);showToast('🎨 Sfondo aggiornato');}
+function setCardBgColor(c){document.documentElement.style.setProperty('--surface',c);document.documentElement.style.setProperty('--surface2',c);localStorage.setItem('hb_card_color',c);showToast('🎨 Card aggiornate');}
+function setSidebarBgColor(c){const sb=document.querySelector('.sidebar');if(sb)sb.style.background=c;document.documentElement.style.setProperty('--sidebar-bg',c);localStorage.setItem('hb_sidebar_color',c);showToast('🎨 Sidebar aggiornata');}
+function setTextColor(c){document.documentElement.style.setProperty('--text',c);localStorage.setItem('hb_text_color',c);showToast('🎨 Testo aggiornato');}
+function resetColors(){['hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color'].forEach(k=>localStorage.removeItem(k));document.documentElement.removeAttribute('style');settingsApplyOnLoad();showToast('↩ Colori ripristinati');}
+function applyCustomColors(){const bg=localStorage.getItem('hb_bg_color');const card=localStorage.getItem('hb_card_color');const sidebar=localStorage.getItem('hb_sidebar_color');const text=localStorage.getItem('hb_text_color');if(bg){document.documentElement.style.setProperty('--bg',bg);document.documentElement.style.setProperty('--bg2',bg);document.body.style.background=bg;}if(card){document.documentElement.style.setProperty('--surface',card);document.documentElement.style.setProperty('--surface2',card);}if(sidebar){const sb=document.querySelector('.sidebar');if(sb)sb.style.background=sidebar;}if(text){document.documentElement.style.setProperty('--text',text);}
+// Aggiorna i color picker con i valori salvati
+setTimeout(()=>{const bgi=document.getElementById('set-app-bg');if(bgi&&bg)bgi.value=bg;const ci=document.getElementById('set-card-bg');if(ci&&card)ci.value=card;const si=document.getElementById('set-sidebar-bg');if(si&&sidebar)si.value=sidebar;const ti=document.getElementById('set-text-color');if(ti&&text)ti.value=text;},200);}
+
 function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const r=document.documentElement;r.style.setProperty('--app-bg-image',bgs[t]||'none');r.style.setProperty('--app-bg-size',sz[t]||'');document.body.style.backgroundImage=bgs[t]||'';document.body.style.backgroundSize=sz[t]||'';document.body.style.backgroundAttachment='fixed';localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
 function setRadius(r){const m={sharp:'4px',normal:'14px',round:'22px'};document.documentElement.style.setProperty('--card-radius',m[r]);localStorage.setItem('hb_radius',r);settingsRefreshUI();}
 function setShadow(s){document.documentElement.style.setProperty('--card-shadow',s==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');localStorage.setItem('hb_shadow',s);settingsRefreshUI();}
@@ -8665,7 +8674,7 @@ async function settingsToggleBio(){
 function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
-function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);}
+function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);applyCustomColors();}
 
 function settingsApplyOnLoad() {
   // Tema
@@ -9802,15 +9811,30 @@ function calShowAddEvent() {
 
         <!-- Sfondo -->
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
-          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🖼 Sfondo</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-            <button id="bg-none"  onclick="setBg('none')"  style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">◻ Nessuno</button>
-            <button id="bg-grad1" onclick="setBg('grad1')" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;">🌅 Viola</button>
-            <button id="bg-grad2" onclick="setBg('grad2')" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:white;border:none;">🌊 Oceano</button>
-            <button id="bg-grad3" onclick="setBg('grad3')" style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#064e3b,#065f46);color:white;border:none;">🌿 Foresta</button>
-            <button id="bg-dots"  onclick="setBg('dots')"  style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚫ Punti</button>
-            <button id="bg-grid"  onclick="setBg('grid')"  style="padding:10px 8px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▦ Griglia</button>
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🎨 Colori app</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <label style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:11px;font-weight:700;color:var(--text3);">Sfondo app</span>
+              <input type="color" id="set-app-bg" oninput="setBgColor(this.value)"
+                style="width:100%;height:40px;border-radius:10px;border:1px solid var(--border);cursor:pointer;padding:2px;background:var(--surface);">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:11px;font-weight:700;color:var(--text3);">Sfondo card</span>
+              <input type="color" id="set-card-bg" oninput="setCardBgColor(this.value)"
+                style="width:100%;height:40px;border-radius:10px;border:1px solid var(--border);cursor:pointer;padding:2px;background:var(--surface);">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:11px;font-weight:700;color:var(--text3);">Sfondo sidebar</span>
+              <input type="color" id="set-sidebar-bg" oninput="setSidebarBgColor(this.value)"
+                style="width:100%;height:40px;border-radius:10px;border:1px solid var(--border);cursor:pointer;padding:2px;background:var(--surface);">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:11px;font-weight:700;color:var(--text3);">Testo principale</span>
+              <input type="color" id="set-text-color" oninput="setTextColor(this.value)"
+                style="width:100%;height:40px;border-radius:10px;border:1px solid var(--border);cursor:pointer;padding:2px;background:var(--surface);">
+            </label>
           </div>
+          <button onclick="resetColors()" style="width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">↩ Ripristina colori default</button>
         </div>
 
         <!-- Stile card -->
@@ -9955,7 +9979,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA228</div>
+            <div style="font-size:13px;color:var(--text3);">BETA229</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
