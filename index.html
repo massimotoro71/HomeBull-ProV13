@@ -2040,7 +2040,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA233</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA234</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2142,7 +2142,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA233</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA234</div>
         </div>
       </div>
     </div>
@@ -2200,6 +2200,10 @@ function cardsSearch(q) {
       <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Server / IT</span>
+      </div>
+      <div class="sidebar-item" data-tab="library" onclick="switchTab('library')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="sidebar-item-label">Libreria</span>
       </div>
 
       <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
@@ -2262,7 +2266,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA233</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA234</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3108,6 +3112,10 @@ function cardsSearch(q) {
         <div class="drawer-item-icon">💳</div>
         <div class="drawer-item-label">Carte</div>
       </div>
+      <div class="drawer-item" data-tab="library" onclick="switchTabFromDrawer('library')">
+        <div class="drawer-item-icon">📚</div>
+        <div class="drawer-item-label">Libreria</div>
+      </div>
       <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer('wifi')">
         <div class="drawer-item-icon">🌐</div>
         <div class="drawer-item-label">Wi-Fi</div>
@@ -3276,7 +3284,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA233',
+  version: 'BETA234',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3285,7 +3293,7 @@ const HB = {
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
   otpCode: '',
-  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','family','shopping']
+  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','family','shopping','library']
 };
 
 // ── Service Worker ─────────────────────────────────────────
@@ -3698,6 +3706,7 @@ function switchTab(tab) {
     cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
     finance:   () => typeof financeOpen === 'function' && financeOpen(),
     server:    () => typeof serverOpen === 'function' && serverOpen(),
+    library:   () => typeof libOpen === 'function' && libOpen(),
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
     family:    () => typeof familyOpen === 'function' && familyOpen(),
@@ -7489,6 +7498,7 @@ const ALL_TABS_META = [
   { id:'wifi',      icon:'🌐', label:'Wi-Fi' },
   { id:'finance',   icon:'📊', label:'Finanze' },
   { id:'server',    icon:'📡', label:'Server/IT' },
+  { id:'library',   icon:'📚', label:'Libreria' },
   { id:'shopping',  icon:'🛒', label:'Lista Spesa' },
 ];
 
@@ -9080,7 +9090,7 @@ function fbMsg(c){
 
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
   'hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
-  'hb13_pw_cats','hb13_shop_lists_v2'];
+  'hb13_pw_cats','hb13_shop_lists_v2','hb13_library'];
 
 // Timestamp helpers
 function _tsKey(k){ return 'hb_ts_' + k; }
@@ -10053,7 +10063,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA233</div>
+            <div style="font-size:13px;color:var(--text3);">BETA234</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10086,6 +10096,7 @@ function calShowAddEvent() {
     <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
     <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
     <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('library');closeMobileMenu()">📚 Libreria</div>
     <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
     <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
     <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
@@ -10102,5 +10113,179 @@ function calShowAddEvent() {
 </div>
 
 <button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
+</body>
+</div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  LIBRERIA — Google Drive + link documenti
+// ═══════════════════════════════════════════════════════════
+const LIB_KEY = 'hb13_library';
+let _libItems = [];
+
+function libLoad() {
+  try { _libItems = JSON.parse(localStorage.getItem(LIB_KEY) || '[]'); } catch(e) { _libItems = []; }
+}
+
+function libSave() {
+  localStorage.setItem(LIB_KEY, JSON.stringify(_libItems));
+}
+
+function libOpen() {
+  libLoad();
+  libRender();
+  document.getElementById('topbar-title').textContent = 'Libreria';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function libRender() {
+  const container = document.getElementById('lib-view-list');
+  if (!container) return;
+  const active = _libItems.filter(i => !i.deleted);
+  
+  // Header con pulsante aggiungi
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);">${active.length} document${active.length !== 1 ? 'i' : 'o'}</div>
+    <button onclick="libShowAdd()" style="padding:8px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">📚 Aggiungi</button>
+  </div>`;
+
+  if (!active.length) {
+    html += `<div style="text-align:center;padding:60px 20px;">
+      <div style="font-size:64px;margin-bottom:16px;">📚</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:8px;">Libreria vuota</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:24px;">Aggiungi manuali, PDF, documenti da Google Drive o link esterni</div>
+      <button onclick="libShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">📚 Aggiungi documento</button>
+    </div>`;
+  } else {
+    const catColors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
+    active.forEach((item, idx) => {
+      const color = catColors[idx % catColors.length];
+      const typeIcon = {pdf:'📄',word:'📝',excel:'📊',link:'🔗',drive:'📁',other:'📎'}[item.type||'other'];
+      html += `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:background 0.15s;" 
+        onclick="libOpen_doc('${item.id}')"
+        onmouseenter="this.style.background='var(--surface2,var(--bg3))'" 
+        onmouseleave="this.style.background='var(--surface)'">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:${color}20;border:1px solid ${color}40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${typeIcon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</div>
+            ${item.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.desc}</div>` : ''}
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;">${item.category||''} ${item.addedAt ? '· ' + new Date(item.addedAt).toLocaleDateString('it-IT') : ''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="event.stopPropagation();libEdit('${item.id}')" style="padding:6px 10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;cursor:pointer;">✏️</button>
+            <button onclick="event.stopPropagation();libDelete('${item.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;cursor:pointer;">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  container.innerHTML = html;
+}
+
+function libOpen_doc(id) {
+  const item = _libItems.find(i => i.id === id);
+  if (!item) return;
+  const url = item.url || '';
+  if (!url) { showToast('Nessun link disponibile'); return; }
+  
+  // Apri in viewer integrato
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;';
+  ov.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">←</button>
+      <div style="flex:1;font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.title}</div>
+      <a href="${url}" target="_blank" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:4px;">🔗 Apri</a>
+    </div>
+    <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" 
+      style="flex:1;border:none;width:100%;" 
+      onerror="this.src='${url}'">
+    </iframe>`;
+  document.body.appendChild(ov);
+}
+
+function libShowAdd() {
+  libShowForm(null);
+}
+
+function libEdit(id) {
+  libShowForm(id);
+}
+
+function libShowForm(id) {
+  const item = id ? _libItems.find(i => i.id === id) : null;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:420px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">${item ? '✏️ Modifica documento' : '📚 Aggiungi documento'}</div>
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Titolo *</div>
+    <input id="_lib_title" value="${item?.title||''}" placeholder="es. Manuale Lavatrice" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Descrizione</div>
+    <input id="_lib_desc" value="${item?.desc||''}" placeholder="Breve descrizione..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Categoria</div>
+    <input id="_lib_cat" value="${item?.category||''}" placeholder="es. Elettrodomestici, Contratti..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Link documento (Google Drive, URL)</div>
+    <input id="_lib_url" value="${item?.url||''}" placeholder="https://drive.google.com/..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Tipo documento</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px;">
+      ${[['pdf','📄 PDF'],['word','📝 Word'],['excel','📊 Excel'],['link','🔗 Link'],['drive','📁 Drive'],['other','📎 Altro']].map(([t,l])=>
+        `<button type="button" onclick="this.parentNode.querySelectorAll('button').forEach(b=>b.style.background='var(--surface)');this.style.background='var(--accent)';this.style.color='white';document.getElementById('_lib_type').value='${t}'" 
+          style="padding:8px;border-radius:8px;border:1px solid var(--border);background:${(item?.type||'other')===t?'var(--accent)':'var(--surface)'};color:${(item?.type||'other')===t?'white':'var(--text)'};font-size:12px;cursor:pointer;font-family:inherit;">${l}</button>`
+      ).join('')}
+    </div>
+    <input type="hidden" id="_lib_type" value="${item?.type||'other'}">
+    
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_lib_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  
+  document.getElementById('_lib_save').onclick = () => {
+    const title = document.getElementById('_lib_title').value.trim();
+    if (!title) { showToast('Inserisci il titolo'); return; }
+    const now = new Date().toISOString();
+    if (item) {
+      const idx = _libItems.findIndex(i => i.id === id);
+      if (idx !== -1) _libItems[idx] = { ..._libItems[idx],
+        title, desc: document.getElementById('_lib_desc').value.trim(),
+        category: document.getElementById('_lib_cat').value.trim(),
+        url: document.getElementById('_lib_url').value.trim(),
+        type: document.getElementById('_lib_type').value,
+        updatedAt: now
+      };
+    } else {
+      _libItems.push({
+        id: 'lib_' + Date.now(), title,
+        desc: document.getElementById('_lib_desc').value.trim(),
+        category: document.getElementById('_lib_cat').value.trim(),
+        url: document.getElementById('_lib_url').value.trim(),
+        type: document.getElementById('_lib_type').value,
+        addedAt: now, updatedAt: now
+      });
+    }
+    libSave(); libRender(); ov.remove();
+    showToast(item ? '✅ Documento aggiornato' : '✅ Documento aggiunto');
+  };
+}
+
+function libDelete(id) {
+  setTimeout(() => {
+    if (!confirm('Eliminare questo documento?')) return;
+    _libItems = _libItems.map(i => i.id === id ? {...i, deleted: true, deletedAt: new Date().toISOString()} : i);
+    libSave(); libRender();
+    showToast('Documento rimosso');
+  }, 50);
+}
+</script>
+
 </body>
 </html>
