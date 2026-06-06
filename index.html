@@ -2040,7 +2040,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA231</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA232</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2142,7 +2142,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA231</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA232</div>
         </div>
       </div>
     </div>
@@ -2262,7 +2262,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA231</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA232</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3276,7 +3276,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA231',
+  version: 'BETA232',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4056,15 +4056,22 @@ let   _pwCats  = [];
 let   _pwItems = [];
 let   _pwCurCat = null;
 
-// Icone per categoria (mapping v11)
+// Icone per categoria (mapping v11 + esteso)
 const CAT_ICONS = {
-  'cat_allarme':'🔔','cat_app':'📱','cat_banca':'🏦','cat_cis':'📊',
-  'cat_cloud':'☁️','cat_codiceufficio':'🏢','cat_codici':'🛡️',
-  'cat_corsi':'🎓','cat_documenti':'📄','cat_email':'📧',
-  'cat_famiglia':'👨‍👩‍👧','cat_finanze':'💰','cat_gaming':'🎮',
-  'cat_google':'🔍','cat_lavoro':'💼','cat_medico':'⚕️',
-  'cat_reti':'🌐','cat_server':'🖥️','cat_shopping':'🛒',
-  'cat_social':'📱','cat_travel':'✈️','cat_vuoto':'📁',
+  // ID esatti
+  'cat_allarme':'🔔','cat_app':'📱','cat_banca':'🏦','cat_cis':'🏛️',
+  'cat_cloud':'☁️','cat_coduff':'🏢','cat_codiceufficio':'🏢','cat_codici':'🛡️',
+  'cat_codsic':'🛡️','cat_corsi':'🎓','cat_documenti':'📄','cat_docpers':'📋',
+  'cat_dos':'💻','cat_domotica':'🏠','cat_email':'📧','cat_famiglia':'👨‍👩‍👧',
+  'cat_finanze':'💰','cat_finance':'💰','cat_gaming':'🎮','cat_giochi':'🎮',
+  'cat_google':'🔍','cat_lavoro':'💼','cat_link':'🔗','cat_medico':'⚕️',
+  'cat_micro':'🪟','cat_pec':'📨','cat_peciarma':'📨','cat_postaiarma':'📮',
+  'cat_posta':'📮','cat_reti':'🌐','cat_sanitari':'🏥','cat_server':'🖥️',
+  'cat_shopping':'🛒','cat_social':'📲','cat_spid':'🪪','cat_streaming':'📺',
+  'cat_tv':'📺','cat_ufficio':'🏢','cat_utili':'⚡','cat_utenze':'⚡',
+  'cat_vari':'📦','cat_viaggicibo':'🍽️','cat_video':'🎬','cat_wifi':'📶',
+  'cat_forense':'⚖️','cat_gestcert':'📜','cat_datpers':'👤','cat_posta':'📮',
+  'cat_spesa':'🛒','cat_personalii':'👤','cat_personali':'👤',
 };
 // Mappa icone stringa v11 → emoji
 const ICON_MAP = {
@@ -4095,19 +4102,38 @@ function getCatIcon(catId, catName, catIconField) {
   // Poi: cerca per ID
   const k = (catId||'').toLowerCase().replace(/[^a-z]/g,'');
   if (CAT_ICONS[k]) return CAT_ICONS[k];
-  // Poi: cerca per nome
+  // Poi: cerca per nome (keyword estese)
   const n = (catName||'').toLowerCase();
   if (n.includes('banca')||n.includes('bank')) return '🏦';
-  if (n.includes('email')||n.includes('mail')) return '📧';
-  if (n.includes('social')) return '📱';
+  if (n.includes('email')||n.includes('mail')||n.includes('posta')) return '📧';
+  if (n.includes('pec')) return '📨';
+  if (n.includes('social')||n.includes('facebook')||n.includes('instagram')) return '📲';
   if (n.includes('cloud')) return '☁️';
-  if (n.includes('lavoro')||n.includes('work')) return '💼';
-  if (n.includes('casa')||n.includes('home')) return '🏠';
-  if (n.includes('allarme')||n.includes('sicurezza')) return '🔔';
+  if (n.includes('lavoro')||n.includes('work')||n.includes('ufficio')) return '💼';
+  if (n.includes('casa')||n.includes('home')||n.includes('domotica')) return '🏠';
+  if (n.includes('alarm')||n.includes('allarme')) return '🔔';
+  if (n.includes('sicurezza')||n.includes('codici')||n.includes('codsic')) return '🛡️';
   if (n.includes('carte')||n.includes('card')) return '💳';
-  if (n.includes('server')||n.includes('it')) return '🖥️';
-  if (n.includes('medic')) return '⚕️';
-  if (n.includes('familia')||n.includes('famigl')) return '👨‍👩‍👧';
+  if (n.includes('server')||n.includes('it')||n.includes('dos')) return '🖥️';
+  if (n.includes('medic')||n.includes('sanit')||n.includes('salute')) return '⚕️';
+  if (n.includes('famig')||n.includes('famil')) return '👨‍👩‍👧';
+  if (n.includes('tv')||n.includes('video')||n.includes('streaming')||n.includes('netflix')) return '📺';
+  if (n.includes('spid')||n.includes('identit')) return '🪪';
+  if (n.includes('micro')||n.includes('microsoft')||n.includes('windows')) return '🪟';
+  if (n.includes('google')) return '🔍';
+  if (n.includes('corsi')||n.includes('scuola')||n.includes('studio')) return '🎓';
+  if (n.includes('finanz')||n.includes('soldi')||n.includes('paypay')||n.includes('paypal')) return '💰';
+  if (n.includes('wifi')||n.includes('rete')||n.includes('router')) return '📶';
+  if (n.includes('link')||n.includes('url')||n.includes('sito')) return '🔗';
+  if (n.includes('app')) return '📱';
+  if (n.includes('giochi')||n.includes('game')||n.includes('gaming')) return '🎮';
+  if (n.includes('utenz')||n.includes('utili')||n.includes('luce')||n.includes('gas')) return '⚡';
+  if (n.includes('spesa')||n.includes('shop')||n.includes('acquist')) return '🛒';
+  if (n.includes('cibo')||n.includes('ristoran')||n.includes('viaggi')) return '🍽️';
+  if (n.includes('legal')||n.includes('forense')||n.includes('avvoc')) return '⚖️';
+  if (n.includes('cert')||n.includes('document')) return '📜';
+  if (n.includes('person')||n.includes('privat')) return '👤';
+  if (n.includes('cis')||n.includes('arma')||n.includes('carabin')) return '🏛️';
   return '📁';
 }
 
@@ -10007,7 +10033,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA231</div>
+            <div style="font-size:13px;color:var(--text3);">BETA232</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
