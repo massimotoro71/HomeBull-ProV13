@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA222</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA223</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA222</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA223</div>
         </div>
       </div>
     </div>
@@ -2165,10 +2165,7 @@ function cardsSearch(q) {
         <span class="sidebar-item-label">Documenti</span>
       </div>
 
-      <div class="sidebar-item" data-tab="family" onclick="switchTab('family')">
-        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span class="sidebar-item-label">Famiglia</span>
-      </div>
+
 
       <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -2262,7 +2259,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA222</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA223</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3151,10 +3148,7 @@ function cardsSearch(q) {
         <div class="drawer-item-icon">🛒</div>
         <div class="drawer-item-label">Lista Spesa</div>
       </div>
-      <div class="drawer-item" data-tab="family" onclick="switchTabFromDrawer('family')">
-        <div class="drawer-item-icon">👨‍👩‍👧</div>
-        <div class="drawer-item-label">Famiglia</div>
-      </div>
+
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
       <button onclick="openSettings();closeMoreDrawer()" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
@@ -3306,7 +3300,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA222',
+  version: 'BETA223',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5355,7 +5349,8 @@ function financeShowList() {
 function financeRender() {
   const list = document.getElementById('finance-list');
   if (!list) return;
-  if (!_financeAccounts.length) {
+  const activeAccounts = _financeAccounts.filter(a=>!a.deleted);
+  if (!activeAccounts.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:48px;margin-bottom:12px;">💰</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun conto salvato</div>
@@ -5365,7 +5360,7 @@ function financeRender() {
     return;
   }
   list.innerHTML = '';
-  _financeAccounts.filter(a=>!a.deleted).forEach(acc => {
+  activeAccounts.forEach(acc => {
     const card = document.createElement('div');
     card.className = 'finance-card';
     card.onclick = () => financeShowDetail(acc.id);
@@ -9960,7 +9955,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA222</div>
+            <div style="font-size:13px;color:var(--text3);">BETA223</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10000,7 +9995,6 @@ function calShowAddEvent() {
     <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
     <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
     <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
-    <div class="mob-item" onclick="switchTab('family');closeMobileMenu()">👨‍👩‍👧 Famiglia</div>
     <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
   </div>
   <div style="padding:10px 14px;border-top:1px solid var(--border);">
