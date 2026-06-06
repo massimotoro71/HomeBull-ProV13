@@ -2038,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA229</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA230</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2140,7 +2140,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA229</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA230</div>
         </div>
       </div>
     </div>
@@ -2260,7 +2260,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA229</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA230</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA229',
+  version: 'BETA230',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8639,6 +8639,20 @@ function setBgColor(c){document.documentElement.style.setProperty('--bg',c);docu
 function setCardBgColor(c){document.documentElement.style.setProperty('--surface',c);document.documentElement.style.setProperty('--surface2',c);localStorage.setItem('hb_card_color',c);showToast('🎨 Card aggiornate');}
 function setSidebarBgColor(c){const sb=document.querySelector('.sidebar');if(sb)sb.style.background=c;document.documentElement.style.setProperty('--sidebar-bg',c);localStorage.setItem('hb_sidebar_color',c);showToast('🎨 Sidebar aggiornata');}
 function setTextColor(c){document.documentElement.style.setProperty('--text',c);localStorage.setItem('hb_text_color',c);showToast('🎨 Testo aggiornato');}
+function resetAllGraphics(){
+  // Reset tutti i valori grafici
+  ['hb_theme','hb_accent','hb13_accent','hb_font','hb_fs','hb_radius','hb_shadow','hb_anim','hb_bg',
+   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color'].forEach(k=>localStorage.removeItem(k));
+  // Ripristina stili CSS
+  document.documentElement.removeAttribute('style');
+  document.body.style.cssText = '';
+  // Applica defaults
+  document.documentElement.setAttribute('data-theme','dark');
+  settingsApplyOnLoad();
+  settingsRefreshUI();
+  showToast('↩ Grafica ripristinata ai default');
+}
+
 function resetColors(){['hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color'].forEach(k=>localStorage.removeItem(k));document.documentElement.removeAttribute('style');settingsApplyOnLoad();showToast('↩ Colori ripristinati');}
 function applyCustomColors(){const bg=localStorage.getItem('hb_bg_color');const card=localStorage.getItem('hb_card_color');const sidebar=localStorage.getItem('hb_sidebar_color');const text=localStorage.getItem('hb_text_color');if(bg){document.documentElement.style.setProperty('--bg',bg);document.documentElement.style.setProperty('--bg2',bg);document.body.style.background=bg;}if(card){document.documentElement.style.setProperty('--surface',card);document.documentElement.style.setProperty('--surface2',card);}if(sidebar){const sb=document.querySelector('.sidebar');if(sb)sb.style.background=sidebar;}if(text){document.documentElement.style.setProperty('--text',text);}
 // Aggiorna i color picker con i valori salvati
@@ -9881,6 +9895,16 @@ function calShowAddEvent() {
           </div>
         </div>
 
+        <!-- Pulsanti Reset e Salva -->
+        <div style="padding:16px 20px;display:flex;gap:10px;">
+          <button onclick="resetAllGraphics()" style="flex:1;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+            ↩ Reset grafica
+          </button>
+          <button onclick="closeSettings();switchTab('home')" style="flex:1;padding:13px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;">
+            ✅ Salva e chiudi
+          </button>
+        </div>
+
       </div>
 
       <!-- ── PAGINA CLOUD ── -->
@@ -9979,7 +10003,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA229</div>
+            <div style="font-size:13px;color:var(--text3);">BETA230</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
