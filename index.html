@@ -2040,7 +2040,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA234</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA236</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2142,7 +2142,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA234</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA236</div>
         </div>
       </div>
     </div>
@@ -2266,7 +2266,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA234</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA236</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3032,6 +3032,11 @@ function cardsSearch(q) {
       </div>
     </div>
 
+
+    <!-- LIBRERIA PANEL -->
+    <div class="tab-panel" id="panel-library" style="height:100%;overflow-y:auto;">
+      <div id="lib-view-list" style="padding:14px;"></div>
+    </div>
     <div class="tab-panel" id="panel-shopping">
       <div style="padding:12px 14px 100px;">
 
@@ -3284,7 +3289,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA234',
+  version: 'BETA236',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10063,7 +10068,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA234</div>
+            <div style="font-size:13px;color:var(--text3);">BETA236</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10231,7 +10236,12 @@ function libShowForm(id) {
     <input id="_lib_cat" value="${item?.category||''}" placeholder="es. Elettrodomestici, Contratti..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
     
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Link documento (Google Drive, URL)</div>
-    <input id="_lib_url" value="${item?.url||''}" placeholder="https://drive.google.com/..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input id="_lib_url" value="${item?.url||''}" placeholder="https://drive.google.com/..." style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:inherit;">
+      <button type="button" id="_lib_drive_btn" style="padding:11px 14px;border-radius:10px;border:none;background:#4285F4;color:white;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">
+        <svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path fill="white" d="M6.28 3l5.72 9.9L6.28 21H2l5.72-9.1L2 3h4.28zm7.44 0L22 3l-5.72 9.1L22 21h-8.28l5.72-9.1L13.72 3z"/></svg>Drive
+      </button>
+    </div>
     
     <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Tipo documento</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px;">
@@ -10248,6 +10258,23 @@ function libShowForm(id) {
     </div>
   </div>`;
   document.body.appendChild(ov);
+  
+  document.getElementById('_lib_drive_btn').onclick = async () => {
+    try {
+      showToast('⏳ Apertura Google Drive...');
+      const file = await libPickFromDrive();
+      if (file) {
+        document.getElementById('_lib_url').value = file.url;
+        document.getElementById('_lib_title').value = document.getElementById('_lib_title').value || file.title;
+        // Imposta tipo automaticamente
+        document.getElementById('_lib_type').value = file.type;
+        document.querySelectorAll('#_lib_type ~ div button, div:has(#_lib_type) button').forEach(b => {
+          b.style.background = 'var(--surface)'; b.style.color = 'var(--text)';
+        });
+        showToast('✅ File selezionato: ' + file.title);
+      }
+    } catch(e) { console.warn('Drive picker:', e); showToast('Errore connessione Drive'); }
+  };
   
   document.getElementById('_lib_save').onclick = () => {
     const title = document.getElementById('_lib_title').value.trim();
@@ -10275,6 +10302,73 @@ function libShowForm(id) {
     libSave(); libRender(); ov.remove();
     showToast(item ? '✅ Documento aggiornato' : '✅ Documento aggiunto');
   };
+}
+
+// ── Google Drive Picker ─────────────────────────────────────
+const GDRIVE_CLIENT_ID = '140879408214-fih8n3ed3jp0hre6ujso7lcq2mkbss1d.apps.googleusercontent.com';
+const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
+const GDRIVE_API_KEY = 'AIzaSyBr6t6gKmanpthFfyUBqfSOMVICc8Efyjs'; // Firebase API key
+let _driveToken = null;
+
+async function libPickFromDrive() {
+  // 1. Ottieni token OAuth Google
+  await new Promise((resolve, reject) => {
+    if(!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    } else resolve();
+  });
+  
+  await new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: GDRIVE_SCOPE + ' https://www.googleapis.com/auth/calendar',
+      callback: (resp) => {
+        if(resp.error) { reject(resp.error); return; }
+        _driveToken = resp.access_token;
+        resolve();
+      }
+    });
+    client.requestAccessToken();
+  });
+
+  // 2. Carica Google Picker API
+  await new Promise((resolve) => {
+    if(window.google?.picker) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = () => { gapi.load('picker', resolve); };
+    document.head.appendChild(s);
+  });
+
+  // 3. Mostra Picker
+  return new Promise((resolve) => {
+    const picker = new google.picker.PickerBuilder()
+      .addView(new google.picker.DocsView()
+        .setIncludeFolders(false)
+        .setMimeTypes('application/pdf,application/vnd.google-apps.document,application/vnd.google-apps.spreadsheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+      .setOAuthToken(_driveToken)
+      .setDeveloperKey(GDRIVE_API_KEY)
+      .setCallback((data) => {
+        if(data.action === google.picker.Action.PICKED) {
+          const file = data.docs[0];
+          resolve({
+            title: file.name,
+            url: file.url || `https://drive.google.com/file/d/${file.id}/view`,
+            type: file.mimeType?.includes('pdf') ? 'pdf' : 
+                  file.mimeType?.includes('spreadsheet') ? 'excel' :
+                  file.mimeType?.includes('document') ? 'word' : 'drive',
+            driveId: file.id
+          });
+        } else if(data.action === google.picker.Action.CANCEL) {
+          resolve(null);
+        }
+      })
+      .build();
+    picker.setVisible(true);
+  });
 }
 
 function libDelete(id) {
