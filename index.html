@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA241</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA242</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA241</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA242</div>
         </div>
       </div>
     </div>
@@ -2263,7 +2263,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA241</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA242</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3286,7 +3286,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA241',
+  version: 'BETA242',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9127,6 +9127,7 @@ async function fbSyncAll(silent=false){
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
+    driveAutoBackup();
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
@@ -9935,6 +9936,15 @@ function calShowAddEvent() {
               <button onclick="driveBackupNow()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup</button>
             </div>
           </div>
+          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Auto backup (ogni 24h)</div>
+              <div style="font-size:11px;color:var(--text3);">Backup silenzioso dopo ogni sync</div>
+            </div>
+            <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
+              <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+            </div>
+          </div>
         </div>
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
         <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
@@ -10012,7 +10022,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA241</div>
+            <div style="font-size:13px;color:var(--text3);">BETA242</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10349,6 +10359,22 @@ async function driveBackupNow(silent=false) {
   }
 }
 
+
+// ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
+async function driveAutoBackup() {
+  if (!_driveBackupToken && !localStorage.getItem('hb_drive_auto')) return;
+  const last = localStorage.getItem('hb_drive_backup_ts');
+  if (last) {
+    const diff = Date.now() - new Date(last).getTime();
+    if (diff < 24 * 60 * 60 * 1000) return; // meno di 24h fa
+  }
+  // Esegui backup silenzioso solo se token già disponibile
+  if (_driveBackupToken) {
+    console.log('🔄 Auto-backup Drive...');
+    await driveBackupNow(true);
+  }
+}
+
 async function driveRestoreNow() {
   try {
     showToast('☁️ Ricerca backup su Drive...');
@@ -10420,10 +10446,27 @@ async function driveRestoreNow() {
 function driveUpdateBackupUI() {
   const ts = localStorage.getItem('hb_drive_backup_ts');
   const el = document.getElementById('drive-backup-ts');
-  if (el && ts) {
-    const d = new Date(ts);
-    el.textContent = 'Ultimo: ' + d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  if (el) {
+    if (ts) {
+      const d = new Date(ts);
+      el.textContent = 'Ultimo: ' + d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    } else {
+      el.textContent = 'Nessun backup effettuato';
+    }
   }
+  // Aggiorna toggle auto
+  const auto = localStorage.getItem('hb_drive_auto') === '1';
+  const tog = document.getElementById('drive-auto-toggle');
+  const thm = document.getElementById('drive-auto-thumb');
+  if (tog) tog.style.background = auto ? '#10b981' : '#6b7280';
+  if (thm) thm.style.left = auto ? '25px' : '3px';
+}
+
+function driveToggleAuto() {
+  const auto = localStorage.getItem('hb_drive_auto') === '1';
+  localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
+  driveUpdateBackupUI();
+  showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
 }
 
 
