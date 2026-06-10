@@ -4189,17 +4189,17 @@ function getCatIcon(catId, catName, catIconField) {
 }
 
 // Carica da localStorage
-function pwLoad() {
+async function pwLoad() {
   try {
-    _pwCats  = JSON.parse(localStorage.getItem(PW_CATS)  || '[]');
-    _pwItems = JSON.parse(localStorage.getItem(PW_KEY)   || '[]');
+    _pwCats  = await localGet(PW_CATS)  || [];
+    _pwItems = await localGet(PW_KEY)   || [];
   } catch(e) { _pwCats=[]; _pwItems=[]; }
 }
 
 // Salva
-function pwSave() {
-  localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
-  localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
+async function pwSave() {
+  await localSet(PW_CATS, _pwCats);
+  await localSet(PW_KEY,  _pwItems);
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -4941,11 +4941,11 @@ const NOTE_KEY = 'hb13_notes';
 let _notes = [];
 let _noteEditId = null; // null = nuova nota
 
-function noteLoad() {
-  try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
+async function noteLoad() {
+  try { _notes = await localGet(NOTE_KEY) || []; } catch(e) { _notes=[]; }
 }
-function noteSaveAll() {
-  localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
+async function noteSaveAll() {
+  await localSet(NOTE_KEY, _notes);
   const el = document.getElementById('stat-notes');
   if (el) el.textContent = _notes.length || '—';
 }
@@ -5034,7 +5034,7 @@ function noteShowEditor() {
   document.getElementById('topbar-sub').textContent = '';
 }
 
-function noteSave() {
+async function noteSave() {
   const title   = document.getElementById('note-title-inp').value.trim();
   const content = document.getElementById('note-content-inp').value.trim();
   if (!title && !content) { showToast('Scrivi qualcosa prima di salvare'); return; }
@@ -5105,10 +5105,10 @@ const CARDS_KEY = 'hb13_cards';
 let _cards = [];
 let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 
-function cardsLoad() {
-  try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
+async function cardsLoad() {
+  try { _cards = await localGet(CARDS_KEY) || []; } catch(e) { _cards=[]; }
 }
-function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
+function cardsSaveAll() { localSet(CARDS_KEY, _cards); }
 
 function cardsOpen() {
   cardsLoad(); cardsShowList();
@@ -5399,10 +5399,10 @@ const FINANCE_KEY = 'hb13_finance';
 let _financeAccounts = [];
 let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 
-function financeLoad() {
-  try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
+async function financeLoad() {
+  try { _financeAccounts = await localGet(FINANCE_KEY) || []; } catch(e) { _financeAccounts=[]; }
 }
-function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
+function financeSaveAll() { localSet(FINANCE_KEY, _financeAccounts); }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -5642,10 +5642,10 @@ const WIFI_KEY = 'hb13_wifi';
 let _wifiNets = [];
 let _wifiSec  = 'WPA';
 
-function wifiLoad() {
-  try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
+async function wifiLoad() {
+  try { _wifiNets = await localGet(WIFI_KEY) || []; } catch(e) { _wifiNets=[]; }
 }
-function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); }
+function wifiSaveAll() { localSet(WIFI_KEY, _wifiNets); }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -5816,10 +5816,10 @@ let _otpAccounts = [];
 let _otpTimer    = null;
 let _otpIcon     = '🔐';
 
-function otpLoad() {
-  try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
+async function otpLoad() {
+  try { _otpAccounts = await localGet(OTP_KEY) || []; } catch(e) { _otpAccounts=[]; }
 }
-function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); }
+function otpSaveAll() { localSet(OTP_KEY, _otpAccounts); }
 
 function otpOpen() {
   otpLoad();
@@ -6101,10 +6101,10 @@ let _calEditId = null;
 
 const CAL_MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
-function calLoad() {
-  try { _calEvents = JSON.parse(localStorage.getItem(CAL_KEY)||'[]'); } catch(e) { _calEvents=[]; }
+async function calLoad() {
+  try { _calEvents = await localGet(CAL_KEY) || []; } catch(e) { _calEvents=[]; }
 }
-function calSaveAll() { localStorage.setItem(CAL_KEY, JSON.stringify(_calEvents)); }
+function calSaveAll() { localSet(CAL_KEY, _calEvents); }
 
 function calOpen() {
   turniLoad();
@@ -6387,10 +6387,10 @@ const DOCS_KEY = 'hb13_documents';
 let _docs = [];
 let _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
 
-function docsLoad() {
-  try { _docs = JSON.parse(localStorage.getItem(DOCS_KEY)||'[]'); } catch(e) { _docs=[]; }
+async function docsLoad() {
+  try { _docs = await localGet(DOCS_KEY) || []; } catch(e) { _docs=[]; }
 }
-function docsSaveAll() { localStorage.setItem(DOCS_KEY, JSON.stringify(_docs)); }
+function docsSaveAll() { localSet(DOCS_KEY, _docs); }
 
 function docsOpen() {
   docsLoad(); docsShowList();
@@ -6684,10 +6684,10 @@ const SERVER_KEY = 'hb13_server';
 let _serverItems = [];
 let _serverType  = { id:'ssh', icon:'🔐', label:'SSH' };
 
-function serverLoad() {
-  try { _serverItems = JSON.parse(localStorage.getItem(SERVER_KEY)||'[]'); } catch(e) { _serverItems=[]; }
+async function serverLoad() {
+  try { _serverItems = await localGet(SERVER_KEY) || []; } catch(e) { _serverItems=[]; }
 }
-function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
+function serverSaveAll() { localSet(SERVER_KEY, _serverItems); }
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -8314,10 +8314,10 @@ let _docType2 = { id:'ci', icon:'🪪', label:'C. Identità' };
 let _docPhotos2 = { fronte: null, retro: null };
 
 function docsLoad2() {
-  try { _docs2 = JSON.parse(localStorage.getItem(DOCS_KEY2)) || []; }
+  try { _docs2 = await localGet(DOCS_KEY2) || []; }
   catch(e) { _docs2 = []; }
 }
-function docsSaveAll2() { localStorage.setItem(DOCS_KEY2, JSON.stringify(_docs2)); }
+function docsSaveAll2() { localSet(DOCS_KEY2, _docs2); }
 
 function docsOpen() {
   docsLoad2();
@@ -8683,7 +8683,19 @@ function setShadow(s){document.documentElement.style.setProperty('--card-shadow'
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 function setFontSize(px){document.documentElement.style.fontSize=px+'px';localStorage.setItem('hb_fs',px);}
-function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
+async function settingsExport(){
+  const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];
+  const data={};
+  for(const k of keys){
+    try{ const v=await localGet(k); if(v!==null) data[k]=v; }catch(e){}
+  }
+  const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  showToast('✅ Backup esportato!');
+}
 function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 async function settingsToggleBio(){
