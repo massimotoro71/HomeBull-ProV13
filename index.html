@@ -3000,8 +3000,6 @@ function cardsSearch(q) {
     </div>
 
     <!-- FAMIGLIA -->
-
-
     <!-- LIBRERIA PANEL -->
     <div class="tab-panel" id="panel-library" style="height:100%;overflow-y:auto;">
       <div id="lib-view-list" style="padding:14px;"></div>
@@ -4120,17 +4118,17 @@ function getCatIcon(catId, catName, catIconField) {
 }
 
 // Carica da localStorage
-async function pwLoad() {
+function pwLoad() {
   try {
-    _pwCats  = await localGet(PW_CATS)  || [];
-    _pwItems = await localGet(PW_KEY)   || [];
+    _pwCats  = JSON.parse(localStorage.getItem(PW_CATS)  || '[]');
+    _pwItems = JSON.parse(localStorage.getItem(PW_KEY)   || '[]');
   } catch(e) { _pwCats=[]; _pwItems=[]; }
 }
 
 // Salva
-async function pwSave() {
-  await localSet(PW_CATS, _pwCats);
-  await localSet(PW_KEY,  _pwItems);
+function pwSave() {
+  localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
+  localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -4999,11 +4997,11 @@ const NOTE_KEY = 'hb13_notes';
 let _notes = [];
 let _noteEditId = null; // null = nuova nota
 
-async function noteLoad() {
-  try { _notes = await localGet(NOTE_KEY) || []; } catch(e) { _notes=[]; }
+function noteLoad() {
+  try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
 }
-async function noteSaveAll() {
-  await localSet(NOTE_KEY, _notes);
+function noteSaveAll() {
+  localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
   const el = document.getElementById('stat-notes');
   if (el) el.textContent = _notes.length || '—';
 }
@@ -5163,10 +5161,10 @@ const CARDS_KEY = 'hb13_cards';
 let _cards = [];
 let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 
-async function cardsLoad() {
-  try { _cards = await localGet(CARDS_KEY) || []; } catch(e) { _cards=[]; }
+function cardsLoad() {
+  try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
 }
-function cardsSaveAll() { localSet(CARDS_KEY, _cards); }
+function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
 
 function cardsOpen() {
   cardsLoad(); cardsShowList();
@@ -5457,10 +5455,10 @@ const FINANCE_KEY = 'hb13_finance';
 let _financeAccounts = [];
 let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 
-async function financeLoad() {
-  try { _financeAccounts = await localGet(FINANCE_KEY) || []; } catch(e) { _financeAccounts=[]; }
+function financeLoad() {
+  try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
 }
-function financeSaveAll() { localSet(FINANCE_KEY, _financeAccounts); }
+function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -5700,10 +5698,10 @@ const WIFI_KEY = 'hb13_wifi';
 let _wifiNets = [];
 let _wifiSec  = 'WPA';
 
-async function wifiLoad() {
-  try { _wifiNets = await localGet(WIFI_KEY) || []; } catch(e) { _wifiNets=[]; }
+function wifiLoad() {
+  try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
 }
-function wifiSaveAll() { localSet(WIFI_KEY, _wifiNets); }
+function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -5874,10 +5872,10 @@ let _otpAccounts = [];
 let _otpTimer    = null;
 let _otpIcon     = '🔐';
 
-async function otpLoad() {
-  try { _otpAccounts = await localGet(OTP_KEY) || []; } catch(e) { _otpAccounts=[]; }
+function otpLoad() {
+  try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
 }
-function otpSaveAll() { localSet(OTP_KEY, _otpAccounts); }
+function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); }
 
 function otpOpen() {
   otpLoad();
@@ -6159,10 +6157,10 @@ let _calEditId = null;
 
 const CAL_MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
-async function calLoad() {
-  try { _calEvents = await localGet(CAL_KEY) || []; } catch(e) { _calEvents=[]; }
+function calLoad() {
+  try { _calEvents = JSON.parse(localStorage.getItem(CAL_KEY)||'[]'); } catch(e) { _calEvents=[]; }
 }
-function calSaveAll() { localSet(CAL_KEY, _calEvents); }
+function calSaveAll() { localStorage.setItem(CAL_KEY, JSON.stringify(_calEvents)); }
 
 function calOpen() {
   turniLoad();
@@ -6322,10 +6320,10 @@ const DOCS_KEY = 'hb13_documents';
 let _docs = [];
 let _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
 
-async function docsLoad() {
-  try { _docs = await localGet(DOCS_KEY) || []; } catch(e) { _docs=[]; }
+function docsLoad() {
+  try { _docs = JSON.parse(localStorage.getItem(DOCS_KEY)||'[]'); } catch(e) { _docs=[]; }
 }
-function docsSaveAll() { localSet(DOCS_KEY, _docs); }
+function docsSaveAll() { localStorage.setItem(DOCS_KEY, JSON.stringify(_docs)); }
 
 function docsOpen() {
   docsLoad(); docsShowList();
@@ -6619,10 +6617,10 @@ const SERVER_KEY = 'hb13_server';
 let _serverItems = [];
 let _serverType  = { id:'ssh', icon:'🔐', label:'SSH' };
 
-async function serverLoad() {
-  try { _serverItems = await localGet(SERVER_KEY) || []; } catch(e) { _serverItems=[]; }
+function serverLoad() {
+  try { _serverItems = JSON.parse(localStorage.getItem(SERVER_KEY)||'[]'); } catch(e) { _serverItems=[]; }
 }
-function serverSaveAll() { localSet(SERVER_KEY, _serverItems); }
+function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -8248,11 +8246,11 @@ let _docs2 = [];
 let _docType2 = { id:'ci', icon:'🪪', label:'C. Identità' };
 let _docPhotos2 = { fronte: null, retro: null };
 
-async function docsLoad2() {
-  try { _docs2 = await localGet(DOCS_KEY2) || []; }
+function docsLoad2() {
+  try { _docs2 = JSON.parse(localStorage.getItem(DOCS_KEY2)) || []; }
   catch(e) { _docs2 = []; }
 }
-function docsSaveAll2() { localSet(DOCS_KEY2, _docs2); }
+function docsSaveAll2() { localStorage.setItem(DOCS_KEY2, JSON.stringify(_docs2)); }
 
 function docsOpen() {
   docsLoad2();
