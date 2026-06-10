@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA238</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA239</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA238</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA239</div>
         </div>
       </div>
     </div>
@@ -2263,7 +2263,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA238</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA239</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3286,7 +3286,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA238',
+  version: 'BETA239',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3297,46 +3297,6 @@ const HB = {
   otpCode: '',
   tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','family','shopping','library']
 };
-
-// ═══════════════════════════════════════════════════════════
-//  LOCAL STORAGE CIFRATO — AES-256-GCM
-//  Usa la stessa sessionKey Firebase già presente.
-//  Fallback trasparente se la chiave non è ancora pronta.
-// ═══════════════════════════════════════════════════════════
-async function localSet(key, value) {
-  try {
-    if (!HB.sessionKey) {
-      localStorage.setItem(key, JSON.stringify(value));
-      return;
-    }
-    const iv  = crypto.getRandomValues(new Uint8Array(12));
-    const enc = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv }, HB.sessionKey,
-      new TextEncoder().encode(JSON.stringify(value))
-    );
-    const buf = new Uint8Array(12 + enc.byteLength);
-    buf.set(iv, 0);
-    buf.set(new Uint8Array(enc), 12);
-    localStorage.setItem(key, 'hb13enc:' + btoa(String.fromCharCode(...buf)));
-  } catch(e) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch(_) {}
-  }
-}
-
-async function localGet(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    if (!raw.startsWith('hb13enc:') || !HB.sessionKey) return JSON.parse(raw);
-    const bytes = Uint8Array.from(atob(raw.slice(8)), c => c.charCodeAt(0));
-    const dec   = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: bytes.slice(0,12) }, HB.sessionKey, bytes.slice(12)
-    );
-    return JSON.parse(new TextDecoder().decode(dec));
-  } catch(e) {
-    try { return JSON.parse(localStorage.getItem(key)); } catch(_) { return null; }
-  }
-}
 
 // ── Service Worker ─────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -5034,7 +4994,7 @@ function noteShowEditor() {
   document.getElementById('topbar-sub').textContent = '';
 }
 
-async function noteSave() {
+function noteSave() {
   const title   = document.getElementById('note-title-inp').value.trim();
   const content = document.getElementById('note-content-inp').value.trim();
   if (!title && !content) { showToast('Scrivi qualcosa prima di salvare'); return; }
@@ -8313,7 +8273,7 @@ let _docs2 = [];
 let _docType2 = { id:'ci', icon:'🪪', label:'C. Identità' };
 let _docPhotos2 = { fronte: null, retro: null };
 
-function docsLoad2() {
+async function docsLoad2() {
   try { _docs2 = await localGet(DOCS_KEY2) || []; }
   catch(e) { _docs2 = []; }
 }
@@ -8683,19 +8643,21 @@ function setShadow(s){document.documentElement.style.setProperty('--card-shadow'
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 function setFontSize(px){document.documentElement.style.fontSize=px+'px';localStorage.setItem('hb_fs',px);}
-async function settingsExport(){
-  const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];
-  const data={};
-  for(const k of keys){
-    try{ const v=await localGet(k); if(v!==null) data[k]=v; }catch(e){}
-  }
-  const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  showToast('✅ Backup esportato!');
+async function forceAppUpdate() {
+  showToast('🔄 Pulizia cache in corso...');
+  try {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+  } catch(e) {}
+  showToast('✅ Cache svuotata — ricarico...');
+  setTimeout(() => location.reload(true), 1200);
 }
+
+function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
 function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 async function settingsToggleBio(){
@@ -9981,6 +9943,10 @@ function calShowAddEvent() {
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
           </div>
+          <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">🔄</span>
+            <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
+          </button>
         </div>
       </div>
 
@@ -10034,7 +10000,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA238</div>
+            <div style="font-size:13px;color:var(--text3);">BETA239</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
