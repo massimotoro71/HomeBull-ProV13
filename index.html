@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA240</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA241</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA240</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA241</div>
         </div>
       </div>
     </div>
@@ -2263,7 +2263,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA240</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA241</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3286,7 +3286,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA240',
+  version: 'BETA241',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9930,7 +9930,10 @@ function calShowAddEvent() {
               <div style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</div>
               <div style="font-size:11px;color:var(--text3);" id="drive-backup-ts">Nessun backup effettuato</div>
             </div>
-            <button onclick="driveBackupNow()" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup ora</button>
+            <div style="display:flex;gap:8px;">
+              <button onclick="driveRestoreNow()" style="padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇️ Ripristina</button>
+              <button onclick="driveBackupNow()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup</button>
+            </div>
           </div>
         </div>
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
@@ -10009,7 +10012,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA240</div>
+            <div style="font-size:13px;color:var(--text3);">BETA241</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10343,6 +10346,74 @@ async function driveBackupNow(silent=false) {
   } catch(e) {
     console.warn('Drive backup error:', e);
     if (!silent) showToast('⚠️ Backup Drive fallito: ' + (e.message || e));
+  }
+}
+
+async function driveRestoreNow() {
+  try {
+    showToast('☁️ Ricerca backup su Drive...');
+    const token = _driveBackupToken || await driveGetBackupToken();
+    const fileName = 'HomeBull-backup.json';
+
+    // Cerca il file su Drive
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name='${fileName}'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const result = await search.json();
+    if (!result.files?.length) {
+      showToast('⚠️ Nessun backup trovato su Drive');
+      return;
+    }
+
+    const file = result.files[0];
+    _driveBackupFileId = file.id;
+    const modDate = new Date(file.modifiedTime).toLocaleDateString('it-IT') +
+                    ' ' + new Date(file.modifiedTime).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+
+    // Chiedi conferma
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+    const bx = document.createElement('div');
+    bx.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';
+    bx.innerHTML = `
+      <div style="font-size:32px;margin-bottom:12px;">☁️</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Ripristina da Drive?</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Backup del ${modDate}</div>
+      <div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">
+        ⚠️ I dati attuali verranno sovrascritti
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button id="_drc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+        <button id="_dro" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Ripristina</button>
+      </div>`;
+    ov.appendChild(bx);
+    document.body.appendChild(ov);
+    document.getElementById('_drc').onclick = () => ov.remove();
+    document.getElementById('_dro').onclick = async () => {
+      ov.remove();
+      try {
+        showToast('⬇️ Download backup...');
+        // Scarica il contenuto del file
+        const dl = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
+          { headers: { Authorization: 'Bearer ' + token } }
+        );
+        const bk = await dl.json();
+        if (!bk.data) { showToast('⚠️ File backup non valido'); return; }
+        // Ripristina dati
+        Object.entries(bk.data).forEach(([k, v]) => {
+          localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+        });
+        showToast('✅ Ripristino completato — ricarico...');
+        setTimeout(() => location.reload(), 1500);
+      } catch(e) {
+        showToast('⚠️ Ripristino fallito: ' + (e.message || e));
+      }
+    };
+  } catch(e) {
+    console.warn('Drive restore error:', e);
+    showToast('⚠️ Errore: ' + (e.message || e));
   }
 }
 
