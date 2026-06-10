@@ -2037,7 +2037,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA239</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA240</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA239</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA240</div>
         </div>
       </div>
     </div>
@@ -2263,7 +2263,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA239</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA240</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3286,7 +3286,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA239',
+  version: 'BETA240',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9180,6 +9180,7 @@ function logout(){
 let _lastSyncTime = null;
 
 function cloudPageOpen(){
+  driveUpdateBackupUI();
   const online = navigator.onLine && fbReady;
   const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
   const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -9923,6 +9924,15 @@ function calShowAddEvent() {
             </div>
           </div>
         </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</div>
+              <div style="font-size:11px;color:var(--text3);" id="drive-backup-ts">Nessun backup effettuato</div>
+            </div>
+            <button onclick="driveBackupNow()" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup ora</button>
+          </div>
+        </div>
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
         <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
       </div>
@@ -9999,7 +10009,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA239</div>
+            <div style="font-size:13px;color:var(--text3);">BETA240</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10242,8 +10252,109 @@ function libShowForm(id) {
 // ── Google Drive Picker ─────────────────────────────────────
 const GDRIVE_CLIENT_ID = '140879408214-fih8n3ed3jp0hre6ujso7lcq2mkbss1d.apps.googleusercontent.com';
 const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
+const GDRIVE_BACKUP_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const GDRIVE_API_KEY = 'AIzaSyBiNWhEAUlsZlfWRiiZOtOU7j3cVvZnBXw'; // Google Picker API key
 let _driveToken = null;
+
+// ── Google Drive Backup ────────────────────────────────────
+let _driveBackupToken = null;
+let _driveBackupFileId = null; // ID file backup su Drive
+
+async function driveGetBackupToken() {
+  await new Promise((resolve, reject) => {
+    if (!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    } else resolve();
+  });
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: GDRIVE_BACKUP_SCOPE,
+      callback: (resp) => {
+        if (resp.error) { reject(resp.error); return; }
+        _driveBackupToken = resp.access_token;
+        resolve(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function driveBackupNow(silent=false) {
+  try {
+    if (!silent) showToast('☁️ Backup Drive in corso...');
+    const token = _driveBackupToken || await driveGetBackupToken();
+
+    // Raccoglie tutti i dati
+    const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+                  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server',
+                  'hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];
+    const data = {};
+    keys.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) try { data[k] = JSON.parse(v); } catch(e) { data[k] = v; }
+    });
+
+    const payload = JSON.stringify({ version:'13.0.0', exportedAt: new Date().toISOString(), data }, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const fileName = 'HomeBull-backup.json';
+
+    // Cerca file esistente
+    if (!_driveBackupFileId) {
+      const search = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q=name='${fileName}'+and+trashed=false&fields=files(id,name)`,
+        { headers: { Authorization: 'Bearer ' + token } }
+      );
+      const result = await search.json();
+      if (result.files?.length > 0) _driveBackupFileId = result.files[0].id;
+    }
+
+    // Upload: update se esiste, create se no
+    let response;
+    if (_driveBackupFileId) {
+      // Aggiorna file esistente
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName })], { type: 'application/json' }));
+      form.append('file', blob);
+      response = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${_driveBackupFileId}?uploadType=multipart`,
+        { method: 'PATCH', headers: { Authorization: 'Bearer ' + token }, body: form }
+      );
+    } else {
+      // Crea nuovo file
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName, mimeType: 'application/json' })], { type: 'application/json' }));
+      form.append('file', blob);
+      response = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
+      );
+    }
+
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const file = await response.json();
+    _driveBackupFileId = file.id;
+    localStorage.setItem('hb_drive_backup_ts', new Date().toISOString());
+    if (!silent) showToast('✅ Backup su Drive completato!');
+    driveUpdateBackupUI();
+  } catch(e) {
+    console.warn('Drive backup error:', e);
+    if (!silent) showToast('⚠️ Backup Drive fallito: ' + (e.message || e));
+  }
+}
+
+function driveUpdateBackupUI() {
+  const ts = localStorage.getItem('hb_drive_backup_ts');
+  const el = document.getElementById('drive-backup-ts');
+  if (el && ts) {
+    const d = new Date(ts);
+    el.textContent = 'Ultimo: ' + d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  }
+}
+
 
 async function libPickFromDrive() {
   // 1. Ottieni token OAuth Google
