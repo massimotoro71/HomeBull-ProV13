@@ -50,7 +50,6 @@
   --tab-wifi:    #84cc16;
   --tab-finance: #eab308;
   --tab-server:  #64748b;
-  --tab-family:  #ec4899;
 
   /* Layout */
   --topbar-h:    54px;
@@ -889,18 +888,7 @@ html, body {
 }
 .cal-cat-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
 
-/* ── Famiglia ──────────────────────────────────────────── */
-.family-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; border-radius: 16px;
-  background: var(--surface); border: 1px solid var(--border);
-  margin-bottom: 10px;
-}
-.family-avatar {
-  width: 46px; height: 46px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0; background: var(--accent-bg);
-}
+
 
 /* ── Finanze ───────────────────────────────────────────── */
 .finance-card {
@@ -2037,7 +2025,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA244</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA247</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,7 +2127,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA244</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA247</div>
         </div>
       </div>
     </div>
@@ -2263,7 +2251,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA244</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA247</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3012,24 +3000,6 @@ function cardsSearch(q) {
       </div>
     </div>
 
-    <!-- FAMIGLIA -->
-    <div class="tab-panel" id="panel-family">
-      <div style="padding:14px 14px 100px;">
-        <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
-          <div style="font-size:22px;flex-shrink:0;">👨‍👩‍👧</div>
-          <div><div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;">Vault Famiglia</div>
-          <div style="font-size:12px;color:var(--text3);line-height:1.5;">Aggiungi i tuoi familiari e scegli cosa condividere. La condivisione reale arriverà con Firebase.</div></div>
-        </div>
-        <div id="family-list"></div>
-        <div id="family-empty" style="display:none;text-align:center;padding:40px 20px;">
-          <div style="font-size:48px;margin-bottom:12px;">👨‍👩‍👧</div>
-          <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nessun familiare</div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i membri della tua famiglia per condividere dati selezionati.</div>
-          <button onclick="familyAdd()" style="padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi familiare</button>
-        </div>
-      </div>
-    </div>
-
 
     <!-- LIBRERIA PANEL -->
     <div class="tab-panel" id="panel-library" style="height:100%;overflow-y:auto;">
@@ -3287,7 +3257,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA244',
+  version: 'BETA247',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3296,7 +3266,7 @@ const HB = {
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
   otpCode: '',
-  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','family','shopping','library']
+  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','shopping','library']
 };
 
 // ── Service Worker ─────────────────────────────────────────
@@ -3685,7 +3655,7 @@ function switchTab(tab) {
     home:'#6366f1', passwords:'#10b981', documents:'#f59e0b',
     notes:'#8b5cf6', calendar:'#ef4444', otp:'#06b6d4',
     cards:'#f97316', wifi:'#84cc16', finance:'#eab308',
-    server:'#64748b', family:'#ec4899'
+    server:'#64748b'
   };
   const accent = accentMap[tab] || '#6366f1';
   document.documentElement.style.setProperty('--accent', accent);
@@ -3712,7 +3682,6 @@ function switchTab(tab) {
     library:   () => typeof libOpen === 'function' && libOpen(),
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
-    family:    () => typeof familyOpen === 'function' && familyOpen(),
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
@@ -4788,7 +4757,6 @@ window.switchTab = function(tab) {
   if (tab === 'server') setTimeout(serverOpen, 50);
   if (tab === 'documents') setTimeout(docsOpen, 50);
   if (tab === 'calendar') setTimeout(calOpen, 50);
-  if (tab === 'family') setTimeout(familyOpen, 50);
   if (tab === 'cards') setTimeout(cardsOpen, 50);
 };
 
@@ -6405,129 +6373,6 @@ function calDeleteEvent(id) {
 // ═══════════════════════════════════════════════════════════
 //  FAMIGLIA
 // ═══════════════════════════════════════════════════════════
-const FAMILY_KEY = 'hb13_family';
-let _family = [];
-
-const SHARE_OPTIONS = [
-  { id: 'passwords', label: 'Password',    icon: '🔐' },
-  { id: 'notes',     label: 'Note',         icon: '📝' },
-  { id: 'shopping',  label: 'Lista Spesa',  icon: '🛒' },
-  { id: 'documents', label: 'Documenti',    icon: '📄' },
-  { id: 'cards',     label: 'Carte',        icon: '💳' },
-  { id: 'wifi',      label: 'Wi-Fi',        icon: '📶' },
-  { id: 'otp',       label: 'OTP / 2FA',   icon: '🔑' },
-  { id: 'calendar',  label: 'Calendario',   icon: '📅' },
-];
-
-function familyLoad() {
-  try { _family = JSON.parse(localStorage.getItem(FAMILY_KEY)) || []; }
-  catch(e) { _family = []; }
-}
-function familySave() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_family)); }
-
-function familyOpen() {
-  familyLoad();
-  familyRender();
-  document.getElementById('topbar-title').textContent = 'Famiglia';
-  document.getElementById('topbar-sub').textContent = _family.length + ' membri';
-}
-
-function familyRender() {
-  const list  = document.getElementById('family-list');
-  const empty = document.getElementById('family-empty');
-  if (!list) return;
-  if (!_family.length) { list.innerHTML = ''; if (empty) empty.style.display='block'; return; }
-  if (empty) empty.style.display = 'none';
-  list.innerHTML = '';
-  _family.forEach((member, idx) => {
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;';
-    const initials = (member.name || member.email || '?').slice(0,2).toUpperCase();
-    const sharedCount = (member.sharing || []).length;
-    const chips = SHARE_OPTIONS.map(opt => {
-      const active = (member.sharing||[]).includes(opt.id);
-      return '<button data-idx="'+idx+'" data-opt="'+opt.id+'" style="padding:6px 11px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid '+(active?'var(--accent)':'var(--border)')+';background:'+(active?'var(--accent-bg)':'var(--surface)')+';color:'+(active?'var(--accent)':'var(--text3)')+';">'+opt.icon+' '+opt.label+'</button>';
-    }).join('');
-    card.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
-      +'<div style="width:44px;height:44px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:white;flex-shrink:0;">'+initials+'</div>'
-      +'<div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(member.name||'Senza nome')+'</div>'
-      +'<div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+member.email+'</div></div>'
-      +'<button data-edit="'+idx+'" style="padding:7px 11px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;">✏️</button>'
-      +'<button data-del="'+idx+'" style="padding:7px 11px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;cursor:pointer;margin-left:6px;">🗑</button>'
-      +'</div>'
-      +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:8px;">Condividi:</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:6px;">'+chips+'</div>'
-      +'<div style="margin-top:10px;font-size:11px;color:var(--text3);">'+(sharedCount>0?'✅ '+sharedCount+' sezione'+(sharedCount>1?'i':'')+ ' condivisa'+(sharedCount>1?'':''):'Nessuna sezione condivisa')+'</div>';
-    // Event listeners
-    card.querySelectorAll('button[data-opt]').forEach(btn => {
-      btn.onclick = () => familyToggleShare(parseInt(btn.dataset.idx), btn.dataset.opt);
-    });
-    card.querySelector('button[data-edit]').onclick = () => familyShowForm(member, idx);
-    card.querySelector('button[data-del]').onclick  = () => familyDelete(idx);
-    list.appendChild(card);
-  });
-}
-
-function familyToggleShare(idx, optId) {
-  if (!_family[idx]) return;
-  if (!_family[idx].sharing) _family[idx].sharing = [];
-  const pos = _family[idx].sharing.indexOf(optId);
-  if (pos>-1) _family[idx].sharing.splice(pos,1); else _family[idx].sharing.push(optId);
-  familySave(); familyRender();
-}
-
-function familyAdd() { familyShowForm(null, null); }
-
-function familyShowForm(member, idx) {
-  const isEdit = idx !== null && idx !== undefined;
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>'
-    +'<div style="font-size:18px;font-weight:800;margin-bottom:18px;">'+(isEdit?'✏️ Modifica familiare':'👤 Nuovo familiare')+'</div>'
-    +'<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Nome</div>'
-    +'<input id="_fm_name" type="text" value="'+(member?.name||'')+'" placeholder="es. Marco, Giusy..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>'
-    +'<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email *</div>'
-    +'<input id="_fm_email" type="email" value="'+(member?.email||'')+'" placeholder="es. marco@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>'
-    +'<div style="display:flex;gap:10px;">'
-    +'<button id="_fm_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
-    +'<button id="_fm_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">'+(isEdit?'Salva':'Aggiungi')+'</button>'
-    +'</div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('_fm_name')?.focus(), 100);
-  document.getElementById('_fm_cancel').onclick = () => overlay.remove();
-  document.getElementById('_fm_save').onclick = () => {
-    const name  = document.getElementById('_fm_name')?.value.trim();
-    const email = document.getElementById('_fm_email')?.value.trim();
-    if (!email) { showToast('Inserisci una email'); return; }
-    if (isEdit) { _family[idx] = {..._family[idx], name, email}; }
-    else { _family.push({id:'fm_'+Date.now(), name, email, sharing:[]}); }
-    familySave(); overlay.remove(); familyRender();
-    showToast(isEdit ? '✅ Aggiornato' : '✅ '+(name||email)+' aggiunto');
-  };
-  document.getElementById('_fm_email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('_fm_save').click(); });
-}
-
-function familyDelete(idx) {
-  const member = _family[idx]; if (!member) return;
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = '<div style="font-size:32px;margin-bottom:10px;">👤</div>'
-    +'<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Rimuovere '+(member.name||member.email)+'?</div>'
-    +'<div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Le condivisioni impostate verranno eliminate.</div>'
-    +'<div style="display:flex;gap:10px;">'
-    +'<button id="_fdel_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
-    +'<button id="_fdel_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Rimuovi</button>'
-    +'</div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
-  document.getElementById('_fdel_cancel').onclick = () => overlay.remove();
-  document.getElementById('_fdel_ok').onclick = () => {
-    _family.splice(idx,1); familySave(); overlay.remove(); familyRender(); showToast('Familiare rimosso');
-  };
-}
 // ═══════════════════════════════════════════════════════════
 //  DOCUMENTI
 // ═══════════════════════════════════════════════════════════
@@ -8844,7 +8689,7 @@ async function forceAppUpdate() {
   showToast('✅ Cache svuotata — ricarico...');
   setTimeout(() => location.reload(true), 1200);
 }
-function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
+function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
 function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 async function settingsToggleBio(){
@@ -9209,7 +9054,7 @@ function fbMsg(c){
 }
 
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
-  'hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
+  'hb13_docs2','hb13_finance','hb13_server','hb13_shop_lists','hb13_calendar_shifts',
   'hb13_pw_cats','hb13_shop_lists_v2','hb13_library'];
 
 // Timestamp helpers
@@ -10210,7 +10055,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA244</div>
+            <div style="font-size:13px;color:var(--text3);">BETA247</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10492,7 +10337,7 @@ async function driveBackupNow(silent=false) {
     // Raccoglie tutti i dati
     const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
                   'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server',
-                  'hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];
+                  'hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];
     const data = {};
     keys.forEach(k => {
       const v = localStorage.getItem(k);
