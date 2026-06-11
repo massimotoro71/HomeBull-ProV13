@@ -2017,7 +2017,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA253</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA254</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2119,7 +2119,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA253</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA254</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2243,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA253</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA254</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3248,7 +3248,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA253',
+  version: 'BETA254',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3259,6 +3259,87 @@ const HB = {
   otpCode: '',
   tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','shopping','library']
 };
+
+// ═══════════════════════════════════════════════════════════
+//  LOCAL STORAGE CIFRATO — AES-256-GCM
+//  Approccio: cache in memoria, cifratura in background.
+//  Le funzioni Load/Save esistenti non cambiano — zero rischi.
+// ═══════════════════════════════════════════════════════════
+
+const _SENSITIVE_KEYS = [
+  'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance',
+  'hb13_server','hb13_shop_lists_v2','hb13_calendar',
+  'hb13_turni_def','hb13_turni_days'
+];
+
+let _lsCache = {};
+let _lsCacheReady = false;
+
+async function initLocalCache() {
+  _lsCache = {};
+  for (const key of _SENSITIVE_KEYS) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      if (raw.startsWith('hb13enc:') && HB.sessionKey) {
+        const bytes = Uint8Array.from(atob(raw.slice(8)), ch => ch.charCodeAt(0));
+        const dec   = await crypto.subtle.decrypt(
+          { name:'AES-GCM', iv: bytes.slice(0,12) }, HB.sessionKey, bytes.slice(12)
+        );
+        _lsCache[key] = new TextDecoder().decode(dec);
+      } else {
+        _lsCache[key] = raw;
+        if (HB.sessionKey) _encryptAndStore(key, raw);
+      }
+    } catch(e) {
+      const raw = localStorage.getItem(key);
+      if (raw) _lsCache[key] = raw;
+    }
+  }
+  _lsCacheReady = true;
+  console.log('🔐 Cache locale pronta —', Object.keys(_lsCache).length, 'chiavi');
+}
+
+async function _encryptAndStore(key, jsonStr) {
+  try {
+    if (!HB.sessionKey) return;
+    const iv  = crypto.getRandomValues(new Uint8Array(12));
+    const enc = await crypto.subtle.encrypt(
+      { name:'AES-GCM', iv }, HB.sessionKey,
+      new TextEncoder().encode(jsonStr)
+    );
+    const buf = new Uint8Array(12 + enc.byteLength);
+    buf.set(iv,0); buf.set(new Uint8Array(enc),12);
+    // Usa il metodo originale per non ciclare
+    Object.getPrototypeOf(localStorage).__origSet.call(
+      localStorage, key, 'hb13enc:' + btoa(String.fromCharCode(...buf))
+    );
+  } catch(e) {}
+}
+
+// Patch trasparente localStorage — getItem legge dalla cache, setItem cifra in background
+(function() {
+  const proto = Object.getPrototypeOf(localStorage);
+  const origGet = proto.getItem.bind(localStorage);
+  const origSet = proto.setItem.bind(localStorage);
+  proto.__origSet = proto.setItem;
+
+  proto.getItem = function(key) {
+    if (_lsCacheReady && _SENSITIVE_KEYS.includes(key)) {
+      return _lsCache[key] !== undefined ? _lsCache[key] : null;
+    }
+    return origGet(key);
+  };
+
+  proto.setItem = function(key, value) {
+    if (_SENSITIVE_KEYS.includes(key)) {
+      _lsCache[key] = value;
+      if (HB.sessionKey) { _encryptAndStore(key, value); return; }
+    }
+    origSet(key, value);
+  };
+})();
 
 // ── Service Worker ─────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -3570,14 +3651,15 @@ function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')
 function unlockApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
-  updateHomeStats();
-  initBackHandler();
-  applyHomePrefs();
-  // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
-  setTimeout(() => {
+  // Inizializza cache cifrata PRIMA di tutto
+  initLocalCache().then(() => {
+    updateHomeStats();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
-  }, 500);
+    setTimeout(checkExpiryNotifications, 3000);
+  });
+  initBackHandler();
+  applyHomePrefs();
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
   if (savedTheme) setTheme(savedTheme);
@@ -9007,7 +9089,6 @@ async function fbSyncLoad(){
       try { if(typeof wifiLoad==='function') wifiLoad(); } catch(e){}
       try { if(typeof financeLoad==='function') financeLoad(); } catch(e){}
       if(typeof updateHomeStats==='function') updateHomeStats();
-      setTimeout(checkExpiryNotifications, 3000);
       const tab = HB.currentTab;
       if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
       else if(tab === 'notes' && typeof noteRenderList==='function') noteRenderList('');
@@ -9951,7 +10032,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA253</div>
+            <div style="font-size:13px;color:var(--text3);">BETA254</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
