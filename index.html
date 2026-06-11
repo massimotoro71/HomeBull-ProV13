@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA264</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA266</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA264</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA266</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA264</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA266</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3259,7 +3259,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA264',
+  version: 'BETA266',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6200,6 +6200,97 @@ function pwShareQR(itemId) {
 function pwCloseQR() {
   clearInterval(_qrCountdownTimer);
   document.getElementById('_qr_share_ov')?.remove();
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE CALENDAR SYNC
+// ═══════════════════════════════════════════════════════════
+let _gcalToken = null;
+
+async function gcalGetToken() {
+  await new Promise((resolve, reject) => {
+    if (window.google?.accounts) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: (resp) => {
+        if (resp.error) { reject(resp.error); return; }
+        _gcalToken = resp.access_token;
+        resolve(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function gcalSync() {
+  try {
+    showToast('📅 Connessione Google Calendar...');
+    const token = _gcalToken || await gcalGetToken();
+
+    // Carica eventi dal calendario Google (prossimi 30 giorni)
+    const now = new Date().toISOString();
+    const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = data.items || [];
+
+    // Importa eventi in HomeBull (evita duplicati per gcal_id)
+    let added = 0;
+    items.forEach(ev => {
+      const date = (ev.start?.date || ev.start?.dateTime || '').slice(0, 10);
+      const time = ev.start?.dateTime ? ev.start.dateTime.slice(11, 16) : '';
+      const existing = _calEvents.find(e => e.gcal_id === ev.id);
+      if (!existing) {
+        _calEvents.push({
+          id:       'gcal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+          gcal_id:  ev.id,
+          title:    ev.summary || 'Evento',
+          date,
+          time,
+          cat:      'personal',
+          color:    '#6366f1',
+        });
+        added++;
+      }
+    });
+
+    if (added > 0) {
+      calSaveAll();
+      if (typeof calRenderMonth === 'function') calRenderMonth();
+    }
+
+    // Aggiorna UI
+    const statusEl = document.getElementById('gcal-status');
+    const btnEl = document.getElementById('gcal-btn');
+    if (statusEl) statusEl.textContent = `Sincronizzato — ${items.length} eventi`;
+    if (btnEl) { btnEl.textContent = '🔄 Aggiorna'; }
+    localStorage.setItem('hb_gcal_connected', '1');
+    showToast(`✅ ${added} nuovi eventi importati da Google Calendar`);
+  } catch(e) {
+    console.warn('GCal sync error:', e);
+    showToast('⚠️ Errore Calendar: ' + (e.message || e));
+  }
+}
+
+function gcalUpdateUI() {
+  if (localStorage.getItem('hb_gcal_connected') === '1') {
+    const el = document.getElementById('gcal-status');
+    const btn = document.getElementById('gcal-btn');
+    if (el) el.textContent = 'Collegato — clicca per aggiornare';
+    if (btn) btn.textContent = '🔄 Aggiorna';
+  }
 }
 
 // ── QR Code generator ────────────────────────────────────
@@ -9252,6 +9343,16 @@ function settingsApplyOnLoad() {
   const animMap = {off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};
   const an = localStorage.getItem('hb_anim')||'normal';
   document.documentElement.style.setProperty('--anim-speed', animMap[an]||'0.18s');
+  // Autolock
+  const autolockVal = localStorage.getItem('hb_autolock') || '0';
+  const autolockSel = document.getElementById('autolock-sel');
+  if (autolockSel) autolockSel.value = autolockVal;
+  // Avvia timer se era attivo
+  if (parseInt(autolockVal) > 0) autolockStart();
+
+  // Drive auto backup UI
+  setTimeout(() => { if (typeof driveUpdateBackupUI === 'function') driveUpdateBackupUI(); }, 300);
+
   // Sfondo
   const bgMap = {
     grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',
@@ -9761,6 +9862,7 @@ let _lastSyncTime = null;
 
 function cloudPageOpen(){
   driveUpdateBackupUI();
+  gcalUpdateUI();
   const online = navigator.onLine && fbReady;
   const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
   const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -10504,6 +10606,17 @@ function calShowAddEvent() {
             </div>
           </div>
         </div>
+        <!-- Google Calendar Sync -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">📅 Google Calendar</div>
+              <div style="font-size:11px;color:var(--text3);" id="gcal-status">Non collegato</div>
+            </div>
+            <button onclick="gcalSync()" id="gcal-btn" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Collega</button>
+          </div>
+        </div>
+
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
           <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
             <div>
@@ -10621,7 +10734,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA264</div>
+            <div style="font-size:13px;color:var(--text3);">BETA266</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
@@ -10631,7 +10744,7 @@ function calShowAddEvent() {
               <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Famiglia, Lista spesa, Server</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Firebase Auth + Sync cloud</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Drive backup</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Calendar sync</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Google Calendar sync</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Condivisione famiglia reale</span></div>
             </div>
           </div>
@@ -10652,17 +10765,17 @@ function calShowAddEvent() {
   </div>
   <div style="padding:6px 0;flex:1;overflow-y:auto;">
     <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
-    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
+    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
     <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
+    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
     <div class="mob-item" onclick="switchTab('library');closeMobileMenu()">📚 Libreria</div>
     <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
     <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
-    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
-    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
-    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
-    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
     <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
-    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
+    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
   </div>
   <div style="padding:10px 14px;border-top:1px solid var(--border);">
     <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
