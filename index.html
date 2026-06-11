@@ -2017,7 +2017,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA255</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA257</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2119,7 +2119,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA255</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA257</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2243,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA255</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA257</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2297,6 +2297,15 @@ function cardsSearch(q) {
             <button onclick="pwToggleSearch()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </button>
+            <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📊</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <select onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems()" style="flex:1;padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:600;outline:none;font-family:inherit;">
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+              <option value="weak">Prima le deboli</option>
+              <option value="strong">Prima le forti</option>
+            </select>
           </div>
           <div id="pw-item-search-wrap" style="display:none;">
             <div class="pw-search-bar">
@@ -2325,9 +2334,11 @@ function cardsSearch(q) {
           <div style="font-size:48px;margin-bottom:16px;">🔐</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
           <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
-          <button onclick="pwImportBackup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
+          <button onclick="pwImportCSV()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📥 Importa da Chrome / Firefox / 1Password</button>
+          <button onclick="pwImportBackup()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
           <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
           <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
+          <input type="file" id="pw-csv-input" accept=".csv" style="display:none;" onchange="pwHandleCSV(event)">
         </div>
       </div>
     </div>
@@ -3248,7 +3259,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA255',
+  version: 'BETA257',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3299,6 +3310,7 @@ async function initLocalCache() {
   }
   _lsCacheReady = true;
   console.log('🔐 Cache locale pronta —', Object.keys(_lsCache).length, 'chiavi');
+  autolockStart();
 }
 
 async function _encryptAndStore(key, jsonStr) {
@@ -4361,6 +4373,13 @@ function pwRenderItems(q='') {
     (i.title||'').toLowerCase().includes(q.toLowerCase()) ||
     (i.username||'').toLowerCase().includes(q.toLowerCase())
   );
+
+  // Ordinamento
+  const sort = localStorage.getItem('hb_pw_sort') || 'az';
+  if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it'));
+  else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it'));
+  else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
+  else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
   const count = _pwItems.filter(i => i.categoryId === _pwCurCat).length;
   document.getElementById('pw-cat-count').textContent = count + ' password';
   if (!items.length) {
@@ -4521,6 +4540,261 @@ function getStrength(pw) {
 }
 
 
+
+
+// ═══════════════════════════════════════════════════════════
+//  STATISTICHE PASSWORD
+// ═══════════════════════════════════════════════════════════
+function pwShowStats() {
+  if (!_pwItems.length) { showToast('Nessuna password salvata'); return; }
+
+  let weak=0, medium=0, strong=0, dupes=0, old=0;
+  const seen = {};
+  const now  = Date.now();
+  const ninetyDays = 90 * 24 * 60 * 60 * 1000;
+
+  _pwItems.forEach(item => {
+    const pw = item.password || '';
+    const s  = getStrength(pw);
+    if (s.score <= 1) weak++;
+    else if (s.score <= 3) medium++;
+    else strong++;
+
+    // Duplicati
+    if (pw && seen[pw]) dupes++;
+    if (pw) seen[pw] = true;
+
+    // Vecchie (non aggiornate da 90gg)
+    if (item.updatedAt && (now - new Date(item.updatedAt).getTime()) > ninetyDays) old++;
+  });
+
+  const total = _pwItems.length;
+  const score = Math.round((strong / total) * 100);
+  const scoreColor = score >= 80 ? '#10b981' : score >= 50 ? '#6366f1' : '#f97316';
+
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:16px;">📊 Statistiche password</div>
+
+    <!-- Score globale -->
+    <div style="background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;">
+      <div style="width:64px;height:64px;border-radius:50%;border:4px solid ${scoreColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-size:18px;font-weight:900;color:${scoreColor};">${score}%</span>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:800;margin-bottom:4px;">Sicurezza vault</div>
+        <div style="font-size:12px;color:var(--text3);">${total} password totali</div>
+      </div>
+    </div>
+
+    <!-- Dettaglio -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#ef4444;">${weak}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Deboli</div>
+      </div>
+      <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#eab308;">${medium}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Medie</div>
+      </div>
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#10b981;">${strong}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Forti</div>
+      </div>
+      <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#f97316;">${dupes}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Duplicate</div>
+      </div>
+    </div>
+
+    ${old > 0 ? `<div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#f97316;">⏰ ${old} password non aggiornate da più di 90 giorni</div>` : ''}
+    ${dupes > 0 ? `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;">⚠️ Hai ${dupes} password duplicate — cambia quelle riusate</div>` : ''}
+    ${weak === 0 && dupes === 0 ? `<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#10b981;">✅ Ottimo! Nessuna password debole o duplicata</div>` : ''}
+
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  IMPORT CSV — Chrome, Firefox, 1Password, Bitwarden
+// ═══════════════════════════════════════════════════════════
+function pwImportCSV() {
+  const input = document.getElementById('pw-csv-input');
+  if (!input) {
+    // Crea input al volo se non esiste (es. dalla lista)
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.csv';
+    inp.style.display = 'none';
+    inp.onchange = pwHandleCSV;
+    document.body.appendChild(inp);
+    inp.click();
+    return;
+  }
+  input.click();
+}
+
+async function pwHandleCSV(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  event.target.value = '';
+
+  showToast('📥 Lettura CSV...');
+  try {
+    const text = await file.text();
+    const lines = text.split(/?
+/).filter(l => l.trim());
+    if (lines.length < 2) { showToast('⚠️ CSV vuoto o non valido'); return; }
+
+    // Rileva formato dal header
+    const header = lines[0].toLowerCase();
+    let parsed = [];
+
+    if (header.includes('name') && header.includes('url') && header.includes('username') && header.includes('password')) {
+      // Chrome / Firefox / Edge: name,url,username,password
+      const cols = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+      const iName = cols.indexOf('name');
+      const iUrl  = cols.findIndex(h => h.includes('url'));
+      const iUser = cols.findIndex(h => h.includes('username') || h === 'login_uri');
+      const iPass = cols.findIndex(h => h.includes('password'));
+      parsed = csvParseRows(lines.slice(1), iName, iUrl, iUser, iPass);
+
+    } else if (header.includes('title') && header.includes('username') && header.includes('password')) {
+      // 1Password
+      const cols = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+      const iName = cols.findIndex(h => h === 'title');
+      const iUrl  = cols.findIndex(h => h.includes('url') || h.includes('website'));
+      const iUser = cols.findIndex(h => h.includes('username'));
+      const iPass = cols.findIndex(h => h === 'password');
+      parsed = csvParseRows(lines.slice(1), iName, iUrl, iUser, iPass);
+
+    } else if (header.includes('login_uri') || header.includes('login_password')) {
+      // Bitwarden
+      const cols = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+      const iName = cols.indexOf('name');
+      const iUrl  = cols.indexOf('login_uri');
+      const iUser = cols.indexOf('login_username');
+      const iPass = cols.indexOf('login_password');
+      parsed = csvParseRows(lines.slice(1), iName, iUrl, iUser, iPass);
+
+    } else {
+      // Tentativo generico — prime 4 colonne
+      parsed = csvParseRows(lines.slice(1), 0, 1, 2, 3);
+    }
+
+    if (!parsed.length) { showToast('⚠️ Nessuna password trovata nel CSV'); return; }
+
+    // Mostra anteprima e chiedi conferma
+    pwShowCSVPreview(parsed);
+
+  } catch(e) {
+    showToast('⚠️ Errore lettura CSV: ' + (e.message||e));
+  }
+}
+
+function csvParseRows(rows, iName, iUrl, iUser, iPass) {
+  const result = [];
+  rows.forEach(row => {
+    // Gestisce virgole dentro virgolette
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < row.length; i++) {
+      const ch = row[i];
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { cols.push(cur); cur = ''; continue; }
+      cur += ch;
+    }
+    cols.push(cur);
+
+    const name = (cols[iName]||'').trim();
+    const pass = (cols[iPass]||'').trim();
+    if (!name && !pass) return;
+    result.push({
+      title:    name || (cols[iUrl]||'').replace(/https?:\/\//,'').split('/')[0] || 'Senza nome',
+      url:      (cols[iUrl]||'').trim(),
+      username: (cols[iUser]||'').trim(),
+      password: pass,
+    });
+  });
+  return result;
+}
+
+function pwShowCSVPreview(items) {
+  // Trova o crea categoria "Importate"
+  let cat = _pwCats.find(c => c.name === 'Importate');
+  if (!cat) {
+    cat = { id: 'cat_imported_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
+  }
+
+  const preview = items.slice(0,5).map(i =>
+    `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+      <div style="font-weight:700;color:var(--text);">${i.title}</div>
+      <div style="color:var(--text3);">${i.username||'—'} · ${i.url||''}</div>
+    </div>`
+  ).join('');
+
+  const more = items.length > 5 ? `<div style="font-size:12px;color:var(--text3);padding:8px 0;">...e altre ${items.length-5} password</div>` : '';
+
+  const ov = document.createElement('div');
+  ov.id = '_csv_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">📥 Importa ${items.length} password</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Verranno aggiunte nella categoria "Importate"</div>
+    <div style="background:var(--surface);border-radius:12px;padding:0 12px;margin-bottom:16px;">
+      ${preview}${more}
+    </div>
+    <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:10px;padding:10px 12px;font-size:12px;color:#f97316;margin-bottom:16px;">
+      ⚠️ Le password duplicate verranno aggiunte comunque — puoi eliminarle dopo.
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('_csv_ov').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button onclick="pwDoImportCSV(${JSON.stringify(items).replace(/</g,'\u003c').replace(/>/g,'\u003e')})" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">✅ Importa tutto</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function pwDoImportCSV(items) {
+  document.getElementById('_csv_ov')?.remove();
+
+  // Trova o crea categoria "Importate"
+  let cat = _pwCats.find(c => c.name === 'Importate');
+  if (!cat) {
+    cat = { id: 'cat_imp_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
+    _pwCats.push(cat);
+  }
+
+  let added = 0;
+  items.forEach(item => {
+    _pwItems.push({
+      id:         'pw_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      categoryId: cat.id,
+      title:      item.title,
+      username:   item.username,
+      password:   item.password,
+      url:        item.url,
+      createdAt:  new Date().toISOString(),
+      updatedAt:  new Date().toISOString(),
+    });
+    added++;
+  });
+
+  pwSave();
+  document.getElementById('pw-import-banner').style.display = 'none';
+  pwRenderCats();
+  showToast(`✅ ${added} password importate!`);
+
+  // Apri direttamente la categoria importate
+  setTimeout(() => {
+    const catEl = document.querySelector(`[data-catid="${cat.id}"]`);
+    if (catEl) catEl.click();
+  }, 300);
+}
 
 // Import backup v11
 function pwImportBackup() {
@@ -8971,7 +9245,42 @@ function skipBioAndEnter() {
 }
 
 // Blocca app senza logout — mostra solo PIN
+
+// ═══════════════════════════════════════════════════════════
+//  TIMEOUT SESSIONE — blocco automatico per inattività
+// ═══════════════════════════════════════════════════════════
+let _autolockTimer = null;
+
+function autolockReset() {
+  const min = parseInt(localStorage.getItem('hb_autolock') || '0');
+  if (!min) return;
+  clearTimeout(_autolockTimer);
+  _autolockTimer = setTimeout(() => {
+    if (document.getElementById('app').classList.contains('visible')) {
+      lockApp();
+      showToast('🔒 Blocco automatico per inattività');
+    }
+  }, min * 60 * 1000);
+}
+
+function autolockStart() {
+  ['touchstart','mousemove','keydown','click','scroll'].forEach(ev =>
+    document.addEventListener(ev, autolockReset, { passive: true })
+  );
+  autolockReset();
+}
+
+function autolockStop() {
+  clearTimeout(_autolockTimer);
+  ['touchstart','mousemove','keydown','click','scroll'].forEach(ev =>
+    document.removeEventListener(ev, autolockReset)
+  );
+}
+
 function lockApp() {
+  autolockStop();
+  _lsCacheReady = false;
+  _lsCache = {};
   HB.authState = 'pin-login';
   HB.pinBuffer = '';
   if (typeof updatePinDots === 'function') updatePinDots();
@@ -10032,7 +10341,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA255</div>
+            <div style="font-size:13px;color:var(--text3);">BETA257</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
