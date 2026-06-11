@@ -2004,28 +2004,20 @@ function cardsSearch(q) {
 
 <!-- Loading -->
 <div id="loading-overlay">
-  <div class="loading-logo">
-    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="12" width="20" height="16" rx="3"/>
-      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
-      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
-    </svg>
+  <div class="loading-logo" style="background:none;box-shadow:none;">
+    <img src="./icon-192.png" style="width:80px;height:80px;border-radius:22px;object-fit:cover;" alt="HomeBull">
   </div>
   <div class="loading-spinner"></div>
 </div>
 
 <!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
 <div id="auth-screen">
-  <div class="auth-logo">
-    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="12" width="20" height="16" rx="3"/>
-      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
-      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
-    </svg>
+  <div class="auth-logo" style="background:none;box-shadow:none;padding:0;">
+    <img src="./icon-192.png" style="width:96px;height:96px;border-radius:26px;object-fit:cover;" alt="HomeBull">
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA251</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA252</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2127,7 +2119,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA251</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA252</div>
         </div>
       </div>
     </div>
@@ -2251,7 +2243,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA251</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA252</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3256,7 +3248,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA251',
+  version: 'BETA252',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3930,6 +3922,66 @@ setInterval(() => {
     te.textContent = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
   }
 }, 30000);
+
+// ═══════════════════════════════════════════════════════════
+//  NOTIFICHE SCADENZE — Push notification via Web API
+// ═══════════════════════════════════════════════════════════
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('⚠️ Browser non supporta notifiche'); return; }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    showToast('✅ Notifiche attivate!');
+    localStorage.setItem('hb_notif', '1');
+    checkExpiryNotifications();
+  } else {
+    showToast('⚠️ Notifiche non autorizzate');
+  }
+}
+
+function checkExpiryNotifications() {
+  if (Notification.permission !== 'granted') return;
+  if (localStorage.getItem('hb_notif') !== '1') return;
+
+  const now   = new Date();
+  const shown = JSON.parse(localStorage.getItem('hb_notif_shown') || '{}');
+  const today = now.toISOString().slice(0,10);
+  if (shown.date === today) return; // già notificato oggi
+
+  const toNotify = [];
+
+  // Documenti
+  (_docs2 || []).forEach(doc => {
+    if (!doc.expiry) return;
+    const days = Math.ceil((new Date(doc.expiry) - now) / 86400000);
+    if (days >= 0 && days <= 30)
+      toNotify.push(`📄 ${doc.label} di ${doc.nome} scade tra ${days} giorni`);
+    else if (days < 0)
+      toNotify.push(`📄 ${doc.label} di ${doc.nome} è scaduto!`);
+  });
+
+  // Carte
+  (_cards || []).forEach(card => {
+    if (!card.exp) return;
+    const parts = card.exp.split('/');
+    if (parts.length < 2) return;
+    const expDate = new Date(2000 + parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
+    const days = Math.ceil((expDate - now) / 86400000);
+    if (days >= 0 && days <= 30)
+      toNotify.push(`💳 ${card.bank||'Carta'} scade tra ${days} giorni`);
+    else if (days < 0)
+      toNotify.push(`💳 ${card.bank||'Carta'} è scaduta!`);
+  });
+
+  if (toNotify.length > 0) {
+    new Notification('HomeBull — Scadenze', {
+      body: toNotify.slice(0,3).join('\n'),
+      icon: './icon-192.png',
+      badge: './icon-192.png'
+    });
+    localStorage.setItem('hb_notif_shown', JSON.stringify({ date: today }));
+  }
+}
+
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
@@ -3995,7 +4047,21 @@ function updateHomeStats() {
     }
   });
 
-  // 2. OTP attivi
+  // 2. Carte in scadenza
+  (_cards || []).forEach(card => {
+    if (!card.exp) return;
+    const parts = card.exp.split('/');
+    if (parts.length < 2) return;
+    const expDate = new Date(2000 + parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
+    const days = Math.ceil((expDate - now) / 86400000);
+    if (days < 0) {
+      alerts.push({ icon:'💳', color:'#ef4444', text: (card.bank||'Carta') + ' scaduta', time: 'Scaduta' });
+    } else if (days <= 60) {
+      alerts.push({ icon:'💳', color:'#f97316', text: (card.bank||'Carta') + ' scade tra ' + days + ' giorni', time: days+'gg' });
+    }
+  });
+
+  // 3. OTP attivi
   const _otpAlerts = JSON.parse(localStorage.getItem('hb13_otp')||'[]');
   if (_otpAlerts.length > 0) {
     alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '' });
@@ -8941,6 +9007,7 @@ async function fbSyncLoad(){
       try { if(typeof wifiLoad==='function') wifiLoad(); } catch(e){}
       try { if(typeof financeLoad==='function') financeLoad(); } catch(e){}
       if(typeof updateHomeStats==='function') updateHomeStats();
+      setTimeout(checkExpiryNotifications, 3000);
       const tab = HB.currentTab;
       if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
       else if(tab === 'notes' && typeof noteRenderList==='function') noteRenderList('');
@@ -9818,6 +9885,22 @@ function calShowAddEvent() {
         </div>
       </div>
 
+      <!-- ── PAGINA NOTIFICHE ── -->
+      <div id="set-page-notif" style="display:none;padding:20px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+          <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">🔔 Notifiche scadenze</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Documenti e carte in scadenza</div>
+            </div>
+            <button onclick="requestNotifPermission()" id="notif-toggle-btn" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Attiva</button>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);line-height:1.5;">
+            Ricevi una notifica quando un documento o una carta sta per scadere (entro 30 giorni).
+          </div>
+        </div>
+      </div>
+
       <!-- ── PAGINA SICUREZZA ── -->
       <div id="set-page-sicurezza" style="display:none;padding:20px;">
         <div style="display:flex;flex-direction:column;gap:12px;">
@@ -9868,7 +9951,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA251</div>
+            <div style="font-size:13px;color:var(--text3);">BETA252</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
