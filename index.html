@@ -2025,7 +2025,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA247</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA248</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2127,7 +2127,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA247</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA248</div>
         </div>
       </div>
     </div>
@@ -2251,7 +2251,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA247</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA248</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2494,7 +2494,6 @@ function cardsSearch(q) {
             </button>
             <input id="note-title-inp" type="text" placeholder="Titolo nota..." maxlength="100"
               style="flex:1;background:none;border:none;outline:none;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);">
-            <button onclick="noteAiCheck()" title="Correggi con AI" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0;">✨</button>
             <button onclick="noteSave()" style="padding:8px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Salva</button>
           </div>
           <div style="padding:6px 14px;flex-shrink:0;">
@@ -3257,7 +3256,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA247',
+  version: 'BETA248',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4379,179 +4378,111 @@ function getStrength(pw) {
 
 
 // ═══════════════════════════════════════════════════════════
-//  AI — Note: correttore ortografico/grammaticale
+//  PASSWORD — Analisi forza locale
 // ═══════════════════════════════════════════════════════════
-async function noteAiCheck() {
-  if (!navigator.onLine) { showToast('⚠️ Connessione assente'); return; }
-  const content = document.getElementById('note-content-inp')?.value?.trim();
-  if (!content) { showToast('Scrivi prima qualcosa nella nota'); return; }
-
-  // Overlay loading
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:28px 24px;max-width:360px;width:100%;border:1px solid var(--border);text-align:center;"><div style="font-size:32px;margin-bottom:12px;">✨</div><div style="font-size:15px;font-weight:800;margin-bottom:6px;">Controllo in corso...</div><div style="font-size:12px;color:var(--text3);">Claude sta analizzando il testo</div></div>';
-  document.body.appendChild(ov);
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Sei un correttore italiano. Correggi SOLO errori ortografici e grammaticali nel testo seguente. 
-Se il testo è già corretto rispondi solo con "OK_NESSUN_ERRORE".
-Altrimenti rispondi con un JSON così:
-{"corrected": "testo corretto completo", "changes": ["descrizione modifica 1", "descrizione modifica 2"]}
-Testo: ${JSON.stringify(content)}`
-        }]
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text?.trim() || '';
-    ov.remove();
-
-    if (reply === 'OK_NESSUN_ERRORE') {
-      showToast('✅ Nessun errore trovato!'); return;
-    }
-
-    let parsed;
-    try { parsed = JSON.parse(reply.replace(/```json|```/g, '').trim()); }
-    catch(e) { showToast('⚠️ Risposta AI non valida'); return; }
-
-    // Mostra diff e chiedi conferma
-    const ov2 = document.createElement('div');
-    ov2.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-    const changes = (parsed.changes || []).map(ch => `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;"><span style="color:#10b981;flex-shrink:0;">•</span><span style="font-size:12px;color:var(--text2);">${ch}</span></div>`).join('');
-    ov2.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;">
-      <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
-      <div style="font-size:16px;font-weight:800;margin-bottom:4px;">✨ Correzioni trovate</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">${(parsed.changes||[]).length} modifica${(parsed.changes||[]).length!==1?'he':''}</div>
-      <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:14px;">${changes}</div>
-      <div style="background:var(--bg3);border-radius:12px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2);line-height:1.6;max-height:140px;overflow-y:auto;">${parsed.corrected}</div>
-      <div style="display:flex;gap:10px;">
-        <button id="_aic_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Ignora</button>
-        <button id="_aic_ok" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">✅ Applica correzioni</button>
-      </div>
-    </div>`;
-    document.body.appendChild(ov2);
-    document.getElementById('_aic_cancel').onclick = () => ov2.remove();
-    document.getElementById('_aic_ok').onclick = () => {
-      document.getElementById('note-content-inp').value = parsed.corrected;
-      ov2.remove();
-      showToast('✅ Correzioni applicate');
-    };
-  } catch(e) {
-    ov.remove();
-    showToast('⚠️ Errore AI: ' + (e.message || e));
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-//  AI — Password: analisi forza avanzata
-// ═══════════════════════════════════════════════════════════
-async function pwAiAnalyze(itemId) {
-  if (!navigator.onLine) { showToast('⚠️ Connessione assente'); return; }
-  const item = _pwItems.find(i => i.id === itemId);
+function pwAiAnalyze(itemId) {
+  const item = _pwItems.find(x => x.id === itemId);
   if (!item?.password) { showToast('Nessuna password da analizzare'); return; }
+  const pw = item.password;
 
-  showToast('🛡️ Analisi in corso...');
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        messages: [{
-          role: 'user',
-          content: `Analizza questa password e rispondi SOLO con un JSON:
-{"score": 1-5, "label": "Molto debole|Debole|Discreta|Forte|Molto forte", "issues": ["problema1"], "tips": ["consiglio1", "consiglio2"]}
-Password: ${JSON.stringify(item.password)}
-Non includere la password nella risposta.`
-        }]
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text?.trim() || '';
-    let parsed;
-    try { parsed = JSON.parse(reply.replace(/```json|```/g,'').trim()); } catch(e) { showToast('⚠️ Errore analisi'); return; }
+  const checks = {
+    len8:    pw.length >= 8,
+    len12:   pw.length >= 12,
+    len16:   pw.length >= 16,
+    upper:   /[A-Z]/.test(pw),
+    lower:   /[a-z]/.test(pw),
+    digit:   /[0-9]/.test(pw),
+    symbol:  /[^A-Za-z0-9]/.test(pw),
+    noRepeat: !/(.)\1{2,}/.test(pw),
+    noSeq:   !/(123|234|345|456|567|678|789|abc|password|qwerty)/i.test(pw),
+  };
+  const score = [checks.len8,checks.len12,checks.len16,
+    checks.upper&&checks.lower,checks.digit,checks.symbol,
+    checks.noRepeat,checks.noSeq].filter(Boolean).length;
 
-    const colors = ['#ef4444','#f97316','#eab308','#6366f1','#10b981'];
-    const col = colors[Math.min((parsed.score||1)-1, 4)];
-    const bars = Array.from({length:5}, (_,i) => `<div style="flex:1;height:6px;border-radius:3px;background:${i<(parsed.score||1)?col:'var(--border)'}"></div>`).join('');
-    const issues = (parsed.issues||[]).map(i=>`<div style="font-size:12px;color:#ef4444;margin-bottom:4px;">⚠️ ${i}</div>`).join('');
-    const tips = (parsed.tips||[]).map(t=>`<div style="font-size:12px;color:var(--text2);margin-bottom:4px;">💡 ${t}</div>`).join('');
+  const labels = ['Molto debole','Molto debole','Debole','Discreta','Discreta','Buona','Forte','Forte','Molto forte'];
+  const colors = ['#ef4444','#ef4444','#f97316','#eab308','#eab308','#6366f1','#10b981','#10b981','#10b981'];
+  const col = colors[score];
 
-    const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-    ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));">
-      <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
-      <div style="font-size:16px;font-weight:800;margin-bottom:14px;">🛡️ Analisi password — ${item.title}</div>
-      <div style="display:flex;gap:4px;margin-bottom:6px;">${bars}</div>
-      <div style="font-size:14px;font-weight:800;color:${col};margin-bottom:14px;">${parsed.label}</div>
-      ${issues ? `<div style="margin-bottom:10px;">${issues}</div>` : ''}
-      ${tips   ? `<div style="margin-bottom:16px;">${tips}</div>`   : ''}
-      <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
-    </div>`;
-    document.body.appendChild(ov);
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+  const issues = [], tips = [];
+  if (!checks.len8)     issues.push('Troppo corta (minimo 8 caratteri)');
+  if (!checks.len12)    tips.push('Usa almeno 12 caratteri');
+  if (!checks.upper)    tips.push('Aggiungi lettere maiuscole (A-Z)');
+  if (!checks.lower)    tips.push('Aggiungi lettere minuscole (a-z)');
+  if (!checks.digit)    tips.push('Aggiungi almeno un numero');
+  if (!checks.symbol)   tips.push('Aggiungi simboli (!, @, #, -, ...)');
+  if (!checks.noRepeat) issues.push('Caratteri ripetuti rilevati (es. aaa)');
+  if (!checks.noSeq)    issues.push('Sequenze comuni rilevate (es. 123, password)');
+
+  const bars = Array.from({length:8},(_,idx) =>
+    '<div style="flex:1;height:6px;border-radius:3px;background:'+(idx<score?col:'var(--border)')+'"></div>'
+  ).join('');
+  const issueHtml = issues.map(x=>'<div style="font-size:12px;color:#ef4444;margin-bottom:4px;">⚠️ '+x+'</div>').join('');
+  const tipHtml   = tips.map(x=>'<div style="font-size:12px;color:var(--text2);margin-bottom:4px;">💡 '+x+'</div>').join('');
+
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">'
+    +'<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:4px;">🛡️ Analisi — '+item.title+'</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-bottom:12px;">'+pw.length+' caratteri</div>'
+    +'<div style="display:flex;gap:3px;margin-bottom:8px;">'+bars+'</div>'
+    +'<div style="font-size:15px;font-weight:800;color:'+col+';margin-bottom:14px;">'+labels[score]+'</div>'
+    +(issueHtml?'<div style="margin-bottom:10px;">'+issueHtml+'</div>':'')
+    +(tipHtml?'<div style="margin-bottom:16px;">'+tipHtml+'</div>':'')
+    +(!issues.length&&!tips.length?'<div style="font-size:13px;color:#10b981;margin-bottom:16px;">✅ Password eccellente!</div>':'')
+    +'<button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>'
+    +'</div>';
+  document.body.appendChild(ov);
 }
 
 // ═══════════════════════════════════════════════════════════
-//  AI — Password: genera password sicura e memorabile
+//  PASSWORD — Generatore locale memorabile
 // ═══════════════════════════════════════════════════════════
-async function pwAiGenerate(itemId) {
-  if (!navigator.onLine) { showToast('⚠️ Connessione assente'); return; }
-  const item = _pwItems.find(i => i.id === itemId);
+function pwAiGenerate(itemId) {
+  const item = _pwItems.find(x => x.id === itemId);
   if (!item) return;
 
-  showToast('🎲 Generazione in corso...');
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
-        messages: [{
-          role: 'user',
-          content: `Genera 3 password sicure e memorabili in italiano per il sito "${item.title}".
-Rispondi SOLO con JSON: {"passwords": ["pass1", "pass2", "pass3"]}
-Requisiti: almeno 12 caratteri, mista maiuscole/minuscole/numeri/simboli, memorabile (es. "Tigre-Blu-742!" o "Sole&Luna99").`
-        }]
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text?.trim() || '';
-    let parsed;
-    try { parsed = JSON.parse(reply.replace(/```json|```/g,'').trim()); } catch(e) { showToast('⚠️ Errore generazione'); return; }
+  const aggettivi = ['Rosso','Blu','Verde','Giallo','Nero','Bianco','Forte','Veloce','Grande','Piccolo','Alto','Lungo','Nuovo','Antico','Dolce','Amaro','Caldo','Freddo','Vivo','Libero'];
+  const nomi      = ['Tigre','Aquila','Leone','Lupo','Volpe','Orso','Falco','Drago','Sole','Luna','Mare','Monte','Fiume','Stella','Vento','Fuoco','Terra','Cielo','Bosco','Pietra'];
+  const simboli   = ['!','@','#','$','%','&','*','-','+','?'];
+  const rand    = arr => arr[Math.floor(Math.random()*arr.length)];
+  const randNum = ()  => Math.floor(Math.random()*900)+100;
 
-    const passwords = parsed.passwords || [];
-    const opts = passwords.map((p,i) => `
-      <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border-radius:12px;margin-bottom:8px;border:1px solid var(--border);">
-        <div style="flex:1;font-family:monospace;font-size:14px;font-weight:700;color:var(--text);word-break:break-all;">${p}</div>
-        <button onclick="pwAiApplyGenerated('${itemId}','${p.replace(/'/g,"\'")}',this)" style="padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Usa</button>
-      </div>`).join('');
+  const passwords = [
+    rand(aggettivi)+rand(nomi)+randNum()+rand(simboli),
+    rand(nomi)+'-'+rand(aggettivi)+'-'+randNum(),
+    rand(aggettivi)+'.'+rand(nomi)+rand(simboli)+randNum(),
+  ];
 
-    const ov = document.createElement('div');
-    ov.id = '_pw_gen_ov';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-    ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));">
-      <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
-      <div style="font-size:16px;font-weight:800;margin-bottom:4px;">🎲 Password suggerite</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Seleziona quella che preferisci</div>
-      ${opts}
-      <button onclick="document.getElementById('_pw_gen_ov').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">Annulla</button>
-    </div>`;
-    document.body.appendChild(ov);
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+  const existing = document.getElementById('_pw_gen_ov');
+  if (existing) existing.remove();
+
+  const opts = passwords.map(p => {
+    const s = getStrength(p);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border-radius:12px;margin-bottom:8px;border:1px solid var(--border);">'
+      +'<div style="flex:1;"><div style="font-family:monospace;font-size:15px;font-weight:700;color:var(--text);word-break:break-all;">'+p+'</div>'
+      +'<div style="margin-top:4px;"><span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:'+s.bg+';color:'+s.col+';">'+s.label+'</span></div></div>'
+      +'<button onclick="pwAiApplyGenerated(''+itemId+'',this.dataset.pw,this)" data-pw="'+p.replace(/"/g,'&quot;')+'" style="padding:8px 14px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Usa</button>'
+      +'</div>';
+  }).join('');
+
+  const ov = document.createElement('div');
+  ov.id = '_pw_gen_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));">'
+    +'<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
+    +'<div style="font-size:16px;font-weight:800;margin-bottom:4px;">🎲 Password suggerite</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Memorabili e sicure — scegli quella che preferisci</div>'
+    +opts
+    +'<button onclick="pwAiGenerate(''+itemId+'')" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔄 Altre 3</button>'
+    +'<button onclick="document.getElementById('_pw_gen_ov').remove()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    +'</div>';
+  document.body.appendChild(ov);
 }
 
 function pwAiApplyGenerated(itemId, newPass, btn) {
-  const item = _pwItems.find(i => i.id === itemId);
+  const item = _pwItems.find(x => x.id === itemId);
   if (!item) return;
   item.password = newPass;
   pwSave();
@@ -4559,6 +4490,8 @@ function pwAiApplyGenerated(itemId, newPass, btn) {
   pwShowDetail(itemId);
   showToast('✅ Password aggiornata!');
 }
+
+
 
 // Import backup v11
 function pwImportBackup() {
@@ -10055,7 +9988,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA247</div>
+            <div style="font-size:13px;color:var(--text3);">BETA248</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
