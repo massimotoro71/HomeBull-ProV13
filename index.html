@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA260</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA261</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA260</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA261</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA260</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA261</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3260,7 +3260,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA260',
+  version: 'BETA261',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4136,9 +4136,9 @@ function updateHomeStats() {
     const exp = new Date(doc.expiry);
     const days = Math.ceil((exp - now) / 86400000);
     if (days < 0) {
-      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto' });
+      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto', tab: 'documents' });
     } else if (days <= 90) {
-      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg' });
+      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg', tab: 'documents' });
     }
   });
 
@@ -4150,31 +4150,32 @@ function updateHomeStats() {
     const expDate = new Date(2000 + parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
     const days = Math.ceil((expDate - now) / 86400000);
     if (days < 0) {
-      alerts.push({ icon:'💳', color:'#ef4444', text: (card.bank||'Carta') + ' scaduta', time: 'Scaduta' });
+      alerts.push({ icon:'💳', color:'#ef4444', text: (card.bank||'Carta') + ' scaduta', time: 'Scaduta', tab: 'cards' });
     } else if (days <= 60) {
-      alerts.push({ icon:'💳', color:'#f97316', text: (card.bank||'Carta') + ' scade tra ' + days + ' giorni', time: days+'gg' });
+      alerts.push({ icon:'💳', color:'#f97316', text: (card.bank||'Carta') + ' scade tra ' + days + ' giorni', time: days+'gg', tab: 'cards' });
     }
   });
 
   // 3. OTP attivi
   const _otpAlerts = JSON.parse(localStorage.getItem('hb13_otp')||'[]');
   if (_otpAlerts.length > 0) {
-    alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '' });
+    alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '', tab: 'otp' });
   }
 
-  // 3. Nessun dato
+  // 4. Nessun dato
   if (alerts.length === 0 && (_pwItems||[]).length === 0) {
-    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '' });
+    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '', tab: '' });
   } else if (alerts.length === 0) {
-    alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '' });
+    alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '', tab: '' });
   }
 
-  // Render alert
+  // Render alert — cliccabili se hanno un tab associato
   alertBox.innerHTML = alerts.slice(0, 5).map(a => `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;">
+    <div onclick="${a.tab ? `switchTab('${a.tab}')` : ''}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;${a.tab ? 'cursor:pointer;' : ''}">
       <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
       <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${a.text}</div>
       ${a.time ? `<div style="font-size:11px;font-weight:700;color:${a.color};flex-shrink:0;">${a.time}</div>` : ''}
+      ${a.tab ? `<div style="font-size:14px;color:var(--text3);flex-shrink:0;">›</div>` : ''}
     </div>
   `).join('');
 }
@@ -10608,7 +10609,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA260</div>
+            <div style="font-size:13px;color:var(--text3);">BETA261</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
