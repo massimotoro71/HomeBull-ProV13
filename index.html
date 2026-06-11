@@ -9,6 +9,7 @@
 <title>HomeBull Pro</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="apple-touch-icon" href="data:image/png;base64,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">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,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">
 <style>
@@ -2017,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA259</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA260</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2119,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA259</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA260</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA259</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA260</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3259,7 +3260,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA259',
+  version: 'BETA260',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8971,6 +8972,209 @@ function setShadow(s){document.documentElement.style.setProperty('--card-shadow'
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 function setFontSize(px){document.documentElement.style.fontSize=px+'px';localStorage.setItem('hb_fs',px);}
+
+// ═══════════════════════════════════════════════════════════
+//  ESPORTA PDF — Backup leggibile di tutti i dati
+// ═══════════════════════════════════════════════════════════
+async function exportPDF() {
+  if (typeof window.jspdf === 'undefined') {
+    showToast('⏳ Caricamento libreria PDF...');
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (typeof window.jspdf === 'undefined') {
+      showToast('⚠️ Libreria PDF non disponibile — controlla la connessione');
+      return;
+    }
+  }
+
+  showToast('📋 Generazione PDF...');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+  const W = 210, margin = 16;
+  const accentR = 99, accentG = 102, accentB = 241;
+  let y = 0;
+
+  // ── Helpers ───────────────────────────────────────────────
+  const newPage = () => { doc.addPage(); y = 20; };
+
+  const checkY = (need=20) => { if (y + need > 280) newPage(); };
+
+  const header = () => {
+    doc.setFillColor(accentR, accentG, accentB);
+    doc.rect(0, 0, W, 18, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text('HomeBull Pro v13 — Backup', margin, 12);
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}), W-margin, 12, {align:'right'});
+    y = 26;
+  };
+
+  const sectionTitle = (title, emoji='') => {
+    checkY(14);
+    doc.setFillColor(accentR, accentG, accentB, 0.1);
+    doc.setDrawColor(accentR, accentG, accentB);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, W - margin*2, 9, 2, 2, 'FD');
+    doc.setTextColor(accentR, accentG, accentB);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(emoji + ' ' + title, margin+3, y+6);
+    y += 13;
+    doc.setTextColor(40,40,40);
+  };
+
+  const row = (label, value, indent=0) => {
+    checkY(6);
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.setTextColor(100,100,100);
+    doc.text(label, margin + indent, y);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(30,30,30);
+    const maxW = W - margin*2 - indent - 35;
+    const val = String(value||'—');
+    const lines = doc.splitTextToSize(val, maxW);
+    doc.text(lines, margin + indent + 33, y);
+    y += Math.max(5, lines.length * 4.5);
+  };
+
+  const divider = () => {
+    checkY(4);
+    doc.setDrawColor(220,220,220); doc.setLineWidth(0.2);
+    doc.line(margin, y, W-margin, y);
+    y += 4;
+  };
+
+  // ── Copertina ─────────────────────────────────────────────
+  header();
+  doc.setFontSize(9); doc.setTextColor(120,120,120); doc.setFont('helvetica','italic');
+  doc.text('⚠️  Documento riservato — conserva in luogo sicuro', margin, y);
+  y += 10;
+
+  // ── PASSWORD ──────────────────────────────────────────────
+  const cats = JSON.parse(localStorage.getItem('hb13_pw_cats')||'[]');
+  const pws  = JSON.parse(localStorage.getItem('hb13_passwords')||'[]');
+  if (pws.length) {
+    sectionTitle('Password (' + pws.length + ')', '🔐');
+    cats.forEach(cat => {
+      const items = pws.filter(p => p.categoryId === cat.id);
+      if (!items.length) return;
+      checkY(8);
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text('▸ ' + cat.name, margin, y); y += 6;
+      items.forEach(p => {
+        checkY(18);
+        row('Sito:', p.title, 4);
+        if (p.username) row('Utente:', p.username, 4);
+        row('Password:', p.password, 4);
+        if (p.url) row('URL:', p.url, 4);
+        if (p.notes) row('Note:', p.notes, 4);
+        divider();
+      });
+    });
+    // Password senza categoria
+    const noCat = pws.filter(p => !cats.find(c => c.id === p.categoryId));
+    if (noCat.length) {
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text('▸ Altre', margin, y); y += 6;
+      noCat.forEach(p => {
+        row('Sito:', p.title, 4);
+        if (p.username) row('Utente:', p.username, 4);
+        row('Password:', p.password, 4);
+        divider();
+      });
+    }
+  }
+
+  // ── NOTE ──────────────────────────────────────────────────
+  const notes = JSON.parse(localStorage.getItem('hb13_notes')||'[]');
+  if (notes.length) {
+    newPage(); header();
+    sectionTitle('Note (' + notes.length + ')', '📝');
+    notes.forEach(n => {
+      checkY(12);
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text(n.title||'Senza titolo', margin, y); y += 5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(80,80,80); doc.setFontSize(8);
+      const lines = doc.splitTextToSize(n.content||'', W - margin*2);
+      lines.slice(0,20).forEach(l => { checkY(5); doc.text(l, margin, y); y += 4.5; });
+      divider();
+    });
+  }
+
+  // ── CARTE ─────────────────────────────────────────────────
+  const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]');
+  if (cards.length) {
+    checkY(20); sectionTitle('Carte (' + cards.length + ')', '💳');
+    cards.forEach(card => {
+      checkY(20);
+      row('Banca:', card.bank);
+      row('Numero:', card.number);
+      row('Intestatario:', card.holder);
+      row('Scadenza:', card.exp);
+      if (card.cvv) row('CVV:', card.cvv);
+      if (card.pin) row('PIN:', card.pin);
+      divider();
+    });
+  }
+
+  // ── WIFI ──────────────────────────────────────────────────
+  const wifis = JSON.parse(localStorage.getItem('hb13_wifi')||'[]');
+  if (wifis.length) {
+    checkY(20); sectionTitle('Wi-Fi (' + wifis.length + ')', '📶');
+    wifis.forEach(w => {
+      checkY(14);
+      row('Rete:', w.ssid);
+      row('Password:', w.pw);
+      if (w.notes) row('Note:', w.notes);
+      divider();
+    });
+  }
+
+  // ── SERVER ────────────────────────────────────────────────
+  const servers = JSON.parse(localStorage.getItem('hb13_server')||'[]');
+  if (servers.length) {
+    checkY(20); sectionTitle('Server / IT (' + servers.length + ')', '🖥️');
+    servers.forEach(s => {
+      checkY(16);
+      row('Nome:', s.name);
+      if (s.host) row('Host:', s.host);
+      if (s.user) row('Utente:', s.user);
+      if (s.pass) row('Password:', s.pass);
+      if (s.notes) row('Note:', s.notes);
+      divider();
+    });
+  }
+
+  // ── FINANZE ───────────────────────────────────────────────
+  const fin = JSON.parse(localStorage.getItem('hb13_finance')||'[]');
+  if (fin.length) {
+    newPage(); header();
+    sectionTitle('Finanze (' + fin.length + ')', '💰');
+    fin.forEach(f => {
+      checkY(14);
+      row('Conto:', f.name);
+      if (f.iban) row('IBAN:', f.iban);
+      if (f.bic) row('BIC:', f.bic);
+      if (f.notes) row('Note:', f.notes);
+      divider();
+    });
+  }
+
+  // ── Footer su ogni pagina ─────────────────────────────────
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7); doc.setTextColor(160,160,160); doc.setFont('helvetica','normal');
+    doc.text('HomeBull Pro v13 — Backup riservato', margin, 292);
+    doc.text('Pagina ' + i + ' di ' + pageCount, W-margin, 292, {align:'right'});
+  }
+
+  // ── Salva ─────────────────────────────────────────────────
+  const fname = 'HomeBull-backup-' + new Date().toISOString().slice(0,10) + '.pdf';
+  doc.save(fname);
+  showToast('✅ PDF esportato!');
+}
+
 async function forceAppUpdate() {
   showToast('🔄 Pulizia cache in corso...');
   try {
@@ -10319,6 +10523,10 @@ function calShowAddEvent() {
             <span style="font-size:28px;">📤</span>
             <div><div style="margin-bottom:3px;">Esporta backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Salva tutti i dati in un file JSON</div></div>
           </button>
+          <button onclick="exportPDF()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">📋</span>
+            <div><div style="margin-bottom:3px;">Esporta PDF</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Backup leggibile con tutte le sezioni</div></div>
+          </button>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
             <span style="font-size:28px;">📥</span>
             <div><div style="margin-bottom:3px;">Importa backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Ripristina da un file JSON</div></div>
@@ -10400,7 +10608,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA259</div>
+            <div style="font-size:13px;color:var(--text3);">BETA260</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
