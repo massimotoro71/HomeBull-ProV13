@@ -2017,7 +2017,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA257</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA258</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2119,7 +2119,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA257</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA258</div>
         </div>
       </div>
     </div>
@@ -2243,7 +2243,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA257</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA258</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3259,7 +3259,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA257',
+  version: 'BETA258',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4449,6 +4449,7 @@ function pwShowDetail(itemId) {
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
+      <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
       <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
       <button onclick="pwDeleteConfirm('${item.id}')" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
     </div>`;
@@ -4645,7 +4646,8 @@ async function pwHandleCSV(event) {
   showToast('📥 Lettura CSV...');
   try {
     const text = await file.text();
-    const lines = text.split(/?
+    const lines = text.split(/
+?
 /).filter(l => l.trim());
     if (lines.length < 2) { showToast('⚠️ CSV vuoto o non valido'); return; }
 
@@ -6127,6 +6129,65 @@ function wifiDelete(id) {
   _wifiNets = _wifiNets.filter(n => n.id !== id);
   wifiSaveAll(); wifiRender();
   showToast('Rete rimossa');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  QR CONDIVISIONE — Password temporanea (60 secondi)
+// ═══════════════════════════════════════════════════════════
+let _qrCountdownTimer = null;
+
+function pwShareQR(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  // Costruisce payload JSON leggibile da qualsiasi app
+  const payload = JSON.stringify({
+    app: 'HomeBull',
+    title: item.title,
+    username: item.username || '',
+    password: item.password || '',
+    url: item.url || '',
+    shared: new Date().toISOString()
+  });
+
+  const ov = document.createElement('div');
+  ov.id = '_qr_share_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:24px;padding:24px;max-width:320px;width:100%;text-align:center;">
+      <div style="font-size:13px;font-weight:800;color:#0a0a1f;margin-bottom:4px;">${item.title}</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:14px;">${item.username || ''}</div>
+      <canvas id="_qr_share_canvas" style="border-radius:12px;max-width:100%;"></canvas>
+      <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <div style="width:36px;height:36px;border-radius:50%;border:3px solid #6366f1;display:flex;align-items:center;justify-content:center;">
+          <span id="_qr_countdown" style="font-size:13px;font-weight:900;color:#6366f1;">60</span>
+        </div>
+        <div style="font-size:12px;color:#6b7280;text-align:left;line-height:1.4;">Il QR si cancella<br>automaticamente</div>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#ef4444;font-weight:600;">⚠️ Non condividere con persone non fidate</div>
+      <button onclick="pwCloseQR()" style="margin-top:14px;width:100%;padding:11px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+    </div>`;
+  document.body.appendChild(ov);
+
+  // Disegna QR
+  const canvas = document.getElementById('_qr_share_canvas');
+  qrDraw(canvas, payload, 240);
+
+  // Countdown 60s
+  let secs = 60;
+  clearInterval(_qrCountdownTimer);
+  _qrCountdownTimer = setInterval(() => {
+    secs--;
+    const el = document.getElementById('_qr_countdown');
+    if (el) el.textContent = secs;
+    if (secs <= 0) pwCloseQR();
+  }, 1000);
+}
+
+function pwCloseQR() {
+  clearInterval(_qrCountdownTimer);
+  document.getElementById('_qr_share_ov')?.remove();
 }
 
 // ── QR Code generator ────────────────────────────────────
@@ -10341,7 +10402,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA257</div>
+            <div style="font-size:13px;color:var(--text3);">BETA258</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
