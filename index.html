@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA266</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA267</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA266</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA267</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA266</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA267</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3259,7 +3259,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA266',
+  version: 'BETA267',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4130,7 +4130,8 @@ function updateHomeStats() {
 
   // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
-  const docsToCheck = _docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]');
+  const docsToCheck = (_docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]'))
+    .filter(d => !d.deleted);
   docsToCheck.forEach(doc => {
     if (!doc.expiry) return;
     const exp = new Date(doc.expiry);
@@ -4144,7 +4145,8 @@ function updateHomeStats() {
   });
 
   // 2. Carte in scadenza
-  const cardsToCheck = _cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]');
+  const cardsToCheck = (_cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]'))
+    .filter(c => !c.deleted);
   cardsToCheck.forEach(card => {
     if (!card.exp) return;
     // Supporta formati: MM/YY, MM/YYYY, YYYY-MM
@@ -4442,6 +4444,7 @@ function pwToggleSearch() {
 function pwShowDetail(itemId) {
   const item = _pwItems.find(i => i.id === itemId);
   if (!item) return;
+  document.getElementById('pw-view-cats').style.display = 'none';
   document.getElementById('pw-view-items').style.display = 'none';
   document.getElementById('pw-view-detail').style.display = 'flex';
   document.getElementById('pw-detail-title').textContent = item.title || '—';
@@ -10734,7 +10737,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA266</div>
+            <div style="font-size:13px;color:var(--text3);">BETA267</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
