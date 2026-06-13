@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA269</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA270</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA269</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA270</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA269</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA270</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3259,7 +3259,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA269',
+  version: 'BETA270',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8215,12 +8215,7 @@ function applyHomePrefs() {
   });
 }
 
-function setTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('hb12_theme', t);
-  document.getElementById('theme-dark-btn').style.borderWidth  = t === 'dark'  ? '2px' : '1px';
-  document.getElementById('theme-light-btn').style.borderWidth = t === 'light' ? '2px' : '1px';
-}
+// (setTheme definita più avanti — supporta anche 'auto')
 
 // ── Keyboard support per PIN ───────────────────────────────
 document.addEventListener('keydown', (e) => {
@@ -9106,6 +9101,15 @@ function settingsRefreshUI() {
   const sl=document.getElementById('fs-slider');if(sl)sl.value=S.fs;
 }
 function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',th);localStorage.setItem('hb_theme',t);settingsRefreshUI();showToast(th==='dark'?'🌙 Dark':'☀️ Light');}
+
+// Aggiorna automaticamente il tema se in modalità 'auto' e cambia il tema di sistema
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (localStorage.getItem('hb_theme') === 'auto') {
+      document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    }
+  });
+}
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
 function setBgColor(c){document.documentElement.style.setProperty('--bg',c);document.documentElement.style.setProperty('--bg2',c);document.body.style.background=c;localStorage.setItem('hb_bg_color',c);showToast('🎨 Sfondo aggiornato');}
 function setCardBgColor(c){document.documentElement.style.setProperty('--surface',c);document.documentElement.style.setProperty('--surface2',c);localStorage.setItem('hb_card_color',c);showToast('🎨 Card aggiornate');}
@@ -9140,6 +9144,190 @@ function setFontSize(px){document.documentElement.style.fontSize=px+'px';localSt
 // ═══════════════════════════════════════════════════════════
 //  ESPORTA PDF — Backup leggibile di tutti i dati
 // ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+//  ESPORTA PDF — Singola categoria/sezione
+// ═══════════════════════════════════════════════════════════
+
+function showPDFSectionPicker() {
+  const sections = [
+    { id:'passwords', icon:'🔐', label:'Password' },
+    { id:'documents', icon:'📄', label:'Documenti' },
+    { id:'notes',     icon:'📝', label:'Note' },
+    { id:'cards',     icon:'💳', label:'Carte' },
+    { id:'wifi',      icon:'📶', label:'Wi-Fi' },
+    { id:'finance',   icon:'💰', label:'Finanze' },
+    { id:'server',    icon:'📡', label:'Server/IT' },
+  ];
+
+  const opts = sections.map(s =>
+    `<button onclick="exportPDFSection('${s.id}');document.getElementById('_pdfsec_ov').remove()" style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:12px;text-align:left;margin-bottom:8px;">
+      <span style="font-size:22px;">${s.icon}</span><span>${s.label}</span>
+    </button>`
+  ).join('');
+
+  const ov = document.createElement('div');
+  ov.id = '_pdfsec_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:14px;">📑 Esporta sezione in PDF</div>
+    ${opts}
+    <button onclick="document.getElementById('_pdfsec_ov').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">Annulla</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+async function exportPDFSection(section) {
+  if (typeof window.jspdf === 'undefined') {
+    showToast('⏳ Caricamento libreria PDF...');
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (typeof window.jspdf === 'undefined') {
+      showToast('⚠️ Libreria PDF non disponibile');
+      return;
+    }
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W = 210, margin = 16;
+  let y = 26;
+
+  doc.setFillColor(99,102,241);
+  doc.rect(0,0,W,18,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13); doc.setFont('helvetica','bold');
+
+  const row = (label, value, indent=0) => {
+    if (y > 280) { doc.addPage(); y = 20; }
+    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
+    doc.text(label, margin+indent, y);
+    doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
+    const lines = doc.splitTextToSize(String(value||'—'), W-margin*2-indent-33);
+    doc.text(lines, margin+indent+33, y);
+    y += Math.max(5, lines.length*4.5);
+  };
+  const divider = () => { if(y>280){doc.addPage();y=20;} doc.setDrawColor(220,220,220); doc.line(margin,y,W-margin,y); y+=4; };
+
+  let title = '', items = [];
+
+  if (section === 'passwords') {
+    title = 'Password';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const cats = JSON.parse(localStorage.getItem('hb13_pw_cats')||'[]');
+    const pws  = JSON.parse(localStorage.getItem('hb13_passwords')||'[]').filter(p=>!p.deleted);
+    cats.forEach(cat => {
+      const catItems = pws.filter(p => p.categoryId === cat.id);
+      if (!catItems.length) return;
+      if (y>270){doc.addPage();y=20;}
+      doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text('▸ ' + cat.name, margin, y); y+=6;
+      catItems.forEach(p => {
+        row('Sito:', p.title, 4);
+        if (p.username) row('Utente:', p.username, 4);
+        row('Password:', p.password, 4);
+        if (p.url) row('URL:', p.url, 4);
+        divider();
+      });
+    });
+    if (!pws.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna password salvata', margin, y); }
+
+  } else if (section === 'cards') {
+    title = 'Carte';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]').filter(c=>!c.deleted);
+    cards.forEach(card => {
+      row('Banca:', card.bank); row('Numero:', card.number);
+      row('Intestatario:', card.holder); row('Scadenza:', card.exp);
+      if (card.cvv) row('CVV:', card.cvv);
+      if (card.pin) row('PIN:', card.pin);
+      divider();
+    });
+    if (!cards.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna carta salvata', margin, y); }
+
+  } else if (section === 'wifi') {
+    title = 'Wi-Fi';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const wifis = JSON.parse(localStorage.getItem('hb13_wifi')||'[]').filter(w=>!w.deleted);
+    wifis.forEach(w => {
+      row('Rete:', w.ssid); row('Password:', w.pw);
+      if (w.notes) row('Note:', w.notes);
+      divider();
+    });
+    if (!wifis.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna rete salvata', margin, y); }
+
+  } else if (section === 'server') {
+    title = 'Server / IT';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const servers = JSON.parse(localStorage.getItem('hb13_server')||'[]').filter(s=>!s.deleted);
+    servers.forEach(s => {
+      row('Nome:', s.name);
+      if (s.host) row('Host:', s.host);
+      if (s.user) row('Utente:', s.user);
+      if (s.pass) row('Password:', s.pass);
+      if (s.notes) row('Note:', s.notes);
+      divider();
+    });
+    if (!servers.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun server salvato', margin, y); }
+
+  } else if (section === 'finance') {
+    title = 'Finanze';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const fin = JSON.parse(localStorage.getItem('hb13_finance')||'[]').filter(f=>!f.deleted);
+    fin.forEach(f => {
+      row('Conto:', f.name);
+      if (f.iban) row('IBAN:', f.iban);
+      if (f.bic) row('BIC:', f.bic);
+      if (f.notes) row('Note:', f.notes);
+      divider();
+    });
+    if (!fin.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun conto salvato', margin, y); }
+
+  } else if (section === 'notes') {
+    title = 'Note';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const notes = JSON.parse(localStorage.getItem('hb13_notes')||'[]').filter(n=>!n.deleted);
+    notes.forEach(n => {
+      if (y>270){doc.addPage();y=20;}
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text(n.title||'Senza titolo', margin, y); y+=5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(80,80,80); doc.setFontSize(8);
+      const lines = doc.splitTextToSize(n.content||'', W-margin*2);
+      lines.slice(0,15).forEach(l => { if(y>280){doc.addPage();y=20;} doc.text(l,margin,y); y+=4.5; });
+      divider();
+    });
+    if (!notes.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna nota salvata', margin, y); }
+
+  } else if (section === 'documents') {
+    title = 'Documenti';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const docs = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').filter(d=>!d.deleted);
+    docs.forEach(d => {
+      row('Tipo:', d.label);
+      row('Nome:', (d.nome||'') + ' ' + (d.cognome||''));
+      if (d.number)  row('Numero:', d.number);
+      if (d.expiry)  row('Scadenza:', d.expiry);
+      divider();
+    });
+    if (!docs.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun documento salvato', margin, y); }
+  }
+
+  doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text(new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}), W-margin, 12, {align:'right'});
+
+  // Footer
+  const pages = doc.internal.getNumberOfPages();
+  for (let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7); doc.setTextColor(160,160,160); doc.setFont('helvetica','normal');
+    doc.text('HomeBull Pro v13 — '+title+' (riservato)', margin, 292);
+    doc.text('Pagina '+i+' di '+pages, W-margin, 292, {align:'right'});
+  }
+
+  doc.save('HomeBull-' + title.replace(/[^a-zA-Z0-9]/g,'') + '-' + new Date().toISOString().slice(0,10) + '.pdf');
+  showToast('✅ PDF "' + title + '" esportato!');
+}
+
 async function exportPDF() {
   if (typeof window.jspdf === 'undefined') {
     showToast('⏳ Caricamento libreria PDF...');
@@ -10711,7 +10899,11 @@ function calShowAddEvent() {
           </button>
           <button onclick="exportPDF()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
             <span style="font-size:28px;">📋</span>
-            <div><div style="margin-bottom:3px;">Esporta PDF</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Backup leggibile con tutte le sezioni</div></div>
+            <div><div style="margin-bottom:3px;">Esporta PDF completo</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Backup leggibile con tutte le sezioni</div></div>
+          </button>
+          <button onclick="showPDFSectionPicker()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">📑</span>
+            <div><div style="margin-bottom:3px;">Esporta PDF singola sezione</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Scegli cosa esportare</div></div>
           </button>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
             <span style="font-size:28px;">📥</span>
@@ -10794,7 +10986,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA269</div>
+            <div style="font-size:13px;color:var(--text3);">BETA270</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -10813,13 +11005,14 @@ function calShowAddEvent() {
               <div style="display:flex;align-items:center;gap:8px;">⏱️ <span style="color:var(--text2);">Blocco automatico per inattività</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔍 <span style="color:var(--text2);">Ricerca globale</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🏠 <span style="color:var(--text2);">Home personalizzabile (accesso rapido)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🎨 <span style="color:var(--text2);">Tema chiaro/scuro/automatico</span></div>
             </div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 In sviluppo</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">📋 Export</div>
             <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Tema chiaro/scuro automatico</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Esporta PDF per singola categoria</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">PDF completo o per singola sezione</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup JSON completo</span></div>
             </div>
           </div>
         </div>
