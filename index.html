@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA267</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA269</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA267</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA269</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA267</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA269</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3259,7 +3259,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA267',
+  version: 'BETA269',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6745,6 +6745,56 @@ function calSelectCat(btn) {
   btn.classList.add('active');
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE CALENDAR — Push eventi (bidirezionale)
+// ═══════════════════════════════════════════════════════════
+async function gcalPushEvent(ev) {
+  if (localStorage.getItem('hb_gcal_connected') !== '1') return;
+  try {
+    const token = _gcalToken || await gcalGetToken();
+    const body = {
+      summary: ev.title,
+      start: ev.time ? { dateTime: ev.date + 'T' + ev.time + ':00', timeZone: 'Europe/Rome' }
+                      : { date: ev.date },
+      end:   ev.time ? { dateTime: ev.date + 'T' + ev.time + ':00', timeZone: 'Europe/Rome' }
+                      : { date: ev.date },
+    };
+
+    if (ev.gcal_id) {
+      // Aggiorna evento esistente
+      await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${ev.gcal_id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify(body)
+      });
+    } else {
+      // Crea nuovo evento
+      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.id) {
+        ev.gcal_id = data.id;
+        calSaveAll();
+      }
+    }
+  } catch(e) { console.warn('GCal push error:', e); }
+}
+
+async function gcalDeleteEvent(gcalId) {
+  if (localStorage.getItem('hb_gcal_connected') !== '1' || !gcalId) return;
+  try {
+    const token = _gcalToken || await gcalGetToken();
+    await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${gcalId}`, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token }
+    });
+  } catch(e) { console.warn('GCal delete error:', e); }
+}
+
 function calSaveEvent() {
   const title = document.getElementById('cal-ev-title').value.trim();
   const date  = document.getElementById('cal-ev-date').value;
@@ -6752,20 +6802,27 @@ function calSaveEvent() {
   if (!date)  { showToast('Seleziona una data'); return; }
   const time  = document.getElementById('cal-ev-time').value;
 
+  let savedEv;
   if (_calEditId) {
-    const ev = _calEvents.find(e => e.id === _calEditId);
-    if (ev) { ev.title = title; ev.date = date; ev.time = time; ev.cat = _calCat.id; ev.color = _calCat.color; }
+    savedEv = _calEvents.find(e => e.id === _calEditId);
+    if (savedEv) { savedEv.title = title; savedEv.date = date; savedEv.time = time; savedEv.cat = _calCat.id; savedEv.color = _calCat.color; }
   } else {
-    _calEvents.push({ id:'ev_'+Date.now(), title, date, time, cat:_calCat.id, color:_calCat.color });
+    savedEv = { id:'ev_'+Date.now(), title, date, time, cat:_calCat.id, color:_calCat.color };
+    _calEvents.push(savedEv);
   }
   calSaveAll();
   calCloseForm();
   calRenderMonth();
   calRenderEvents();
   showToast('✅ Evento salvato');
+
+  // Sync verso Google Calendar (se collegato)
+  if (savedEv) gcalPushEvent(savedEv);
 }
 
 function calDeleteEvent(id) {
+  const ev = _calEvents.find(e => e.id === id);
+  if (ev?.gcal_id) gcalDeleteEvent(ev.gcal_id);
   _calEvents = _calEvents.filter(e => e.id !== id);
   calSaveAll(); calRenderMonth(); calRenderEvents();
   showToast('Evento rimosso');
@@ -10737,18 +10794,32 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA267</div>
+            <div style="font-size:13px;color:var(--text3);">BETA269</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Password, Note, OTP, Carte, WiFi</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Documenti con Codice Fiscale</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Famiglia, Lista spesa, Server</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Firebase Auth + Sync cloud</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Drive backup</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Google Calendar sync</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Condivisione famiglia reale</span></div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
+              <div style="display:flex;align-items:center;gap:8px;">🔐 <span style="color:var(--text2);">Password, Note, OTP, Carte, Wi-Fi, Server</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📄 <span style="color:var(--text2);">Documenti con scadenze e Codice Fiscale</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📅 <span style="color:var(--text2);">Calendario + sync Google Calendar bidirezionale</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Sync Firebase multi-dispositivo</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔒 <span style="color:var(--text2);">Cifratura AES-256 (cloud + locale)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup Google Drive (ultimi 5 + auto 24h)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">Esporta PDF / JSON</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📥 <span style="color:var(--text2);">Import CSV da Chrome/Firefox/1Password</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📊 <span style="color:var(--text2);">Statistiche e analisi password</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📱 <span style="color:var(--text2);">Condivisione QR temporanea</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔔 <span style="color:var(--text2);">Notifiche scadenze</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">⏱️ <span style="color:var(--text2);">Blocco automatico per inattività</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔍 <span style="color:var(--text2);">Ricerca globale</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🏠 <span style="color:var(--text2);">Home personalizzabile (accesso rapido)</span></div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 In sviluppo</div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
+              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Tema chiaro/scuro automatico</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Esporta PDF per singola categoria</span></div>
             </div>
           </div>
         </div>
