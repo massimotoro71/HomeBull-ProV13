@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA270</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA271</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA270</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA271</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA270</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA271</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2299,6 +2299,7 @@ function cardsSearch(q) {
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </button>
             <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📊</button>
+            <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📷</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
             <select onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems()" style="flex:1;padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:600;outline:none;font-family:inherit;">
@@ -2337,6 +2338,7 @@ function cardsSearch(q) {
           <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
           <button onclick="pwImportCSV()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📥 Importa da Chrome / Firefox / 1Password</button>
           <button onclick="pwImportBackup()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
+          <button onclick="pwScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📷 Scansiona QR condiviso</button>
           <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
           <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
           <input type="file" id="pw-csv-input" accept=".csv" style="display:none;" onchange="pwHandleCSV(event)">
@@ -3259,7 +3261,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA270',
+  version: 'BETA271',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4640,6 +4642,68 @@ function pwShowStats() {
 // ═══════════════════════════════════════════════════════════
 //  IMPORT CSV — Chrome, Firefox, 1Password, Bitwarden
 // ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+//  IMPORT PASSWORD via QR — scansiona QR condiviso da altro dispositivo
+// ═══════════════════════════════════════════════════════════
+function pwScanQR() {
+  qrScannerOpen('Scansiona QR password', (data) => {
+    let parsed;
+    try { parsed = JSON.parse(data); } catch(e) {
+      showToast('⚠️ QR non valido o non leggibile');
+      return;
+    }
+    if (parsed.app !== 'HomeBull' || !parsed.password) {
+      showToast('⚠️ QR non riconosciuto — non è una password HomeBull');
+      return;
+    }
+    pwShowQRImportPreview(parsed);
+  });
+}
+
+function pwShowQRImportPreview(data) {
+  const ov = document.createElement('div');
+  ov.id = '_qrimp_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:32px;text-align:center;margin-bottom:12px;">📷</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;margin-bottom:14px;">Importa password?</div>
+    <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px;">${data.title || 'Senza nome'}</div>
+      <div style="font-size:12px;color:var(--text3);">${data.username || '—'}</div>
+      ${data.url ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${data.url}</div>` : ''}
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:16px;">La password verrà aggiunta alla categoria "Importate"</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_qri_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_qri_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_qri_cancel').onclick = () => ov.remove();
+  document.getElementById('_qri_ok').onclick = () => {
+    ov.remove();
+    let cat = _pwCats.find(c => c.name === 'Importate');
+    if (!cat) {
+      cat = { id: 'cat_imp_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
+      _pwCats.push(cat);
+    }
+    _pwItems.push({
+      id: 'pw_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      categoryId: cat.id,
+      title: data.title || 'Senza nome',
+      username: data.username || '',
+      password: data.password || '',
+      url: data.url || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    pwSave();
+    pwRenderCats();
+    showToast('✅ Password importata!');
+  };
+}
+
 function pwImportCSV() {
   const input = document.getElementById('pw-csv-input');
   if (!input) {
@@ -10986,7 +11050,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA270</div>
+            <div style="font-size:13px;color:var(--text3);">BETA271</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -11000,7 +11064,7 @@ function calShowAddEvent() {
               <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">Esporta PDF / JSON</span></div>
               <div style="display:flex;align-items:center;gap:8px;">📥 <span style="color:var(--text2);">Import CSV da Chrome/Firefox/1Password</span></div>
               <div style="display:flex;align-items:center;gap:8px;">📊 <span style="color:var(--text2);">Statistiche e analisi password</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📱 <span style="color:var(--text2);">Condivisione QR temporanea</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📱 <span style="color:var(--text2);">Condivisione e scansione QR password</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔔 <span style="color:var(--text2);">Notifiche scadenze</span></div>
               <div style="display:flex;align-items:center;gap:8px;">⏱️ <span style="color:var(--text2);">Blocco automatico per inattività</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔍 <span style="color:var(--text2);">Ricerca globale</span></div>
