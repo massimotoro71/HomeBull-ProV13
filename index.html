@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA278</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA279</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA278</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA279</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA278</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA279</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA278',
+  version: 'BETA279',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10337,7 +10337,7 @@ async function viewSharedSection(shareId, section) {
       +'<div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:14px;">'
       +(items.length ? items.map(i=>'<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">'+(i.name||i.title||i.summary||JSON.stringify(i).slice(0,50))+'</div>').join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;">Nessun elemento</div>')
       +'</div>'
-      +'<button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>'
+      +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>'
       +'</div>';
     document.body.appendChild(ov);
   } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
@@ -10350,23 +10350,34 @@ function showShareModal(section) {
     const active = Object.values(_myShares).filter(s => s.section === section);
     const received = Object.values(_receivedShares).filter(s => s.section === section);
 
-    const activeHtml = active.length ? active.map(s =>
-      '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:10px;margin-bottom:6px;">'
-      +'<div style="flex:1;"><div style="font-size:13px;font-weight:700;">'+s.withEmail+'</div>'
-      +'<div style="font-size:11px;color:var(--text3);">'+(s.permission==='write'?'✏️ Può modificare':'👁 Solo lettura')+'</div></div>'
-      +'<button onclick="removeShare(''+s.shareId+'')" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">Rimuovi</button>'
-      +'</div>'
-    ).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">Nessuna condivisione attiva</div>';
+    const activeHtml = active.length ? active.map(s => {
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:10px;margin-bottom:6px;';
+      div.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Può modificare' : '👁 Solo lettura') + '</div></div>';
+      const btn = document.createElement('button');
+      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;';
+      btn.textContent = 'Rimuovi';
+      btn.dataset.shareId = s.shareId;
+      btn.addEventListener('click', () => removeShare(s.shareId));
+      div.appendChild(btn);
+      return div.outerHTML;
+    }).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">Nessuna condivisione attiva</div>';
 
     const receivedHtml = received.length ?
       '<div style="margin-top:14px;"><div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>'
-      + received.map(s =>
-        '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;margin-bottom:6px;">'
-        +'<div style="flex:1;"><div style="font-size:13px;font-weight:700;">'+s.fromEmail+'</div>'
-        +'<div style="font-size:11px;color:var(--text3);">'+(s.permission==='write'?'✏️ Puoi modificare':'👁 Solo lettura')+'</div></div>'
-        +'<button onclick="viewSharedSection(''+s.shareId+'',''+section+'')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">Apri</button>'
-        +'</div>'
-      ).join('') + '</div>' : '';
+      + received.map(s => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;margin-bottom:6px;';
+        div.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
+          + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Puoi modificare' : '👁 Solo lettura') + '</div></div>';
+        const btn = document.createElement('button');
+        btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
+        btn.textContent = 'Apri';
+        btn.addEventListener('click', () => viewSharedSection(s.shareId, section));
+        div.appendChild(btn);
+        return div.outerHTML;
+      }).join('') + '</div>' : '';
 
     const ov = document.createElement('div');
     ov.id = '_share_modal';
@@ -10383,14 +10394,28 @@ function showShareModal(section) {
       +'<div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>'
       +'<input id="_share_email_inp" type="email" placeholder="email@esempio.com" style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;">'
       +'<div style="display:flex;gap:8px;margin-bottom:10px;">'
-      +'<button id="_perm_write" class="active-perm" onclick="this.classList.add('active-perm');document.getElementById('_perm_read').classList.remove('active-perm');" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">✏️ Modifica</button>'
-      +'<button id="_perm_read" onclick="this.classList.add('active-perm');document.getElementById('_perm_write').classList.remove('active-perm');" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">👁 Lettura</button>'
+      +'<button id="_perm_write" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">✏️ Modifica</button>'
+      +'<button id="_perm_read" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">👁 Lettura</button>'
       +'</div>'
-      +'<button onclick="doCreateShare(''+section+'')" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Condividi</button>'
+      +'<button id="_share_submit" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Condividi</button>'
       +'</div>'
-      +'<button onclick="document.getElementById('_share_modal').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">Chiudi</button>'
+      +'<button id="_share_close" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">Chiudi</button>'
       +'</div>';
     document.body.appendChild(ov);
+
+    // Event listeners sicuri (no apici inline)
+    document.getElementById('_perm_write')?.addEventListener('click', function() {
+      this.style.background = 'var(--accent)'; this.style.color = 'white'; this.style.borderColor = 'var(--accent)';
+      const r = document.getElementById('_perm_read');
+      if(r){ r.style.background = 'var(--surface)'; r.style.color = 'var(--text)'; r.style.borderColor = 'var(--border)'; }
+    });
+    document.getElementById('_perm_read')?.addEventListener('click', function() {
+      this.style.background = 'var(--accent)'; this.style.color = 'white'; this.style.borderColor = 'var(--accent)';
+      const w = document.getElementById('_perm_write');
+      if(w){ w.style.background = 'var(--surface)'; w.style.color = 'var(--text)'; w.style.borderColor = 'var(--border)'; }
+    });
+    document.getElementById('_share_submit')?.addEventListener('click', () => doCreateShare(section));
+    document.getElementById('_share_close')?.addEventListener('click', () => document.getElementById('_share_modal')?.remove());
   });
 }
 
@@ -11273,7 +11298,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA278</div>
+            <div style="font-size:13px;color:var(--text3);">BETA279</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
