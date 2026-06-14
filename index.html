@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA286</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA274</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA286</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA274</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA286</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA274</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA286',
+  version: 'BETA274',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3674,9 +3674,8 @@ function unlockApp() {
     updateHomeStats();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
-    // Carica condivisioni dopo 3s dall'unlock
-    setTimeout(() => loadShares().then(() => { updateHomeStats(); startSharesListener(); }), 3000);
-    setTimeout(checkExpiryNotifications, 5000);
+    setTimeout(() => loadShares(), 2000);
+    setTimeout(checkExpiryNotifications, 3000);
   });
   initBackHandler();
   applyHomePrefs();
@@ -3703,14 +3702,14 @@ const TAB_CONFIG = {
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
   documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
-  calendar:  { title: 'Calendario',  sub: '', actions: ['add','share'] },
+  calendar:  { title: 'Calendario',  sub: '', actions: [] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Carte',       sub: '', actions: [] },
   wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
   finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
   server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: '', actions: ['share'] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
 };
 
 function switchTab(tab) {
@@ -3900,15 +3899,6 @@ function renderTopbarActions(actions) {
   if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
-    container.appendChild(btn);
-  }
-  if (actions.includes('share')) {
-    const btn = document.createElement('div');
-    btn.className = 'topbar-btn';
-    btn.title = 'Condividi';
-    btn.innerHTML = '👥';
-    btn.style.fontSize = '18px';
-    btn.onclick = () => showShareModal(HB.currentTab);
     container.appendChild(btn);
   }
 }
@@ -4187,7 +4177,13 @@ function updateHomeStats() {
     }
   });
 
-  // 3. OTP attivi
+  // 3. Condivisioni ricevute
+  const receivedCount = Object.keys(_receivedShares || {}).length;
+  if (receivedCount > 0) {
+    alerts.push({ icon:'👥', color:'#6366f1', text: receivedCount + ' sezione' + (receivedCount>1?'i':'e') + ' condivise con te', time: '', tab: 'shopping' });
+  }
+
+  // 4. OTP attivi
   const _otpAlerts = JSON.parse(localStorage.getItem('hb13_otp')||'[]');
   if (_otpAlerts.length > 0) {
     alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '', tab: 'otp' });
@@ -7477,8 +7473,6 @@ function serverSave() {
 const SHOP_LISTS_KEY = 'hb13_shop_lists_v2'; // { listId: {name, items:{id:{name,icon,qty}}} }
 const SHOP_RECENT    = 'hb12_shopping_recent';
 let _shopLists  = {};   // tutte le liste
-let _sharedShopLists = {}; // liste condivise ricevute { shareId: {fromEmail, data} }
-let _shopCurSharedId = null; // ID condivisione attiva
 let _shopCurId  = null; // lista corrente
 let _shopList   = {};   // items lista corrente (shortcut)
 let _shopRecent = [];   // ultimi 8 prodotti usati
@@ -7613,7 +7607,6 @@ function shopOpen() {
 }
 
 function shopRenderAll(q='') {
-  loadSharedShopLists();
   shopRenderListTabs();
   shopRenderActive();
   shopRenderRecent();
@@ -7657,22 +7650,6 @@ function shopRenderListTabs() {
       container.appendChild(btn);
     }
   });
-  // Tab liste condivise ricevute
-  Object.values(_sharedShopLists).forEach(shared => {
-    const btn = document.createElement('button');
-    const isActive = _shopCurSharedId === shared.shareId;
-    btn.style.cssText = 'padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:' + (isActive ? '2px solid #10b981' : '1px solid #10b98155') + ';background:' + (isActive ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.05)') + ';color:' + (isActive ? '#10b981' : '#10b98199') + ';';
-    btn.textContent = '👥 ' + shared.fromEmail.split('@')[0];
-    btn.onclick = () => {
-      _shopCurSharedId = shared.shareId;
-      _shopCurId = null;
-      shopRenderListTabs();
-      shopRenderShared();
-      startSharedShopListener(shared.shareId);
-    };
-    container.appendChild(btn);
-  });
-
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
   addBtn.style.cssText = 'padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:1px dashed var(--border2);background:transparent;color:var(--text3);';
@@ -7682,89 +7659,14 @@ function shopRenderListTabs() {
 }
 
 function shopSwitchList(id) {
-  shopSave();
-  _shopCurSharedId = null;
+  shopSave(); // salva corrente
   _shopCurId = id;
   _shopList  = _shopLists[id].items;
   shopRenderAll();
 }
 
-
-// ── Liste spesa condivise ─────────────────────────────────
-async function loadSharedShopLists() {
-  if (!fbReady || !HB.user || !fbDb) return;
-  const shopReceived = Object.entries(_receivedShares)
-    .filter(([k,s]) => (s.section || s.section) === 'shopping')
-    .map(([k,s]) => ({...s, shareId: s.shareId || k}));
-  
-  if (!shopReceived.length) { _sharedShopLists = {}; return; }
-  
-  for (const share of shopReceived) {
-    try {
-      const snap = await fbDb.ref('shared/' + share.shareId + '/data').get();
-      if (snap.exists()) {
-        _sharedShopLists[share.shareId] = {
-          fromEmail: share.fromEmail,
-          shareId: share.shareId,
-          permission: share.permission,
-          data: snap.val()
-        };
-      }
-    } catch(e) { console.warn('loadSharedShopLists:', e); }
-  }
-  shopRenderListTabs();
-}
-
-// Listener realtime per aggiornamenti lista condivisa
-function startSharedShopListener(shareId) {
-  if (!fbReady || !fbDb) return;
-  fbDb.ref('shared/' + shareId + '/data').on('value', snap => {
-    if (snap.exists() && _sharedShopLists[shareId]) {
-      _sharedShopLists[shareId].data = snap.val();
-      if (_shopCurSharedId === shareId) shopRenderShared();
-    }
-  });
-}
-
-function shopRenderShared() {
-  const shared = _sharedShopLists[_shopCurSharedId];
-  if (!shared) return;
-  
-  const grid = document.getElementById('shop-active-grid');
-  if (!grid) return;
-  
-  const data = shared.data;
-  let items = [];
-  if (data && typeof data === 'object' && !Array.isArray(data)) {
-    Object.values(data).forEach(list => {
-      if (list.items) Object.values(list.items).forEach(item => {
-        if (!item.deleted) items.push(item);
-      });
-    });
-  }
-  
-  if (!items.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:16px;color:var(--text3);font-size:13px;">Lista vuota</div>';
-    return;
-  }
-  
-  grid.innerHTML = items.map(item => {
-    const checked = item.checked || item.done;
-    return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border-radius:12px;border:1px solid var(--border);">'
-      + '<div style="font-size:22px;">' + (item.icon || '🛒') + '</div>'
-      + '<div style="flex:1;font-size:14px;font-weight:600;' + (checked ? 'text-decoration:line-through;color:var(--text3);' : '') + '">' + (item.name || '?') + '</div>'
-      + (checked ? '<div style="color:#10b981;font-size:18px;">✅</div>' : '')
-      + '</div>';
-  }).join('');
-  
-  // Aggiorna label
-  const nameLabel = document.getElementById('shop-list-name-label');
-  if (nameLabel) nameLabel.textContent = '👥 Lista di ' + shared.fromEmail.split('@')[0];
-}
-
 // ── Lista corrente (griglia 4 colonne) ──────────────────
 function shopRenderActive() {
-  if (_shopCurSharedId) { shopRenderShared(); return; }
   const grid = document.getElementById('shop-active-grid');
   if (!grid) return;
   const items = Object.entries(_shopList);
@@ -10296,6 +10198,10 @@ async function fbSyncAll(silent=false){
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
     driveAutoBackup();
+    loadShares();
+    // Sync dati condivisi
+    syncSharedData('shopping');
+    syncSharedData('calendar');
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
@@ -10348,6 +10254,7 @@ function logout(){
 
 let _lastSyncTime = null;
 
+
 // ═══════════════════════════════════════════════════════════
 //  CONDIVISIONE SELETTIVA — Lista Spesa e Calendario
 // ═══════════════════════════════════════════════════════════
@@ -10356,260 +10263,213 @@ const SHAREABLE_SECTIONS = {
   calendar:  { label: 'Calendario',  icon: '📅', key: 'hb13_calendar' },
 };
 
-let _myShares = {};
-let _receivedShares = {};
+let _myShares = {}; // { shareId: { section, withEmail, permission, name } }
+let _receivedShares = {}; // { shareId: { section, fromEmail, permission } }
 
+// Carica le condivisioni dell'utente da Firebase
 async function loadShares() {
-  if (!fbReady || !HB.user || !fbDb) return;
+  if (!fbReady || !HB.user) return;
   const emailKey = _getSyncKey();
   if (!emailKey) return;
   try {
+    // Le mie condivisioni create
     const mySnap = await fbDb.ref('userShares/' + emailKey + '/created').get();
     _myShares = mySnap.exists() ? mySnap.val() : {};
+
+    // Condivisioni ricevute da altri
     const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
-    const newReceived = recSnap.exists() ? recSnap.val() : {};
-    
-    // Notifica nuove condivisioni ricevute
-    const oldCount = Object.keys(_receivedShares).length;
-    const newCount = Object.keys(newReceived).length;
-    if (newCount > oldCount && oldCount >= 0) {
-      const diff = newCount - oldCount;
-      showToast('👥 ' + diff + ' nuova condivisione ricevuta!');
-    }
-    _receivedShares = newReceived;
-    
-    console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
-  } catch(e) { console.warn('loadShares:', e); }
+    _receivedShares = recSnap.exists() ? recSnap.val() : {};
+
+    console.log('✅ Shares caricati:', Object.keys(_myShares).length, 'creati,', Object.keys(_receivedShares).length, 'ricevuti');
+  } catch(e) { console.warn('loadShares error:', e); }
 }
 
-// Listener realtime per condivisioni ricevute
-function startSharesListener() {
-  if (!fbReady || !HB.user || !fbDb) return;
-  const emailKey = _getSyncKey();
-  if (!emailKey) return;
-  fbDb.ref('userShares/' + emailKey + '/received').on('value', snap => {
-    const newReceived = snap.exists() ? snap.val() : {};
-    const oldCount = Object.keys(_receivedShares).length;
-    const newCount = Object.keys(newReceived).length;
-    if (newCount > oldCount && oldCount >= 0 && document.getElementById('app')?.classList.contains('visible')) {
-      showToast('👥 Nuova condivisione ricevuta!');
-      updateHomeStats();
-    }
-    _receivedShares = newReceived;
-  });
-}
-
-async function createShare(section, withEmail, permission) {
+// Crea una nuova condivisione
+async function createShare(section, withEmail, permission = 'write') {
   if (!fbReady || !HB.user) { showToast('⚠️ Devi essere connesso'); return; }
   const myEmail = _emailOtpAddr || HB.user?.email;
-  if (!myEmail) return;
+  if (!myEmail) { showToast('⚠️ Email non trovata'); return; }
   if (withEmail.toLowerCase() === myEmail.toLowerCase()) { showToast('⚠️ Non puoi condividere con te stesso'); return; }
+
+  showToast('📤 Creazione condivisione...');
   try {
-    const shareId = 'sh_' + Date.now();
-    const myKey = _getSyncKey();
-    const withKey = btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-    const sectionKey = SHAREABLE_SECTIONS[section]?.key;
-    const data = sectionKey ? (() => { try { return JSON.parse(localStorage.getItem(sectionKey)||'[]'); } catch(e) { return []; }})() : [];
-    const shareObj = { id:shareId, section, fromEmail:myEmail, fromKey:myKey, withEmail:withEmail.toLowerCase(), withKey, permission, createdAt:new Date().toISOString(), data };
+    const shareId = 'sh_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    const myEmailKey = _getSyncKey();
+    const withEmailKey = btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+
+    // Dati da condividere
+    const sectionData = localStorage.getItem(SHAREABLE_SECTIONS[section]?.key);
+
+    const shareObj = {
+      id: shareId,
+      section,
+      fromEmail: myEmail,
+      fromKey: myEmailKey,
+      withEmail: withEmail.toLowerCase(),
+      withKey: withEmailKey,
+      permission,
+      createdAt: new Date().toISOString(),
+      data: sectionData ? JSON.parse(sectionData) : [],
+    };
+
+    // Salva in Firebase
     await fbDb.ref('shared/' + shareId).set(shareObj);
-    await fbDb.ref('userShares/' + myKey + '/created/' + shareId).set({ shareId, section, withEmail:withEmail.toLowerCase(), permission, createdAt:shareObj.createdAt });
-    await fbDb.ref('userShares/' + withKey + '/received/' + shareId).set({ shareId, section, fromEmail:myEmail, permission, createdAt:shareObj.createdAt });
+
+    // Indice per me (creatore)
+    await fbDb.ref('userShares/' + myEmailKey + '/created/' + shareId).set({
+      shareId, section, withEmail: withEmail.toLowerCase(), permission, createdAt: shareObj.createdAt
+    });
+
+    // Notifica per il destinatario
+    await fbDb.ref('userShares/' + withEmailKey + '/received/' + shareId).set({
+      shareId, section, fromEmail: myEmail, permission, createdAt: shareObj.createdAt
+    });
+
     _myShares[shareId] = shareObj;
-    showToast('✅ Condivisione creata con ' + withEmail);
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-async function removeShare(shareId) {
-  const myKey = _getSyncKey();
-  console.log('removeShare:', shareId, '_myShares:', JSON.stringify(_myShares));
-  const share = _myShares[shareId];
-  if (!share) { 
-    // Prova rimozione diretta da Firebase anche senza dati locali
-    try {
-      await fbDb.ref('shared/' + shareId).remove();
-      await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
-      delete _myShares[shareId];
-      document.getElementById('_share_modal')?.remove();
-      showToast('✅ Rimossa');
-      return;
-    } catch(e) {}
-    showToast('⚠️ Condivisione non trovata');
-    return;
+    showToast('✅ Condivisione creata! ' + withEmail + ' può ora vedere ' + SHAREABLE_SECTIONS[section].label);
+    return shareId;
+  } catch(e) {
+    console.warn('createShare error:', e);
+    showToast('⚠️ Errore: ' + (e.message || e));
   }
-  try {
-    const withEmail = share.withEmail || '';
-    const withKey = withEmail ? btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28) : '';
-    await fbDb.ref('shared/' + shareId).remove();
-    await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
-    if (withKey) await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
-    delete _myShares[shareId];
-    document.getElementById('_share_modal')?.remove();
-    showToast('✅ Condivisione rimossa');
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
 }
 
-// Pulisce tutte le condivisioni duplicate (per cleanup)
-async function cleanupAllShares() {
-  if (!confirm('Rimuovere TUTTE le condivisioni?')) return;
-  const myKey = _getSyncKey();
+// Rimuovi una condivisione
+async function removeShare(shareId) {
+  const myEmailKey = _getSyncKey();
   try {
-    // Rimuovi tutti gli share creati
-    for (const shareId of Object.keys(_myShares)) {
-      try { await fbDb.ref('shared/' + shareId).remove(); } catch(e) {}
-    }
-    await fbDb.ref('userShares/' + myKey + '/created').remove();
-    await fbDb.ref('userShares/' + myKey + '/received').remove();
-    _myShares = {};
-    _receivedShares = {};
-    document.getElementById('_share_modal')?.remove();
-    showToast('✅ Tutte le condivisioni rimosse');
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+    const share = _myShares[shareId];
+    if (!share) return;
+    const withEmailKey = btoa(share.withEmail).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+    await fbDb.ref('shared/' + shareId).remove();
+    await fbDb.ref('userShares/' + myEmailKey + '/created/' + shareId).remove();
+    await fbDb.ref('userShares/' + withEmailKey + '/received/' + shareId).remove();
+    delete _myShares[shareId];
+    showToast('✅ Condivisione rimossa');
+  } catch(e) { showToast('⚠️ Errore rimozione'); }
+}
+
+// Sincronizza dati condivisi verso Firebase (chiamata dopo ogni salvataggio)
+async function syncSharedData(section) {
+  if (!fbReady || !HB.user) return;
+  const sectionKey = SHAREABLE_SECTIONS[section]?.key;
+  if (!sectionKey) return;
+
+  // Trova le mie condivisioni attive per questa sezione
+  const activeShares = Object.values(_myShares).filter(s => s.section === section);
+  if (!activeShares.length) return;
+
+  const data = (() => { try { return JSON.parse(localStorage.getItem(sectionKey)||'[]'); } catch(e) { return []; } })();
+
+  for (const share of activeShares) {
+    try {
+      await fbDb.ref('shared/' + share.shareId + '/data').set(data);
+      await fbDb.ref('shared/' + share.shareId + '/lastSync').set(new Date().toISOString());
+    } catch(e) { console.warn('syncSharedData error:', e); }
+  }
+}
+
+// Carica dati da una condivisione ricevuta
+async function loadSharedData(shareId) {
+  try {
+    const snap = await fbDb.ref('shared/' + shareId + '/data').get();
+    return snap.exists() ? snap.val() : null;
+  } catch(e) { return null; }
+}
+
+// Mostra modal condivisione per una sezione
+function showShareModal(section) {
+  if (!SHAREABLE_SECTIONS[section]) return;
+  const sec = SHAREABLE_SECTIONS[section];
+
+  // Lista condivisioni attive per questa sezione
+  const active = Object.values(_myShares).filter(s => s.section === section);
+  const received = Object.values(_receivedShares).filter(s => s.section === section);
+
+  const activeHtml = active.length ? active.map(s => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:10px;margin-bottom:6px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;">${s.withEmail}</div>
+        <div style="font-size:11px;color:var(--text3);">${s.permission === 'write' ? '✏️ Può modificare' : '👁 Solo lettura'}</div>
+      </div>
+      <button onclick="removeShare('${s.shareId}')" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">Rimuovi</button>
+    </div>`).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">Nessuna condivisione attiva</div>';
+
+  const receivedHtml = received.length ? `
+    <div style="margin-top:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>
+      ${received.map(s => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;margin-bottom:6px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;">${s.fromEmail}</div>
+            <div style="font-size:11px;color:var(--text3);">${s.permission === 'write' ? '✏️ Puoi modificare' : '👁 Solo lettura'}</div>
+          </div>
+          <button onclick="viewSharedSection('${s.shareId}','${section}')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">Apri</button>
+        </div>`).join('')}
+    </div>` : '';
+
+  const ov = document.createElement('div');
+  ov.id = '_share_modal';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">${sec.icon} Condividi ${sec.label}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Condividi con altri utenti HomeBull</div>
+
+    <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;">CONDIVISA CON</div>
+      ${activeHtml}
+    </div>
+    ${receivedHtml}
+
+    <div style="background:var(--surface);border-radius:12px;padding:14px;margin-top:12px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>
+      <input id="_share_email_inp" type="email" placeholder="email@esempio.com" style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;">
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button id="_perm_write" onclick="document.getElementById('_perm_write').style.background='var(--accent)';document.getElementById('_perm_write').style.color='white';document.getElementById('_perm_read').style.background='var(--surface)';document.getElementById('_perm_read').style.color='var(--text)';" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">✏️ Può modificare</button>
+        <button id="_perm_read" onclick="document.getElementById('_perm_read').style.background='var(--accent)';document.getElementById('_perm_read').style.color='white';document.getElementById('_perm_write').style.background='var(--surface)';document.getElementById('_perm_write').style.color='var(--text)';" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">👁 Solo lettura</button>
+      </div>
+      <button onclick="doCreateShare('${section}')" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Condividi</button>
+    </div>
+
+    <button onclick="document.getElementById('_share_modal').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">Chiudi</button>
+  </div>`;
+  document.body.appendChild(ov);
 }
 
 async function doCreateShare(section) {
   const email = document.getElementById('_share_email_inp')?.value?.trim();
-  const perm = document.getElementById('_perm_read')?.dataset.selected === 'true' ? 'read' : 'write';
-  if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
-  document.getElementById('_share_modal')?.remove();
-  await createShare(section, email, perm);
-}
-
-async function doCreateShareWithPerm(email, section, perm) {
-  if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
+  if (!email || !email.includes('@')) { showToast('⚠️ Inserisci un'email valida'); return; }
+  const perm = document.getElementById('_perm_write')?.style.background.includes('241') ? 'write' : 'read';
   document.getElementById('_share_modal')?.remove();
   await createShare(section, email, perm);
 }
 
 async function viewSharedSection(shareId, section) {
-  console.log('viewSharedSection:', shareId, section, '_receivedShares:', JSON.stringify(_receivedShares));
   document.getElementById('_share_modal')?.remove();
-  showToast('📥 Caricamento...');
-  try {
-    const snap = await fbDb.ref('shared/' + shareId + '/data').get();
-    const data = snap.exists() ? snap.val() : null;
-    if (!data) { showToast('⚠️ Dati non disponibili'); return; }
-    const sec = SHAREABLE_SECTIONS[section];
-    const share = _receivedShares[shareId];
+  showToast('📥 Caricamento dati condivisi...');
+  const data = await loadSharedData(shareId);
+  if (!data) { showToast('⚠️ Dati non disponibili'); return; }
 
-    // Normalizza dati — shopping è oggetto {listId: {name, items:{}}}, calendar è array
-    let items = [];
-    if (section === 'shopping' && typeof data === 'object' && !Array.isArray(data)) {
-      // Lista spesa: estrai tutti gli item da tutte le liste
-      Object.values(data).forEach(list => {
-        if (list.items) {
-          Object.values(list.items).forEach(item => {
-            if (!item.deleted) items.push({ name: (item.checked ? '✅ ' : '⬜ ') + (item.name || item.label || '?') });
-          });
-        }
-      });
-    } else if (Array.isArray(data)) {
-      items = data.filter(i => !i.deleted).map(i => ({ name: i.title || i.summary || i.name || JSON.stringify(i).slice(0,50) }));
-    }
-
-    const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-    ov.innerHTML = '<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">'
-      +'<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
-      +'<div style="font-size:16px;font-weight:800;margin-bottom:4px;">'+sec.icon+' '+sec.label+' condivisa</div>'
-      +'<div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Da: '+(share?.fromEmail||'')+'</div>'
-      +'<div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:14px;">'
-      +(items.length ? items.map(i=>'<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">'+i.name+'</div>').join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;">Nessun elemento</div>')
-      +'</div>'
-      +'<button id="_vss_close" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>'
-      +'</div>';
-    document.body.appendChild(ov);
-    document.getElementById('_vss_close')?.addEventListener('click', () => ov.remove());
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+  // Mostra i dati condivisi in un modal
+  const sec = SHAREABLE_SECTIONS[section];
+  const share = _receivedShares[shareId];
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">${sec.icon} ${sec.label} condivisa</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Da: ${share?.fromEmail || 'Utente'}</div>
+    <div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:14px;">
+      ${Array.isArray(data) ? data.filter(i=>!i.deleted).map(item =>
+        `<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">${item.name || item.title || JSON.stringify(item)}</div>`
+      ).join('') || '<div style="color:var(--text3);font-size:13px;text-align:center;">Nessun elemento</div>' :
+      `<pre style="font-size:11px;color:var(--text3);white-space:pre-wrap;">${JSON.stringify(data,null,2).slice(0,500)}</pre>`}
+    </div>
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+  </div>`;
+  document.body.appendChild(ov);
 }
-
-function showShareModal(section) {
-  if (!SHAREABLE_SECTIONS[section]) return;
-  loadShares().then(() => {
-    const sec = SHAREABLE_SECTIONS[section];
-    // Usa entries() per avere sia chiave che valore
-    const active = Object.entries(_myShares)
-      .filter(([k,s]) => s.section === section)
-      .map(([k,s]) => ({...s, shareId: s.shareId || k}));
-    const received = Object.entries(_receivedShares)
-      .filter(([k,s]) => s.section === section)
-      .map(([k,s]) => ({...s, shareId: s.shareId || k}));
-
-    const activeHtml = active.length ? active.map((s, idx) =>
-      '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:10px;margin-bottom:6px;">'
-      + '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
-      + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Può modificare' : '👁 Solo lettura') + '</div></div>'
-      + '<button id="_rimuovi_' + idx + '" data-sid="' + s.shareId + '" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">Rimuovi</button>'
-      + '</div>'
-    ).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">Nessuna condivisione attiva</div>';
-
-    const receivedHtml = received.length ?
-      '<div style="margin-top:14px;"><div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>'
-      + received.map((s, idx) =>
-        '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;margin-bottom:6px;">'
-        + '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Puoi modificare' : '👁 Solo lettura') + '</div></div>'
-        + '<button id="_apri_' + idx + '" data-sid="' + s.shareId + '" data-sec="' + section + '" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">Apri</button>'
-        + '</div>'
-      ).join('') + '</div>' : '';
-
-    const ov = document.createElement('div');
-    ov.id = '_share_modal';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-    ov.innerHTML = '<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">'
-      +'<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
-      +'<div style="font-size:16px;font-weight:800;margin-bottom:4px;">'+sec.icon+' Condividi '+sec.label+'</div>'
-      +'<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Condividi con altri utenti HomeBull</div>'
-      +'<div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:14px;">'
-      +'<div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;">CONDIVISA CON</div>'
-      +activeHtml+'</div>'
-      +receivedHtml
-      +'<div style="background:var(--surface);border-radius:12px;padding:14px;margin-top:12px;">'
-      +'<div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>'
-      +'<input id="_share_email_inp" type="email" placeholder="email@esempio.com" style="width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;">'
-      +'<div style="display:flex;gap:8px;margin-bottom:10px;">'
-      +'<button id="_perm_write" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">✏️ Modifica</button>'
-      +'<button id="_perm_read" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;">👁 Lettura</button>'
-      +'</div>'
-      +'<button id="_share_submit" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Condividi</button>'
-      +'</div>'
-      +'<button id="_share_cleanup" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;">🗑 Rimuovi tutte le condivisioni</button>'
-      +'<button id="_share_close" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;">Chiudi</button>'
-      +'</div>';
-    document.body.appendChild(ov);
-
-    // Event listeners sicuri (no apici inline)
-    document.getElementById('_perm_write')?.addEventListener('click', function() {
-      this.style.background = 'var(--accent)'; this.style.color = 'white'; this.style.borderColor = 'var(--accent)';
-      this.dataset.selected = 'true';
-      const r = document.getElementById('_perm_read');
-      if(r){ r.style.background = 'var(--surface)'; r.style.color = 'var(--text)'; r.style.borderColor = 'var(--border)'; r.dataset.selected = 'false'; }
-    });
-    document.getElementById('_perm_read')?.addEventListener('click', function() {
-      this.style.background = 'var(--accent)'; this.style.color = 'white'; this.style.borderColor = 'var(--accent)';
-      this.dataset.selected = 'true';
-      const w = document.getElementById('_perm_write');
-      if(w){ w.style.background = 'var(--surface)'; w.style.color = 'var(--text)'; w.style.borderColor = 'var(--border)'; w.dataset.selected = 'false'; }
-    });
-    // Default: write selezionato
-    const pw = document.getElementById('_perm_write');
-    if(pw) { pw.dataset.selected = 'true'; pw.style.background = 'var(--accent)'; pw.style.color = 'white'; }
-    document.getElementById('_share_cleanup')?.addEventListener('click', () => cleanupAllShares());
-    document.getElementById('_share_submit')?.addEventListener('click', () => {
-      const perm = document.getElementById('_perm_read')?.dataset.selected === 'true' ? 'read' : 'write';
-      doCreateShareWithPerm(document.getElementById('_share_email_inp')?.value?.trim(), section, perm);
-    });
-    document.getElementById('_share_close')?.addEventListener('click', () => document.getElementById('_share_modal')?.remove());
-
-    // Listener bottoni Rimuovi e Apri (dopo che il DOM è pronto)
-    active.forEach((s, idx) => {
-      document.getElementById('_rimuovi_' + idx)?.addEventListener('click', () => removeShare(s.shareId));
-    });
-    received.forEach((s, idx) => {
-      document.getElementById('_apri_' + idx)?.addEventListener('click', () => viewSharedSection(s.shareId, section));
-    });
-  });
-}
-
 
 function cloudPageOpen(){
   driveUpdateBackupUI();
@@ -11489,7 +11349,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA286</div>
+            <div style="font-size:13px;color:var(--text3);">BETA274</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
