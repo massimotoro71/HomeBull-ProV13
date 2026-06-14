@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA285</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA286</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA285</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA286</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA285</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA286</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA285',
+  version: 'BETA286',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7477,6 +7477,8 @@ function serverSave() {
 const SHOP_LISTS_KEY = 'hb13_shop_lists_v2'; // { listId: {name, items:{id:{name,icon,qty}}} }
 const SHOP_RECENT    = 'hb12_shopping_recent';
 let _shopLists  = {};   // tutte le liste
+let _sharedShopLists = {}; // liste condivise ricevute { shareId: {fromEmail, data} }
+let _shopCurSharedId = null; // ID condivisione attiva
 let _shopCurId  = null; // lista corrente
 let _shopList   = {};   // items lista corrente (shortcut)
 let _shopRecent = [];   // ultimi 8 prodotti usati
@@ -7611,6 +7613,7 @@ function shopOpen() {
 }
 
 function shopRenderAll(q='') {
+  loadSharedShopLists();
   shopRenderListTabs();
   shopRenderActive();
   shopRenderRecent();
@@ -7654,6 +7657,22 @@ function shopRenderListTabs() {
       container.appendChild(btn);
     }
   });
+  // Tab liste condivise ricevute
+  Object.values(_sharedShopLists).forEach(shared => {
+    const btn = document.createElement('button');
+    const isActive = _shopCurSharedId === shared.shareId;
+    btn.style.cssText = 'padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:' + (isActive ? '2px solid #10b981' : '1px solid #10b98155') + ';background:' + (isActive ? 'rgba(16,185,129,0.15)' : 'rgba(16,185,129,0.05)') + ';color:' + (isActive ? '#10b981' : '#10b98199') + ';';
+    btn.textContent = '👥 ' + shared.fromEmail.split('@')[0];
+    btn.onclick = () => {
+      _shopCurSharedId = shared.shareId;
+      _shopCurId = null;
+      shopRenderListTabs();
+      shopRenderShared();
+      startSharedShopListener(shared.shareId);
+    };
+    container.appendChild(btn);
+  });
+
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
   addBtn.style.cssText = 'padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:1px dashed var(--border2);background:transparent;color:var(--text3);';
@@ -7663,14 +7682,89 @@ function shopRenderListTabs() {
 }
 
 function shopSwitchList(id) {
-  shopSave(); // salva corrente
+  shopSave();
+  _shopCurSharedId = null;
   _shopCurId = id;
   _shopList  = _shopLists[id].items;
   shopRenderAll();
 }
 
+
+// ── Liste spesa condivise ─────────────────────────────────
+async function loadSharedShopLists() {
+  if (!fbReady || !HB.user || !fbDb) return;
+  const shopReceived = Object.entries(_receivedShares)
+    .filter(([k,s]) => (s.section || s.section) === 'shopping')
+    .map(([k,s]) => ({...s, shareId: s.shareId || k}));
+  
+  if (!shopReceived.length) { _sharedShopLists = {}; return; }
+  
+  for (const share of shopReceived) {
+    try {
+      const snap = await fbDb.ref('shared/' + share.shareId + '/data').get();
+      if (snap.exists()) {
+        _sharedShopLists[share.shareId] = {
+          fromEmail: share.fromEmail,
+          shareId: share.shareId,
+          permission: share.permission,
+          data: snap.val()
+        };
+      }
+    } catch(e) { console.warn('loadSharedShopLists:', e); }
+  }
+  shopRenderListTabs();
+}
+
+// Listener realtime per aggiornamenti lista condivisa
+function startSharedShopListener(shareId) {
+  if (!fbReady || !fbDb) return;
+  fbDb.ref('shared/' + shareId + '/data').on('value', snap => {
+    if (snap.exists() && _sharedShopLists[shareId]) {
+      _sharedShopLists[shareId].data = snap.val();
+      if (_shopCurSharedId === shareId) shopRenderShared();
+    }
+  });
+}
+
+function shopRenderShared() {
+  const shared = _sharedShopLists[_shopCurSharedId];
+  if (!shared) return;
+  
+  const grid = document.getElementById('shop-active-grid');
+  if (!grid) return;
+  
+  const data = shared.data;
+  let items = [];
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    Object.values(data).forEach(list => {
+      if (list.items) Object.values(list.items).forEach(item => {
+        if (!item.deleted) items.push(item);
+      });
+    });
+  }
+  
+  if (!items.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:16px;color:var(--text3);font-size:13px;">Lista vuota</div>';
+    return;
+  }
+  
+  grid.innerHTML = items.map(item => {
+    const checked = item.checked || item.done;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border-radius:12px;border:1px solid var(--border);">'
+      + '<div style="font-size:22px;">' + (item.icon || '🛒') + '</div>'
+      + '<div style="flex:1;font-size:14px;font-weight:600;' + (checked ? 'text-decoration:line-through;color:var(--text3);' : '') + '">' + (item.name || '?') + '</div>'
+      + (checked ? '<div style="color:#10b981;font-size:18px;">✅</div>' : '')
+      + '</div>';
+  }).join('');
+  
+  // Aggiorna label
+  const nameLabel = document.getElementById('shop-list-name-label');
+  if (nameLabel) nameLabel.textContent = '👥 Lista di ' + shared.fromEmail.split('@')[0];
+}
+
 // ── Lista corrente (griglia 4 colonne) ──────────────────
 function shopRenderActive() {
+  if (_shopCurSharedId) { shopRenderShared(); return; }
   const grid = document.getElementById('shop-active-grid');
   if (!grid) return;
   const items = Object.entries(_shopList);
@@ -11395,7 +11489,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA285</div>
+            <div style="font-size:13px;color:var(--text3);">BETA286</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
