@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA280</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA283</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA280</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA283</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA280</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA283</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA280',
+  version: 'BETA283',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10327,23 +10327,31 @@ async function createShare(section, withEmail, permission) {
 
 async function removeShare(shareId) {
   const myKey = _getSyncKey();
+  // _myShares può contenere l'oggetto completo o solo l'indice
   const share = _myShares[shareId];
-  if (!share) return;
+  if (!share) { showToast('⚠️ Condivisione non trovata'); return; }
   try {
-    const withKey = btoa(share.withEmail).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+    const withEmail = share.withEmail || share.email || '';
+    const withKey = withEmail ? btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28) : '';
     await fbDb.ref('shared/' + shareId).remove();
     await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
-    await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
+    if (withKey) await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
     delete _myShares[shareId];
     document.getElementById('_share_modal')?.remove();
     showToast('✅ Condivisione rimossa');
-  } catch(e) { showToast('⚠️ Errore rimozione'); }
+  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
 }
 
 async function doCreateShare(section) {
   const email = document.getElementById('_share_email_inp')?.value?.trim();
+  const perm = document.getElementById('_perm_read')?.dataset.selected === 'true' ? 'read' : 'write';
   if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
-  const perm = document.getElementById('_perm_write')?.classList.contains('active-perm') ? 'write' : 'read';
+  document.getElementById('_share_modal')?.remove();
+  await createShare(section, email, perm);
+}
+
+async function doCreateShareWithPerm(email, section, perm) {
+  if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
   document.getElementById('_share_modal')?.remove();
   await createShare(section, email, perm);
 }
@@ -10357,7 +10365,22 @@ async function viewSharedSection(shareId, section) {
     if (!data) { showToast('⚠️ Dati non disponibili'); return; }
     const sec = SHAREABLE_SECTIONS[section];
     const share = _receivedShares[shareId];
-    const items = Array.isArray(data) ? data.filter(i=>!i.deleted) : [];
+
+    // Normalizza dati — shopping è oggetto {listId: {name, items:{}}}, calendar è array
+    let items = [];
+    if (section === 'shopping' && typeof data === 'object' && !Array.isArray(data)) {
+      // Lista spesa: estrai tutti gli item da tutte le liste
+      Object.values(data).forEach(list => {
+        if (list.items) {
+          Object.values(list.items).forEach(item => {
+            if (!item.deleted) items.push({ name: (item.checked ? '✅ ' : '⬜ ') + (item.name || item.label || '?') });
+          });
+        }
+      });
+    } else if (Array.isArray(data)) {
+      items = data.filter(i => !i.deleted).map(i => ({ name: i.title || i.summary || i.name || JSON.stringify(i).slice(0,50) }));
+    }
+
     const ov = document.createElement('div');
     ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
     ov.innerHTML = '<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">'
@@ -10365,11 +10388,12 @@ async function viewSharedSection(shareId, section) {
       +'<div style="font-size:16px;font-weight:800;margin-bottom:4px;">'+sec.icon+' '+sec.label+' condivisa</div>'
       +'<div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Da: '+(share?.fromEmail||'')+'</div>'
       +'<div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:14px;">'
-      +(items.length ? items.map(i=>'<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">'+(i.name||i.title||i.summary||JSON.stringify(i).slice(0,50))+'</div>').join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;">Nessun elemento</div>')
+      +(items.length ? items.map(i=>'<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;">'+i.name+'</div>').join('') : '<div style="color:var(--text3);font-size:13px;text-align:center;">Nessun elemento</div>')
       +'</div>'
-      +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>'
+      +'<button id="_vss_close" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>'
       +'</div>';
     document.body.appendChild(ov);
+    document.getElementById('_vss_close')?.addEventListener('click', () => ov.remove());
   } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
 }
 
@@ -10436,15 +10460,23 @@ function showShareModal(section) {
     // Event listeners sicuri (no apici inline)
     document.getElementById('_perm_write')?.addEventListener('click', function() {
       this.style.background = 'var(--accent)'; this.style.color = 'white'; this.style.borderColor = 'var(--accent)';
+      this.dataset.selected = 'true';
       const r = document.getElementById('_perm_read');
-      if(r){ r.style.background = 'var(--surface)'; r.style.color = 'var(--text)'; r.style.borderColor = 'var(--border)'; }
+      if(r){ r.style.background = 'var(--surface)'; r.style.color = 'var(--text)'; r.style.borderColor = 'var(--border)'; r.dataset.selected = 'false'; }
     });
     document.getElementById('_perm_read')?.addEventListener('click', function() {
       this.style.background = 'var(--accent)'; this.style.color = 'white'; this.style.borderColor = 'var(--accent)';
+      this.dataset.selected = 'true';
       const w = document.getElementById('_perm_write');
-      if(w){ w.style.background = 'var(--surface)'; w.style.color = 'var(--text)'; w.style.borderColor = 'var(--border)'; }
+      if(w){ w.style.background = 'var(--surface)'; w.style.color = 'var(--text)'; w.style.borderColor = 'var(--border)'; w.dataset.selected = 'false'; }
     });
-    document.getElementById('_share_submit')?.addEventListener('click', () => doCreateShare(section));
+    // Default: write selezionato
+    const pw = document.getElementById('_perm_write');
+    if(pw) { pw.dataset.selected = 'true'; pw.style.background = 'var(--accent)'; pw.style.color = 'white'; }
+    document.getElementById('_share_submit')?.addEventListener('click', () => {
+      const perm = document.getElementById('_perm_read')?.dataset.selected === 'true' ? 'read' : 'write';
+      doCreateShareWithPerm(document.getElementById('_share_email_inp')?.value?.trim(), section, perm);
+    });
     document.getElementById('_share_close')?.addEventListener('click', () => document.getElementById('_share_modal')?.remove());
   });
 }
@@ -11328,7 +11360,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA280</div>
+            <div style="font-size:13px;color:var(--text3);">BETA283</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
