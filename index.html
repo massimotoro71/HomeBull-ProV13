@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA283</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA284</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA283</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA284</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA283</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA284</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA283',
+  version: 'BETA284',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10327,11 +10327,23 @@ async function createShare(section, withEmail, permission) {
 
 async function removeShare(shareId) {
   const myKey = _getSyncKey();
-  // _myShares può contenere l'oggetto completo o solo l'indice
+  console.log('removeShare:', shareId, '_myShares:', JSON.stringify(_myShares));
   const share = _myShares[shareId];
-  if (!share) { showToast('⚠️ Condivisione non trovata'); return; }
+  if (!share) { 
+    // Prova rimozione diretta da Firebase anche senza dati locali
+    try {
+      await fbDb.ref('shared/' + shareId).remove();
+      await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
+      delete _myShares[shareId];
+      document.getElementById('_share_modal')?.remove();
+      showToast('✅ Rimossa');
+      return;
+    } catch(e) {}
+    showToast('⚠️ Condivisione non trovata');
+    return;
+  }
   try {
-    const withEmail = share.withEmail || share.email || '';
+    const withEmail = share.withEmail || '';
     const withKey = withEmail ? btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28) : '';
     await fbDb.ref('shared/' + shareId).remove();
     await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
@@ -10339,6 +10351,24 @@ async function removeShare(shareId) {
     delete _myShares[shareId];
     document.getElementById('_share_modal')?.remove();
     showToast('✅ Condivisione rimossa');
+  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+}
+
+// Pulisce tutte le condivisioni duplicate (per cleanup)
+async function cleanupAllShares() {
+  if (!confirm('Rimuovere TUTTE le condivisioni?')) return;
+  const myKey = _getSyncKey();
+  try {
+    // Rimuovi tutti gli share creati
+    for (const shareId of Object.keys(_myShares)) {
+      try { await fbDb.ref('shared/' + shareId).remove(); } catch(e) {}
+    }
+    await fbDb.ref('userShares/' + myKey + '/created').remove();
+    await fbDb.ref('userShares/' + myKey + '/received').remove();
+    _myShares = {};
+    _receivedShares = {};
+    document.getElementById('_share_modal')?.remove();
+    showToast('✅ Tutte le condivisioni rimosse');
   } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
 }
 
@@ -10357,6 +10387,7 @@ async function doCreateShareWithPerm(email, section, perm) {
 }
 
 async function viewSharedSection(shareId, section) {
+  console.log('viewSharedSection:', shareId, section, '_receivedShares:', JSON.stringify(_receivedShares));
   document.getElementById('_share_modal')?.remove();
   showToast('📥 Caricamento...');
   try {
@@ -10453,7 +10484,8 @@ function showShareModal(section) {
       +'</div>'
       +'<button id="_share_submit" style="width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Condividi</button>'
       +'</div>'
-      +'<button id="_share_close" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:10px;">Chiudi</button>'
+      +'<button id="_share_cleanup" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;">🗑 Rimuovi tutte le condivisioni</button>'
+      +'<button id="_share_close" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;">Chiudi</button>'
       +'</div>';
     document.body.appendChild(ov);
 
@@ -10473,6 +10505,7 @@ function showShareModal(section) {
     // Default: write selezionato
     const pw = document.getElementById('_perm_write');
     if(pw) { pw.dataset.selected = 'true'; pw.style.background = 'var(--accent)'; pw.style.color = 'white'; }
+    document.getElementById('_share_cleanup')?.addEventListener('click', () => cleanupAllShares());
     document.getElementById('_share_submit')?.addEventListener('click', () => {
       const perm = document.getElementById('_perm_read')?.dataset.selected === 'true' ? 'read' : 'write';
       doCreateShareWithPerm(document.getElementById('_share_email_inp')?.value?.trim(), section, perm);
@@ -11360,7 +11393,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA283</div>
+            <div style="font-size:13px;color:var(--text3);">BETA284</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
