@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA284</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA285</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA284</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA285</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA284</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA285</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA284',
+  version: 'BETA285',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10432,37 +10432,31 @@ function showShareModal(section) {
   if (!SHAREABLE_SECTIONS[section]) return;
   loadShares().then(() => {
     const sec = SHAREABLE_SECTIONS[section];
-    const active = Object.values(_myShares).filter(s => s.section === section);
-    const received = Object.values(_receivedShares).filter(s => s.section === section);
+    // Usa entries() per avere sia chiave che valore
+    const active = Object.entries(_myShares)
+      .filter(([k,s]) => s.section === section)
+      .map(([k,s]) => ({...s, shareId: s.shareId || k}));
+    const received = Object.entries(_receivedShares)
+      .filter(([k,s]) => s.section === section)
+      .map(([k,s]) => ({...s, shareId: s.shareId || k}));
 
-    const activeHtml = active.length ? active.map(s => {
-      const div = document.createElement('div');
-      div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:10px;margin-bottom:6px;';
-      div.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Può modificare' : '👁 Solo lettura') + '</div></div>';
-      const btn = document.createElement('button');
-      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;';
-      btn.textContent = 'Rimuovi';
-      btn.dataset.shareId = s.shareId;
-      btn.addEventListener('click', () => removeShare(s.shareId));
-      div.appendChild(btn);
-      return div.outerHTML;
-    }).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">Nessuna condivisione attiva</div>';
+    const activeHtml = active.length ? active.map((s, idx) =>
+      '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:10px;margin-bottom:6px;">'
+      + '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
+      + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Può modificare' : '👁 Solo lettura') + '</div></div>'
+      + '<button id="_rimuovi_' + idx + '" data-sid="' + s.shareId + '" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">Rimuovi</button>'
+      + '</div>'
+    ).join('') : '<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px;">Nessuna condivisione attiva</div>';
 
     const receivedHtml = received.length ?
       '<div style="margin-top:14px;"><div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>'
-      + received.map(s => {
-        const div = document.createElement('div');
-        div.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;margin-bottom:6px;';
-        div.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
-          + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Puoi modificare' : '👁 Solo lettura') + '</div></div>';
-        const btn = document.createElement('button');
-        btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
-        btn.textContent = 'Apri';
-        btn.addEventListener('click', () => viewSharedSection(s.shareId, section));
-        div.appendChild(btn);
-        return div.outerHTML;
-      }).join('') + '</div>' : '';
+      + received.map((s, idx) =>
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;margin-bottom:6px;">'
+        + '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission === 'write' ? '✏️ Puoi modificare' : '👁 Solo lettura') + '</div></div>'
+        + '<button id="_apri_' + idx + '" data-sid="' + s.shareId + '" data-sec="' + section + '" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">Apri</button>'
+        + '</div>'
+      ).join('') + '</div>' : '';
 
     const ov = document.createElement('div');
     ov.id = '_share_modal';
@@ -10511,6 +10505,14 @@ function showShareModal(section) {
       doCreateShareWithPerm(document.getElementById('_share_email_inp')?.value?.trim(), section, perm);
     });
     document.getElementById('_share_close')?.addEventListener('click', () => document.getElementById('_share_modal')?.remove());
+
+    // Listener bottoni Rimuovi e Apri (dopo che il DOM è pronto)
+    active.forEach((s, idx) => {
+      document.getElementById('_rimuovi_' + idx)?.addEventListener('click', () => removeShare(s.shareId));
+    });
+    received.forEach((s, idx) => {
+      document.getElementById('_apri_' + idx)?.addEventListener('click', () => viewSharedSection(s.shareId, section));
+    });
   });
 }
 
@@ -11393,7 +11395,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA284</div>
+            <div style="font-size:13px;color:var(--text3);">BETA285</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
