@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA272</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA273</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA272</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA273</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA272</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA273</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA272',
+  version: 'BETA273',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5322,7 +5322,13 @@ function qrScannerClose() {
 }
 
 function qrScanFromGallery() {
-  document.getElementById('qr-gallery-input').click();
+  // Prima ferma la camera senza chiudere il modal
+  if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
+  if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+  // Piccolo delay per far completare lo stop
+  setTimeout(() => {
+    document.getElementById('qr-gallery-input').click();
+  }, 100);
 }
 
 function qrHandleGalleryImage(event) {
@@ -5330,27 +5336,53 @@ function qrHandleGalleryImage(event) {
   if (!file) return;
   event.target.value = '';
 
+  showToast('🔍 Analisi immagine...');
+
   const img = new Image();
   img.onload = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0);
-    try {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      if (typeof jsQR !== 'undefined') {
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
-        if (code?.data) {
-          qrScannerClose();
-          _qrCallback?.(code.data);
-          return;
-        }
-      }
-      showToast('⚠️ Nessun QR trovato nell\'immagine');
-    } catch(e) {
-      showToast('⚠️ Errore lettura immagine');
+    // Ridimensiona a max 1024px per migliorare lettura jsQR
+    const MAX = 1024;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
     }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+
+    // Prova lettura diretta
+    const imageData = ctx.getImageData(0, 0, w, h);
+    let code = null;
+    if (typeof jsQR !== 'undefined') {
+      code = jsQR(imageData.data, w, h, { inversionAttempts: 'both' });
+    }
+
+    if (code?.data) {
+      qrScannerClose();
+      _qrCallback?.(code.data);
+      return;
+    }
+
+    // Prova con contrasto aumentato
+    const enhanced = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < enhanced.data.length; i += 4) {
+      const avg = (enhanced.data[i] + enhanced.data[i+1] + enhanced.data[i+2]) / 3;
+      const val = avg > 128 ? 255 : 0;
+      enhanced.data[i] = enhanced.data[i+1] = enhanced.data[i+2] = val;
+    }
+    code = jsQR(enhanced.data, w, h, { inversionAttempts: 'both' });
+
+    if (code?.data) {
+      qrScannerClose();
+      _qrCallback?.(code.data);
+    } else {
+      showToast('⚠️ Nessun QR trovato — prova con un\'immagine più nitida');
+    }
+
+    URL.revokeObjectURL(img.src);
   };
   img.onerror = () => showToast('⚠️ Immagine non valida');
   img.src = URL.createObjectURL(file);
@@ -11089,7 +11121,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA272</div>
+            <div style="font-size:13px;color:var(--text3);">BETA273</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
