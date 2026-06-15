@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA290</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA291</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA290</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA291</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA290</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA291</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA290',
+  version: 'BETA291',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10301,11 +10301,15 @@ async function loadShares() {
   const emailKey = _getSyncKey();
   if (!emailKey) return;
   try {
+    console.log('loadShares — emailKey:', emailKey);
     const mySnap  = await fbDb.ref('userShares/' + emailKey + '/created').get();
     _myShares     = mySnap.exists()  ? mySnap.val()  : {};
     const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
     _receivedShares = recSnap.exists() ? recSnap.val() : {};
     console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
+    // Debug: mostra cosa c'è su Firebase
+    const allSnap = await fbDb.ref('userShares/' + emailKey).get();
+    console.log('userShares raw:', JSON.stringify(allSnap.val()));
   } catch(e) { console.warn('loadShares:', e); }
 }
 
@@ -11469,7 +11473,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA290</div>
+            <div style="font-size:13px;color:var(--text3);">BETA291</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
