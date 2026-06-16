@@ -2027,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA304</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA305</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA304</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA305</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA304</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA305</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA304',
+  version: 'BETA305',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3644,32 +3644,6 @@ async function deriveKey(pin, salt) {
   );
 }
 
-async function hbEncrypt(text) {
-  if (!HB.sessionKey) return text;
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const enc = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv }, HB.sessionKey, new TextEncoder().encode(text)
-  );
-  const combined = new Uint8Array(12 + enc.byteLength);
-  combined.set(iv, 0);
-  combined.set(new Uint8Array(enc), 12);
-  let bin = '';
-  for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
-  return 'hb12:' + btoa(bin);
-}
-
-async function hbDecrypt(data) {
-  if (!HB.sessionKey || !data.startsWith('hb12:')) return data;
-  try {
-    const combined = new Uint8Array(atob(data.slice(5)).split('').map(c => c.charCodeAt(0)));
-    const dec = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: combined.slice(0, 12) },
-      HB.sessionKey, combined.slice(12)
-    );
-    return new TextDecoder().decode(dec);
-  } catch(e) { return null; }
-}
-
 // ── User persistence (email only, no secrets) ──────────────
 function saveUser(u) { localStorage.setItem('hb12_user', JSON.stringify(u)); }
 function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')); } catch { return null; } }
@@ -3977,9 +3951,6 @@ function topbarBack() {
 }
 
 // ── More Drawer ────────────────────────────────────────────
-function openMoreDrawer() {
-  document.getElementById('more-drawer').classList.add('open');
-}
 function closeMoreDrawer() {
   document.getElementById('more-drawer').classList.remove('open');
 }
@@ -5147,20 +5118,19 @@ const _iconCache = {};
 async function aiGetCatIcon(catName) {
   if (_iconCache[catName]) return _iconCache[catName];
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 10,
-        messages: [{
-          role: 'user',
-          content: `Rispondi SOLO con un singolo emoji che rappresenta meglio la categoria password chiamata "${catName}". Solo l'emoji, nient'altro.`
-        }]
-      })
-    });
-    const data = await res.json();
-    const emoji = data.content?.[0]?.text?.trim() || '📁';
+    // Mappa emoji locale — no API call
+    const emojiMap = {
+      'social': '📱', 'email': '📧', 'mail': '📧', 'banca': '🏦', 'bank': '🏦',
+      'lavoro': '💼', 'work': '💼', 'casa': '🏠', 'home': '🏠', 'shop': '🛒',
+      'acquisti': '🛒', 'giochi': '🎮', 'game': '🎮', 'viaggi': '✈️', 'travel': '✈️',
+      'salute': '🏥', 'health': '🏥', 'scuola': '🎓', 'school': '🎓',
+      'musica': '🎵', 'music': '🎵', 'video': '🎬', 'foto': '📷', 'photo': '📷',
+      'finanz': '💰', 'finance': '💰', 'governo': '🏛️', 'gov': '🏛️',
+      'assicur': '🛡️', 'insurance': '🛡️', 'auto': '🚗', 'car': '🚗',
+      'sport': '⚽', 'food': '🍕', 'cibo': '🍕',
+    };
+    const low = catName.toLowerCase();
+    const emoji = Object.entries(emojiMap).find(([k]) => low.includes(k))?.[1] || '📁';
     _iconCache[catName] = emoji;
     return emoji;
   } catch(e) { return '📁'; }
@@ -5290,12 +5260,6 @@ function cfCalcola() {
   showToast('✅ Codice Fiscale calcolato!');
 }
 
-async function cfCopyResult() {
-  const cf = document.getElementById('cf-result-text')?.textContent;
-  try { await navigator.clipboard.writeText(cf); showToast('📋 CF copiato!'); }
-  catch(e) { showToast(cf); }
-}
-
 // ── Barcode Code 128 ─────────────────────────────────────
 // Tabella Code 128B
 const C128_TABLE = [
@@ -5353,33 +5317,7 @@ function cfBarcodeZoom(dir) {
   if (cf) cfDrawBarcode(cf);
 }
 
-function cfZoomBarcode() { cfBarcodeZoom(1); }
-
 // ── UI helpers CF ────────────────────────────────────────
-function cfSetSesso(s) {
-  _cfSesso = s;
-  document.getElementById('cf-sesso-m').style.cssText = s==='M' ?
-    'flex:1;padding:10px;border-radius:10px;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit;' :
-    'flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:800;cursor:pointer;font-family:inherit;';
-  document.getElementById('cf-sesso-f').style.cssText = s==='F' ?
-    'flex:1;padding:10px;border-radius:10px;border:2px solid #e879a0;background:rgba(232,121,160,0.1);color:#e879a0;font-weight:800;cursor:pointer;font-family:inherit;' :
-    'flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:800;cursor:pointer;font-family:inherit;';
-}
-
-function cfSearchComune(q) {
-  cfLoadComuni();
-  const results = document.getElementById('cf-comune-results');
-  if (!results) return;
-  if (q.length < 2) { results.style.display = 'none'; return; }
-  const ql = q.toUpperCase();
-  const matches = Object.keys(_cfComuni).filter(n => n.includes(ql)).slice(0, 12);
-  if (!matches.length) { results.style.display = 'none'; return; }
-  results.style.display = 'block';
-  results.innerHTML = matches.map(n =>
-    `<div onclick="cfSelectComune('${n}')" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">${n} <span style="color:var(--text3);font-size:11px;">${_cfComuni[n].prov}</span></div>`
-  ).join('');
-}
-
 function cfSelectComune(nome) {
   _cfComuneSelezionato = nome;
   document.getElementById('cf-comune-search').value = nome;
@@ -6894,19 +6832,6 @@ function calRenderMonth() {
   calRenderMonthNew();
 }
 
-function calPrevMonth() {
-  _calMonth--;
-  if (_calMonth < 0) { _calMonth = 11; _calYear--; }
-  _calSelectedDate = null;
-  calRenderMonth(); calRenderEvents();
-}
-function calNextMonth() {
-  _calMonth++;
-  if (_calMonth > 11) { _calMonth = 0; _calYear++; }
-  _calSelectedDate = null;
-  calRenderMonth(); calRenderEvents();
-}
-
 function calSelectDate(dateStr) {
   _calSelectedDate = dateStr;
   calRenderMonth();
@@ -7252,43 +7177,6 @@ function docsDelete(id) {
 
 // Array temporaneo foto per il documento corrente
 let _docPhotos = []; // array di base64 string
-
-function docPhotoCapture(source) {
-  const inp = document.getElementById('doc-photo-input');
-  if (source === 'camera') {
-    inp.setAttribute('capture', 'environment');
-  } else {
-    inp.removeAttribute('capture');
-  }
-  inp.click();
-}
-
-function docPhotoSelected(input) {
-  const files = input.files;
-  if (!files?.length) return;
-  Array.from(files).forEach(file => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      // Comprimi l'immagine prima di salvarla
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX = 800;
-        const ratio = Math.min(MAX/img.width, MAX/img.height, 1);
-        canvas.width  = Math.round(img.width  * ratio);
-        canvas.height = Math.round(img.height * ratio);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        const b64 = canvas.toDataURL('image/jpeg', 0.75);
-        _docPhotos.push(b64);
-        docRenderPhotos();
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-  input.value = '';
-}
 
 function docRenderPhotos() {
   const preview = document.getElementById('doc-photos-preview');
@@ -8123,16 +8011,7 @@ let backPressCount = 0;
 let backPressTimer = null;
 let _backHandlerActive = false;
 
-// Avvia subito il buffer history E il listener — non aspettare unlock
-(function earlyBackHandler() {
-  history.replaceState({ hb: 'root' }, '');
-  for (let i = 0; i < 20; i++) history.pushState({ hb: 'app' }, '');
-
-  window.addEventListener('popstate', (e) => {
-    history.pushState({ hb: 'app' }, '');
-    if (typeof handleBackPress === 'function') handleBackPress();
-  });
-})();
+// Back handler inizializzato in initBackHandler
 
 function initBackHandler() {
   // Il listener è già attivo — non fare nulla
@@ -8426,43 +8305,6 @@ function loadHomePrefs() {
 }
 function saveHomePrefs(prefs) {
   localStorage.setItem(HOME_PREFS_KEY, JSON.stringify(prefs));
-}
-
-function openHomeCustom() {
-  const prefs = loadHomePrefs();
-  // Precompila checkbox sezioni
-  const defaults = { search:true, quick:true, stats:true, alerts:true };
-  ['search','quick','stats','alerts'].forEach(k => {
-    const el = document.getElementById('hc-' + k);
-    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
-  });
-  // Precompila quick access
-  qaSelected = [...loadQuickAccess()];
-  const container = document.getElementById('qa-all-tabs-home');
-  container.innerHTML = '';
-  ALL_TABS_META.forEach(tab => {
-    const el = document.createElement('div');
-    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
-    el.dataset.id = tab.id;
-    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
-    el.onclick = () => {
-      if (qaSelected.includes(tab.id)) {
-        qaSelected = qaSelected.filter(t => t !== tab.id);
-        el.classList.remove('selected');
-      } else if (qaSelected.length < 8) {
-        qaSelected.push(tab.id);
-        el.classList.add('selected');
-      } else {
-        showToast('Massimo 6 schede');
-      }
-    };
-    container.appendChild(el);
-  });
-  // Tema
-  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
-  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
-  document.getElementById('home-custom-modal').style.display = 'flex';
 }
 
 function closeHomeCustom() {
@@ -8982,56 +8824,6 @@ function cfPrint(){
   const w=window.open('','_blank');
   w.document.write('<html><body style="text-align:center;font-family:monospace;padding:40px;"><h2>CODICE FISCALE</h2><div style="font-size:28px;font-weight:bold;letter-spacing:6px;margin:20px 0;">'+cf+'</div><svg id="bc"></svg><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#bc","'+cf+'",{format:"CODE128",width:3,height:80,displayValue:false});<\/script></body></html>');
   w.document.close();setTimeout(()=>w.print(),800);
-}
-
-function docsTogglePersonal(){
-  const form=document.getElementById('docs-personal-form');
-  const btn=document.getElementById('docs-personal-toggle');
-  if(!form)return;
-  const open=form.style.display!=='none';
-  form.style.display=open?'none':'block';
-  btn.textContent=open?'+ Espandi':'− Chiudi';
-  if(!open){try{const d=JSON.parse(localStorage.getItem(CF_PERSONAL_KEY)||'{}');
-    ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{const el=document.getElementById('cf_'+k);if(el&&d[k])el.value=d[k];});
-    if(d.cf){document.getElementById('cf_manual').value=d.cf;document.getElementById('cf_result').textContent=d.cf;cfGenBarcode(d.cf);}
-  }catch(e){}}
-}
-
-function docsPersonalSave(){
-  const d={};
-  ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{d[k]=document.getElementById('cf_'+k)?.value?.trim()||'';});
-  d.cf=document.getElementById('cf_manual')?.value?.trim()||document.getElementById('cf_result')?.textContent||'';
-  localStorage.setItem(CF_PERSONAL_KEY,JSON.stringify(d));
-  showToast('✅ Dati personali salvati');
-}
-
-function cfSaveAsDoc() {
-  const cognome = document.getElementById('cf_cognome')?.value.trim();
-  const nome    = document.getElementById('cf_nome')?.value.trim();
-  const cf      = document.getElementById('cf_manual')?.value.trim() || document.getElementById('cf_result')?.textContent;
-  if (!cognome || !nome) { showToast('Inserisci cognome e nome'); return; }
-  if (!cf || cf === '—' || cf.length !== 16) { showToast('CF non valido — inseriscilo manualmente'); return; }
-
-  // Salva come documento
-  const doc = {
-    id: 'doc_' + Date.now(),
-    type: 'cf', icon: '📋', label: 'Cod. Fiscale',
-    holder: cognome + ' ' + nome,
-    number: cf,
-    expiry: '', issue: '', issuer: '',
-    notes: [
-      document.getElementById('cf_nascita')?.value ? 'Nato/a il ' + document.getElementById('cf_nascita')?.value : '',
-      document.getElementById('cf_comune')?.value  ? 'a ' + document.getElementById('cf_comune')?.value : '',
-      document.getElementById('cf_residenza')?.value ? 'Res: ' + document.getElementById('cf_residenza')?.value : '',
-      document.getElementById('cf_via')?.value      ? document.getElementById('cf_via')?.value : '',
-    ].filter(Boolean).join(' | '),
-    photos: [],
-    createdAt: new Date().toISOString()
-  };
-  _docs.push(doc);
-  docsSaveAll();
-  docsShowList();
-  showToast('✅ Codice Fiscale salvato nei documenti');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -10222,14 +10014,6 @@ async function authLogout() {
 
 function fbLogout() { lockApp(); }
 
-function fbMsg(c){
-  return({'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata',
-    'auth/invalid-credential':'Email o password errata','auth/email-already-in-use':'Email già registrata',
-    'auth/invalid-email':'Email non valida','auth/weak-password':'Password troppo debole',
-    'auth/too-many-requests':'Troppi tentativi — riprova tra poco',
-    'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
-}
-
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
   'hb13_docs2','hb13_finance','hb13_server','hb13_shop_lists','hb13_calendar_shifts',
   'hb13_pw_cats','hb13_shop_lists_v2'];
@@ -10247,22 +10031,6 @@ function _getSyncKey(){
 }
 
 // Merge per array con ID
-function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
-  if(!local||!Array.isArray(local)) return cloud||[];
-  if(!cloud||!Array.isArray(cloud)) return local||[];
-  const map = {};
-  local.forEach(item => { if(item.id) map[item.id]=item; });
-  cloud.forEach(item => {
-    if(!item.id) return;
-    if(!map[item.id]) { map[item.id]=item; }
-    else {
-      const lt = new Date(map[item.id].deletedAt||map[item.id][tsField]||0).getTime();
-      const ct = new Date(item.deletedAt||item[tsField]||0).getTime();
-      if(ct>lt) map[item.id]=item;
-    }
-  });
-  return Object.values(map);
-}
 function markDeleted(arr,id){ return arr.map(i=>i.id===id?{...i,deleted:true,deletedAt:new Date().toISOString()}:i); }
 const MERGE_KEYS={'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,'hb13_cards':true,'hb13_wifi':true,'hb13_docs2':true,'hb13_finance':true,'hb13_server':true};
 
@@ -10347,19 +10115,6 @@ async function fbSyncAll(silent=false){
 }
 
 let _syncInProgress = false;
-(function patchLocalStorage(){
-  const origSet = localStorage.setItem.bind(localStorage);
-  localStorage.setItem = function(key, value) {
-    origSet(key, value);
-    if(!_syncInProgress && HB_SYNC_KEYS.includes(key)){
-      _setLocalTs(key, Date.now());
-      if(fbReady && HB.user){
-        clearTimeout(window._syncDebounce);
-        window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
-      }
-    }
-  };
-})();
 
 let _realtimeRef = null;
 function fbStartRealtime(){
@@ -11449,13 +11204,19 @@ function calShowAddEvent() {
               <button onclick="driveBackupNow()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup</button>
             </div>
           </div>
-          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
-            <div>
-              <div style="font-size:13px;font-weight:700;">Auto backup (ogni 24h)</div>
-              <div style="font-size:11px;color:var(--text3);">Backup silenzioso dopo ogni sync</div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div>
+                <div style="font-size:13px;font-weight:700;">Auto backup Drive</div>
+                <div style="font-size:11px;color:var(--text3);">Backup silenzioso automatico</div>
+              </div>
+              <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
+                <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+              </div>
             </div>
-            <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
-              <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+            <div style="display:flex;gap:8px;" id="drive-auto-mode-row">
+              <button onclick="driveSetAutoMode('save')" id="drive-mode-save" style="flex:1;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Ad ogni modifica</button>
+              <button onclick="driveSetAutoMode('30min')" id="drive-mode-30min" style="flex:1;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Ogni 30 minuti</button>
             </div>
           </div>
         </div>
@@ -11559,7 +11320,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA304</div>
+            <div style="font-size:13px;color:var(--text3);">BETA305</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -11586,6 +11347,7 @@ function calShowAddEvent() {
             <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
               <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">PDF completo o per singola sezione</span></div>
               <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup JSON completo</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Drive backup automatico (ultimi 10)</span></div>
             </div>
           </div>
         </div>
@@ -11918,7 +11680,7 @@ async function drivePruneOldBackups(token) {
     const result = await search.json();
     const files = result.files || [];
     // Elimina quelli oltre il 5°
-    const toDelete = files.slice(5);
+    const toDelete = files.slice(10);
     for (const f of toDelete) {
       await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, {
         method: 'DELETE', headers: { Authorization: 'Bearer ' + token }
@@ -11931,17 +11693,25 @@ async function drivePruneOldBackups(token) {
 
 // ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
 async function driveAutoBackup() {
-  // Auto backup solo se attivato dall'utente
   if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  if (!_driveBackupToken) return; // niente popup automatici
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
   const last = localStorage.getItem('hb_drive_backup_ts');
-  if (last) {
+  if (last && mode === '30min') {
     const diff = Date.now() - new Date(last).getTime();
-    if (diff < 24 * 60 * 60 * 1000) return; // meno di 24h fa
+    if (diff < 30 * 60 * 1000) return; // meno di 30 minuti fa
   }
-  // Esegui solo se token già disponibile (niente popup OAuth automatici)
-  if (_driveBackupToken) {
-    console.log('🔄 Auto-backup Drive silenzioso...');
-    await driveBackupNow(true);
+  // mode === 'save' → sempre (chiamato dopo ogni salvataggio)
+  console.log('🔄 Auto-backup Drive silenzioso (' + mode + ')...');
+  await driveBackupNow(true);
+}
+
+// Chiama dopo ogni salvataggio significativo
+function driveAutoBackupOnSave() {
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  if (mode === 'save' && localStorage.getItem('hb_drive_auto') === '1') {
+    clearTimeout(window._driveBackupDebounce);
+    window._driveBackupDebounce = setTimeout(() => driveAutoBackup(), 5000);
   }
 }
 
@@ -12043,6 +11813,14 @@ function driveUpdateBackupUI() {
   const thm = document.getElementById('drive-auto-thumb');
   if (tog) tog.style.background = auto ? '#10b981' : '#6b7280';
   if (thm) thm.style.left = auto ? '25px' : '3px';
+  // Aggiorna bottoni modo
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  const modeRow = document.getElementById('drive-auto-mode-row');
+  if (modeRow) modeRow.style.display = auto ? 'flex' : 'none';
+  const btnSave = document.getElementById('drive-mode-save');
+  const btn30 = document.getElementById('drive-mode-30min');
+  if (btnSave) { btnSave.style.background = mode==='save' ? 'var(--accent)' : 'var(--surface)'; btnSave.style.color = mode==='save' ? 'white' : 'var(--text)'; btnSave.style.border = mode==='save' ? 'none' : '1px solid var(--border)'; }
+  if (btn30)  { btn30.style.background  = mode==='30min'? 'var(--accent)' : 'var(--surface)'; btn30.style.color  = mode==='30min'? 'white' : 'var(--text)'; btn30.style.border = mode==='30min'? 'none' : '1px solid var(--border)'; }
 }
 
 function driveToggleAuto() {
@@ -12050,6 +11828,12 @@ function driveToggleAuto() {
   localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
   driveUpdateBackupUI();
   showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
+}
+
+function driveSetAutoMode(mode) {
+  localStorage.setItem('hb_drive_auto_mode', mode);
+  driveUpdateBackupUI();
+  showToast(mode === 'save' ? '✅ Backup ad ogni modifica' : '✅ Backup ogni 30 minuti');
 }
 
 
