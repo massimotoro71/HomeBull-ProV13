@@ -2027,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA306</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA307</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA306</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA307</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA306</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA307</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA306',
+  version: 'BETA307',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3669,7 +3669,7 @@ function unlockApp() {
         try {
           const myKey = _getSyncKey();
           if (!myKey || !fbDb) return;
-          const snap = await fbDb.ref('hb13/' + myKey + '/sharedListId').get();
+          const snap = await fbDb.ref('userMeta/' + myKey + '/sharedListId').get();
           if (snap.exists()) {
             const listId = snap.val();
             localStorage.setItem('hb_shared_list_id', listId);
@@ -10043,6 +10043,18 @@ function _tsKey(k){ return 'hb_ts_' + k; }
 function _getLocalTs(k){ return parseInt(localStorage.getItem(_tsKey(k))||'0'); }
 function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(localStorage,_tsKey(k),t||Date.now()); }
 
+// Intercetta setItem per aggiornare timestamp automaticamente
+(function patchStorageTs() {
+  const origSet = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(key, value) {
+    origSet.call(this, key, value);
+    // Se è una chiave dati HB e non stiamo già sincronizzando
+    if (HB_SYNC_KEYS && HB_SYNC_KEYS.includes(key) && !_syncInProgress) {
+      _setLocalTs(key, Date.now());
+    }
+  };
+})();
+
 function _getSyncKey(){
   let emailAddr = _emailOtpAddr || HB.user?.email || '';
   if(!emailAddr){ try { emailAddr = JSON.parse(localStorage.getItem('hb_last_user')||'{}').email||''; } catch(e){} }
@@ -10233,9 +10245,9 @@ async function sharedListJoin(listId) {
     await fbDb.ref('sharedLists/' + listId + '/members/' + myKey).set(myEmail);
     localStorage.setItem('hb_shared_list_id', listId);
     _sharedListId = listId;
-    // Salva anche su Firebase per sync automatico altri dispositivi
+    // Salva su path separato (non cifrato) per sync automatico
     const myKey2 = _getSyncKey();
-    if (myKey2) fbDb.ref('hb13/' + myKey2 + '/sharedListId').set(listId);
+    if (myKey2) fbDb.ref('userMeta/' + myKey2 + '/sharedListId').set(listId);
     showToast('✅ Entrato nella lista condivisa!');
     document.getElementById('_bring_modal')?.remove();
     sharedListStart();
@@ -10297,7 +10309,7 @@ async function sharedListLeave() {
   localStorage.removeItem('hb_shared_list_id');
   // Rimuovi anche da Firebase
   const myKeyL = _getSyncKey();
-  if (myKeyL && fbDb) fbDb.ref('hb13/' + myKeyL + '/sharedListId').remove();
+  if (myKeyL && fbDb) fbDb.ref('userMeta/' + myKeyL + '/sharedListId').remove();
   _sharedListId   = null;
   _sharedListData = null;
   _shopCurSharedId = null;
@@ -11346,7 +11358,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA306</div>
+            <div style="font-size:13px;color:var(--text3);">BETA307</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
