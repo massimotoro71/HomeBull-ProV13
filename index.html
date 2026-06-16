@@ -2027,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA298</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA299</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA298</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA299</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA298</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA299</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA298',
+  version: 'BETA299',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10405,16 +10405,34 @@ async function sharedListCreate() {
   showToast('📋 Creazione lista condivisa...');
   try {
     const listId = 'bl_' + Date.now();
+    
+    // Importa elementi dalla lista locale attiva
+    const localItems = {};
+    if (_shopList && Object.keys(_shopList).length > 0) {
+      Object.entries(_shopList).forEach(([id, item]) => {
+        if (!item.deleted) {
+          localItems['i_' + Date.now() + '_' + Math.random().toString(36).slice(2,5)] = {
+            name: item.name,
+            icon: item.icon || '🛒',
+            checked: item.checked || false,
+            addedBy: myEmail,
+            addedAt: new Date().toISOString()
+          };
+        }
+      });
+    }
+
     await fbDb.ref('sharedLists/' + listId).set({
-      name: 'Lista Condivisa',
+      name: _shopLists[_shopCurId]?.name || 'Lista Condivisa',
       createdBy: myEmail,
       createdAt: new Date().toISOString(),
       members: { [myKey]: myEmail },
-      items: {}
+      items: localItems
     });
     localStorage.setItem('hb_shared_list_id', listId);
     _sharedListId = listId;
-    showToast('✅ Lista creata! Condividi il codice con gli altri');
+    const imported = Object.keys(localItems).length;
+    showToast('✅ Lista creata' + (imported > 0 ? ' con ' + imported + ' prodotti!' : '!'));
     sharedListStart();
     sharedListShowModal();
   } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
@@ -10428,7 +10446,7 @@ async function sharedListJoin(listId) {
   try {
     const snap = await fbDb.ref('sharedLists/' + listId).get();
     if (!snap.exists()) { showToast('⚠️ Lista non trovata — controlla il codice'); return; }
-    // Aggiungiti come membro
+    // Aggiungiti come membro (anche se stesso utente su altro dispositivo)
     await fbDb.ref('sharedLists/' + listId + '/members/' + myKey).set(myEmail);
     localStorage.setItem('hb_shared_list_id', listId);
     _sharedListId = listId;
@@ -10449,10 +10467,13 @@ function sharedListStart() {
     // Aggiorna lista spesa
     if (HB.currentTab === 'shopping') {
       if (_shopCurSharedId === 'bring') renderBringList();
-      else shopRenderListTabs(); // mostra/aggiorna tab 👥
+      else shopRenderListTabs();
     }
     updateBringBadge();
   });
+  // Vai automaticamente al tab condiviso
+  _shopCurSharedId = 'bring';
+  if (HB.currentTab === 'shopping') shopRenderAll();
   console.log('✅ Lista condivisa listener attivo:', _sharedListId);
 }
 
@@ -11529,7 +11550,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA298</div>
+            <div style="font-size:13px;color:var(--text3);">BETA299</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
