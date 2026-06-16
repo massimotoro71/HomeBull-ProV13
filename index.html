@@ -9,11 +9,12 @@
 <title>HomeBull Pro</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="apple-touch-icon" href="data:image/png;base64,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">
 <link rel="icon" type="image/png" sizes="192x192" href="data:image/png;base64,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">
 <style>
 /* ═══════════════════════════════════════════════════════════
-   HOMEBULL PRO v12 — Design System
+   HOMEBULL PRO v13 — Design System
    Font: DM Sans (body) + Syne (display)
    Palette: dark-first, indigo accent, per-tab accent colors
 ═══════════════════════════════════════════════════════════ */
@@ -50,7 +51,6 @@
   --tab-wifi:    #84cc16;
   --tab-finance: #eab308;
   --tab-server:  #64748b;
-  --tab-family:  #ec4899;
 
   /* Layout */
   --topbar-h:    54px;
@@ -889,18 +889,7 @@ html, body {
 }
 .cal-cat-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent); }
 
-/* ── Famiglia ──────────────────────────────────────────── */
-.family-card {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; border-radius: 16px;
-  background: var(--surface); border: 1px solid var(--border);
-  margin-bottom: 10px;
-}
-.family-avatar {
-  width: 46px; height: 46px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0; background: var(--accent-bg);
-}
+
 
 /* ── Finanze ───────────────────────────────────────────── */
 .finance-card {
@@ -1111,7 +1100,9 @@ html, body {
 .shop-accordion {
   border: 1px solid var(--border); border-radius: 14px;
   margin-bottom: 8px; overflow: hidden;
+  transition: border-color 0.2s;
 }
+.shop-accordion:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
 .shop-accordion-header {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 14px; cursor: pointer;
@@ -1255,21 +1246,18 @@ html, body {
 .tab-panel.active { opacity: 1 !important; pointer-events: auto !important; }
 
 /* Topbar sticky */
-#topbar { position: sticky !important; top: 0 !important; left: auto !important;
-  right: auto !important; width: 100% !important; flex-shrink: 0; }
-
-/* Accordion testo visibile */
-.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
-
-/* ── Fix topbar: NON fixed, dentro app-main ── */
 #topbar {
   position: sticky !important;
   top: 0 !important;
   left: auto !important;
   right: auto !important;
   width: 100% !important;
+  flex-shrink: 0;
   z-index: 10 !important;
 }
+
+/* Accordion testo visibile */
+.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
 
 /* ══════════════════════════════════════════════════════════
    CSS MOBILE — Samsung Galaxy S26 Ultra + iPhone 13 Pro
@@ -2017,28 +2005,20 @@ function cardsSearch(q) {
 
 <!-- Loading -->
 <div id="loading-overlay">
-  <div class="loading-logo">
-    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="12" width="20" height="16" rx="3"/>
-      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
-      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
-    </svg>
+  <div class="loading-logo" style="background:none;box-shadow:none;">
+    <img src="./icon-192.png" style="width:80px;height:80px;border-radius:22px;object-fit:cover;" alt="HomeBull">
   </div>
   <div class="loading-spinner"></div>
 </div>
 
 <!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
 <div id="auth-screen">
-  <div class="auth-logo">
-    <svg viewBox="0 0 36 36" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="8" y="12" width="20" height="16" rx="3"/>
-      <path d="M12 12V9a6 6 0 0 1 12 0v3"/>
-      <circle cx="18" cy="20" r="2" fill="white" stroke="none"/>
-    </svg>
+  <div class="auth-logo" style="background:none;box-shadow:none;padding:0;">
+    <img src="./icon-192.png" style="width:96px;height:96px;border-radius:26px;object-fit:cover;" alt="HomeBull">
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA230</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA292</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2139,8 +2119,8 @@ function cardsSearch(q) {
       <div>
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
-          <div class="sidebar-logo-ver">Pro v12</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA230</div>
+          <div class="sidebar-logo-ver">Pro v13</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA292</div>
         </div>
       </div>
     </div>
@@ -2178,6 +2158,11 @@ function cardsSearch(q) {
         <span class="sidebar-item-label">Lista Spesa</span>
       </div>
 
+      <div class="sidebar-item" data-tab="library" onclick="switchTab('library')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        <span class="sidebar-item-label">Libreria</span>
+      </div>
+
       <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <span class="sidebar-item-label">Note</span>
@@ -2199,7 +2184,6 @@ function cardsSearch(q) {
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Server / IT</span>
       </div>
-
       <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
         <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
         <span class="sidebar-item-label">Wi-Fi</span>
@@ -2260,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA230</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA292</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2314,6 +2298,16 @@ function cardsSearch(q) {
             <button onclick="pwToggleSearch()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             </button>
+            <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📊</button>
+            <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📷</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <select onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems()" style="flex:1;padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:600;outline:none;font-family:inherit;">
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+              <option value="weak">Prima le deboli</option>
+              <option value="strong">Prima le forti</option>
+            </select>
           </div>
           <div id="pw-item-search-wrap" style="display:none;">
             <div class="pw-search-bar">
@@ -2342,9 +2336,12 @@ function cardsSearch(q) {
           <div style="font-size:48px;margin-bottom:16px;">🔐</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
           <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
-          <button onclick="pwImportBackup()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
+          <button onclick="pwImportCSV()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📥 Importa da Chrome / Firefox / 1Password</button>
+          <button onclick="pwImportBackup()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
+          <button onclick="pwScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📷 Scansiona QR condiviso</button>
           <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
           <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
+          <input type="file" id="pw-csv-input" accept=".csv" style="display:none;" onchange="pwHandleCSV(event)">
         </div>
       </div>
     </div>
@@ -3009,23 +3006,10 @@ function cardsSearch(q) {
     </div>
 
     <!-- FAMIGLIA -->
-    <div class="tab-panel" id="panel-family">
-      <div style="padding:14px 14px 100px;">
-        <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
-          <div style="font-size:22px;flex-shrink:0;">👨‍👩‍👧</div>
-          <div><div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;">Vault Famiglia</div>
-          <div style="font-size:12px;color:var(--text3);line-height:1.5;">Aggiungi i tuoi familiari e scegli cosa condividere. La condivisione reale arriverà con Firebase.</div></div>
-        </div>
-        <div id="family-list"></div>
-        <div id="family-empty" style="display:none;text-align:center;padding:40px 20px;">
-          <div style="font-size:48px;margin-bottom:12px;">👨‍👩‍👧</div>
-          <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Nessun familiare</div>
-          <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i membri della tua famiglia per condividere dati selezionati.</div>
-          <button onclick="familyAdd()" style="padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Aggiungi familiare</button>
-        </div>
-      </div>
+    <!-- LIBRERIA PANEL -->
+    <div class="tab-panel" id="panel-library" style="height:100%;overflow-y:auto;">
+      <div id="lib-view-list" style="padding:14px;"></div>
     </div>
-
     <div class="tab-panel" id="panel-shopping">
       <div style="padding:12px 14px 100px;">
 
@@ -3094,35 +3078,38 @@ function cardsSearch(q) {
     <div class="drawer-handle"></div>
     <div class="drawer-title">Altre schede</div>
     <div class="drawer-grid">
-      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
-        <div class="drawer-item-icon">📄</div>
-        <div class="drawer-item-label">Documenti</div>
-      </div>
-      <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
-        <div class="drawer-item-icon">📝</div>
-        <div class="drawer-item-label">Note</div>
-      </div>
       <div class="drawer-item" data-tab="cards" onclick="switchTabFromDrawer('cards')">
         <div class="drawer-item-icon">💳</div>
         <div class="drawer-item-label">Carte</div>
       </div>
-      <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer('wifi')">
-        <div class="drawer-item-icon">🌐</div>
-        <div class="drawer-item-label">Wi-Fi</div>
+      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
+        <div class="drawer-item-icon">📄</div>
+        <div class="drawer-item-label">Documenti</div>
       </div>
       <div class="drawer-item" data-tab="finance" onclick="switchTabFromDrawer('finance')">
         <div class="drawer-item-icon">📊</div>
         <div class="drawer-item-label">Finanze</div>
       </div>
-      <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
-        <div class="drawer-item-icon">📡</div>
-        <div class="drawer-item-label">Server/IT</div>
-      </div>
       <div class="drawer-item" data-tab="shopping" onclick="switchTabFromDrawer('shopping')">
         <div class="drawer-item-icon">🛒</div>
         <div class="drawer-item-label">Lista Spesa</div>
       </div>
-
+      <div class="drawer-item" data-tab="library" onclick="switchTabFromDrawer('library')">
+        <div class="drawer-item-icon">📚</div>
+        <div class="drawer-item-label">Libreria</div>
+      </div>
+      <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
+        <div class="drawer-item-icon">📝</div>
+        <div class="drawer-item-label">Note</div>
+      </div>
+      <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
+        <div class="drawer-item-icon">📡</div>
+        <div class="drawer-item-label">Server/IT</div>
+      </div>
+      <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer('wifi')">
+        <div class="drawer-item-icon">🌐</div>
+        <div class="drawer-item-label">Wi-Fi</div>
+      </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
       <button onclick="openSettings();closeMoreDrawer()" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
@@ -3185,7 +3172,11 @@ function cardsSearch(q) {
     <!-- Footer -->
     <div style="padding:14px 18px;text-align:center;">
       <div style="color:rgba(255,255,255,0.5);font-size:12px;margin-bottom:12px;">Inquadra il QR code nel riquadro</div>
-      <button onclick="qrScannerClose()" style="width:100%;padding:11px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <div style="display:flex;gap:10px;margin-bottom:0;">
+        <button onclick="qrScanFromGallery()" style="flex:1;padding:11px;border-radius:12px;background:rgba(99,102,241,0.3);border:1px solid rgba(99,102,241,0.5);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🖼️ Galleria</button>
+        <button onclick="qrScannerClose()" style="flex:1;padding:11px;border-radius:12px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      </div>
+      <input type="file" id="qr-gallery-input" accept="image/*" style="display:none;" onchange="qrHandleGalleryImage(event)">
     </div>
   </div>
 </div>
@@ -3274,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA230',
+  version: 'BETA292',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3283,8 +3274,90 @@ const HB = {
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
   otpCode: '',
-  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','family','shopping']
+  tabs: ['home','passwords','documents','notes','calendar','otp','cards','wifi','finance','server','shopping','library']
 };
+
+// ═══════════════════════════════════════════════════════════
+//  LOCAL STORAGE CIFRATO — AES-256-GCM
+//  Approccio: cache in memoria, cifratura in background.
+//  Le funzioni Load/Save esistenti non cambiano — zero rischi.
+// ═══════════════════════════════════════════════════════════
+
+const _SENSITIVE_KEYS = [
+  'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance',
+  'hb13_server','hb13_shop_lists_v2','hb13_calendar',
+  'hb13_turni_def','hb13_turni_days'
+];
+
+let _lsCache = {};
+let _lsCacheReady = false;
+
+async function initLocalCache() {
+  _lsCache = {};
+  for (const key of _SENSITIVE_KEYS) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      if (raw.startsWith('hb13enc:') && HB.sessionKey) {
+        const bytes = Uint8Array.from(atob(raw.slice(8)), ch => ch.charCodeAt(0));
+        const dec   = await crypto.subtle.decrypt(
+          { name:'AES-GCM', iv: bytes.slice(0,12) }, HB.sessionKey, bytes.slice(12)
+        );
+        _lsCache[key] = new TextDecoder().decode(dec);
+      } else {
+        _lsCache[key] = raw;
+        if (HB.sessionKey) _encryptAndStore(key, raw);
+      }
+    } catch(e) {
+      const raw = localStorage.getItem(key);
+      if (raw) _lsCache[key] = raw;
+    }
+  }
+  _lsCacheReady = true;
+  console.log('🔐 Cache locale pronta —', Object.keys(_lsCache).length, 'chiavi');
+  autolockStart();
+}
+
+async function _encryptAndStore(key, jsonStr) {
+  try {
+    if (!HB.sessionKey) return;
+    const iv  = crypto.getRandomValues(new Uint8Array(12));
+    const enc = await crypto.subtle.encrypt(
+      { name:'AES-GCM', iv }, HB.sessionKey,
+      new TextEncoder().encode(jsonStr)
+    );
+    const buf = new Uint8Array(12 + enc.byteLength);
+    buf.set(iv,0); buf.set(new Uint8Array(enc),12);
+    // Usa il metodo originale per non ciclare
+    Object.getPrototypeOf(localStorage).__origSet.call(
+      localStorage, key, 'hb13enc:' + btoa(String.fromCharCode(...buf))
+    );
+  } catch(e) {}
+}
+
+// Patch trasparente localStorage — getItem legge dalla cache, setItem cifra in background
+(function() {
+  const proto = Object.getPrototypeOf(localStorage);
+  const origGet = proto.getItem.bind(localStorage);
+  const origSet = proto.setItem.bind(localStorage);
+  proto.__origSet = proto.setItem;
+
+  proto.getItem = function(key) {
+    if (_lsCacheReady && _SENSITIVE_KEYS.includes(key)) {
+      return _lsCache[key] !== undefined ? _lsCache[key] : null;
+    }
+    return origGet(key);
+  };
+
+  proto.setItem = function(key, value) {
+    if (_SENSITIVE_KEYS.includes(key)) {
+      _lsCache[key] = value;
+      if (HB.sessionKey) { _encryptAndStore(key, value); return; }
+    }
+    origSet(key, value);
+  };
+})();
 
 // ── Service Worker ─────────────────────────────────────────
 if ('serviceWorker' in navigator) {
@@ -3596,14 +3669,27 @@ function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')
 function unlockApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
-  updateHomeStats();
-  initBackHandler();
-  applyHomePrefs();
-  // Carica dati dal cloud ad ogni sblocco e avvia listener realtime
-  setTimeout(() => {
+  // Inizializza cache cifrata PRIMA di tutto
+  initLocalCache().then(() => {
+    updateHomeStats();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
-  }, 500);
+    // Carica condivisioni dopo sync
+    setTimeout(() => {
+      loadShares().then(() => {
+        // Avvia listener per condivisioni shopping ricevute
+        Object.entries(_receivedShares)
+          .filter(([k,s]) => s.section === 'shopping')
+          .forEach(([k,s]) => startShopShareListener(s.shareId || k));
+        // Notifica condivisioni presenti
+        const cnt = Object.keys(_receivedShares).length;
+        if (cnt > 0) updateHomeStats();
+      });
+    }, 3000);
+    setTimeout(checkExpiryNotifications, 3000);
+  });
+  initBackHandler();
+  applyHomePrefs();
   // Ripristina tema
   const savedTheme = localStorage.getItem('hb12_theme');
   if (savedTheme) setTheme(savedTheme);
@@ -3627,14 +3713,14 @@ const TAB_CONFIG = {
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
   documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
-  calendar:  { title: 'Calendario',  sub: '', actions: [] },
+  calendar:  { title: 'Calendario',  sub: '', actions: ['add','share'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Carte',       sub: '', actions: [] },
   wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
   finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
   server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: ['share'] },
 };
 
 function switchTab(tab) {
@@ -3672,7 +3758,7 @@ function switchTab(tab) {
     home:'#6366f1', passwords:'#10b981', documents:'#f59e0b',
     notes:'#8b5cf6', calendar:'#ef4444', otp:'#06b6d4',
     cards:'#f97316', wifi:'#84cc16', finance:'#eab308',
-    server:'#64748b', family:'#ec4899'
+    server:'#64748b'
   };
   const accent = accentMap[tab] || '#6366f1';
   document.documentElement.style.setProperty('--accent', accent);
@@ -3696,9 +3782,9 @@ function switchTab(tab) {
     cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
     finance:   () => typeof financeOpen === 'function' && financeOpen(),
     server:    () => typeof serverOpen === 'function' && serverOpen(),
+    library:   () => typeof libOpen === 'function' && libOpen(),
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     calendar:  () => typeof calOpen === 'function' && calOpen(),
-    family:    () => typeof familyOpen === 'function' && familyOpen(),
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
@@ -3826,6 +3912,15 @@ function renderTopbarActions(actions) {
     };
     container.appendChild(btn);
   }
+  if (actions.includes('share')) {
+    const shareBtn = document.createElement('div');
+    shareBtn.className = 'topbar-btn';
+    shareBtn.title = 'Condividi';
+    shareBtn.innerHTML = '👥';
+    shareBtn.style.fontSize = '18px';
+    shareBtn.onclick = () => showShareModal(HB.currentTab);
+    container.appendChild(shareBtn);
+  }
 }
 
 function topbarBack() {
@@ -3948,6 +4043,66 @@ setInterval(() => {
     te.textContent = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
   }
 }, 30000);
+
+// ═══════════════════════════════════════════════════════════
+//  NOTIFICHE SCADENZE — Push notification via Web API
+// ═══════════════════════════════════════════════════════════
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('⚠️ Browser non supporta notifiche'); return; }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    showToast('✅ Notifiche attivate!');
+    localStorage.setItem('hb_notif', '1');
+    checkExpiryNotifications();
+  } else {
+    showToast('⚠️ Notifiche non autorizzate');
+  }
+}
+
+function checkExpiryNotifications() {
+  if (Notification.permission !== 'granted') return;
+  if (localStorage.getItem('hb_notif') !== '1') return;
+
+  const now   = new Date();
+  const shown = JSON.parse(localStorage.getItem('hb_notif_shown') || '{}');
+  const today = now.toISOString().slice(0,10);
+  if (shown.date === today) return; // già notificato oggi
+
+  const toNotify = [];
+
+  // Documenti
+  (_docs2 || []).forEach(doc => {
+    if (!doc.expiry) return;
+    const days = Math.ceil((new Date(doc.expiry) - now) / 86400000);
+    if (days >= 0 && days <= 30)
+      toNotify.push(`📄 ${doc.label} di ${doc.nome} scade tra ${days} giorni`);
+    else if (days < 0)
+      toNotify.push(`📄 ${doc.label} di ${doc.nome} è scaduto!`);
+  });
+
+  // Carte
+  (_cards || []).forEach(card => {
+    if (!card.exp) return;
+    const parts = card.exp.split('/');
+    if (parts.length < 2) return;
+    const expDate = new Date(2000 + parseInt(parts[1]), parseInt(parts[0]) - 1, 1);
+    const days = Math.ceil((expDate - now) / 86400000);
+    if (days >= 0 && days <= 30)
+      toNotify.push(`💳 ${card.bank||'Carta'} scade tra ${days} giorni`);
+    else if (days < 0)
+      toNotify.push(`💳 ${card.bank||'Carta'} è scaduta!`);
+  });
+
+  if (toNotify.length > 0) {
+    new Notification('HomeBull — Scadenze', {
+      body: toNotify.slice(0,3).join('\n'),
+      icon: './icon-192.png',
+      badge: './icon-192.png'
+    });
+    localStorage.setItem('hb_notif_shown', JSON.stringify({ date: today }));
+  }
+}
+
 function updateHomeStats() {
   updateHomeDate();
   renderQuickAccess();
@@ -4002,36 +4157,66 @@ function updateHomeStats() {
 
   // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
-  (_docs2 || []).forEach(doc => {
+  const docsToCheck = (_docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]'))
+    .filter(d => !d.deleted);
+  docsToCheck.forEach(doc => {
     if (!doc.expiry) return;
     const exp = new Date(doc.expiry);
+    if (isNaN(exp.getTime())) return;
     const days = Math.ceil((exp - now) / 86400000);
     if (days < 0) {
-      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto' });
+      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto', tab: 'documents' });
     } else if (days <= 90) {
-      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg' });
+      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg', tab: 'documents' });
     }
   });
 
-  // 2. OTP attivi
+  // 2. Carte in scadenza
+  const cardsToCheck = (_cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]'))
+    .filter(c => !c.deleted);
+  cardsToCheck.forEach(card => {
+    if (!card.exp) return;
+    // Supporta formati: MM/YY, MM/YYYY, YYYY-MM
+    let expDate;
+    const parts = card.exp.split('/');
+    if (parts.length === 2) {
+      const mm = parseInt(parts[0]);
+      const yy = parseInt(parts[1]);
+      const yyyy = yy < 100 ? 2000 + yy : yy;
+      if (isNaN(mm) || isNaN(yyyy)) return;
+      expDate = new Date(yyyy, mm - 1, 1);
+    } else if (card.exp.includes('-')) {
+      expDate = new Date(card.exp);
+    } else return;
+    if (isNaN(expDate.getTime())) return;
+    const days = Math.ceil((expDate - now) / 86400000);
+    if (days < 0) {
+      alerts.push({ icon:'💳', color:'#ef4444', text: (card.bank||'Carta') + ' scaduta', time: 'Scaduta', tab: 'cards' });
+    } else if (days <= 60) {
+      alerts.push({ icon:'💳', color:'#f97316', text: (card.bank||'Carta') + ' scade tra ' + days + ' giorni', time: days+'gg', tab: 'cards' });
+    }
+  });
+
+  // 3. OTP attivi
   const _otpAlerts = JSON.parse(localStorage.getItem('hb13_otp')||'[]');
   if (_otpAlerts.length > 0) {
-    alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '' });
+    alerts.push({ icon:'🔑', color:'#10b981', text: _otpAlerts.length + ' codici OTP / 2FA attivi', time: '', tab: 'otp' });
   }
 
-  // 3. Nessun dato
+  // 4. Nessun dato
   if (alerts.length === 0 && (_pwItems||[]).length === 0) {
-    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '' });
+    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '', tab: '' });
   } else if (alerts.length === 0) {
-    alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '' });
+    alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '', tab: '' });
   }
 
-  // Render alert
+  // Render alert — cliccabili se hanno un tab associato
   alertBox.innerHTML = alerts.slice(0, 5).map(a => `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;">
+    <div onclick="${a.tab ? `switchTab('${a.tab}')` : ''}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;${a.tab ? 'cursor:pointer;' : ''}">
       <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
       <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${a.text}</div>
       ${a.time ? `<div style="font-size:11px;font-weight:700;color:${a.color};flex-shrink:0;">${a.time}</div>` : ''}
+      ${a.tab ? `<div style="font-size:14px;color:var(--text3);flex-shrink:0;">›</div>` : ''}
     </div>
   `).join('');
 }
@@ -4054,15 +4239,22 @@ let   _pwCats  = [];
 let   _pwItems = [];
 let   _pwCurCat = null;
 
-// Icone per categoria (mapping v11)
+// Icone per categoria (mapping v11 + esteso)
 const CAT_ICONS = {
-  'cat_allarme':'🔔','cat_app':'📱','cat_banca':'🏦','cat_cis':'📊',
-  'cat_cloud':'☁️','cat_codiceufficio':'🏢','cat_codici':'🛡️',
-  'cat_corsi':'🎓','cat_documenti':'📄','cat_email':'📧',
-  'cat_famiglia':'👨‍👩‍👧','cat_finanze':'💰','cat_gaming':'🎮',
-  'cat_google':'🔍','cat_lavoro':'💼','cat_medico':'⚕️',
-  'cat_reti':'🌐','cat_server':'🖥️','cat_shopping':'🛒',
-  'cat_social':'📱','cat_travel':'✈️','cat_vuoto':'📁',
+  // ID esatti
+  'cat_allarme':'🔔','cat_app':'📱','cat_banca':'🏦','cat_cis':'🏛️',
+  'cat_cloud':'☁️','cat_coduff':'🏢','cat_codiceufficio':'🏢','cat_codici':'🛡️',
+  'cat_codsic':'🛡️','cat_corsi':'🎓','cat_documenti':'📄','cat_docpers':'📋',
+  'cat_dos':'💻','cat_domotica':'🏠','cat_email':'📧','cat_famiglia':'👨‍👩‍👧',
+  'cat_finanze':'💰','cat_finance':'💰','cat_gaming':'🎮','cat_giochi':'🎮',
+  'cat_google':'🔍','cat_lavoro':'💼','cat_link':'🔗','cat_medico':'⚕️',
+  'cat_micro':'🪟','cat_pec':'📨','cat_peciarma':'📨','cat_postaiarma':'📮',
+  'cat_posta':'📮','cat_reti':'🌐','cat_sanitari':'🏥','cat_server':'🖥️',
+  'cat_shopping':'🛒','cat_social':'📲','cat_spid':'🪪','cat_streaming':'📺',
+  'cat_tv':'📺','cat_ufficio':'🏢','cat_utili':'⚡','cat_utenze':'⚡',
+  'cat_vari':'📦','cat_viaggicibo':'🍽️','cat_video':'🎬','cat_wifi':'📶',
+  'cat_forense':'⚖️','cat_gestcert':'📜','cat_datpers':'👤','cat_posta':'📮',
+  'cat_spesa':'🛒','cat_personalii':'👤','cat_personali':'👤',
 };
 // Mappa icone stringa v11 → emoji
 const ICON_MAP = {
@@ -4093,19 +4285,38 @@ function getCatIcon(catId, catName, catIconField) {
   // Poi: cerca per ID
   const k = (catId||'').toLowerCase().replace(/[^a-z]/g,'');
   if (CAT_ICONS[k]) return CAT_ICONS[k];
-  // Poi: cerca per nome
+  // Poi: cerca per nome (keyword estese)
   const n = (catName||'').toLowerCase();
   if (n.includes('banca')||n.includes('bank')) return '🏦';
-  if (n.includes('email')||n.includes('mail')) return '📧';
-  if (n.includes('social')) return '📱';
+  if (n.includes('email')||n.includes('mail')||n.includes('posta')) return '📧';
+  if (n.includes('pec')) return '📨';
+  if (n.includes('social')||n.includes('facebook')||n.includes('instagram')) return '📲';
   if (n.includes('cloud')) return '☁️';
-  if (n.includes('lavoro')||n.includes('work')) return '💼';
-  if (n.includes('casa')||n.includes('home')) return '🏠';
-  if (n.includes('allarme')||n.includes('sicurezza')) return '🔔';
+  if (n.includes('lavoro')||n.includes('work')||n.includes('ufficio')) return '💼';
+  if (n.includes('casa')||n.includes('home')||n.includes('domotica')) return '🏠';
+  if (n.includes('alarm')||n.includes('allarme')) return '🔔';
+  if (n.includes('sicurezza')||n.includes('codici')||n.includes('codsic')) return '🛡️';
   if (n.includes('carte')||n.includes('card')) return '💳';
-  if (n.includes('server')||n.includes('it')) return '🖥️';
-  if (n.includes('medic')) return '⚕️';
-  if (n.includes('familia')||n.includes('famigl')) return '👨‍👩‍👧';
+  if (n.includes('server')||n.includes('it')||n.includes('dos')) return '🖥️';
+  if (n.includes('medic')||n.includes('sanit')||n.includes('salute')) return '⚕️';
+  if (n.includes('famig')||n.includes('famil')) return '👨‍👩‍👧';
+  if (n.includes('tv')||n.includes('video')||n.includes('streaming')||n.includes('netflix')) return '📺';
+  if (n.includes('spid')||n.includes('identit')) return '🪪';
+  if (n.includes('micro')||n.includes('microsoft')||n.includes('windows')) return '🪟';
+  if (n.includes('google')) return '🔍';
+  if (n.includes('corsi')||n.includes('scuola')||n.includes('studio')) return '🎓';
+  if (n.includes('finanz')||n.includes('soldi')||n.includes('paypay')||n.includes('paypal')) return '💰';
+  if (n.includes('wifi')||n.includes('rete')||n.includes('router')) return '📶';
+  if (n.includes('link')||n.includes('url')||n.includes('sito')) return '🔗';
+  if (n.includes('app')) return '📱';
+  if (n.includes('giochi')||n.includes('game')||n.includes('gaming')) return '🎮';
+  if (n.includes('utenz')||n.includes('utili')||n.includes('luce')||n.includes('gas')) return '⚡';
+  if (n.includes('spesa')||n.includes('shop')||n.includes('acquist')) return '🛒';
+  if (n.includes('cibo')||n.includes('ristoran')||n.includes('viaggi')) return '🍽️';
+  if (n.includes('legal')||n.includes('forense')||n.includes('avvoc')) return '⚖️';
+  if (n.includes('cert')||n.includes('document')) return '📜';
+  if (n.includes('person')||n.includes('privat')) return '👤';
+  if (n.includes('cis')||n.includes('arma')||n.includes('carabin')) return '🏛️';
   return '📁';
 }
 
@@ -4156,6 +4367,38 @@ function pwShowCats(q='') {
 
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
+  
+  // Se c'è una query — cerca in TUTTE le password (come la home)
+  if (q) {
+    const ql = q.toLowerCase();
+    const matches = _pwItems.filter(i => !i.deleted && (
+      (i.title||'').toLowerCase().includes(ql) ||
+      (i.username||'').toLowerCase().includes(ql) ||
+      (i.url||'').toLowerCase().includes(ql) ||
+      (i.notes||'').toLowerCase().includes(ql)
+    ));
+    if (!matches.length) {
+      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessun risultato per "' + q + '"</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    matches.forEach(item => {
+      const cat = _pwCats.find(c => c.id === item.categoryId);
+      const s = getStrength(item.password||'');
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-bottom:8px;';
+      div.onclick = () => pwShowDetail(item.id);
+      div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:var(--accent)20;border:1px solid var(--accent)40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🔐</div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (item.title||'Senza nome') + '</div>'
+        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||'') + (cat ? ' · ' + cat.name : '') + '</div>'
+        + '</div>'
+        + '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:' + s.bg + ';color:' + s.col + ';">' + s.label + '</span>';
+      grid.appendChild(div);
+    });
+    return;
+  }
+
   const cats = _pwCats
     .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name, 'it'));
@@ -4171,7 +4414,7 @@ function pwRenderCats(q='') {
     const div = document.createElement('div');
     const ci = cats.indexOf(cat);
     const color = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'][ci % 8];
-    div.style.cssText = 'display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-bottom:8px;transition:background 0.15s;';
+    div.style.cssText = `display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};cursor:pointer;margin-bottom:8px;transition:background 0.15s;`;
     div.onmouseenter = () => div.style.background = 'var(--surface2,var(--bg3))';
     div.onmouseleave = () => div.style.background = 'var(--surface)';
     div.onclick = () => pwShowItems(cat.id, cat.name);
@@ -4180,8 +4423,67 @@ function pwRenderCats(q='') {
         +'<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+cat.name+'</div>'
       +'</div>'
       +'<div style="width:26px;height:26px;border-radius:99px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text3);flex-shrink:0;">'+count+'</div>';
+    // Bottone rinomina ✏️
+    const editBtn = document.createElement('button');
+    editBtn.style.cssText = 'width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface2,var(--bg3));color:var(--text3);font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:4px;';
+    editBtn.innerHTML = '✏️';
+    editBtn.title = 'Rinomina';
+    editBtn.onclick = (e) => { e.stopPropagation(); pwRenameCategory(cat.id, cat.name); };
+    div.appendChild(editBtn);
     grid.appendChild(div);
   });
+}
+
+
+// ── Rinomina categoria password ───────────────────────────
+function pwRenameCategory(catId, currentName) {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);';
+  
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = currentName;
+  inp.style.cssText = 'width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:15px;font-weight:700;font-family:inherit;box-sizing:border-box;margin:16px 0;';
+  
+  box.innerHTML = '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">✏️ Rinomina categoria</div>'
+    + '<div style="font-size:12px;color:var(--text3);">Inserisci il nuovo nome</div>';
+  box.appendChild(inp);
+  
+  const btns = document.createElement('div');
+  btns.style.cssText = 'display:flex;gap:10px;';
+  
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Annulla';
+  cancelBtn.style.cssText = 'flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
+  cancelBtn.onclick = () => ov.remove();
+  
+  const okBtn = document.createElement('button');
+  okBtn.textContent = 'Rinomina';
+  okBtn.style.cssText = 'flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
+  okBtn.onclick = () => {
+    const newName = inp.value.trim();
+    if (!newName) { showToast('⚠️ Inserisci un nome'); return; }
+    if (newName === currentName) { ov.remove(); return; }
+    const cat = _pwCats.find(c => c.id === catId);
+    if (cat) {
+      cat.name = newName;
+      pwSave();
+      ov.remove();
+      pwRenderCats();
+      showToast('✅ Categoria rinominata');
+    }
+  };
+  
+  btns.appendChild(cancelBtn);
+  btns.appendChild(okBtn);
+  box.appendChild(btns);
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+  inp.select();
+  inp.focus();
+  inp.onkeydown = (e) => { if (e.key === 'Enter') okBtn.click(); if (e.key === 'Escape') ov.remove(); };
 }
 
 function pwFilterCats(q) { pwRenderCats(q); }
@@ -4205,6 +4507,13 @@ function pwRenderItems(q='') {
     (i.title||'').toLowerCase().includes(q.toLowerCase()) ||
     (i.username||'').toLowerCase().includes(q.toLowerCase())
   );
+
+  // Ordinamento
+  const sort = localStorage.getItem('hb_pw_sort') || 'az';
+  if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it'));
+  else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it'));
+  else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
+  else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
   const count = _pwItems.filter(i => i.categoryId === _pwCurCat).length;
   document.getElementById('pw-cat-count').textContent = count + ' password';
   if (!items.length) {
@@ -4253,6 +4562,7 @@ function pwToggleSearch() {
 function pwShowDetail(itemId) {
   const item = _pwItems.find(i => i.id === itemId);
   if (!item) return;
+  document.getElementById('pw-view-cats').style.display = 'none';
   document.getElementById('pw-view-items').style.display = 'none';
   document.getElementById('pw-view-detail').style.display = 'flex';
   document.getElementById('pw-detail-title').textContent = item.title || '—';
@@ -4274,6 +4584,7 @@ function pwShowDetail(itemId) {
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
+      <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
       <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
       <button onclick="pwDeleteConfirm('${item.id}')" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
     </div>`;
@@ -4362,6 +4673,324 @@ function getStrength(pw) {
   if (s >= 10)      return { label:'Buona', bg:'rgba(99,102,241,0.15)', col:'#6366f1' };
   if (s >= 6)       return { label:'Media', bg:'rgba(234,179,8,0.15)',   col:'#eab308' };
   return              { label:'Debole', bg:'rgba(239,68,68,0.15)',   col:'#ef4444' };
+}
+
+
+
+
+// ═══════════════════════════════════════════════════════════
+//  STATISTICHE PASSWORD
+// ═══════════════════════════════════════════════════════════
+function pwShowStats() {
+  if (!_pwItems.length) { showToast('Nessuna password salvata'); return; }
+
+  let weak=0, medium=0, strong=0, dupes=0, old=0;
+  const seen = {};
+  const now  = Date.now();
+  const ninetyDays = 90 * 24 * 60 * 60 * 1000;
+
+  _pwItems.forEach(item => {
+    const pw = item.password || '';
+    const s  = getStrength(pw);
+    if (s.score <= 1) weak++;
+    else if (s.score <= 3) medium++;
+    else strong++;
+
+    // Duplicati
+    if (pw && seen[pw]) dupes++;
+    if (pw) seen[pw] = true;
+
+    // Vecchie (non aggiornate da 90gg)
+    if (item.updatedAt && (now - new Date(item.updatedAt).getTime()) > ninetyDays) old++;
+  });
+
+  const total = _pwItems.length;
+  const score = Math.round((strong / total) * 100);
+  const scoreColor = score >= 80 ? '#10b981' : score >= 50 ? '#6366f1' : '#f97316';
+
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:16px;">📊 Statistiche password</div>
+
+    <!-- Score globale -->
+    <div style="background:var(--surface);border-radius:16px;padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;">
+      <div style="width:64px;height:64px;border-radius:50%;border:4px solid ${scoreColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-size:18px;font-weight:900;color:${scoreColor};">${score}%</span>
+      </div>
+      <div>
+        <div style="font-size:14px;font-weight:800;margin-bottom:4px;">Sicurezza vault</div>
+        <div style="font-size:12px;color:var(--text3);">${total} password totali</div>
+      </div>
+    </div>
+
+    <!-- Dettaglio -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#ef4444;">${weak}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Deboli</div>
+      </div>
+      <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#eab308;">${medium}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Medie</div>
+      </div>
+      <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#10b981;">${strong}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Forti</div>
+      </div>
+      <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:24px;font-weight:900;color:#f97316;">${dupes}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px;">Duplicate</div>
+      </div>
+    </div>
+
+    ${old > 0 ? `<div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#f97316;">⏰ ${old} password non aggiornate da più di 90 giorni</div>` : ''}
+    ${dupes > 0 ? `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;">⚠️ Hai ${dupes} password duplicate — cambia quelle riusate</div>` : ''}
+    ${weak === 0 && dupes === 0 ? `<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#10b981;">✅ Ottimo! Nessuna password debole o duplicata</div>` : ''}
+
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  IMPORT CSV — Chrome, Firefox, 1Password, Bitwarden
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+//  IMPORT PASSWORD via QR — scansiona QR condiviso da altro dispositivo
+// ═══════════════════════════════════════════════════════════
+function pwScanQR() {
+  qrScannerOpen('Scansiona QR password', (data) => {
+    let parsed;
+    try { parsed = JSON.parse(data); } catch(e) {
+      showToast('⚠️ QR non valido o non leggibile');
+      return;
+    }
+    if (parsed.app !== 'HomeBull' || !parsed.password) {
+      showToast('⚠️ QR non riconosciuto — non è una password HomeBull');
+      return;
+    }
+    pwShowQRImportPreview(parsed);
+  });
+}
+
+function pwShowQRImportPreview(data) {
+  const ov = document.createElement('div');
+  ov.id = '_qrimp_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:32px;text-align:center;margin-bottom:12px;">📷</div>
+    <div style="font-size:15px;font-weight:800;text-align:center;margin-bottom:14px;">Importa password?</div>
+    <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px;">${data.title || 'Senza nome'}</div>
+      <div style="font-size:12px;color:var(--text3);">${data.username || '—'}</div>
+      ${data.url ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${data.url}</div>` : ''}
+    </div>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:16px;">La password verrà aggiunta alla categoria "Importate"</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_qri_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_qri_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_qri_cancel').onclick = () => ov.remove();
+  document.getElementById('_qri_ok').onclick = () => {
+    ov.remove();
+    let cat = _pwCats.find(c => c.name === 'Importate');
+    if (!cat) {
+      cat = { id: 'cat_imp_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
+      _pwCats.push(cat);
+    }
+    _pwItems.push({
+      id: 'pw_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      categoryId: cat.id,
+      title: data.title || 'Senza nome',
+      username: data.username || '',
+      password: data.password || '',
+      url: data.url || '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    pwSave();
+    pwRenderCats();
+    showToast('✅ Password importata!');
+  };
+}
+
+function pwImportCSV() {
+  const input = document.getElementById('pw-csv-input');
+  if (!input) {
+    // Crea input al volo se non esiste (es. dalla lista)
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = '.csv';
+    inp.style.display = 'none';
+    inp.onchange = pwHandleCSV;
+    document.body.appendChild(inp);
+    inp.click();
+    return;
+  }
+  input.click();
+}
+
+async function pwHandleCSV(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  event.target.value = '';
+
+  showToast('📥 Lettura CSV...');
+  try {
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) { showToast('⚠️ CSV vuoto o non valido'); return; }
+
+    // Rileva formato dal header
+    const header = lines[0].toLowerCase();
+    let parsed = [];
+
+    if (header.includes('name') && header.includes('url') && header.includes('username') && header.includes('password')) {
+      // Chrome / Firefox / Edge: name,url,username,password
+      const cols = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+      const iName = cols.indexOf('name');
+      const iUrl  = cols.findIndex(h => h.includes('url'));
+      const iUser = cols.findIndex(h => h.includes('username') || h === 'login_uri');
+      const iPass = cols.findIndex(h => h.includes('password'));
+      parsed = csvParseRows(lines.slice(1), iName, iUrl, iUser, iPass);
+
+    } else if (header.includes('title') && header.includes('username') && header.includes('password')) {
+      // 1Password
+      const cols = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+      const iName = cols.findIndex(h => h === 'title');
+      const iUrl  = cols.findIndex(h => h.includes('url') || h.includes('website'));
+      const iUser = cols.findIndex(h => h.includes('username'));
+      const iPass = cols.findIndex(h => h === 'password');
+      parsed = csvParseRows(lines.slice(1), iName, iUrl, iUser, iPass);
+
+    } else if (header.includes('login_uri') || header.includes('login_password')) {
+      // Bitwarden
+      const cols = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g,''));
+      const iName = cols.indexOf('name');
+      const iUrl  = cols.indexOf('login_uri');
+      const iUser = cols.indexOf('login_username');
+      const iPass = cols.indexOf('login_password');
+      parsed = csvParseRows(lines.slice(1), iName, iUrl, iUser, iPass);
+
+    } else {
+      // Tentativo generico — prime 4 colonne
+      parsed = csvParseRows(lines.slice(1), 0, 1, 2, 3);
+    }
+
+    if (!parsed.length) { showToast('⚠️ Nessuna password trovata nel CSV'); return; }
+
+    // Mostra anteprima e chiedi conferma
+    pwShowCSVPreview(parsed);
+
+  } catch(e) {
+    showToast('⚠️ Errore lettura CSV: ' + (e.message||e));
+  }
+}
+
+function csvParseRows(rows, iName, iUrl, iUser, iPass) {
+  const result = [];
+  rows.forEach(row => {
+    // Gestisce virgole dentro virgolette
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < row.length; i++) {
+      const ch = row[i];
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (ch === ',' && !inQ) { cols.push(cur); cur = ''; continue; }
+      cur += ch;
+    }
+    cols.push(cur);
+
+    const name = (cols[iName]||'').trim();
+    const pass = (cols[iPass]||'').trim();
+    if (!name && !pass) return;
+    result.push({
+      title:    name || (cols[iUrl]||'').replace(/https?:\/\//,'').split('/')[0] || 'Senza nome',
+      url:      (cols[iUrl]||'').trim(),
+      username: (cols[iUser]||'').trim(),
+      password: pass,
+    });
+  });
+  return result;
+}
+
+function pwShowCSVPreview(items) {
+  // Trova o crea categoria "Importate"
+  let cat = _pwCats.find(c => c.name === 'Importate');
+  if (!cat) {
+    cat = { id: 'cat_imported_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
+  }
+
+  const preview = items.slice(0,5).map(i =>
+    `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;">
+      <div style="font-weight:700;color:var(--text);">${i.title}</div>
+      <div style="color:var(--text3);">${i.username||'—'} · ${i.url||''}</div>
+    </div>`
+  ).join('');
+
+  const more = items.length > 5 ? `<div style="font-size:12px;color:var(--text3);padding:8px 0;">...e altre ${items.length-5} password</div>` : '';
+
+  const ov = document.createElement('div');
+  ov.id = '_csv_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">📥 Importa ${items.length} password</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Verranno aggiunte nella categoria "Importate"</div>
+    <div style="background:var(--surface);border-radius:12px;padding:0 12px;margin-bottom:16px;">
+      ${preview}${more}
+    </div>
+    <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:10px;padding:10px 12px;font-size:12px;color:#f97316;margin-bottom:16px;">
+      ⚠️ Le password duplicate verranno aggiunte comunque — puoi eliminarle dopo.
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="document.getElementById('_csv_ov').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button onclick="pwDoImportCSV(${JSON.stringify(items).replace(/</g,'\u003c').replace(/>/g,'\u003e')})" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">✅ Importa tutto</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function pwDoImportCSV(items) {
+  document.getElementById('_csv_ov')?.remove();
+
+  // Trova o crea categoria "Importate"
+  let cat = _pwCats.find(c => c.name === 'Importate');
+  if (!cat) {
+    cat = { id: 'cat_imp_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
+    _pwCats.push(cat);
+  }
+
+  let added = 0;
+  items.forEach(item => {
+    _pwItems.push({
+      id:         'pw_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+      categoryId: cat.id,
+      title:      item.title,
+      username:   item.username,
+      password:   item.password,
+      url:        item.url,
+      createdAt:  new Date().toISOString(),
+      updatedAt:  new Date().toISOString(),
+    });
+    added++;
+  });
+
+  pwSave();
+  document.getElementById('pw-import-banner').style.display = 'none';
+  pwRenderCats();
+  showToast(`✅ ${added} password importate!`);
+
+  // Apri direttamente la categoria importate
+  setTimeout(() => {
+    const catEl = document.querySelector(`[data-catid="${cat.id}"]`);
+    if (catEl) catEl.click();
+  }, 300);
 }
 
 // Import backup v11
@@ -4561,7 +5190,6 @@ window.switchTab = function(tab) {
   if (tab === 'server') setTimeout(serverOpen, 50);
   if (tab === 'documents') setTimeout(docsOpen, 50);
   if (tab === 'calendar') setTimeout(calOpen, 50);
-  if (tab === 'family') setTimeout(familyOpen, 50);
   if (tab === 'cards') setTimeout(cardsOpen, 50);
 };
 
@@ -4803,6 +5431,73 @@ function qrScannerClose() {
   document.getElementById('qr-scanner-modal').style.display = 'none';
   if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
   if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+}
+
+function qrScanFromGallery() {
+  // Prima ferma la camera senza chiudere il modal
+  if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
+  if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+  // Piccolo delay per far completare lo stop
+  setTimeout(() => {
+    document.getElementById('qr-gallery-input').click();
+  }, 100);
+}
+
+function qrHandleGalleryImage(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  event.target.value = '';
+
+  showToast('🔍 Analisi immagine...');
+
+  const img = new Image();
+  img.onload = () => {
+    // Ridimensiona a max 1024px per migliorare lettura jsQR
+    const MAX = 1024;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+
+    // Prova lettura diretta
+    const imageData = ctx.getImageData(0, 0, w, h);
+    let code = null;
+    if (typeof jsQR !== 'undefined') {
+      code = jsQR(imageData.data, w, h, { inversionAttempts: 'both' });
+    }
+
+    if (code?.data) {
+      qrScannerClose();
+      _qrCallback?.(code.data);
+      return;
+    }
+
+    // Prova con contrasto aumentato
+    const enhanced = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < enhanced.data.length; i += 4) {
+      const avg = (enhanced.data[i] + enhanced.data[i+1] + enhanced.data[i+2]) / 3;
+      const val = avg > 128 ? 255 : 0;
+      enhanced.data[i] = enhanced.data[i+1] = enhanced.data[i+2] = val;
+    }
+    code = jsQR(enhanced.data, w, h, { inversionAttempts: 'both' });
+
+    if (code?.data) {
+      qrScannerClose();
+      _qrCallback?.(code.data);
+    } else {
+      showToast('⚠️ Nessun QR trovato — prova con un\'immagine più nitida');
+    }
+
+    URL.revokeObjectURL(img.src);
+  };
+  img.onerror = () => showToast('⚠️ Immagine non valida');
+  img.src = URL.createObjectURL(file);
 }
 
 // Parser otpauth:// per OTP
@@ -5384,7 +6079,7 @@ function financeRender() {
       <div class="finance-actions">
         ${acc.iban ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeCopy('${acc.id}','iban')">📋 IBAN</button>` : ''}
         ${acc.bic  ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeCopy('${acc.id}','bic')">📋 BIC</button>` : ''}
-        ${acc.user ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeShowDetail('${acc.id}')">🔐 Credenziali</button>` : ''}
+        ${(acc.user||acc.pw||acc.pin) ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeShowDetail('${acc.id}')">🔐 Credenziali</button>` : ''}
       </div>`;
     list.appendChild(card);
   });
@@ -5404,6 +6099,7 @@ function financeShowDetail(id) {
     acc.bic ? `<div class="pw-field-row"><div class="pw-field-label">BIC / SWIFT</div><div class="pw-field-value" style="font-family:monospace;">${acc.bic}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="financeCopy('${acc.id}','bic')">📋 Copia</button></div></div>` : '',
     acc.holder ? `<div class="pw-field-row"><div class="pw-field-label">Intestatario</div><div class="pw-field-value">${acc.holder}</div></div>` : '',
     acc.user ? `<div class="pw-field-row"><div class="pw-field-label">Username</div><div class="pw-field-value">${acc.user}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="financeCopy('${acc.id}','user')">📋 Copia</button></div></div>` : '',
+    acc.pin ? `<div class="pw-field-row"><div class="pw-field-label">PIN</div><div class="pw-field-value" id="fin-pin-${acc.id}" style="font-family:monospace;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="financeTogglePin('${acc.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="navigator.clipboard.writeText(_financeAccounts.find(a=>a.id==='${acc.id}')?.pin||'')">📋 Copia</button></div></div>` : '',
     acc.pw ? `<div class="pw-field-row"><div class="pw-field-label">Password</div><div class="pw-field-value" id="fin-pw-${acc.id}" style="font-family:monospace;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="financeToggleDetailPw('${acc.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="financeCopy('${acc.id}','pw')">📋 Copia</button></div></div>` : '',
     acc.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="font-size:13px;white-space:pre-wrap;">${acc.notes}</div></div>` : '',
   ].filter(Boolean).join('');
@@ -5423,6 +6119,14 @@ function financeShowDetail(id) {
     </div>
   </div>`;
   document.body.appendChild(overlay);
+}
+
+function financeTogglePin(id) {
+  const el = document.getElementById('fin-pin-' + id);
+  const acc = _financeAccounts.find(a => a.id === id);
+  if (!el || !acc) return;
+  const shown = el.textContent !== '••••••••';
+  el.textContent = shown ? '••••••••' : (acc.pin || '');
 }
 
 function financeToggleDetailPw(id) {
@@ -5446,9 +6150,18 @@ function financeEdit(id) {
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
   ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
     <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Conto</div>
-    ${[['_fe_label','Nome conto',acc.label||''],['_fe_iban','IBAN',acc.iban||''],['_fe_bic','BIC/SWIFT',acc.bic||''],['_fe_holder','Intestatario',acc.holder||''],['_fe_user','Username',acc.user||''],['_fe_notes','Note',acc.notes||'']].map(([id,label,val])=>`
+    ${[['_fe_label','Nome conto',acc.label||''],['_fe_iban','IBAN',acc.iban||''],['_fe_bic','BIC/SWIFT',acc.bic||''],['_fe_holder','Intestatario',acc.holder||''],['_fe_user','Username',acc.user||'']].map(([id,label,val])=>`
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
     <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">PIN</div>
+    <input id="_fe_pin" value="${acc.pin||''}" type="password" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Password accesso</div>
+    <div style="position:relative;margin-bottom:10px;">
+      <input id="_fe_pw" value="${acc.pw||''}" type="password" style="width:100%;padding:10px;padding-right:40px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;font-family:inherit;">
+      <button type="button" onclick="const i=document.getElementById('_fe_pw');i.type=i.type==='password'?'text':'password'" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁️</button>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Note</div>
+    <input id="_fe_notes" value="${acc.notes||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
     <div style="display:flex;gap:10px;margin-top:6px;">
       <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_fe_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
@@ -5464,6 +6177,8 @@ function financeEdit(id) {
       bic: document.getElementById('_fe_bic').value.trim(),
       holder: document.getElementById('_fe_holder').value.trim(),
       user: document.getElementById('_fe_user').value.trim(),
+      pin: document.getElementById('_fe_pin').value,
+      pw: document.getElementById('_fe_pw').value,
       notes: document.getElementById('_fe_notes').value.trim(),
       updatedAt: new Date().toISOString()
     }; }
@@ -5676,6 +6391,156 @@ function wifiDelete(id) {
   _wifiNets = _wifiNets.filter(n => n.id !== id);
   wifiSaveAll(); wifiRender();
   showToast('Rete rimossa');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  QR CONDIVISIONE — Password temporanea (60 secondi)
+// ═══════════════════════════════════════════════════════════
+let _qrCountdownTimer = null;
+
+function pwShareQR(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  // Costruisce payload JSON leggibile da qualsiasi app
+  const payload = JSON.stringify({
+    app: 'HomeBull',
+    title: item.title,
+    username: item.username || '',
+    password: item.password || '',
+    url: item.url || '',
+    shared: new Date().toISOString()
+  });
+
+  const ov = document.createElement('div');
+  ov.id = '_qr_share_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:24px;padding:24px;max-width:320px;width:100%;text-align:center;">
+      <div style="font-size:13px;font-weight:800;color:#0a0a1f;margin-bottom:4px;">${item.title}</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:14px;">${item.username || ''}</div>
+      <canvas id="_qr_share_canvas" style="border-radius:12px;max-width:100%;"></canvas>
+      <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <div style="width:36px;height:36px;border-radius:50%;border:3px solid #6366f1;display:flex;align-items:center;justify-content:center;">
+          <span id="_qr_countdown" style="font-size:13px;font-weight:900;color:#6366f1;">60</span>
+        </div>
+        <div style="font-size:12px;color:#6b7280;text-align:left;line-height:1.4;">Il QR si cancella<br>automaticamente</div>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#ef4444;font-weight:600;">⚠️ Non condividere con persone non fidate</div>
+      <button onclick="pwCloseQR()" style="margin-top:14px;width:100%;padding:11px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+    </div>`;
+  document.body.appendChild(ov);
+
+  // Disegna QR
+  const canvas = document.getElementById('_qr_share_canvas');
+  qrDraw(canvas, payload, 240);
+
+  // Countdown 60s
+  let secs = 60;
+  clearInterval(_qrCountdownTimer);
+  _qrCountdownTimer = setInterval(() => {
+    secs--;
+    const el = document.getElementById('_qr_countdown');
+    if (el) el.textContent = secs;
+    if (secs <= 0) pwCloseQR();
+  }, 1000);
+}
+
+function pwCloseQR() {
+  clearInterval(_qrCountdownTimer);
+  document.getElementById('_qr_share_ov')?.remove();
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE CALENDAR SYNC
+// ═══════════════════════════════════════════════════════════
+let _gcalToken = null;
+
+async function gcalGetToken() {
+  await new Promise((resolve, reject) => {
+    if (window.google?.accounts) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: (resp) => {
+        if (resp.error) { reject(resp.error); return; }
+        _gcalToken = resp.access_token;
+        resolve(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function gcalSync() {
+  try {
+    showToast('📅 Connessione Google Calendar...');
+    const token = _gcalToken || await gcalGetToken();
+
+    // Carica eventi dal calendario Google (prossimi 30 giorni)
+    const now = new Date().toISOString();
+    const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = data.items || [];
+
+    // Importa eventi in HomeBull (evita duplicati per gcal_id)
+    let added = 0;
+    items.forEach(ev => {
+      const date = (ev.start?.date || ev.start?.dateTime || '').slice(0, 10);
+      const time = ev.start?.dateTime ? ev.start.dateTime.slice(11, 16) : '';
+      const existing = _calEvents.find(e => e.gcal_id === ev.id);
+      if (!existing) {
+        _calEvents.push({
+          id:       'gcal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+          gcal_id:  ev.id,
+          title:    ev.summary || 'Evento',
+          date,
+          time,
+          cat:      'personal',
+          color:    '#6366f1',
+        });
+        added++;
+      }
+    });
+
+    if (added > 0) {
+      calSaveAll();
+      if (typeof calRenderMonth === 'function') calRenderMonth();
+    }
+
+    // Aggiorna UI
+    const statusEl = document.getElementById('gcal-status');
+    const btnEl = document.getElementById('gcal-btn');
+    if (statusEl) statusEl.textContent = `Sincronizzato — ${items.length} eventi`;
+    if (btnEl) { btnEl.textContent = '🔄 Aggiorna'; }
+    localStorage.setItem('hb_gcal_connected', '1');
+    showToast(`✅ ${added} nuovi eventi importati da Google Calendar`);
+  } catch(e) {
+    console.warn('GCal sync error:', e);
+    showToast('⚠️ Errore Calendar: ' + (e.message || e));
+  }
+}
+
+function gcalUpdateUI() {
+  if (localStorage.getItem('hb_gcal_connected') === '1') {
+    const el = document.getElementById('gcal-status');
+    const btn = document.getElementById('gcal-btn');
+    if (el) el.textContent = 'Collegato — clicca per aggiornare';
+    if (btn) btn.textContent = '🔄 Aggiorna';
+  }
 }
 
 // ── QR Code generator ────────────────────────────────────
@@ -6023,90 +6888,7 @@ function calOpen() {
 
 // ── Render calendario ────────────────────────────────────
 function calRenderMonth() {
-  calRenderMonthNew(); return;
-  const label = document.getElementById('cal-month-label');
-  const grid  = document.getElementById('cal-grid');
-  if (!label || !grid) return;
-  label.textContent = CAL_MONTHS[_calMonth] + ' ' + _calYear;
-
-  const firstDay = new Date(_calYear, _calMonth, 1);
-  const lastDay  = new Date(_calYear, _calMonth + 1, 0);
-  const startDow = (firstDay.getDay() + 6) % 7;
-  const today    = new Date();
-
-  const eventDates = new Set(_calEvents
-    .filter(e => { const d = new Date(e.date); return d.getFullYear()===_calYear && d.getMonth()===_calMonth; })
-    .map(e => new Date(e.date).getDate())
-  );
-
-  grid.innerHTML = '';
-
-  for (let i = 0; i < startDow; i++) {
-    const d = new Date(_calYear, _calMonth, -startDow + i + 1);
-    const el = document.createElement('div');
-    el.className = 'cal-day other-month';
-    el.textContent = d.getDate();
-    grid.appendChild(el);
-  }
-
-  for (let d = 1; d <= lastDay.getDate(); d++) {
-    const el = document.createElement('div');
-    el.className = 'cal-day';
-    el.style.cssText = 'position:relative;overflow:hidden;';
-    const isToday = d === today.getDate() && _calMonth === today.getMonth() && _calYear === today.getFullYear();
-    const dateStr = `${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    if (isToday) el.classList.add('today');
-    if (_calSelectedDate === dateStr) el.classList.add('selected');
-    if (eventDates.has(d)) el.classList.add('has-event');
-
-    // ── Turni: colori nel giorno ──
-    const dayShifts = (_calDayShifts[dateStr] || []).slice(0, 2);
-    if (dayShifts.length === 1) {
-      const t = _turniDef.find(t => t.id === dayShifts[0]);
-      if (t) {
-        const bg = document.createElement('div');
-        bg.style.cssText = `position:absolute;inset:0;background:${t.color}55;z-index:0;`;
-        el.appendChild(bg);
-      }
-    } else if (dayShifts.length === 2) {
-      const t1 = _turniDef.find(t => t.id === dayShifts[0]);
-      const t2 = _turniDef.find(t => t.id === dayShifts[1]);
-      if (t1) {
-        const bg1 = document.createElement('div');
-        bg1.style.cssText = `position:absolute;inset:0;background:${t1.color}66;z-index:0;clip-path:polygon(0 0,100% 0,0 100%);`;
-        el.appendChild(bg1);
-      }
-      if (t2) {
-        const bg2 = document.createElement('div');
-        bg2.style.cssText = `position:absolute;inset:0;background:${t2.color}66;z-index:0;clip-path:polygon(100% 0,100% 100%,0 100%);`;
-        el.appendChild(bg2);
-      }
-    }
-
-    const num = document.createElement('span');
-    num.style.cssText = 'position:relative;z-index:1;font-weight:700;font-size:12px;';
-    num.textContent = d;
-    el.appendChild(num);
-
-    if (dayShifts.length > 0) {
-      const t1 = _turniDef.find(t=>t.id===dayShifts[0]);
-      const t2 = dayShifts.length>1 ? _turniDef.find(t=>t.id===dayShifts[1]) : null;
-      if (t1) {
-        const lbl = document.createElement('div');
-        lbl.style.cssText = 'position:absolute;bottom:2px;left:0;right:0;text-align:center;font-size:8px;font-weight:800;z-index:2;line-height:1;';
-        if (t2) {
-          lbl.innerHTML = '<span style="color:'+t1.color+'">'+t1.label+'</span><span style="color:var(--text3);">/</span><span style="color:'+t2.color+'">'+t2.label+'</span>';
-        } else {
-          lbl.style.color = isToday ? '#fff' : t1.color;
-          lbl.textContent = t1.label;
-        }
-        el.appendChild(lbl);
-      }
-    }
-
-    el.onclick = () => calSelectDate(dateStr);
-    grid.appendChild(el);
-  }
+  calRenderMonthNew();
 }
 
 function calPrevMonth() {
@@ -6210,6 +6992,56 @@ function calSelectCat(btn) {
   btn.classList.add('active');
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE CALENDAR — Push eventi (bidirezionale)
+// ═══════════════════════════════════════════════════════════
+async function gcalPushEvent(ev) {
+  if (localStorage.getItem('hb_gcal_connected') !== '1') return;
+  try {
+    const token = _gcalToken || await gcalGetToken();
+    const body = {
+      summary: ev.title,
+      start: ev.time ? { dateTime: ev.date + 'T' + ev.time + ':00', timeZone: 'Europe/Rome' }
+                      : { date: ev.date },
+      end:   ev.time ? { dateTime: ev.date + 'T' + ev.time + ':00', timeZone: 'Europe/Rome' }
+                      : { date: ev.date },
+    };
+
+    if (ev.gcal_id) {
+      // Aggiorna evento esistente
+      await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${ev.gcal_id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify(body)
+      });
+    } else {
+      // Crea nuovo evento
+      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.id) {
+        ev.gcal_id = data.id;
+        calSaveAll();
+      }
+    }
+  } catch(e) { console.warn('GCal push error:', e); }
+}
+
+async function gcalDeleteEvent(gcalId) {
+  if (localStorage.getItem('hb_gcal_connected') !== '1' || !gcalId) return;
+  try {
+    const token = _gcalToken || await gcalGetToken();
+    await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${gcalId}`, {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token }
+    });
+  } catch(e) { console.warn('GCal delete error:', e); }
+}
+
 function calSaveEvent() {
   const title = document.getElementById('cal-ev-title').value.trim();
   const date  = document.getElementById('cal-ev-date').value;
@@ -6217,20 +7049,27 @@ function calSaveEvent() {
   if (!date)  { showToast('Seleziona una data'); return; }
   const time  = document.getElementById('cal-ev-time').value;
 
+  let savedEv;
   if (_calEditId) {
-    const ev = _calEvents.find(e => e.id === _calEditId);
-    if (ev) { ev.title = title; ev.date = date; ev.time = time; ev.cat = _calCat.id; ev.color = _calCat.color; }
+    savedEv = _calEvents.find(e => e.id === _calEditId);
+    if (savedEv) { savedEv.title = title; savedEv.date = date; savedEv.time = time; savedEv.cat = _calCat.id; savedEv.color = _calCat.color; }
   } else {
-    _calEvents.push({ id:'ev_'+Date.now(), title, date, time, cat:_calCat.id, color:_calCat.color });
+    savedEv = { id:'ev_'+Date.now(), title, date, time, cat:_calCat.id, color:_calCat.color };
+    _calEvents.push(savedEv);
   }
   calSaveAll();
   calCloseForm();
   calRenderMonth();
   calRenderEvents();
   showToast('✅ Evento salvato');
+
+  // Sync verso Google Calendar (se collegato)
+  if (savedEv) gcalPushEvent(savedEv);
 }
 
 function calDeleteEvent(id) {
+  const ev = _calEvents.find(e => e.id === id);
+  if (ev?.gcal_id) gcalDeleteEvent(ev.gcal_id);
   _calEvents = _calEvents.filter(e => e.id !== id);
   calSaveAll(); calRenderMonth(); calRenderEvents();
   showToast('Evento rimosso');
@@ -6241,129 +7080,6 @@ function calDeleteEvent(id) {
 // ═══════════════════════════════════════════════════════════
 //  FAMIGLIA
 // ═══════════════════════════════════════════════════════════
-const FAMILY_KEY = 'hb13_family';
-let _family = [];
-
-const SHARE_OPTIONS = [
-  { id: 'passwords', label: 'Password',    icon: '🔐' },
-  { id: 'notes',     label: 'Note',         icon: '📝' },
-  { id: 'shopping',  label: 'Lista Spesa',  icon: '🛒' },
-  { id: 'documents', label: 'Documenti',    icon: '📄' },
-  { id: 'cards',     label: 'Carte',        icon: '💳' },
-  { id: 'wifi',      label: 'Wi-Fi',        icon: '📶' },
-  { id: 'otp',       label: 'OTP / 2FA',   icon: '🔑' },
-  { id: 'calendar',  label: 'Calendario',   icon: '📅' },
-];
-
-function familyLoad() {
-  try { _family = JSON.parse(localStorage.getItem(FAMILY_KEY)) || []; }
-  catch(e) { _family = []; }
-}
-function familySave() { localStorage.setItem(FAMILY_KEY, JSON.stringify(_family)); }
-
-function familyOpen() {
-  familyLoad();
-  familyRender();
-  document.getElementById('topbar-title').textContent = 'Famiglia';
-  document.getElementById('topbar-sub').textContent = _family.length + ' membri';
-}
-
-function familyRender() {
-  const list  = document.getElementById('family-list');
-  const empty = document.getElementById('family-empty');
-  if (!list) return;
-  if (!_family.length) { list.innerHTML = ''; if (empty) empty.style.display='block'; return; }
-  if (empty) empty.style.display = 'none';
-  list.innerHTML = '';
-  _family.forEach((member, idx) => {
-    const card = document.createElement('div');
-    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;';
-    const initials = (member.name || member.email || '?').slice(0,2).toUpperCase();
-    const sharedCount = (member.sharing || []).length;
-    const chips = SHARE_OPTIONS.map(opt => {
-      const active = (member.sharing||[]).includes(opt.id);
-      return '<button data-idx="'+idx+'" data-opt="'+opt.id+'" style="padding:6px 11px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:1px solid '+(active?'var(--accent)':'var(--border)')+';background:'+(active?'var(--accent-bg)':'var(--surface)')+';color:'+(active?'var(--accent)':'var(--text3)')+';">'+opt.icon+' '+opt.label+'</button>';
-    }).join('');
-    card.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">'
-      +'<div style="width:44px;height:44px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:white;flex-shrink:0;">'+initials+'</div>'
-      +'<div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(member.name||'Senza nome')+'</div>'
-      +'<div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+member.email+'</div></div>'
-      +'<button data-edit="'+idx+'" style="padding:7px 11px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;">✏️</button>'
-      +'<button data-del="'+idx+'" style="padding:7px 11px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;cursor:pointer;margin-left:6px;">🗑</button>'
-      +'</div>'
-      +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:8px;">Condividi:</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:6px;">'+chips+'</div>'
-      +'<div style="margin-top:10px;font-size:11px;color:var(--text3);">'+(sharedCount>0?'✅ '+sharedCount+' sezione'+(sharedCount>1?'i':'')+ ' condivisa'+(sharedCount>1?'':''):'Nessuna sezione condivisa')+'</div>';
-    // Event listeners
-    card.querySelectorAll('button[data-opt]').forEach(btn => {
-      btn.onclick = () => familyToggleShare(parseInt(btn.dataset.idx), btn.dataset.opt);
-    });
-    card.querySelector('button[data-edit]').onclick = () => familyShowForm(member, idx);
-    card.querySelector('button[data-del]').onclick  = () => familyDelete(idx);
-    list.appendChild(card);
-  });
-}
-
-function familyToggleShare(idx, optId) {
-  if (!_family[idx]) return;
-  if (!_family[idx].sharing) _family[idx].sharing = [];
-  const pos = _family[idx].sharing.indexOf(optId);
-  if (pos>-1) _family[idx].sharing.splice(pos,1); else _family[idx].sharing.push(optId);
-  familySave(); familyRender();
-}
-
-function familyAdd() { familyShowForm(null, null); }
-
-function familyShowForm(member, idx) {
-  const isEdit = idx !== null && idx !== undefined;
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
-  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>'
-    +'<div style="font-size:18px;font-weight:800;margin-bottom:18px;">'+(isEdit?'✏️ Modifica familiare':'👤 Nuovo familiare')+'</div>'
-    +'<div style="margin-bottom:12px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Nome</div>'
-    +'<input id="_fm_name" type="text" value="'+(member?.name||'')+'" placeholder="es. Marco, Giusy..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>'
-    +'<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email *</div>'
-    +'<input id="_fm_email" type="email" value="'+(member?.email||'')+'" placeholder="es. marco@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>'
-    +'<div style="display:flex;gap:10px;">'
-    +'<button id="_fm_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
-    +'<button id="_fm_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">'+(isEdit?'Salva':'Aggiungi')+'</button>'
-    +'</div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('_fm_name')?.focus(), 100);
-  document.getElementById('_fm_cancel').onclick = () => overlay.remove();
-  document.getElementById('_fm_save').onclick = () => {
-    const name  = document.getElementById('_fm_name')?.value.trim();
-    const email = document.getElementById('_fm_email')?.value.trim();
-    if (!email) { showToast('Inserisci una email'); return; }
-    if (isEdit) { _family[idx] = {..._family[idx], name, email}; }
-    else { _family.push({id:'fm_'+Date.now(), name, email, sharing:[]}); }
-    familySave(); overlay.remove(); familyRender();
-    showToast(isEdit ? '✅ Aggiornato' : '✅ '+(name||email)+' aggiunto');
-  };
-  document.getElementById('_fm_email').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('_fm_save').click(); });
-}
-
-function familyDelete(idx) {
-  const member = _family[idx]; if (!member) return;
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
-  const box = document.createElement('div');
-  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
-  box.innerHTML = '<div style="font-size:32px;margin-bottom:10px;">👤</div>'
-    +'<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Rimuovere '+(member.name||member.email)+'?</div>'
-    +'<div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Le condivisioni impostate verranno eliminate.</div>'
-    +'<div style="display:flex;gap:10px;">'
-    +'<button id="_fdel_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
-    +'<button id="_fdel_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Rimuovi</button>'
-    +'</div>';
-  overlay.appendChild(box); document.body.appendChild(overlay);
-  document.getElementById('_fdel_cancel').onclick = () => overlay.remove();
-  document.getElementById('_fdel_ok').onclick = () => {
-    _family.splice(idx,1); familySave(); overlay.remove(); familyRender(); showToast('Familiare rimosso');
-  };
-}
 // ═══════════════════════════════════════════════════════════
 //  DOCUMENTI
 // ═══════════════════════════════════════════════════════════
@@ -6989,10 +7705,13 @@ function shopSave() {
 
 function shopOpen() {
   shopLoad();
+  // Mantieni lista condivisa attiva se presente
+  if (_shopCurSharedId && _sharedShopData[_shopCurSharedId]) {
+    shopRenderAll();
+    return;
+  }
+  _shopCurSharedId = null;
   shopRenderAll();
-  document.getElementById('topbar-title').textContent = 'Lista Spesa';
-  const count = Object.keys(_shopList).length;
-  document.getElementById('topbar-sub').textContent = count + (count===1?' prodotto':' prodotti');
 }
 
 function shopRenderAll(q='') {
@@ -7039,6 +7758,19 @@ function shopRenderListTabs() {
       container.appendChild(btn);
     }
   });
+  // Tab liste condivise ricevute
+  Object.entries(_sharedShopData).forEach(([shareId, shared]) => {
+    const isActive = _shopCurSharedId === shareId;
+    const btn = document.createElement('button');
+    btn.style.cssText = 'padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;'
+      + 'border:' + (isActive ? '2px solid #10b981' : '1px solid rgba(16,185,129,0.4)') + ';'
+      + 'background:' + (isActive ? 'rgba(16,185,129,0.15)' : 'transparent') + ';'
+      + 'color:' + (isActive ? '#10b981' : 'rgba(16,185,129,0.8)') + ';';
+    btn.textContent = '👥 ' + shared.fromEmail.split('@')[0];
+    btn.onclick = () => { _shopCurSharedId = shareId; shopRenderAll(); };
+    container.appendChild(btn);
+  });
+
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
   addBtn.style.cssText = 'padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;border:1px dashed var(--border2);background:transparent;color:var(--text3);';
@@ -7048,7 +7780,8 @@ function shopRenderListTabs() {
 }
 
 function shopSwitchList(id) {
-  shopSave(); // salva corrente
+  shopSave();
+  _shopCurSharedId = null;
   _shopCurId = id;
   _shopList  = _shopLists[id].items;
   shopRenderAll();
@@ -7056,6 +7789,7 @@ function shopSwitchList(id) {
 
 // ── Lista corrente (griglia 4 colonne) ──────────────────
 function shopRenderActive() {
+  if (_shopCurSharedId) { renderSharedShopTab(); return; }
   const grid = document.getElementById('shop-active-grid');
   if (!grid) return;
   const items = Object.entries(_shopList);
@@ -7152,7 +7886,9 @@ function shopRenderCategories(q='') {
     accordion.className = 'shop-accordion';
 
     const header = document.createElement('div');
+    const shopColors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899','#14b8a6','#a855f7','#84cc16','#fb923c'];
     header.className = 'shop-accordion-header';
+    header.style.borderLeft = `3px solid ${shopColors[idx % shopColors.length]}`;
     header.onclick = () => {
       _shopOpenCats[idx] = !isOpen;
       shopRenderCategories(q);
@@ -7439,6 +8175,7 @@ const ALL_TABS_META = [
   { id:'wifi',      icon:'🌐', label:'Wi-Fi' },
   { id:'finance',   icon:'📊', label:'Finanze' },
   { id:'server',    icon:'📡', label:'Server/IT' },
+  { id:'library',   icon:'📚', label:'Libreria' },
   { id:'shopping',  icon:'🛒', label:'Lista Spesa' },
 ];
 
@@ -7743,12 +8480,7 @@ function applyHomePrefs() {
   });
 }
 
-function setTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('hb12_theme', t);
-  document.getElementById('theme-dark-btn').style.borderWidth  = t === 'dark'  ? '2px' : '1px';
-  document.getElementById('theme-light-btn').style.borderWidth = t === 'light' ? '2px' : '1px';
-}
+// (setTheme definita più avanti — supporta anche 'auto')
 
 // ── Keyboard support per PIN ───────────────────────────────
 document.addEventListener('keydown', (e) => {
@@ -8634,6 +9366,15 @@ function settingsRefreshUI() {
   const sl=document.getElementById('fs-slider');if(sl)sl.value=S.fs;
 }
 function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',th);localStorage.setItem('hb_theme',t);settingsRefreshUI();showToast(th==='dark'?'🌙 Dark':'☀️ Light');}
+
+// Aggiorna automaticamente il tema se in modalità 'auto' e cambia il tema di sistema
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (localStorage.getItem('hb_theme') === 'auto') {
+      document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+    }
+  });
+}
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
 function setBgColor(c){document.documentElement.style.setProperty('--bg',c);document.documentElement.style.setProperty('--bg2',c);document.body.style.background=c;localStorage.setItem('hb_bg_color',c);showToast('🎨 Sfondo aggiornato');}
 function setCardBgColor(c){document.documentElement.style.setProperty('--surface',c);document.documentElement.style.setProperty('--surface2',c);localStorage.setItem('hb_card_color',c);showToast('🎨 Card aggiornate');}
@@ -8664,7 +9405,407 @@ function setShadow(s){document.documentElement.style.setProperty('--card-shadow'
 function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 function setFontSize(px){document.documentElement.style.fontSize=px+'px';localStorage.setItem('hb_fs',px);}
-function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
+
+// ═══════════════════════════════════════════════════════════
+//  ESPORTA PDF — Backup leggibile di tutti i dati
+// ═══════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════
+//  ESPORTA PDF — Singola categoria/sezione
+// ═══════════════════════════════════════════════════════════
+
+function showPDFSectionPicker() {
+  const sections = [
+    { id:'passwords', icon:'🔐', label:'Password' },
+    { id:'documents', icon:'📄', label:'Documenti' },
+    { id:'notes',     icon:'📝', label:'Note' },
+    { id:'cards',     icon:'💳', label:'Carte' },
+    { id:'wifi',      icon:'📶', label:'Wi-Fi' },
+    { id:'finance',   icon:'💰', label:'Finanze' },
+    { id:'server',    icon:'📡', label:'Server/IT' },
+  ];
+
+  const opts = sections.map(s =>
+    `<button onclick="exportPDFSection('${s.id}');document.getElementById('_pdfsec_ov').remove()" style="width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:12px;text-align:left;margin-bottom:8px;">
+      <span style="font-size:22px;">${s.icon}</span><span>${s.label}</span>
+    </button>`
+  ).join('');
+
+  const ov = document.createElement('div');
+  ov.id = '_pdfsec_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:14px;">📑 Esporta sezione in PDF</div>
+    ${opts}
+    <button onclick="document.getElementById('_pdfsec_ov').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">Annulla</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+async function exportPDFSection(section) {
+  if (typeof window.jspdf === 'undefined') {
+    showToast('⏳ Caricamento libreria PDF...');
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (typeof window.jspdf === 'undefined') {
+      showToast('⚠️ Libreria PDF non disponibile');
+      return;
+    }
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W = 210, margin = 16;
+  let y = 26;
+
+  doc.setFillColor(99,102,241);
+  doc.rect(0,0,W,18,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(13); doc.setFont('helvetica','bold');
+
+  const row = (label, value, indent=0) => {
+    if (y > 280) { doc.addPage(); y = 20; }
+    doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
+    doc.text(label, margin+indent, y);
+    doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
+    const lines = doc.splitTextToSize(String(value||'—'), W-margin*2-indent-33);
+    doc.text(lines, margin+indent+33, y);
+    y += Math.max(5, lines.length*4.5);
+  };
+  const divider = () => { if(y>280){doc.addPage();y=20;} doc.setDrawColor(220,220,220); doc.line(margin,y,W-margin,y); y+=4; };
+
+  let title = '', items = [];
+
+  if (section === 'passwords') {
+    title = 'Password';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const cats = JSON.parse(localStorage.getItem('hb13_pw_cats')||'[]');
+    const pws  = JSON.parse(localStorage.getItem('hb13_passwords')||'[]').filter(p=>!p.deleted);
+    cats.forEach(cat => {
+      const catItems = pws.filter(p => p.categoryId === cat.id);
+      if (!catItems.length) return;
+      if (y>270){doc.addPage();y=20;}
+      doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text('▸ ' + cat.name, margin, y); y+=6;
+      catItems.forEach(p => {
+        row('Sito:', p.title, 4);
+        if (p.username) row('Utente:', p.username, 4);
+        row('Password:', p.password, 4);
+        if (p.url) row('URL:', p.url, 4);
+        divider();
+      });
+    });
+    if (!pws.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna password salvata', margin, y); }
+
+  } else if (section === 'cards') {
+    title = 'Carte';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]').filter(c=>!c.deleted);
+    cards.forEach(card => {
+      row('Banca:', card.bank); row('Numero:', card.number);
+      row('Intestatario:', card.holder); row('Scadenza:', card.exp);
+      if (card.cvv) row('CVV:', card.cvv);
+      if (card.pin) row('PIN:', card.pin);
+      divider();
+    });
+    if (!cards.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna carta salvata', margin, y); }
+
+  } else if (section === 'wifi') {
+    title = 'Wi-Fi';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const wifis = JSON.parse(localStorage.getItem('hb13_wifi')||'[]').filter(w=>!w.deleted);
+    wifis.forEach(w => {
+      row('Rete:', w.ssid); row('Password:', w.pw);
+      if (w.notes) row('Note:', w.notes);
+      divider();
+    });
+    if (!wifis.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna rete salvata', margin, y); }
+
+  } else if (section === 'server') {
+    title = 'Server / IT';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const servers = JSON.parse(localStorage.getItem('hb13_server')||'[]').filter(s=>!s.deleted);
+    servers.forEach(s => {
+      row('Nome:', s.name);
+      if (s.host) row('Host:', s.host);
+      if (s.user) row('Utente:', s.user);
+      if (s.pass) row('Password:', s.pass);
+      if (s.notes) row('Note:', s.notes);
+      divider();
+    });
+    if (!servers.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun server salvato', margin, y); }
+
+  } else if (section === 'finance') {
+    title = 'Finanze';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const fin = JSON.parse(localStorage.getItem('hb13_finance')||'[]').filter(f=>!f.deleted);
+    fin.forEach(f => {
+      row('Conto:', f.name);
+      if (f.iban) row('IBAN:', f.iban);
+      if (f.bic) row('BIC:', f.bic);
+      if (f.notes) row('Note:', f.notes);
+      divider();
+    });
+    if (!fin.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun conto salvato', margin, y); }
+
+  } else if (section === 'notes') {
+    title = 'Note';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const notes = JSON.parse(localStorage.getItem('hb13_notes')||'[]').filter(n=>!n.deleted);
+    notes.forEach(n => {
+      if (y>270){doc.addPage();y=20;}
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text(n.title||'Senza titolo', margin, y); y+=5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(80,80,80); doc.setFontSize(8);
+      const lines = doc.splitTextToSize(n.content||'', W-margin*2);
+      lines.slice(0,15).forEach(l => { if(y>280){doc.addPage();y=20;} doc.text(l,margin,y); y+=4.5; });
+      divider();
+    });
+    if (!notes.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna nota salvata', margin, y); }
+
+  } else if (section === 'documents') {
+    title = 'Documenti';
+    doc.text('HomeBull — ' + title, margin, 12);
+    const docs = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').filter(d=>!d.deleted);
+    docs.forEach(d => {
+      row('Tipo:', d.label);
+      row('Nome:', (d.nome||'') + ' ' + (d.cognome||''));
+      if (d.number)  row('Numero:', d.number);
+      if (d.expiry)  row('Scadenza:', d.expiry);
+      divider();
+    });
+    if (!docs.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun documento salvato', margin, y); }
+  }
+
+  doc.setFontSize(8); doc.setTextColor(255,255,255);
+  doc.text(new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}), W-margin, 12, {align:'right'});
+
+  // Footer
+  const pages = doc.internal.getNumberOfPages();
+  for (let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7); doc.setTextColor(160,160,160); doc.setFont('helvetica','normal');
+    doc.text('HomeBull Pro v13 — '+title+' (riservato)', margin, 292);
+    doc.text('Pagina '+i+' di '+pages, W-margin, 292, {align:'right'});
+  }
+
+  doc.save('HomeBull-' + title.replace(/[^a-zA-Z0-9]/g,'') + '-' + new Date().toISOString().slice(0,10) + '.pdf');
+  showToast('✅ PDF "' + title + '" esportato!');
+}
+
+async function exportPDF() {
+  if (typeof window.jspdf === 'undefined') {
+    showToast('⏳ Caricamento libreria PDF...');
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    if (typeof window.jspdf === 'undefined') {
+      showToast('⚠️ Libreria PDF non disponibile — controlla la connessione');
+      return;
+    }
+  }
+
+  showToast('📋 Generazione PDF...');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+  const W = 210, margin = 16;
+  const accentR = 99, accentG = 102, accentB = 241;
+  let y = 0;
+
+  // ── Helpers ───────────────────────────────────────────────
+  const newPage = () => { doc.addPage(); y = 20; };
+
+  const checkY = (need=20) => { if (y + need > 280) newPage(); };
+
+  const header = () => {
+    doc.setFillColor(accentR, accentG, accentB);
+    doc.rect(0, 0, W, 18, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text('HomeBull Pro v13 — Backup', margin, 12);
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'long',year:'numeric'}), W-margin, 12, {align:'right'});
+    y = 26;
+  };
+
+  const sectionTitle = (title, emoji='') => {
+    checkY(14);
+    doc.setFillColor(accentR, accentG, accentB, 0.1);
+    doc.setDrawColor(accentR, accentG, accentB);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(margin, y, W - margin*2, 9, 2, 2, 'FD');
+    doc.setTextColor(accentR, accentG, accentB);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text(emoji + ' ' + title, margin+3, y+6);
+    y += 13;
+    doc.setTextColor(40,40,40);
+  };
+
+  const row = (label, value, indent=0) => {
+    checkY(6);
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.setTextColor(100,100,100);
+    doc.text(label, margin + indent, y);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(30,30,30);
+    const maxW = W - margin*2 - indent - 35;
+    const val = String(value||'—');
+    const lines = doc.splitTextToSize(val, maxW);
+    doc.text(lines, margin + indent + 33, y);
+    y += Math.max(5, lines.length * 4.5);
+  };
+
+  const divider = () => {
+    checkY(4);
+    doc.setDrawColor(220,220,220); doc.setLineWidth(0.2);
+    doc.line(margin, y, W-margin, y);
+    y += 4;
+  };
+
+  // ── Copertina ─────────────────────────────────────────────
+  header();
+  doc.setFontSize(9); doc.setTextColor(120,120,120); doc.setFont('helvetica','italic');
+  doc.text('⚠️  Documento riservato — conserva in luogo sicuro', margin, y);
+  y += 10;
+
+  // ── PASSWORD ──────────────────────────────────────────────
+  const cats = JSON.parse(localStorage.getItem('hb13_pw_cats')||'[]');
+  const pws  = JSON.parse(localStorage.getItem('hb13_passwords')||'[]');
+  if (pws.length) {
+    sectionTitle('Password (' + pws.length + ')', '🔐');
+    cats.forEach(cat => {
+      const items = pws.filter(p => p.categoryId === cat.id);
+      if (!items.length) return;
+      checkY(8);
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text('▸ ' + cat.name, margin, y); y += 6;
+      items.forEach(p => {
+        checkY(18);
+        row('Sito:', p.title, 4);
+        if (p.username) row('Utente:', p.username, 4);
+        row('Password:', p.password, 4);
+        if (p.url) row('URL:', p.url, 4);
+        if (p.notes) row('Note:', p.notes, 4);
+        divider();
+      });
+    });
+    // Password senza categoria
+    const noCat = pws.filter(p => !cats.find(c => c.id === p.categoryId));
+    if (noCat.length) {
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text('▸ Altre', margin, y); y += 6;
+      noCat.forEach(p => {
+        row('Sito:', p.title, 4);
+        if (p.username) row('Utente:', p.username, 4);
+        row('Password:', p.password, 4);
+        divider();
+      });
+    }
+  }
+
+  // ── NOTE ──────────────────────────────────────────────────
+  const notes = JSON.parse(localStorage.getItem('hb13_notes')||'[]');
+  if (notes.length) {
+    newPage(); header();
+    sectionTitle('Note (' + notes.length + ')', '📝');
+    notes.forEach(n => {
+      checkY(12);
+      doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
+      doc.text(n.title||'Senza titolo', margin, y); y += 5;
+      doc.setFont('helvetica','normal'); doc.setTextColor(80,80,80); doc.setFontSize(8);
+      const lines = doc.splitTextToSize(n.content||'', W - margin*2);
+      lines.slice(0,20).forEach(l => { checkY(5); doc.text(l, margin, y); y += 4.5; });
+      divider();
+    });
+  }
+
+  // ── CARTE ─────────────────────────────────────────────────
+  const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]');
+  if (cards.length) {
+    checkY(20); sectionTitle('Carte (' + cards.length + ')', '💳');
+    cards.forEach(card => {
+      checkY(20);
+      row('Banca:', card.bank);
+      row('Numero:', card.number);
+      row('Intestatario:', card.holder);
+      row('Scadenza:', card.exp);
+      if (card.cvv) row('CVV:', card.cvv);
+      if (card.pin) row('PIN:', card.pin);
+      divider();
+    });
+  }
+
+  // ── WIFI ──────────────────────────────────────────────────
+  const wifis = JSON.parse(localStorage.getItem('hb13_wifi')||'[]');
+  if (wifis.length) {
+    checkY(20); sectionTitle('Wi-Fi (' + wifis.length + ')', '📶');
+    wifis.forEach(w => {
+      checkY(14);
+      row('Rete:', w.ssid);
+      row('Password:', w.pw);
+      if (w.notes) row('Note:', w.notes);
+      divider();
+    });
+  }
+
+  // ── SERVER ────────────────────────────────────────────────
+  const servers = JSON.parse(localStorage.getItem('hb13_server')||'[]');
+  if (servers.length) {
+    checkY(20); sectionTitle('Server / IT (' + servers.length + ')', '🖥️');
+    servers.forEach(s => {
+      checkY(16);
+      row('Nome:', s.name);
+      if (s.host) row('Host:', s.host);
+      if (s.user) row('Utente:', s.user);
+      if (s.pass) row('Password:', s.pass);
+      if (s.notes) row('Note:', s.notes);
+      divider();
+    });
+  }
+
+  // ── FINANZE ───────────────────────────────────────────────
+  const fin = JSON.parse(localStorage.getItem('hb13_finance')||'[]');
+  if (fin.length) {
+    newPage(); header();
+    sectionTitle('Finanze (' + fin.length + ')', '💰');
+    fin.forEach(f => {
+      checkY(14);
+      row('Conto:', f.name);
+      if (f.iban) row('IBAN:', f.iban);
+      if (f.bic) row('BIC:', f.bic);
+      if (f.notes) row('Note:', f.notes);
+      divider();
+    });
+  }
+
+  // ── Footer su ogni pagina ─────────────────────────────────
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(7); doc.setTextColor(160,160,160); doc.setFont('helvetica','normal');
+    doc.text('HomeBull Pro v13 — Backup riservato', margin, 292);
+    doc.text('Pagina ' + i + ' di ' + pageCount, W-margin, 292, {align:'right'});
+  }
+
+  // ── Salva ─────────────────────────────────────────────────
+  const fname = 'HomeBull-backup-' + new Date().toISOString().slice(0,10) + '.pdf';
+  doc.save(fname);
+  showToast('✅ PDF esportato!');
+}
+
+async function forceAppUpdate() {
+  showToast('🔄 Pulizia cache in corso...');
+  try {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+  } catch(e) {}
+  showToast('✅ Cache svuotata — ricarico...');
+  setTimeout(() => location.reload(true), 1200);
+}
+function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server','hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
 function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 async function settingsToggleBio(){
@@ -8715,6 +9856,16 @@ function settingsApplyOnLoad() {
   const animMap = {off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};
   const an = localStorage.getItem('hb_anim')||'normal';
   document.documentElement.style.setProperty('--anim-speed', animMap[an]||'0.18s');
+  // Autolock
+  const autolockVal = localStorage.getItem('hb_autolock') || '0';
+  const autolockSel = document.getElementById('autolock-sel');
+  if (autolockSel) autolockSel.value = autolockVal;
+  // Avvia timer se era attivo
+  if (parseInt(autolockVal) > 0) autolockStart();
+
+  // Drive auto backup UI
+  setTimeout(() => { if (typeof driveUpdateBackupUI === 'function') driveUpdateBackupUI(); }, 300);
+
   // Sfondo
   const bgMap = {
     grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',
@@ -8984,7 +10135,42 @@ function skipBioAndEnter() {
 }
 
 // Blocca app senza logout — mostra solo PIN
+
+// ═══════════════════════════════════════════════════════════
+//  TIMEOUT SESSIONE — blocco automatico per inattività
+// ═══════════════════════════════════════════════════════════
+let _autolockTimer = null;
+
+function autolockReset() {
+  const min = parseInt(localStorage.getItem('hb_autolock') || '0');
+  if (!min) return;
+  clearTimeout(_autolockTimer);
+  _autolockTimer = setTimeout(() => {
+    if (document.getElementById('app').classList.contains('visible')) {
+      lockApp();
+      showToast('🔒 Blocco automatico per inattività');
+    }
+  }, min * 60 * 1000);
+}
+
+function autolockStart() {
+  ['touchstart','mousemove','keydown','click','scroll'].forEach(ev =>
+    document.addEventListener(ev, autolockReset, { passive: true })
+  );
+  autolockReset();
+}
+
+function autolockStop() {
+  clearTimeout(_autolockTimer);
+  ['touchstart','mousemove','keydown','click','scroll'].forEach(ev =>
+    document.removeEventListener(ev, autolockReset)
+  );
+}
+
 function lockApp() {
+  autolockStop();
+  _lsCacheReady = false;
+  _lsCache = {};
   HB.authState = 'pin-login';
   HB.pinBuffer = '';
   if (typeof updatePinDots === 'function') updatePinDots();
@@ -9029,8 +10215,8 @@ function fbMsg(c){
 }
 
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
-  'hb13_docs2','hb13_finance','hb13_server','hb13_family','hb13_shop_lists','hb13_calendar_shifts',
-  'hb13_pw_cats','hb13_shop_lists_v2'];
+  'hb13_docs2','hb13_finance','hb13_server','hb13_shop_lists','hb13_calendar_shifts',
+  'hb13_pw_cats','hb13_shop_lists_v2','hb13_library'];
 
 // Timestamp helpers
 function _tsKey(k){ return 'hb_ts_' + k; }
@@ -9094,7 +10280,7 @@ async function fbSyncLoad(){
     if(updated){
       showToast('\u2601\ufe0f Dati aggiornati dal cloud');
       try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
-      try { if(typeof notesLoad==='function') notesLoad(); } catch(e){}
+      try { if(typeof noteLoad==='function') { noteLoad(); } } catch(e){}
       try { if(typeof otpLoad==='function') otpLoad(); } catch(e){}
       try { if(typeof docsLoad2==='function') docsLoad2(); } catch(e){}
       try { if(typeof shopLoad==='function') shopLoad(); } catch(e){}
@@ -9104,10 +10290,9 @@ async function fbSyncLoad(){
       if(typeof updateHomeStats==='function') updateHomeStats();
       const tab = HB.currentTab;
       if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
-      else if(tab === 'notes' && typeof renderNotes==='function') renderNotes();
+      else if(tab === 'notes' && typeof noteRenderList==='function') noteRenderList('');
       else if(tab === 'shopping' && typeof shopRenderAll==='function') { shopLoad(); shopRenderAll(); }
       else if(tab === 'wifi' && typeof wifiRender==='function') wifiRender();
-      else if(tab === 'family' && typeof familyRender==='function') familyRender();
       else if(tab === 'finance' && typeof financeRender==='function') financeRender();
       else if(tab === 'otp' && typeof otpRender==='function') otpRender();
       else if(tab === 'cards' && typeof cardsRender==='function') cardsRender();
@@ -9135,6 +10320,7 @@ async function fbSyncAll(silent=false){
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
+    driveAutoBackup();
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
@@ -9187,7 +10373,322 @@ function logout(){
 
 let _lastSyncTime = null;
 
+// ═══════════════════════════════════════════════════════════
+//  CONDIVISIONE SELETTIVA — Lista Spesa e Calendario
+// ═══════════════════════════════════════════════════════════
+const SHAREABLE = {
+  shopping: { label: 'Lista Spesa', icon: '🛒', key: 'hb13_shop_lists_v2' },
+  calendar:  { label: 'Calendario',  icon: '📅', key: 'hb13_calendar' },
+};
+
+let _myShares      = {}; // condivisioni create da me
+let _receivedShares = {}; // condivisioni ricevute
+let _sharedShopData = {}; // { shareId: { fromEmail, items[] } } dati lista spesa ricevuta
+let _shopCurSharedId = null; // shareId lista condivisa attiva
+
+// ── Carica condivisioni da Firebase ──────────────────────
+async function loadShares() {
+  if (!fbReady || !fbDb) return;
+  const emailKey = _getSyncKey();
+  if (!emailKey) return;
+  try {
+    console.log('loadShares — emailKey:', emailKey);
+    const mySnap  = await fbDb.ref('userShares/' + emailKey + '/created').get();
+    _myShares     = mySnap.exists()  ? mySnap.val()  : {};
+    const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
+    _receivedShares = recSnap.exists() ? recSnap.val() : {};
+    console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
+    // Debug: mostra cosa c'è su Firebase
+    const allSnap = await fbDb.ref('userShares/' + emailKey).get();
+    console.log('userShares raw:', JSON.stringify(allSnap.val()));
+  } catch(e) { console.warn('loadShares:', e); }
+}
+
+// ── Crea condivisione ─────────────────────────────────────
+async function createShare(section, withEmail, permission) {
+  const myEmail = _emailOtpAddr;
+  if (!myEmail) { showToast('⚠️ Email non trovata'); return; }
+  if (withEmail.toLowerCase() === myEmail.toLowerCase()) { showToast('⚠️ Non puoi condividere con te stesso'); return; }
+
+  showToast('📤 Condivisione in corso...');
+  try {
+    const shareId  = 'sh_' + Date.now();
+    const myKey    = _getSyncKey();
+    const withKey  = btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+    const rawData  = localStorage.getItem(SHAREABLE[section]?.key);
+    const data     = rawData ? JSON.parse(rawData) : (section === 'shopping' ? {} : []);
+
+    // Salva in Firebase
+    await fbDb.ref('shared/' + shareId).set({
+      id: shareId, section, fromEmail: myEmail, fromKey: myKey,
+      withEmail: withEmail.toLowerCase(), withKey, permission,
+      createdAt: new Date().toISOString(), data
+    });
+    await fbDb.ref('userShares/' + myKey  + '/created/'  + shareId).set({ shareId, section, withEmail: withEmail.toLowerCase(), permission });
+    await fbDb.ref('userShares/' + withKey + '/received/' + shareId).set({ shareId, section, fromEmail: myEmail, permission });
+
+    _myShares[shareId] = { shareId, section, withEmail: withEmail.toLowerCase(), permission };
+    showToast('✅ Condiviso con ' + withEmail);
+  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+}
+
+// ── Rimuovi condivisione ──────────────────────────────────
+async function removeShare(shareId) {
+  const myKey = _getSyncKey();
+  const share = _myShares[shareId];
+  try {
+    await fbDb.ref('shared/' + shareId).remove();
+    await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
+    if (share?.withEmail) {
+      const withKey = btoa(share.withEmail).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+      await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
+    }
+    delete _myShares[shareId];
+    showToast('✅ Condivisione rimossa');
+    document.getElementById('_share_modal')?.remove();
+  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+}
+
+// ── Rimuovi tutte le condivisioni (cleanup) ───────────────
+async function cleanupAllShares() {
+  if (!confirm('Rimuovere TUTTE le condivisioni?')) return;
+  const myKey = _getSyncKey();
+  for (const shareId of Object.keys(_myShares)) {
+    try { await fbDb.ref('shared/' + shareId).remove(); } catch(e){}
+  }
+  await fbDb.ref('userShares/' + myKey + '/created').remove();
+  await fbDb.ref('userShares/' + myKey + '/received').remove();
+  _myShares = {}; _receivedShares = {};
+  _sharedShopData = {}; _shopCurSharedId = null;
+  document.getElementById('_share_modal')?.remove();
+  shopRenderAll();
+  showToast('✅ Tutte le condivisioni rimosse');
+}
+
+// ── Listener realtime lista spesa condivisa ───────────────
+function startShopShareListener(shareId) {
+  if (!fbReady || !fbDb) return;
+  fbDb.ref('shared/' + shareId + '/data').on('value', snap => {
+    if (!snap.exists()) return;
+    const raw = snap.val();
+    // Estrai items da struttura { listId: { name, items: {...} } }
+    const items = [];
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      Object.values(raw).forEach(list => {
+        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
+          if (!item.deleted) items.push({ id, ...item });
+        });
+      });
+    }
+    if (_sharedShopData[shareId]) _sharedShopData[shareId].items = items;
+    if (_shopCurSharedId === shareId) renderSharedShopTab();
+  });
+}
+
+// ── Render tab lista spesa condivisa ─────────────────────
+function renderSharedShopTab() {
+  const shared = _sharedShopData[_shopCurSharedId];
+  if (!shared) return;
+  const grid = document.getElementById('shop-active-grid');
+  if (!grid) return;
+  const items = shared.items || [];
+  if (!items.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3);font-size:13px;">Lista vuota</div>';
+  } else {
+    grid.innerHTML = items.map(item => {
+      const done = item.checked || item.done;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:6px;">'
+        + '<div style="font-size:22px;">' + (item.icon || '🛒') + '</div>'
+        + '<div style="flex:1;font-size:14px;font-weight:600;' + (done ? 'text-decoration:line-through;opacity:0.5;' : '') + '">' + (item.name || '?') + '</div>'
+        + (done ? '<span style="color:#10b981;font-size:18px;">✅</span>' : '')
+        + '</div>';
+    }).join('');
+  }
+  const nameLabel = document.getElementById('shop-list-name-label');
+  if (nameLabel) nameLabel.textContent = '👥 ' + shared.fromEmail.split('@')[0];
+  const sub = document.getElementById('topbar-sub');
+  if (sub) sub.textContent = items.length + (items.length===1?' prodotto':' prodotti');
+}
+
+// ── Modal condivisione ────────────────────────────────────
+function showShareModal(section) {
+  if (!SHAREABLE[section]) return;
+  loadShares().then(() => _showShareModalInner(section));
+}
+
+function _showShareModalInner(section) {
+  const sec = SHAREABLE[section];
+  const active   = Object.entries(_myShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
+  const received = Object.entries(_receivedShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
+
+  const ov = document.createElement('div');
+  ov.id = '_share_modal';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;';
+
+  // Header
+  const header = document.createElement('div');
+  header.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
+    + '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">' + sec.icon + ' Condividi ' + sec.label + '</div>'
+    + '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Condividi con altri utenti HomeBull</div>';
+  wrap.appendChild(header);
+
+  // Sezione "Condivisa con"
+  const activeBox = document.createElement('div');
+  activeBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:12px;margin-bottom:12px;';
+  activeBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">CONDIVISA CON</div>';
+  if (active.length) {
+    active.forEach(s => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);';
+      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Può modificare':'👁 Solo lettura') + '</div></div>';
+      const btn = document.createElement('button');
+      btn.textContent = 'Rimuovi';
+      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;';
+      btn.onclick = () => removeShare(s.shareId);
+      row.appendChild(btn);
+      activeBox.appendChild(row);
+    });
+  } else {
+    activeBox.innerHTML += '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px;">Nessuna condivisione attiva</div>';
+  }
+  wrap.appendChild(activeBox);
+
+  // Sezione "Ricevute da"
+  if (received.length) {
+    const recBox = document.createElement('div');
+    recBox.style.cssText = 'background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:12px;margin-bottom:12px;';
+    recBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>';
+    received.forEach(s => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;';
+      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Puoi modificare':'👁 Solo lettura') + '</div></div>';
+      if (section === 'shopping') {
+        const btn = document.createElement('button');
+        btn.textContent = 'Vedi lista';
+        btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
+        btn.onclick = () => {
+          ov.remove();
+          openSharedShopList(s.shareId, s.fromEmail);
+        };
+        row.appendChild(btn);
+      }
+      recBox.appendChild(row);
+    });
+    wrap.appendChild(recBox);
+  }
+
+  // Form aggiungi condivisione
+  const form = document.createElement('div');
+  form.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:10px;';
+  form.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>';
+
+  const inp = document.createElement('input');
+  inp.type = 'email'; inp.placeholder = 'email@esempio.com';
+  inp.style.cssText = 'width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;';
+  form.appendChild(inp);
+
+  // Bottoni permesso
+  const permRow = document.createElement('div');
+  permRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;';
+  let selPerm = 'write';
+  const bWrite = document.createElement('button');
+  bWrite.textContent = '✏️ Modifica';
+  bWrite.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:2px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
+  const bRead = document.createElement('button');
+  bRead.textContent = '👁 Lettura';
+  bRead.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;';
+
+  bWrite.onclick = () => { selPerm='write'; bWrite.style.borderWidth='2px'; bWrite.style.background='var(--accent)'; bWrite.style.color='white'; bRead.style.background='var(--surface)'; bRead.style.color='var(--text)'; bRead.style.borderWidth='1px'; };
+  bRead.onclick  = () => { selPerm='read';  bRead.style.borderWidth='2px';  bRead.style.background='var(--accent)';  bRead.style.color='white'; bWrite.style.background='var(--surface)'; bWrite.style.color='var(--text)'; bWrite.style.borderWidth='1px'; };
+
+  permRow.appendChild(bWrite); permRow.appendChild(bRead);
+  form.appendChild(permRow);
+
+  const submitBtn = document.createElement('button');
+  submitBtn.textContent = 'Condividi';
+  submitBtn.style.cssText = 'width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
+  submitBtn.onclick = () => {
+    const email = inp.value.trim();
+    if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
+    ov.remove();
+    createShare(section, email, selPerm);
+  };
+  form.appendChild(submitBtn);
+  wrap.appendChild(form);
+
+  // Bottoni footer
+  const cleanBtn = document.createElement('button');
+  cleanBtn.textContent = '🗑 Rimuovi tutte le condivisioni';
+  cleanBtn.style.cssText = 'width:100%;padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;';
+  cleanBtn.onclick = cleanupAllShares;
+  wrap.appendChild(cleanBtn);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Chiudi';
+  closeBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
+  closeBtn.onclick = () => ov.remove();
+  wrap.appendChild(closeBtn);
+
+  ov.appendChild(wrap);
+  document.body.appendChild(ov);
+}
+
+// ── Apri lista spesa condivisa come tab ──────────────────
+async function openSharedShopList(shareId, fromEmail) {
+  showToast('📥 Caricamento lista...');
+  try {
+    const snap = await fbDb.ref('shared/' + shareId + '/data').get();
+    if (!snap.exists()) { showToast('⚠️ Lista non disponibile'); return; }
+    const raw = snap.val();
+    const items = [];
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      Object.values(raw).forEach(list => {
+        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
+          if (!item.deleted) items.push({ id, ...item });
+        });
+      });
+    }
+    // Prima popola i dati, POI setta l'ID e switcha tab
+    _sharedShopData[shareId] = { fromEmail, items };
+    _shopCurSharedId = shareId;
+    
+    // Vai alla Lista Spesa — ma bypassa shopOpen per non resettare _shopCurSharedId
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('panel-shopping')?.style.setProperty('display', 'flex');
+    HB.currentTab = 'shopping';
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+    document.querySelector('.sidebar-item[data-tab="shopping"]')?.classList.add('active');
+    shopLoad(); // carica dati locali
+    _shopCurSharedId = shareId; // ripristina dopo shopLoad
+    shopRenderListTabs();
+    renderSharedShopTab();
+    startShopShareListener(shareId);
+    showToast('✅ Lista di ' + fromEmail.split('@')[0] + ' caricata');
+  } catch(e) { 
+    console.error('openSharedShopList error:', e);
+    showToast('⚠️ Errore: ' + (e.message||e)); 
+  }
+}
+
+// ── Sincronizza lista spesa verso Firebase (dopo ogni save) ─
+async function syncShopShare() {
+  const myShopShares = Object.entries(_myShares).filter(([k,s]) => s.section==='shopping');
+  if (!myShopShares.length) return;
+  const data = (() => { try { return JSON.parse(localStorage.getItem(SHOP_LISTS_KEY)||'{}'); } catch(e) { return {}; }})();
+  for (const [k,s] of myShopShares) {
+    try { await fbDb.ref('shared/' + (s.shareId||k) + '/data').set(data); } catch(e){}
+  }
+}
+
+
 function cloudPageOpen(){
+  driveUpdateBackupUI();
+  gcalUpdateUI();
   const online = navigator.onLine && fbReady;
   const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
   const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -9931,6 +11432,38 @@ function calShowAddEvent() {
             </div>
           </div>
         </div>
+        <!-- Google Calendar Sync -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">📅 Google Calendar</div>
+              <div style="font-size:11px;color:var(--text3);" id="gcal-status">Non collegato</div>
+            </div>
+            <button onclick="gcalSync()" id="gcal-btn" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Collega</button>
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
+          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</div>
+              <div style="font-size:11px;color:var(--text3);" id="drive-backup-ts">Nessun backup effettuato</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="driveRestoreNow()" style="padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇️ Ripristina</button>
+              <button onclick="driveBackupNow()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup</button>
+            </div>
+          </div>
+          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Auto backup (ogni 24h)</div>
+              <div style="font-size:11px;color:var(--text3);">Backup silenzioso dopo ogni sync</div>
+            </div>
+            <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
+              <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+            </div>
+          </div>
+        </div>
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
         <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
       </div>
@@ -9942,6 +11475,14 @@ function calShowAddEvent() {
             <span style="font-size:28px;">📤</span>
             <div><div style="margin-bottom:3px;">Esporta backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Salva tutti i dati in un file JSON</div></div>
           </button>
+          <button onclick="exportPDF()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">📋</span>
+            <div><div style="margin-bottom:3px;">Esporta PDF completo</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Backup leggibile con tutte le sezioni</div></div>
+          </button>
+          <button onclick="showPDFSectionPicker()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">📑</span>
+            <div><div style="margin-bottom:3px;">Esporta PDF singola sezione</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Scegli cosa esportare</div></div>
+          </button>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
             <span style="font-size:28px;">📥</span>
             <div><div style="margin-bottom:3px;">Importa backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Ripristina da un file JSON</div></div>
@@ -9949,6 +11490,26 @@ function calShowAddEvent() {
           </label>
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
+          </div>
+          <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">🔄</span>
+            <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── PAGINA NOTIFICHE ── -->
+      <div id="set-page-notif" style="display:none;padding:20px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+          <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">🔔 Notifiche scadenze</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Documenti e carte in scadenza</div>
+            </div>
+            <button onclick="requestNotifPermission()" id="notif-toggle-btn" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Attiva</button>
+          </div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);line-height:1.5;">
+            Ricevi una notifica quando un documento o una carta sta per scadere (entro 30 giorni).
           </div>
         </div>
       </div>
@@ -10003,18 +11564,33 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA230</div>
+            <div style="font-size:13px;color:var(--text3);">BETA292</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">🗺 Roadmap</div>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Password, Note, OTP, Carte, WiFi</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Documenti con Codice Fiscale</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">✅ <span style="color:var(--text2);">Famiglia, Lista spesa, Server</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Firebase Auth + Sync cloud</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Drive backup</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Google Calendar sync</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔜 <span style="color:var(--text3);">Condivisione famiglia reale</span></div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
+              <div style="display:flex;align-items:center;gap:8px;">🔐 <span style="color:var(--text2);">Password, Note, OTP, Carte, Wi-Fi, Server</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📄 <span style="color:var(--text2);">Documenti con scadenze e Codice Fiscale</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📅 <span style="color:var(--text2);">Calendario + sync Google Calendar bidirezionale</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Sync Firebase multi-dispositivo</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔒 <span style="color:var(--text2);">Cifratura AES-256 (cloud + locale)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup Google Drive (ultimi 5 + auto 24h)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">Esporta PDF / JSON</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📥 <span style="color:var(--text2);">Import CSV da Chrome/Firefox/1Password</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📊 <span style="color:var(--text2);">Statistiche e analisi password</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📱 <span style="color:var(--text2);">Condivisione e scansione QR password</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔔 <span style="color:var(--text2);">Notifiche scadenze</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">⏱️ <span style="color:var(--text2);">Blocco automatico per inattività</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🔍 <span style="color:var(--text2);">Ricerca globale</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🏠 <span style="color:var(--text2);">Home personalizzabile (accesso rapido)</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">🎨 <span style="color:var(--text2);">Tema chiaro/scuro/automatico</span></div>
+            </div>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">📋 Export</div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
+              <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">PDF completo o per singola sezione</span></div>
+              <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup JSON completo</span></div>
             </div>
           </div>
         </div>
@@ -10034,16 +11610,17 @@ function calShowAddEvent() {
   </div>
   <div style="padding:6px 0;flex:1;overflow-y:auto;">
     <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
-    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
+    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
     <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
+    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
+    <div class="mob-item" onclick="switchTab('library');closeMobileMenu()">📚 Libreria</div>
     <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
     <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
-    <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
-    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
-    <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
-    <div class="mob-item" onclick="switchTab('calendar');closeMobileMenu()">📅 Calendario</div>
+    <div class="mob-item" onclick="switchTab('passwords');closeMobileMenu()">🔐 Password</div>
     <div class="mob-item" onclick="switchTab('server');closeMobileMenu()">📡 Server/IT</div>
-    <div class="mob-item" onclick="switchTab('shopping');closeMobileMenu()">🛒 Lista Spesa</div>
+    <div class="mob-item" onclick="switchTab('wifi');closeMobileMenu()">📶 Wi-Fi</div>
   </div>
   <div style="padding:10px 14px;border-top:1px solid var(--border);">
     <div class="mob-item" onclick="openSettings();closeMobileMenu()">⚙️ Impostazioni</div>
@@ -10052,5 +11629,510 @@ function calShowAddEvent() {
 </div>
 
 <button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
+</body>
+</div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  LIBRERIA — Google Drive + link documenti
+// ═══════════════════════════════════════════════════════════
+const LIB_KEY = 'hb13_library';
+let _libItems = [];
+
+function libLoad() {
+  try { _libItems = JSON.parse(localStorage.getItem(LIB_KEY) || '[]'); } catch(e) { _libItems = []; }
+}
+
+function libSave() {
+  localStorage.setItem(LIB_KEY, JSON.stringify(_libItems));
+}
+
+function libOpen() {
+  libLoad();
+  libRender();
+  document.getElementById('topbar-title').textContent = 'Libreria';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function libRender() {
+  const container = document.getElementById('lib-view-list');
+  if (!container) return;
+  const active = _libItems.filter(i => !i.deleted);
+  
+  // Header con pulsante aggiungi
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);">${active.length} document${active.length !== 1 ? 'i' : 'o'}</div>
+    <button onclick="libShowAdd()" style="padding:8px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">📚 Aggiungi</button>
+  </div>`;
+
+  if (!active.length) {
+    html += `<div style="text-align:center;padding:60px 20px;">
+      <div style="font-size:64px;margin-bottom:16px;">📚</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:8px;">Libreria vuota</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:24px;">Aggiungi manuali, PDF, documenti da Google Drive o link esterni</div>
+      <button onclick="libShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">📚 Aggiungi documento</button>
+    </div>`;
+  } else {
+    const catColors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
+    active.forEach((item, idx) => {
+      const color = catColors[idx % catColors.length];
+      const typeIcon = {pdf:'📄',word:'📝',excel:'📊',link:'🔗',drive:'📁',other:'📎'}[item.type||'other'];
+      html += `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:background 0.15s;" 
+        onclick="libOpen_doc('${item.id}')"
+        onmouseenter="this.style.background='var(--surface2,var(--bg3))'" 
+        onmouseleave="this.style.background='var(--surface)'">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:${color}20;border:1px solid ${color}40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${typeIcon}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</div>
+            ${item.desc ? `<div style="font-size:12px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.desc}</div>` : ''}
+            <div style="font-size:11px;color:var(--text3);margin-top:4px;">${item.category||''} ${item.addedAt ? '· ' + new Date(item.addedAt).toLocaleDateString('it-IT') : ''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="event.stopPropagation();libEdit('${item.id}')" style="padding:6px 10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;cursor:pointer;">✏️</button>
+            <button onclick="event.stopPropagation();libDelete('${item.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;cursor:pointer;">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  }
+  container.innerHTML = html;
+}
+
+function libOpen_doc(id) {
+  const item = _libItems.find(i => i.id === id);
+  if (!item) return;
+  const url = item.url || '';
+  if (!url) { showToast('Nessun link disponibile'); return; }
+  
+  // Apri in viewer integrato
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;';
+  ov.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">←</button>
+      <div style="flex:1;font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.title}</div>
+      <a href="${url}" target="_blank" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:4px;">🔗 Apri</a>
+    </div>
+    <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" 
+      style="flex:1;border:none;width:100%;" 
+      onerror="this.src='${url}'">
+    </iframe>`;
+  document.body.appendChild(ov);
+}
+
+function libShowAdd() {
+  libShowForm(null);
+}
+
+function libEdit(id) {
+  libShowForm(id);
+}
+
+function libShowForm(id) {
+  const item = id ? _libItems.find(i => i.id === id) : null;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:420px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">${item ? '✏️ Modifica documento' : '📚 Aggiungi documento'}</div>
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Titolo *</div>
+    <input id="_lib_title" value="${item?.title||''}" placeholder="es. Manuale Lavatrice" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Descrizione</div>
+    <input id="_lib_desc" value="${item?.desc||''}" placeholder="Breve descrizione..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Categoria</div>
+    <input id="_lib_cat" value="${item?.category||''}" placeholder="es. Elettrodomestici, Contratti..." style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Link documento (Google Drive, URL)</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input id="_lib_url" value="${item?.url||''}" placeholder="https://drive.google.com/..." style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:inherit;">
+      <button type="button" id="_lib_drive_btn" style="padding:11px 14px;border-radius:10px;border:none;background:#4285F4;color:white;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">
+        <svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px;"><path fill="white" d="M6.28 3l5.72 9.9L6.28 21H2l5.72-9.1L2 3h4.28zm7.44 0L22 3l-5.72 9.1L22 21h-8.28l5.72-9.1L13.72 3z"/></svg>Drive
+      </button>
+    </div>
+    
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Tipo documento</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px;">
+      ${[['pdf','📄 PDF'],['word','📝 Word'],['excel','📊 Excel'],['link','🔗 Link'],['drive','📁 Drive'],['other','📎 Altro']].map(([t,l])=>
+        `<button type="button" onclick="this.parentNode.querySelectorAll('button').forEach(b=>b.style.background='var(--surface)');this.style.background='var(--accent)';this.style.color='white';document.getElementById('_lib_type').value='${t}'" 
+          style="padding:8px;border-radius:8px;border:1px solid var(--border);background:${(item?.type||'other')===t?'var(--accent)':'var(--surface)'};color:${(item?.type||'other')===t?'white':'var(--text)'};font-size:12px;cursor:pointer;font-family:inherit;">${l}</button>`
+      ).join('')}
+    </div>
+    <input type="hidden" id="_lib_type" value="${item?.type||'other'}">
+    
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_lib_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  
+  document.getElementById('_lib_drive_btn').onclick = async () => {
+    try {
+      // Porta il picker sopra il form
+      const formOv = ov;
+      formOv.style.zIndex = '9000'; // abbassa il form temporaneamente
+      showToast('⏳ Apertura Google Drive...');
+      const file = await libPickFromDrive();
+      formOv.style.zIndex = '9999'; // ripristina
+      if (file) {
+        document.getElementById('_lib_url').value = file.url;
+        document.getElementById('_lib_title').value = document.getElementById('_lib_title').value || file.title;
+        // Imposta tipo automaticamente
+        document.getElementById('_lib_type').value = file.type;
+        document.querySelectorAll('#_lib_type ~ div button, div:has(#_lib_type) button').forEach(b => {
+          b.style.background = 'var(--surface)'; b.style.color = 'var(--text)';
+        });
+        showToast('✅ File selezionato: ' + file.title);
+      }
+    } catch(e) { console.warn('Drive picker:', e); showToast('Errore connessione Drive'); }
+  };
+  
+  document.getElementById('_lib_save').onclick = () => {
+    const title = document.getElementById('_lib_title').value.trim();
+    if (!title) { showToast('Inserisci il titolo'); return; }
+    const now = new Date().toISOString();
+    if (item) {
+      const idx = _libItems.findIndex(i => i.id === id);
+      if (idx !== -1) _libItems[idx] = { ..._libItems[idx],
+        title, desc: document.getElementById('_lib_desc').value.trim(),
+        category: document.getElementById('_lib_cat').value.trim(),
+        url: document.getElementById('_lib_url').value.trim(),
+        type: document.getElementById('_lib_type').value,
+        updatedAt: now
+      };
+    } else {
+      _libItems.push({
+        id: 'lib_' + Date.now(), title,
+        desc: document.getElementById('_lib_desc').value.trim(),
+        category: document.getElementById('_lib_cat').value.trim(),
+        url: document.getElementById('_lib_url').value.trim(),
+        type: document.getElementById('_lib_type').value,
+        addedAt: now, updatedAt: now
+      });
+    }
+    libSave(); libRender(); ov.remove();
+    showToast(item ? '✅ Documento aggiornato' : '✅ Documento aggiunto');
+  };
+}
+
+// ── Google Drive Picker ─────────────────────────────────────
+const GDRIVE_CLIENT_ID = '140879408214-fih8n3ed3jp0hre6ujso7lcq2mkbss1d.apps.googleusercontent.com';
+const GDRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.readonly';
+const GDRIVE_BACKUP_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const GDRIVE_API_KEY = 'AIzaSyBiNWhEAUlsZlfWRiiZOtOU7j3cVvZnBXw'; // Google Picker API key
+let _driveToken = null;
+
+// ── Google Drive Backup ────────────────────────────────────
+let _driveBackupToken = null;
+let _driveBackupFileId = null; // ID file backup su Drive
+
+async function driveGetBackupToken() {
+  await new Promise((resolve, reject) => {
+    if (!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    } else resolve();
+  });
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: GDRIVE_BACKUP_SCOPE,
+      callback: (resp) => {
+        if (resp.error) { reject(resp.error); return; }
+        _driveBackupToken = resp.access_token;
+        resolve(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function driveBackupNow(silent=false) {
+  try {
+    if (!silent) showToast('☁️ Backup Drive in corso...');
+    const token = _driveBackupToken || await driveGetBackupToken();
+
+    // Raccoglie tutti i dati
+    const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+                  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server',
+                  'hb13_shop_lists_v2','hb13_calendar','hb13_turni_def','hb13_turni_days'];
+    const data = {};
+    keys.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) try { data[k] = JSON.parse(v); } catch(e) { data[k] = v; }
+    });
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
+    const fileName = `HomeBull-backup-${dateStr}.json`;
+    const payload = JSON.stringify({ version:'13.0.0', exportedAt: now.toISOString(), data }, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+
+    // Cerca se esiste già un backup di oggi
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name='${fileName}'+and+trashed=false&fields=files(id,name)`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const searchResult = await search.json();
+    const existingId = searchResult.files?.[0]?.id || null;
+
+    // Upload: aggiorna quello di oggi o crea nuovo
+    let response;
+    const form = new FormData();
+    if (existingId) {
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName })], { type: 'application/json' }));
+      form.append('file', blob);
+      response = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`,
+        { method: 'PATCH', headers: { Authorization: 'Bearer ' + token }, body: form }
+      );
+    } else {
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName, mimeType: 'application/json' })], { type: 'application/json' }));
+      form.append('file', blob);
+      response = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
+      );
+      // Mantieni solo gli ultimi 5 backup — elimina i più vecchi
+      setTimeout(() => drivePruneOldBackups(token), 2000);
+    }
+
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    localStorage.setItem('hb_drive_backup_ts', now.toISOString());
+    if (!silent) showToast('✅ Backup su Drive completato!');
+    driveUpdateBackupUI();
+  } catch(e) {
+    console.warn('Drive backup error:', e);
+    if (!silent) showToast('⚠️ Backup Drive fallito: ' + (e.message || e));
+  }
+}
+
+async function drivePruneOldBackups(token) {
+  try {
+    // Cerca tutti i backup HomeBull ordinati per data
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,createdTime)&orderBy=createdTime+desc`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const result = await search.json();
+    const files = result.files || [];
+    // Elimina quelli oltre il 5°
+    const toDelete = files.slice(5);
+    for (const f of toDelete) {
+      await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, {
+        method: 'DELETE', headers: { Authorization: 'Bearer ' + token }
+      });
+      console.log('🗑 Backup vecchio eliminato:', f.name);
+    }
+  } catch(e) { console.warn('Prune error:', e); }
+}
+
+
+// ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
+async function driveAutoBackup() {
+  // Auto backup solo se attivato dall'utente
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  const last = localStorage.getItem('hb_drive_backup_ts');
+  if (last) {
+    const diff = Date.now() - new Date(last).getTime();
+    if (diff < 24 * 60 * 60 * 1000) return; // meno di 24h fa
+  }
+  // Esegui solo se token già disponibile (niente popup OAuth automatici)
+  if (_driveBackupToken) {
+    console.log('🔄 Auto-backup Drive silenzioso...');
+    await driveBackupNow(true);
+  }
+}
+
+async function driveRestoreNow() {
+  try {
+    showToast('☁️ Ricerca backup su Drive...');
+    const token = _driveBackupToken || await driveGetBackupToken();
+
+    // Cerca tutti i backup HomeBull (ultimi 5)
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&pageSize=5`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const result = await search.json();
+    const files = result.files || [];
+    if (!files.length) { showToast('⚠️ Nessun backup trovato su Drive'); return; }
+
+    // Mostra lista backup da scegliere
+    const ov = document.createElement('div');
+    ov.id = '_dr_ov';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+    const rows = files.map((f, i) => {
+      const d = new Date(f.modifiedTime);
+      const label = d.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}) +
+                    ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      return `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;">📦 Backup ${i===0?'<span style=\"font-size:10px;background:rgba(99,102,241,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;margin-left:6px;\">Più recente</span>':''}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">${label}</div>
+        </div>
+        <button onclick="driveDoRestore('${f.id}','${label}',this)" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Ripristina</button>
+      </div>`;
+    }).join('');
+
+    ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;">
+      <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px;">☁️ Scegli backup</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Ultimi ${files.length} backup disponibili</div>
+      ${rows}
+      <button onclick="document.getElementById('_dr_ov').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;">Annulla</button>
+    </div>`;
+    document.body.appendChild(ov);
+  } catch(e) {
+    console.warn('Drive restore error:', e);
+    showToast('⚠️ Errore: ' + (e.message || e));
+  }
+}
+
+async function driveDoRestore(fileId, dateLabel, btn) {
+  document.getElementById('_dr_ov')?.remove();
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:32px;margin-bottom:12px;">☁️</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Ripristina questo backup?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${dateLabel}</div>
+    <div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_drc2" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_dro2" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Ripristina</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_drc2').onclick = () => ov.remove();
+  document.getElementById('_dro2').onclick = async () => {
+    ov.remove();
+    try {
+      showToast('⬇️ Download backup...');
+      const token = _driveBackupToken || await driveGetBackupToken();
+      const dl = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+        { headers: { Authorization: 'Bearer ' + token } }
+      );
+      const bk = await dl.json();
+      if (!bk.data) { showToast('⚠️ File backup non valido'); return; }
+      Object.entries(bk.data).forEach(([k, v]) => {
+        localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+      });
+      showToast('✅ Ripristino completato — ricarico...');
+      setTimeout(() => location.reload(), 1500);
+    } catch(e) { showToast('⚠️ Ripristino fallito: ' + (e.message || e)); }
+  };
+}
+
+function driveUpdateBackupUI() {
+  const ts = localStorage.getItem('hb_drive_backup_ts');
+  const el = document.getElementById('drive-backup-ts');
+  if (el) {
+    if (ts) {
+      const d = new Date(ts);
+      el.textContent = 'Ultimo: ' + d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    } else {
+      el.textContent = 'Nessun backup effettuato';
+    }
+  }
+  // Aggiorna toggle auto
+  const auto = localStorage.getItem('hb_drive_auto') === '1';
+  const tog = document.getElementById('drive-auto-toggle');
+  const thm = document.getElementById('drive-auto-thumb');
+  if (tog) tog.style.background = auto ? '#10b981' : '#6b7280';
+  if (thm) thm.style.left = auto ? '25px' : '3px';
+}
+
+function driveToggleAuto() {
+  const auto = localStorage.getItem('hb_drive_auto') === '1';
+  localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
+  driveUpdateBackupUI();
+  showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
+}
+
+
+async function libPickFromDrive() {
+  // 1. Ottieni token OAuth Google
+  await new Promise((resolve, reject) => {
+    if(!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    } else resolve();
+  });
+  
+  await new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: GDRIVE_SCOPE + ' https://www.googleapis.com/auth/calendar',
+      callback: (resp) => {
+        if(resp.error) { reject(resp.error); return; }
+        _driveToken = resp.access_token;
+        resolve();
+      }
+    });
+    client.requestAccessToken();
+  });
+
+  // 2. Carica Google Picker API
+  await new Promise((resolve) => {
+    if(window.google?.picker) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = () => { gapi.load('picker', resolve); };
+    document.head.appendChild(s);
+  });
+
+  // 3. Mostra Picker sopra tutto
+  return new Promise((resolve) => {
+    const picker = new google.picker.PickerBuilder()
+      .addView(new google.picker.DocsView()
+        .setIncludeFolders(false)
+        .setMimeTypes('application/pdf,application/vnd.google-apps.document,application/vnd.google-apps.spreadsheet,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+      .setOAuthToken(_driveToken)
+      .setDeveloperKey(GDRIVE_API_KEY)
+      .setCallback((data) => {
+        if(data.action === google.picker.Action.PICKED) {
+          const file = data.docs[0];
+          resolve({
+            title: file.name,
+            url: file.url || `https://drive.google.com/file/d/${file.id}/view`,
+            type: file.mimeType?.includes('pdf') ? 'pdf' : 
+                  file.mimeType?.includes('spreadsheet') ? 'excel' :
+                  file.mimeType?.includes('document') ? 'word' : 'drive',
+            driveId: file.id
+          });
+        } else if(data.action === google.picker.Action.CANCEL) {
+          resolve(null);
+        }
+      })
+      .build();
+    picker.setVisible(true);
+    // Forza z-index alto sul dialog del picker
+    setTimeout(() => {
+      const dlg = document.querySelector('.picker-dialog');
+      if(dlg) { dlg.style.zIndex = '99999'; dlg.parentElement.style.zIndex = '99999'; }
+    }, 200);
+  });
+}
+
+function libDelete(id) {
+  setTimeout(() => {
+    if (!confirm('Eliminare questo documento?')) return;
+    _libItems = _libItems.map(i => i.id === id ? {...i, deleted: true, deletedAt: new Date().toISOString()} : i);
+    libSave(); libRender();
+    showToast('Documento rimosso');
+  }, 50);
+}
+</script>
+
 </body>
 </html>
