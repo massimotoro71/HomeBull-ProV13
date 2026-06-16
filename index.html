@@ -1908,10 +1908,19 @@ function shopConfirmCustom(btn) {
   const name = document.getElementById('shop-custom-name')?.value.trim();
   const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
   if (!name) { showToast('Inserisci il nome del prodotto'); return; }
+  btn.closest('[style]').remove();
+
+  // Se lista condivisa attiva — aggiungi su Firebase
+  if (_shopCurSharedId === 'bring' && _sharedListId) {
+    sharedListAddItem(name, icon);
+    showToast('✅ ' + name + ' aggiunto alla lista condivisa!');
+    return;
+  }
+
+  // Altrimenti lista locale
   const id = 'custom_' + Date.now();
   _shopList[id] = { name, icon, qty: 1 };
   shopSave();
-  btn.closest('[style]').remove();
   shopRenderAll();
   showToast('✅ ' + name + ' aggiunto!');
 }
@@ -2018,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA296</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA297</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA296</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA297</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA296</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA297</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA296',
+  version: 'BETA297',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8083,9 +8092,18 @@ function shopAddCustomFromSearch() {
   const inp = document.getElementById('shop-search');
   const name = inp?.value?.trim();
   if (!name) return;
+  inp.value = '';
+
+  // Se lista condivisa attiva
+  if (_shopCurSharedId === 'bring' && _sharedListId) {
+    sharedListAddItem(name, '🛒');
+    showToast('✅ ' + name + ' aggiunto alla lista condivisa');
+    return;
+  }
+
   const id = 'custom_' + Date.now();
   _shopList[id] = { name, icon: '🛒', qty: 1 };
-  shopSave(); inp.value = ''; shopRenderAll();
+  shopSave(); shopRenderAll();
   showToast('✅ ' + name + ' aggiunto');
 }
 
@@ -11508,7 +11526,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA296</div>
+            <div style="font-size:13px;color:var(--text3);">BETA297</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
