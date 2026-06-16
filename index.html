@@ -2027,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA307</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA309</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA307</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA309</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA307</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA309</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA307',
+  version: 'BETA309',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8027,20 +8027,29 @@ function shopAddCustomFromSearch() {
 // ── Fine Lista Spesa ──────────────────────────────────────
 
 // ── Fine Scheda Password ──────────────────────────────────
+let _backHandlerActive = false;
 let backPressCount = 0;
 let backPressTimer = null;
-let _backHandlerActive = false;
 
-// Back handler inizializzato in initBackHandler
+// Riempie lo stack history per intercettare il tasto back Android
+(function initBackBuffer() {
+  for (let i = 0; i < 20; i++) history.pushState({ hb: 'app' }, '');
+  window.addEventListener('popstate', () => {
+    history.pushState({ hb: 'app' }, ''); // rimetti subito uno stato
+    handleBackPress();
+  });
+})();
 
 function initBackHandler() {
-  // Il listener è già attivo — non fare nulla
   _backHandlerActive = true;
 }
 
 function handleBackPress() {
+    // Chiudi qualsiasi modal generico aperto (z-index alto)
+    const genericModal = document.querySelector('#_bring_modal, #_share_modal, #_qrimp_ov, #_pdfsec_ov, #_setup_wizard, #_cd_ov');
+    if (genericModal) { genericModal.remove(); return; }
 
-    // Chiudi qualsiasi modal/overlay aperto
+    // Chiudi modal/overlay specifici
     if (document.getElementById('settings-overlay')?.style.display === 'flex') {
       closeSettings(); return;
     }
@@ -8067,6 +8076,11 @@ function handleBackPress() {
     }
     if (document.getElementById('home-custom-modal')?.style.display === 'flex') {
       closeHomeCustom(); return;
+    }
+    // Prima prova il bottone back interno del tab corrente
+    const topbarBack = document.getElementById('topbar-back');
+    if (topbarBack?.classList.contains('visible')) {
+      topbarBack.click(); return;
     }
     if (HB.currentTab !== 'home') {
       switchTab('home'); return;
@@ -11358,7 +11372,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA307</div>
+            <div style="font-size:13px;color:var(--text3);">BETA309</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
