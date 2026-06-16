@@ -2027,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA301</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA302</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA301</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA302</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA301</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA302</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA301',
+  version: 'BETA302',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -10532,36 +10532,42 @@ function renderBringList() {
   const items = _sharedListData?.items ? Object.entries(_sharedListData.items) : [];
   const members = _sharedListData?.members ? Object.values(_sharedListData.members) : [];
 
+  grid.style.cssText = 'display:flex;flex-direction:column;gap:8px;padding:8px 0;';
+
   if (!items.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px 20px;">'
+    grid.innerHTML = '<div style="text-align:center;padding:30px 20px;">'
       + '<div style="font-size:32px;margin-bottom:8px;">🛒</div>'
       + '<div style="font-size:14px;color:var(--text3);">Lista vuota — aggiungi qualcosa!</div>'
       + '</div>';
   } else {
     grid.innerHTML = '';
-    items.sort(([,a],[,b]) => (a.checked===b.checked ? 0 : a.checked ? 1 : -1));
-    items.forEach(([itemId, item]) => {
+    const sorted = [...items].sort(([,a],[,b]) => (a.checked===b.checked ? 0 : a.checked ? 1 : -1));
+    sorted.forEach(([itemId, item]) => {
       const div = document.createElement('div');
-      div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--surface);border-radius:14px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;'
+      div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border-radius:14px;border:1px solid var(--border);cursor:pointer;'
         + (item.checked ? 'opacity:0.5;' : '');
       div.onclick = () => sharedListToggle(itemId, item.checked);
 
+      // Icona piccola (come lista locale)
       const icon = document.createElement('div');
-      icon.style.cssText = 'font-size:24px;flex-shrink:0;';
+      icon.style.cssText = 'font-size:22px;flex-shrink:0;width:36px;text-align:center;';
       icon.textContent = item.icon || '🛒';
 
+      // Info
       const info = document.createElement('div');
       info.style.cssText = 'flex:1;min-width:0;';
-      info.innerHTML = '<div style="font-size:14px;font-weight:700;' + (item.checked ? 'text-decoration:line-through;' : '') + '">' + item.name + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);margin-top:1px;">aggiunto da ' + (item.addedBy||'').split('@')[0] + '</div>';
+      info.innerHTML = '<div style="font-size:14px;font-weight:700;' + (item.checked ? 'text-decoration:line-through;' : '') + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + item.name + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px;">da ' + (item.addedBy||'').split('@')[0] + '</div>';
 
+      // Spunta
       const check = document.createElement('div');
-      check.style.cssText = 'font-size:20px;flex-shrink:0;';
+      check.style.cssText = 'font-size:18px;flex-shrink:0;';
       check.textContent = item.checked ? '✅' : '⬜';
 
+      // Elimina
       const del = document.createElement('button');
-      del.style.cssText = 'width:28px;height:28px;border-radius:8px;border:none;background:rgba(239,68,68,0.1);color:#ef4444;font-size:14px;cursor:pointer;flex-shrink:0;';
-      del.textContent = '×';
+      del.style.cssText = 'width:28px;height:28px;border-radius:8px;border:none;background:rgba(239,68,68,0.15);color:#ef4444;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
+      del.innerHTML = '×';
       del.onclick = (e) => { e.stopPropagation(); sharedListRemove(itemId); };
 
       div.appendChild(icon); div.appendChild(info); div.appendChild(check); div.appendChild(del);
@@ -11558,7 +11564,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA301</div>
+            <div style="font-size:13px;color:var(--text3);">BETA302</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
