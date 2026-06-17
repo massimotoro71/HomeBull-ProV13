@@ -3674,6 +3674,7 @@ function unlockApp() {
     updateHomeStats();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
+    setTimeout(driveStartAutoTimer, 2000);
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
@@ -10266,7 +10267,10 @@ async function fbSyncLoad(){
       if(remoteTs > localTs && cloud[k]){
         let value = cloud[k];
         if(typeof value === 'string' && value.startsWith('hb12:')) { console.warn('Skip legacy:', k); continue; }
-        try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
+        // Accetta dati cifrati hb13enc: senza validazione JSON
+        if(typeof value === 'string' && !value.startsWith('hb13enc:')) {
+          try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
+        }
         _syncInProgress = true;
         localStorage.setItem(k, value);
         _syncInProgress = false;
@@ -10321,6 +10325,7 @@ async function fbSyncAll(silent=false){
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
     driveAutoBackup();
+    driveAutoBackupOnSave();
   }catch(e){
     console.warn('SyncAll:',e);
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
@@ -10513,12 +10518,7 @@ function renderSharedShopTab() {
 // ── Modal condivisione ────────────────────────────────────
 function showShareModal(section) {
   if (!SHAREABLE[section]) return;
-  showToast('⏳ Caricamento...');
-  // Forza ricaricamento da Firebase ogni volta che apri il modal
-  loadShares().then(() => {
-    showToast('');
-    _showShareModalInner(section);
-  });
+  loadShares().then(() => _showShareModalInner(section));
 }
 
 function _showShareModalInner(section) {
@@ -11459,13 +11459,19 @@ function calShowAddEvent() {
               <button onclick="driveBackupNow()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup</button>
             </div>
           </div>
-          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
-            <div>
-              <div style="font-size:13px;font-weight:700;">Auto backup (ogni 24h)</div>
-              <div style="font-size:11px;color:var(--text3);">Backup silenzioso dopo ogni sync</div>
+          <div style="padding:12px 16px;border-top:1px solid var(--border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div>
+                <div style="font-size:13px;font-weight:700;">Auto backup Drive</div>
+                <div style="font-size:11px;color:var(--text3);">Backup silenzioso automatico</div>
+              </div>
+              <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
+                <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+              </div>
             </div>
-            <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
-              <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
+            <div id="drive-mode-row" style="display:none;gap:8px;flex-direction:row;">
+              <button onclick="driveSetAutoMode('save')" id="drive-mode-save" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">⚡ Ad ogni modifica</button>
+              <button onclick="driveSetAutoMode('30min')" id="drive-mode-30min" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🕐 Ogni 30 minuti</button>
             </div>
           </div>
         </div>
@@ -11928,7 +11934,7 @@ async function drivePruneOldBackups(token) {
     const result = await search.json();
     const files = result.files || [];
     // Elimina quelli oltre il 5°
-    const toDelete = files.slice(5);
+    const toDelete = files.slice(10);
     for (const f of toDelete) {
       await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, {
         method: 'DELETE', headers: { Authorization: 'Bearer ' + token }
@@ -11941,17 +11947,34 @@ async function drivePruneOldBackups(token) {
 
 // ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
 async function driveAutoBackup() {
-  // Auto backup solo se attivato dall'utente
   if (localStorage.getItem('hb_drive_auto') !== '1') return;
-  const last = localStorage.getItem('hb_drive_backup_ts');
-  if (last) {
-    const diff = Date.now() - new Date(last).getTime();
-    if (diff < 24 * 60 * 60 * 1000) return; // meno di 24h fa
+  if (!_driveBackupToken) return; // niente popup automatici — prima backup manuale
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  if (mode === '30min') {
+    const last = localStorage.getItem('hb_drive_backup_ts');
+    if (last && Date.now() - new Date(last).getTime() < 30*60*1000) return;
   }
-  // Esegui solo se token già disponibile (niente popup OAuth automatici)
-  if (_driveBackupToken) {
-    console.log('🔄 Auto-backup Drive silenzioso...');
-    await driveBackupNow(true);
+  console.log('🔄 Auto-backup Drive (' + mode + ')...');
+  await driveBackupNow(true);
+}
+
+function driveAutoBackupOnSave() {
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  if (!_driveBackupToken) return;
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  if (mode === 'save') {
+    clearTimeout(window._driveBackupDebounce);
+    window._driveBackupDebounce = setTimeout(() => driveAutoBackup(), 5000);
+  }
+}
+
+function driveStartAutoTimer() {
+  clearInterval(window._driveAutoTimer);
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  if (mode === '30min') {
+    window._driveAutoTimer = setInterval(() => driveAutoBackup(), 30*60*1000);
+    console.log('⏱ Drive auto-backup ogni 30min attivo');
   }
 }
 
@@ -12053,13 +12076,28 @@ function driveUpdateBackupUI() {
   const thm = document.getElementById('drive-auto-thumb');
   if (tog) tog.style.background = auto ? '#10b981' : '#6b7280';
   if (thm) thm.style.left = auto ? '25px' : '3px';
+  const modeRow = document.getElementById('drive-mode-row');
+  if (modeRow) modeRow.style.display = auto ? 'flex' : 'none';
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  const btnSave = document.getElementById('drive-mode-save');
+  const btn30   = document.getElementById('drive-mode-30min');
+  if (btnSave) { btnSave.style.background = mode==='save'  ? 'var(--accent)':'var(--surface)'; btnSave.style.color = mode==='save'  ? 'white':'var(--text)'; btnSave.style.border = mode==='save'  ? 'none':'1px solid var(--border)'; }
+  if (btn30)   { btn30.style.background   = mode==='30min' ? 'var(--accent)':'var(--surface)'; btn30.style.color   = mode==='30min' ? 'white':'var(--text)'; btn30.style.border   = mode==='30min' ? 'none':'1px solid var(--border)'; }
 }
 
 function driveToggleAuto() {
   const auto = localStorage.getItem('hb_drive_auto') === '1';
   localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
   driveUpdateBackupUI();
+  driveStartAutoTimer();
   showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
+}
+
+function driveSetAutoMode(mode) {
+  localStorage.setItem('hb_drive_auto_mode', mode);
+  driveUpdateBackupUI();
+  driveStartAutoTimer();
+  showToast(mode === 'save' ? '✅ Backup ad ogni modifica' : '✅ Backup ogni 30 minuti');
 }
 
 
