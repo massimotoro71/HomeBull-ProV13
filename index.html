@@ -2027,7 +2027,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA309</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA310</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2129,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA309</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA310</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2253,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA309</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA310</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3274,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA309',
+  version: 'BETA310',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3657,6 +3657,7 @@ function unlockApp() {
     updateHomeStats();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
+    driveStartAutoTimer(); // avvia timer backup automatico
     // Riprendi lista condivisa se già configurata
     // Prima controlla localStorage, poi Firebase
     const savedListId = localStorage.getItem('hb_shared_list_id');
@@ -8031,11 +8032,14 @@ let _backHandlerActive = false;
 let backPressCount = 0;
 let backPressTimer = null;
 
-// Riempie lo stack history per intercettare il tasto back Android
+// Intercetta tasto back Android senza chiudere l'app
 (function initBackBuffer() {
-  for (let i = 0; i < 20; i++) history.pushState({ hb: 'app' }, '');
-  window.addEventListener('popstate', () => {
-    history.pushState({ hb: 'app' }, ''); // rimetti subito uno stato
+  // Aggiungi UN solo stato per intercettare il primo back
+  if (!history.state?.hb) history.pushState({ hb: 'app' }, '');
+  
+  window.addEventListener('popstate', (e) => {
+    // Rimetti sempre uno stato in cima
+    history.pushState({ hb: 'app' }, '');
     handleBackPress();
   });
 })();
@@ -11372,7 +11376,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA309</div>
+            <div style="font-size:13px;color:var(--text3);">BETA310</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -11746,22 +11750,37 @@ async function drivePruneOldBackups(token) {
 // ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
 async function driveAutoBackup() {
   if (localStorage.getItem('hb_drive_auto') !== '1') return;
-  if (!_driveBackupToken) return; // niente popup automatici
   const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
   const last = localStorage.getItem('hb_drive_backup_ts');
   if (last && mode === '30min') {
     const diff = Date.now() - new Date(last).getTime();
-    if (diff < 30 * 60 * 1000) return; // meno di 30 minuti fa
+    if (diff < 30 * 60 * 1000) return;
   }
-  // mode === 'save' → sempre (chiamato dopo ogni salvataggio)
-  console.log('🔄 Auto-backup Drive silenzioso (' + mode + ')...');
+  // Se non abbiamo il token, prova a ottenerlo silenziosamente
+  if (!_driveBackupToken) {
+    console.log('Drive auto: token non disponibile, skip');
+    return;
+  }
+  console.log('🔄 Auto-backup Drive (' + mode + ')...');
   await driveBackupNow(true);
+}
+
+// Avvia timer backup ogni 30 minuti
+function driveStartAutoTimer() {
+  clearInterval(window._driveAutoTimer);
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  if (mode === '30min') {
+    window._driveAutoTimer = setInterval(() => driveAutoBackup(), 30 * 60 * 1000);
+    console.log('⏱ Drive auto-backup ogni 30min attivo');
+  }
 }
 
 // Chiama dopo ogni salvataggio significativo
 function driveAutoBackupOnSave() {
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
   const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
-  if (mode === 'save' && localStorage.getItem('hb_drive_auto') === '1') {
+  if (mode === 'save') {
     clearTimeout(window._driveBackupDebounce);
     window._driveBackupDebounce = setTimeout(() => driveAutoBackup(), 5000);
   }
@@ -11879,12 +11898,14 @@ function driveToggleAuto() {
   const auto = localStorage.getItem('hb_drive_auto') === '1';
   localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
   driveUpdateBackupUI();
+  driveStartAutoTimer();
   showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
 }
 
 function driveSetAutoMode(mode) {
   localStorage.setItem('hb_drive_auto_mode', mode);
   driveUpdateBackupUI();
+  driveStartAutoTimer();
   showToast(mode === 'save' ? '✅ Backup ad ogni modifica' : '✅ Backup ogni 30 minuti');
 }
 
