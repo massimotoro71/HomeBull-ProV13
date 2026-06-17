@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA313</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA314</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA313</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA314</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA313</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA314</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA313',
+  version: 'BETA314',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3716,14 +3716,14 @@ const TAB_CONFIG = {
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
   documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
-  calendar:  { title: 'Calendario',  sub: '', actions: ['add','share'] },
+  calendar:  { title: 'Calendario',  sub: '', actions: ['add'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Carte',       sub: '', actions: [] },
   wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
   finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
   server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: '', actions: ['share'] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
 };
 
 function switchTab(tab) {
@@ -3914,15 +3914,6 @@ function renderTopbarActions(actions) {
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
-  }
-  if (actions.includes('share')) {
-    const shareBtn = document.createElement('div');
-    shareBtn.className = 'topbar-btn';
-    shareBtn.title = 'Condividi';
-    shareBtn.innerHTML = '👥';
-    shareBtn.style.fontSize = '18px';
-    shareBtn.onclick = () => showShareModal(HB.currentTab);
-    container.appendChild(shareBtn);
   }
 }
 
@@ -10391,316 +10382,6 @@ let _lastSyncTime = null;
 // ═══════════════════════════════════════════════════════════
 //  CONDIVISIONE SELETTIVA — Lista Spesa e Calendario
 // ═══════════════════════════════════════════════════════════
-const SHAREABLE = {
-  shopping: { label: 'Lista Spesa', icon: '🛒', key: 'hb13_shop_lists_v2' },
-  calendar:  { label: 'Calendario',  icon: '📅', key: 'hb13_calendar' },
-};
-
-let _myShares      = {}; // condivisioni create da me
-let _receivedShares = {}; // condivisioni ricevute
-let _sharedShopData = {}; // { shareId: { fromEmail, items[] } } dati lista spesa ricevuta
-let _shopCurSharedId = null; // shareId lista condivisa attiva
-
-// ── Carica condivisioni da Firebase ──────────────────────
-async function loadShares() {
-  if (!fbReady || !fbDb) return;
-  const emailKey = _getSyncKey();
-  if (!emailKey) return;
-  try {
-    console.log('loadShares — emailKey:', emailKey);
-    const mySnap  = await fbDb.ref('userShares/' + emailKey + '/created').get();
-    _myShares     = mySnap.exists()  ? mySnap.val()  : {};
-    const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
-    _receivedShares = recSnap.exists() ? recSnap.val() : {};
-    console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
-    // Debug: mostra cosa c'è su Firebase
-    const allSnap = await fbDb.ref('userShares/' + emailKey).get();
-    console.log('userShares raw:', JSON.stringify(allSnap.val()));
-  } catch(e) { console.warn('loadShares:', e); }
-}
-
-// ── Crea condivisione ─────────────────────────────────────
-async function createShare(section, withEmail, permission) {
-  const myEmail = _emailOtpAddr;
-  if (!myEmail) { showToast('⚠️ Email non trovata'); return; }
-  if (withEmail.toLowerCase() === myEmail.toLowerCase()) { showToast('⚠️ Non puoi condividere con te stesso'); return; }
-
-  showToast('📤 Condivisione in corso...');
-  try {
-    const shareId  = 'sh_' + Date.now();
-    const myKey    = _getSyncKey();
-    const withKey  = btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-    const rawData  = localStorage.getItem(SHAREABLE[section]?.key);
-    const data     = rawData ? JSON.parse(rawData) : (section === 'shopping' ? {} : []);
-
-    // Salva in Firebase
-    await fbDb.ref('shared/' + shareId).set({
-      id: shareId, section, fromEmail: myEmail, fromKey: myKey,
-      withEmail: withEmail.toLowerCase(), withKey, permission,
-      createdAt: new Date().toISOString(), data
-    });
-    await fbDb.ref('userShares/' + myKey  + '/created/'  + shareId).set({ shareId, section, withEmail: withEmail.toLowerCase(), permission });
-    await fbDb.ref('userShares/' + withKey + '/received/' + shareId).set({ shareId, section, fromEmail: myEmail, permission });
-
-    _myShares[shareId] = { shareId, section, withEmail: withEmail.toLowerCase(), permission };
-    showToast('✅ Condiviso con ' + withEmail);
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-// ── Rimuovi condivisione ──────────────────────────────────
-async function removeShare(shareId) {
-  const myKey = _getSyncKey();
-  const share = _myShares[shareId];
-  try {
-    await fbDb.ref('shared/' + shareId).remove();
-    await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
-    if (share?.withEmail) {
-      const withKey = btoa(share.withEmail).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-      await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
-    }
-    delete _myShares[shareId];
-    showToast('✅ Condivisione rimossa');
-    document.getElementById('_share_modal')?.remove();
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-// ── Rimuovi tutte le condivisioni (cleanup) ───────────────
-async function cleanupAllShares() {
-  if (!confirm('Rimuovere TUTTE le condivisioni?')) return;
-  const myKey = _getSyncKey();
-  for (const shareId of Object.keys(_myShares)) {
-    try { await fbDb.ref('shared/' + shareId).remove(); } catch(e){}
-  }
-  await fbDb.ref('userShares/' + myKey + '/created').remove();
-  await fbDb.ref('userShares/' + myKey + '/received').remove();
-  _myShares = {}; _receivedShares = {};
-  _sharedShopData = {}; _shopCurSharedId = null;
-  document.getElementById('_share_modal')?.remove();
-  shopRenderAll();
-  showToast('✅ Tutte le condivisioni rimosse');
-}
-
-// ── Listener realtime lista spesa condivisa ───────────────
-function startShopShareListener(shareId) {
-  if (!fbReady || !fbDb) return;
-  fbDb.ref('shared/' + shareId + '/data').on('value', snap => {
-    if (!snap.exists()) return;
-    const raw = snap.val();
-    // Estrai items da struttura { listId: { name, items: {...} } }
-    const items = [];
-    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      Object.values(raw).forEach(list => {
-        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
-          if (!item.deleted) items.push({ id, ...item });
-        });
-      });
-    }
-    if (_sharedShopData[shareId]) _sharedShopData[shareId].items = items;
-    if (_shopCurSharedId === shareId) renderSharedShopTab();
-  });
-}
-
-// ── Render tab lista spesa condivisa ─────────────────────
-function renderSharedShopTab() {
-  const shared = _sharedShopData[_shopCurSharedId];
-  if (!shared) return;
-  const grid = document.getElementById('shop-active-grid');
-  if (!grid) return;
-  const items = shared.items || [];
-  if (!items.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3);font-size:13px;">Lista vuota</div>';
-  } else {
-    grid.innerHTML = items.map(item => {
-      const done = item.checked || item.done;
-      return '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:6px;">'
-        + '<div style="font-size:22px;">' + (item.icon || '🛒') + '</div>'
-        + '<div style="flex:1;font-size:14px;font-weight:600;' + (done ? 'text-decoration:line-through;opacity:0.5;' : '') + '">' + (item.name || '?') + '</div>'
-        + (done ? '<span style="color:#10b981;font-size:18px;">✅</span>' : '')
-        + '</div>';
-    }).join('');
-  }
-  const nameLabel = document.getElementById('shop-list-name-label');
-  if (nameLabel) nameLabel.textContent = '👥 ' + shared.fromEmail.split('@')[0];
-  const sub = document.getElementById('topbar-sub');
-  if (sub) sub.textContent = items.length + (items.length===1?' prodotto':' prodotti');
-}
-
-// ── Modal condivisione ────────────────────────────────────
-function showShareModal(section) {
-  if (!SHAREABLE[section]) return;
-  loadShares().then(() => _showShareModalInner(section));
-}
-
-function _showShareModalInner(section) {
-  const sec = SHAREABLE[section];
-  const active   = Object.entries(_myShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
-  const received = Object.entries(_receivedShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
-
-  const ov = document.createElement('div');
-  ov.id = '_share_modal';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;';
-
-  // Header
-  const header = document.createElement('div');
-  header.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
-    + '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">' + sec.icon + ' Condividi ' + sec.label + '</div>'
-    + '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Condividi con altri utenti HomeBull</div>';
-  wrap.appendChild(header);
-
-  // Sezione "Condivisa con"
-  const activeBox = document.createElement('div');
-  activeBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:12px;margin-bottom:12px;';
-  activeBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">CONDIVISA CON</div>';
-  if (active.length) {
-    active.forEach(s => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);';
-      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Può modificare':'👁 Solo lettura') + '</div></div>';
-      const btn = document.createElement('button');
-      btn.textContent = 'Rimuovi';
-      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;';
-      btn.onclick = () => removeShare(s.shareId);
-      row.appendChild(btn);
-      activeBox.appendChild(row);
-    });
-  } else {
-    activeBox.innerHTML += '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px;">Nessuna condivisione attiva</div>';
-  }
-  wrap.appendChild(activeBox);
-
-  // Sezione "Ricevute da"
-  if (received.length) {
-    const recBox = document.createElement('div');
-    recBox.style.cssText = 'background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:12px;margin-bottom:12px;';
-    recBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>';
-    received.forEach(s => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;';
-      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Puoi modificare':'👁 Solo lettura') + '</div></div>';
-      if (section === 'shopping') {
-        const btn = document.createElement('button');
-        btn.textContent = 'Vedi lista';
-        btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
-        btn.onclick = () => {
-          ov.remove();
-          openSharedShopList(s.shareId, s.fromEmail);
-        };
-        row.appendChild(btn);
-      }
-      recBox.appendChild(row);
-    });
-    wrap.appendChild(recBox);
-  }
-
-  // Form aggiungi condivisione
-  const form = document.createElement('div');
-  form.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:10px;';
-  form.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>';
-
-  const inp = document.createElement('input');
-  inp.type = 'email'; inp.placeholder = 'email@esempio.com';
-  inp.style.cssText = 'width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;';
-  form.appendChild(inp);
-
-  // Bottoni permesso
-  const permRow = document.createElement('div');
-  permRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;';
-  let selPerm = 'write';
-  const bWrite = document.createElement('button');
-  bWrite.textContent = '✏️ Modifica';
-  bWrite.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:2px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
-  const bRead = document.createElement('button');
-  bRead.textContent = '👁 Lettura';
-  bRead.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;';
-
-  bWrite.onclick = () => { selPerm='write'; bWrite.style.borderWidth='2px'; bWrite.style.background='var(--accent)'; bWrite.style.color='white'; bRead.style.background='var(--surface)'; bRead.style.color='var(--text)'; bRead.style.borderWidth='1px'; };
-  bRead.onclick  = () => { selPerm='read';  bRead.style.borderWidth='2px';  bRead.style.background='var(--accent)';  bRead.style.color='white'; bWrite.style.background='var(--surface)'; bWrite.style.color='var(--text)'; bWrite.style.borderWidth='1px'; };
-
-  permRow.appendChild(bWrite); permRow.appendChild(bRead);
-  form.appendChild(permRow);
-
-  const submitBtn = document.createElement('button');
-  submitBtn.textContent = 'Condividi';
-  submitBtn.style.cssText = 'width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
-  submitBtn.onclick = () => {
-    const email = inp.value.trim();
-    if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
-    ov.remove();
-    createShare(section, email, selPerm);
-  };
-  form.appendChild(submitBtn);
-  wrap.appendChild(form);
-
-  // Bottoni footer
-  const cleanBtn = document.createElement('button');
-  cleanBtn.textContent = '🗑 Rimuovi tutte le condivisioni';
-  cleanBtn.style.cssText = 'width:100%;padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;';
-  cleanBtn.onclick = cleanupAllShares;
-  wrap.appendChild(cleanBtn);
-
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Chiudi';
-  closeBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
-  closeBtn.onclick = () => ov.remove();
-  wrap.appendChild(closeBtn);
-
-  ov.appendChild(wrap);
-  document.body.appendChild(ov);
-}
-
-// ── Apri lista spesa condivisa come tab ──────────────────
-async function openSharedShopList(shareId, fromEmail) {
-  showToast('📥 Caricamento lista...');
-  try {
-    const snap = await fbDb.ref('shared/' + shareId + '/data').get();
-    if (!snap.exists()) { showToast('⚠️ Lista non disponibile'); return; }
-    const raw = snap.val();
-    const items = [];
-    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      Object.values(raw).forEach(list => {
-        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
-          if (!item.deleted) items.push({ id, ...item });
-        });
-      });
-    }
-    // Prima popola i dati, POI setta l'ID e switcha tab
-    _sharedShopData[shareId] = { fromEmail, items };
-    _shopCurSharedId = shareId;
-    
-    // Vai alla Lista Spesa — ma bypassa shopOpen per non resettare _shopCurSharedId
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-    document.getElementById('panel-shopping')?.style.setProperty('display', 'flex');
-    HB.currentTab = 'shopping';
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    document.querySelector('.sidebar-item[data-tab="shopping"]')?.classList.add('active');
-    shopLoad(); // carica dati locali
-    _shopCurSharedId = shareId; // ripristina dopo shopLoad
-    shopRenderListTabs();
-    renderSharedShopTab();
-    startShopShareListener(shareId);
-    showToast('✅ Lista di ' + fromEmail.split('@')[0] + ' caricata');
-  } catch(e) { 
-    console.error('openSharedShopList error:', e);
-    showToast('⚠️ Errore: ' + (e.message||e)); 
-  }
-}
-
-// ── Sincronizza lista spesa verso Firebase (dopo ogni save) ─
-async function syncShopShare() {
-  const myShopShares = Object.entries(_myShares).filter(([k,s]) => s.section==='shopping');
-  if (!myShopShares.length) return;
-  const data = (() => { try { return JSON.parse(localStorage.getItem(SHOP_LISTS_KEY)||'{}'); } catch(e) { return {}; }})();
-  for (const [k,s] of myShopShares) {
-    try { await fbDb.ref('shared/' + (s.shareId||k) + '/data').set(data); } catch(e){}
-  }
-}
-
-
 // ── Listener realtime password ────────────────────────────
 let _pwRealtimeRef = null;
 
@@ -11662,7 +11343,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA313</div>
+            <div style="font-size:13px;color:var(--text3);">BETA314</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
