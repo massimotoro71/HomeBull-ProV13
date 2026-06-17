@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA312</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA313</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA312</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA313</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA312</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA313</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA312',
+  version: 'BETA313',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3676,6 +3676,7 @@ function unlockApp() {
     fbStartRealtime();
     setTimeout(driveStartAutoTimer, 2000);
     setTimeout(shopStartRealtime, 3000); // listener realtime lista spesa
+    setTimeout(pwStartRealtime, 3500);    // listener realtime password
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
@@ -4334,6 +4335,14 @@ function pwLoad() {
 function pwSave() {
   localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
   localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
+  // Upload immediato su Firebase per sync realtime
+  if (fbReady && fbDb) {
+    const emailKey = _getSyncKey();
+    if (emailKey) {
+      fbDb.ref('hb13/' + emailKey + '/' + PW_KEY).set(JSON.stringify(_pwItems)).catch(()=>{});
+      fbDb.ref('hb13/' + emailKey + '/' + PW_CATS).set(JSON.stringify(_pwCats)).catch(()=>{});
+    }
+  }
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -10692,6 +10701,38 @@ async function syncShopShare() {
 }
 
 
+// ── Listener realtime password ────────────────────────────
+let _pwRealtimeRef = null;
+
+function pwStartRealtime() {
+  if (!fbReady || !fbDb) return;
+  const emailKey = _getSyncKey();
+  if (!emailKey) return;
+  if (_pwRealtimeRef) { _pwRealtimeRef.off(); }
+
+  _pwRealtimeRef = fbDb.ref('hb13/' + emailKey + '/' + PW_KEY);
+  _pwRealtimeRef.on('value', snap => {
+    if (!snap.exists()) return;
+    const raw = snap.val();
+    if (!raw) return;
+    try {
+      const cloudStr = typeof raw === 'string' ? raw : JSON.stringify(raw);
+      const localStr = localStorage.getItem(PW_KEY);
+      if (cloudStr !== localStr) {
+        localStorage.setItem(PW_KEY, cloudStr);
+        _pwItems = JSON.parse(cloudStr);
+        if (HB.currentTab === 'passwords') {
+          pwRenderCats();
+          pwLoad();
+        }
+        console.log('🔐 Password aggiornate in realtime');
+      }
+    } catch(e) { console.warn('pwRealtime:', e); }
+  });
+  console.log('✅ Password listener realtime attivo');
+}
+
+
 // ═══════════════════════════════════════════════════════════
 //  SYNC LISTA SPESA REALTIME — stesso utente multi-dispositivo
 // ═══════════════════════════════════════════════════════════
@@ -11621,7 +11662,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA312</div>
+            <div style="font-size:13px;color:var(--text3);">BETA313</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
