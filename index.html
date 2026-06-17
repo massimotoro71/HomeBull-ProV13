@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA293</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA312</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA293</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA312</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA293</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA312</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA293',
+  version: 'BETA312',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3675,6 +3675,7 @@ function unlockApp() {
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
     setTimeout(driveStartAutoTimer, 2000);
+    setTimeout(shopStartRealtime, 3000); // listener realtime lista spesa
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
@@ -10691,6 +10692,51 @@ async function syncShopShare() {
 }
 
 
+// ═══════════════════════════════════════════════════════════
+//  SYNC LISTA SPESA REALTIME — stesso utente multi-dispositivo
+// ═══════════════════════════════════════════════════════════
+let _shopRealtimeRef = null;
+
+function shopStartRealtime() {
+  if (!fbReady || !fbDb) return;
+  const emailKey = _getSyncKey();
+  if (!emailKey) return;
+  if (_shopRealtimeRef) { _shopRealtimeRef.off(); }
+  
+  _shopRealtimeRef = fbDb.ref('hb13/' + emailKey + '/' + SHOP_LISTS_KEY);
+  _shopRealtimeRef.on('value', snap => {
+    if (!snap.exists()) return;
+    const raw = snap.val();
+    if (!raw) return;
+    
+    // Aggiorna solo se i dati sono più recenti di quelli locali
+    try {
+      const cloudData = typeof raw === 'string' ? raw : JSON.stringify(raw);
+      const localData = localStorage.getItem(SHOP_LISTS_KEY);
+      
+      // Se i dati cloud sono diversi da quelli locali, aggiorna
+      if (cloudData !== localData) {
+        // Salva in localStorage senza triggerare un nuovo upload
+        const origSetItem = Storage.prototype.setItem;
+        Storage.prototype.setItem = function(k, v) { origSetItem.call(this, k, v); };
+        localStorage.setItem(SHOP_LISTS_KEY, typeof raw === 'string' ? raw : JSON.stringify(raw));
+        Storage.prototype.setItem = origSetItem;
+        
+        // Ricarica la lista spesa se siamo nella sezione
+        shopLoad();
+        if (HB.currentTab === 'shopping') shopRenderAll();
+        console.log('🛒 Lista spesa aggiornata in realtime');
+      }
+    } catch(e) { console.warn('shopRealtime:', e); }
+  });
+  console.log('✅ Lista spesa listener realtime attivo');
+}
+
+function shopStopRealtime() {
+  if (_shopRealtimeRef) { _shopRealtimeRef.off(); _shopRealtimeRef = null; }
+}
+
+
 function cloudPageOpen(){
   driveUpdateBackupUI();
   gcalUpdateUI();
@@ -11575,7 +11621,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA293</div>
+            <div style="font-size:13px;color:var(--text3);">BETA312</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
