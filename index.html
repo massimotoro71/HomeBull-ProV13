@@ -1908,19 +1908,10 @@ function shopConfirmCustom(btn) {
   const name = document.getElementById('shop-custom-name')?.value.trim();
   const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
   if (!name) { showToast('Inserisci il nome del prodotto'); return; }
-  btn.closest('[style]').remove();
-
-  // Se lista condivisa attiva — aggiungi su Firebase
-  if (_shopCurSharedId === 'bring' && _sharedListId) {
-    sharedListAddItem(name, icon);
-    showToast('✅ ' + name + ' aggiunto alla lista condivisa!');
-    return;
-  }
-
-  // Altrimenti lista locale
   const id = 'custom_' + Date.now();
   _shopList[id] = { name, icon, qty: 1 };
   shopSave();
+  btn.closest('[style]').remove();
   shopRenderAll();
   showToast('✅ ' + name + ' aggiunto!');
 }
@@ -2027,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA310</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA293</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2129,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA310</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA293</div>
         </div>
       </div>
     </div>
@@ -2253,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA310</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA293</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3274,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA310',
+  version: 'BETA293',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3644,6 +3635,32 @@ async function deriveKey(pin, salt) {
   );
 }
 
+async function hbEncrypt(text) {
+  if (!HB.sessionKey) return text;
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv }, HB.sessionKey, new TextEncoder().encode(text)
+  );
+  const combined = new Uint8Array(12 + enc.byteLength);
+  combined.set(iv, 0);
+  combined.set(new Uint8Array(enc), 12);
+  let bin = '';
+  for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
+  return 'hb12:' + btoa(bin);
+}
+
+async function hbDecrypt(data) {
+  if (!HB.sessionKey || !data.startsWith('hb12:')) return data;
+  try {
+    const combined = new Uint8Array(atob(data.slice(5)).split('').map(c => c.charCodeAt(0)));
+    const dec = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: combined.slice(0, 12) },
+      HB.sessionKey, combined.slice(12)
+    );
+    return new TextDecoder().decode(dec);
+  } catch(e) { return null; }
+}
+
 // ── User persistence (email only, no secrets) ──────────────
 function saveUser(u) { localStorage.setItem('hb12_user', JSON.stringify(u)); }
 function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')); } catch { return null; } }
@@ -3657,31 +3674,18 @@ function unlockApp() {
     updateHomeStats();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
-    driveStartAutoTimer(); // avvia timer backup automatico
-    // Riprendi lista condivisa se già configurata
-    // Prima controlla localStorage, poi Firebase
-    const savedListId = localStorage.getItem('hb_shared_list_id');
-    if (savedListId) {
-      _sharedListId = savedListId;
-      setTimeout(sharedListStart, 2000);
-    } else {
-      // Controlla se c'è una lista condivisa su Firebase per questo utente
-      setTimeout(async () => {
-        try {
-          const myKey = _getSyncKey();
-          if (!myKey || !fbDb) return;
-          const snap = await fbDb.ref('userMeta/' + myKey + '/sharedListId').get();
-          if (snap.exists()) {
-            const listId = snap.val();
-            localStorage.setItem('hb_shared_list_id', listId);
-            _sharedListId = listId;
-            sharedListStart();
-            showToast('👥 Lista condivisa ripristinata');
-          }
-        } catch(e) { console.warn('sharedList restore:', e); }
-      }, 3000);
-    }
-
+    // Carica condivisioni dopo sync
+    setTimeout(() => {
+      loadShares().then(() => {
+        // Avvia listener per condivisioni shopping ricevute
+        Object.entries(_receivedShares)
+          .filter(([k,s]) => s.section === 'shopping')
+          .forEach(([k,s]) => startShopShareListener(s.shareId || k));
+        // Notifica condivisioni presenti
+        const cnt = Object.keys(_receivedShares).length;
+        if (cnt > 0) updateHomeStats();
+      });
+    }, 3000);
     setTimeout(checkExpiryNotifications, 3000);
   });
   initBackHandler();
@@ -3709,7 +3713,7 @@ const TAB_CONFIG = {
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
   documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
-  calendar:  { title: 'Calendario',  sub: '', actions: [] },
+  calendar:  { title: 'Calendario',  sub: '', actions: ['add','share'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Carte',       sub: '', actions: [] },
   wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
@@ -3908,17 +3912,15 @@ function renderTopbarActions(actions) {
     };
     container.appendChild(btn);
   }
-
   if (actions.includes('share')) {
     const shareBtn = document.createElement('div');
     shareBtn.className = 'topbar-btn';
-    shareBtn.title = 'Lista condivisa';
+    shareBtn.title = 'Condividi';
     shareBtn.innerHTML = '👥';
     shareBtn.style.fontSize = '18px';
-    shareBtn.onclick = () => sharedListShowModal();
+    shareBtn.onclick = () => showShareModal(HB.currentTab);
     container.appendChild(shareBtn);
   }
-
 }
 
 function topbarBack() {
@@ -3972,6 +3974,9 @@ function topbarBack() {
 }
 
 // ── More Drawer ────────────────────────────────────────────
+function openMoreDrawer() {
+  document.getElementById('more-drawer').classList.add('open');
+}
 function closeMoreDrawer() {
   document.getElementById('more-drawer').classList.remove('open');
 }
@@ -4152,7 +4157,7 @@ function updateHomeStats() {
 
   // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
-  const docsToCheck = (_docs2?.length ? _docs2 : (() => { try { const r = localStorage.getItem('hb13_docs2'); return r && !r.startsWith('hb13enc:') ? JSON.parse(r) : []; } catch(e) { return []; }})())
+  const docsToCheck = (_docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]'))
     .filter(d => !d.deleted);
   docsToCheck.forEach(doc => {
     if (!doc.expiry) return;
@@ -4167,7 +4172,7 @@ function updateHomeStats() {
   });
 
   // 2. Carte in scadenza
-  const cardsToCheck = (_cards?.length ? _cards : (() => { try { const r = localStorage.getItem('hb13_cards'); return r && !r.startsWith('hb13enc:') ? JSON.parse(r) : []; } catch(e) { return []; }})())
+  const cardsToCheck = (_cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]'))
     .filter(c => !c.deleted);
   cardsToCheck.forEach(card => {
     if (!card.exp) return;
@@ -5139,19 +5144,20 @@ const _iconCache = {};
 async function aiGetCatIcon(catName) {
   if (_iconCache[catName]) return _iconCache[catName];
   try {
-    // Mappa emoji locale — no API call
-    const emojiMap = {
-      'social': '📱', 'email': '📧', 'mail': '📧', 'banca': '🏦', 'bank': '🏦',
-      'lavoro': '💼', 'work': '💼', 'casa': '🏠', 'home': '🏠', 'shop': '🛒',
-      'acquisti': '🛒', 'giochi': '🎮', 'game': '🎮', 'viaggi': '✈️', 'travel': '✈️',
-      'salute': '🏥', 'health': '🏥', 'scuola': '🎓', 'school': '🎓',
-      'musica': '🎵', 'music': '🎵', 'video': '🎬', 'foto': '📷', 'photo': '📷',
-      'finanz': '💰', 'finance': '💰', 'governo': '🏛️', 'gov': '🏛️',
-      'assicur': '🛡️', 'insurance': '🛡️', 'auto': '🚗', 'car': '🚗',
-      'sport': '⚽', 'food': '🍕', 'cibo': '🍕',
-    };
-    const low = catName.toLowerCase();
-    const emoji = Object.entries(emojiMap).find(([k]) => low.includes(k))?.[1] || '📁';
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 10,
+        messages: [{
+          role: 'user',
+          content: `Rispondi SOLO con un singolo emoji che rappresenta meglio la categoria password chiamata "${catName}". Solo l'emoji, nient'altro.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const emoji = data.content?.[0]?.text?.trim() || '📁';
     _iconCache[catName] = emoji;
     return emoji;
   } catch(e) { return '📁'; }
@@ -5281,6 +5287,12 @@ function cfCalcola() {
   showToast('✅ Codice Fiscale calcolato!');
 }
 
+async function cfCopyResult() {
+  const cf = document.getElementById('cf-result-text')?.textContent;
+  try { await navigator.clipboard.writeText(cf); showToast('📋 CF copiato!'); }
+  catch(e) { showToast(cf); }
+}
+
 // ── Barcode Code 128 ─────────────────────────────────────
 // Tabella Code 128B
 const C128_TABLE = [
@@ -5338,7 +5350,33 @@ function cfBarcodeZoom(dir) {
   if (cf) cfDrawBarcode(cf);
 }
 
+function cfZoomBarcode() { cfBarcodeZoom(1); }
+
 // ── UI helpers CF ────────────────────────────────────────
+function cfSetSesso(s) {
+  _cfSesso = s;
+  document.getElementById('cf-sesso-m').style.cssText = s==='M' ?
+    'flex:1;padding:10px;border-radius:10px;border:2px solid var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:800;cursor:pointer;font-family:inherit;' :
+    'flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:800;cursor:pointer;font-family:inherit;';
+  document.getElementById('cf-sesso-f').style.cssText = s==='F' ?
+    'flex:1;padding:10px;border-radius:10px;border:2px solid #e879a0;background:rgba(232,121,160,0.1);color:#e879a0;font-weight:800;cursor:pointer;font-family:inherit;' :
+    'flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:800;cursor:pointer;font-family:inherit;';
+}
+
+function cfSearchComune(q) {
+  cfLoadComuni();
+  const results = document.getElementById('cf-comune-results');
+  if (!results) return;
+  if (q.length < 2) { results.style.display = 'none'; return; }
+  const ql = q.toUpperCase();
+  const matches = Object.keys(_cfComuni).filter(n => n.includes(ql)).slice(0, 12);
+  if (!matches.length) { results.style.display = 'none'; return; }
+  results.style.display = 'block';
+  results.innerHTML = matches.map(n =>
+    `<div onclick="cfSelectComune('${n}')" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">${n} <span style="color:var(--text3);font-size:11px;">${_cfComuni[n].prov}</span></div>`
+  ).join('');
+}
+
 function cfSelectComune(nome) {
   _cfComuneSelezionato = nome;
   document.getElementById('cf-comune-search').value = nome;
@@ -6853,6 +6891,19 @@ function calRenderMonth() {
   calRenderMonthNew();
 }
 
+function calPrevMonth() {
+  _calMonth--;
+  if (_calMonth < 0) { _calMonth = 11; _calYear--; }
+  _calSelectedDate = null;
+  calRenderMonth(); calRenderEvents();
+}
+function calNextMonth() {
+  _calMonth++;
+  if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+  _calSelectedDate = null;
+  calRenderMonth(); calRenderEvents();
+}
+
 function calSelectDate(dateStr) {
   _calSelectedDate = dateStr;
   calRenderMonth();
@@ -7198,6 +7249,43 @@ function docsDelete(id) {
 
 // Array temporaneo foto per il documento corrente
 let _docPhotos = []; // array di base64 string
+
+function docPhotoCapture(source) {
+  const inp = document.getElementById('doc-photo-input');
+  if (source === 'camera') {
+    inp.setAttribute('capture', 'environment');
+  } else {
+    inp.removeAttribute('capture');
+  }
+  inp.click();
+}
+
+function docPhotoSelected(input) {
+  const files = input.files;
+  if (!files?.length) return;
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Comprimi l'immagine prima di salvarla
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 800;
+        const ratio = Math.min(MAX/img.width, MAX/img.height, 1);
+        canvas.width  = Math.round(img.width  * ratio);
+        canvas.height = Math.round(img.height * ratio);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const b64 = canvas.toDataURL('image/jpeg', 0.75);
+        _docPhotos.push(b64);
+        docRenderPhotos();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
 
 function docRenderPhotos() {
   const preview = document.getElementById('doc-photos-preview');
@@ -7617,14 +7705,18 @@ function shopSave() {
 
 function shopOpen() {
   shopLoad();
+  // Mantieni lista condivisa attiva se presente
+  if (_shopCurSharedId && _sharedShopData[_shopCurSharedId]) {
+    shopRenderAll();
+    return;
+  }
+  _shopCurSharedId = null;
   shopRenderAll();
 }
 
 function shopRenderAll(q='') {
   shopRenderListTabs();
   shopRenderActive();
-  // Se lista condivisa attiva, non sovrascrivere label e sub
-  if (_shopCurSharedId === 'bring') return;
   shopRenderRecent();
   shopRenderCategories(q);
   const count = Object.keys(_shopList).length;
@@ -7666,20 +7758,18 @@ function shopRenderListTabs() {
       container.appendChild(btn);
     }
   });
-  // Tab lista condivisa (se attiva)
-  if (_sharedListId) {
-    const isActive = _shopCurSharedId === 'bring';
-    const bringTab = document.createElement('button');
-    bringTab.id = 'bring-tab-btn';
-    const pending = _sharedListData?.items ? Object.values(_sharedListData.items).filter(i=>!i.checked).length : 0;
-    bringTab.textContent = '👥 Condivisa' + (pending > 0 ? ' (' + pending + ')' : '');
-    bringTab.style.cssText = 'padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;'
-      + 'border:' + (isActive ? '2px solid #10b981' : '1px solid rgba(16,185,129,0.5)') + ';'
+  // Tab liste condivise ricevute
+  Object.entries(_sharedShopData).forEach(([shareId, shared]) => {
+    const isActive = _shopCurSharedId === shareId;
+    const btn = document.createElement('button');
+    btn.style.cssText = 'padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;'
+      + 'border:' + (isActive ? '2px solid #10b981' : '1px solid rgba(16,185,129,0.4)') + ';'
       + 'background:' + (isActive ? 'rgba(16,185,129,0.15)' : 'transparent') + ';'
       + 'color:' + (isActive ? '#10b981' : 'rgba(16,185,129,0.8)') + ';';
-    bringTab.onclick = () => { _shopCurSharedId = 'bring'; shopRenderListTabs(); renderBringList(); };
-    container.appendChild(bringTab);
-  }
+    btn.textContent = '👥 ' + shared.fromEmail.split('@')[0];
+    btn.onclick = () => { _shopCurSharedId = shareId; shopRenderAll(); };
+    container.appendChild(btn);
+  });
 
   // Tasto + nuova lista
   const addBtn = document.createElement('button');
@@ -7691,7 +7781,7 @@ function shopRenderListTabs() {
 
 function shopSwitchList(id) {
   shopSave();
-  _shopCurSharedId = null; // resetta tab condivisa
+  _shopCurSharedId = null;
   _shopCurId = id;
   _shopList  = _shopLists[id].items;
   shopRenderAll();
@@ -7699,7 +7789,7 @@ function shopSwitchList(id) {
 
 // ── Lista corrente (griglia 4 colonne) ──────────────────
 function shopRenderActive() {
-  if (_shopCurSharedId === 'bring') { renderBringList(); return; }
+  if (_shopCurSharedId) { renderSharedShopTab(); return; }
   const grid = document.getElementById('shop-active-grid');
   if (!grid) return;
   const items = Object.entries(_shopList);
@@ -7853,15 +7943,9 @@ function shopToggle(product) {
 }
 
 function shopAddDirect(product, name) {
-  // Se lista condivisa attiva — aggiungi su Firebase
-  if (_shopCurSharedId === 'bring' && _sharedListId) {
-    sharedListAddItem(name, product.icon || '🛒');
-    _shopRecent = [product, ..._shopRecent.filter(p => p.id !== product.id)].slice(0, 20);
-    shopSave();
-    return;
-  }
   const id = product.id + '_' + Date.now();
   _shopList[id] = { name, icon: product.icon, qty: 1 };
+  // Aggiungi ai recenti
   _shopRecent = [product, ..._shopRecent.filter(p => p.id !== product.id)].slice(0, 20);
   shopSave(); shopRenderAll();
 }
@@ -8010,50 +8094,38 @@ function shopAddCustomFromSearch() {
   const inp = document.getElementById('shop-search');
   const name = inp?.value?.trim();
   if (!name) return;
-  inp.value = '';
-
-  // Se lista condivisa attiva
-  if (_shopCurSharedId === 'bring' && _sharedListId) {
-    sharedListAddItem(name, '🛒');
-    showToast('✅ ' + name + ' aggiunto alla lista condivisa');
-    return;
-  }
-
   const id = 'custom_' + Date.now();
   _shopList[id] = { name, icon: '🛒', qty: 1 };
-  shopSave(); shopRenderAll();
+  shopSave(); inp.value = ''; shopRenderAll();
   showToast('✅ ' + name + ' aggiunto');
 }
 
 // ── Fine Lista Spesa ──────────────────────────────────────
 
 // ── Fine Scheda Password ──────────────────────────────────
-let _backHandlerActive = false;
 let backPressCount = 0;
 let backPressTimer = null;
+let _backHandlerActive = false;
 
-// Intercetta tasto back Android senza chiudere l'app
-(function initBackBuffer() {
-  // Aggiungi UN solo stato per intercettare il primo back
-  if (!history.state?.hb) history.pushState({ hb: 'app' }, '');
-  
+// Avvia subito il buffer history E il listener — non aspettare unlock
+(function earlyBackHandler() {
+  history.replaceState({ hb: 'root' }, '');
+  for (let i = 0; i < 20; i++) history.pushState({ hb: 'app' }, '');
+
   window.addEventListener('popstate', (e) => {
-    // Rimetti sempre uno stato in cima
     history.pushState({ hb: 'app' }, '');
-    handleBackPress();
+    if (typeof handleBackPress === 'function') handleBackPress();
   });
 })();
 
 function initBackHandler() {
+  // Il listener è già attivo — non fare nulla
   _backHandlerActive = true;
 }
 
 function handleBackPress() {
-    // Chiudi qualsiasi modal generico aperto (z-index alto)
-    const genericModal = document.querySelector('#_bring_modal, #_share_modal, #_qrimp_ov, #_pdfsec_ov, #_setup_wizard, #_cd_ov');
-    if (genericModal) { genericModal.remove(); return; }
 
-    // Chiudi modal/overlay specifici
+    // Chiudi qualsiasi modal/overlay aperto
     if (document.getElementById('settings-overlay')?.style.display === 'flex') {
       closeSettings(); return;
     }
@@ -8080,11 +8152,6 @@ function handleBackPress() {
     }
     if (document.getElementById('home-custom-modal')?.style.display === 'flex') {
       closeHomeCustom(); return;
-    }
-    // Prima prova il bottone back interno del tab corrente
-    const topbarBack = document.getElementById('topbar-back');
-    if (topbarBack?.classList.contains('visible')) {
-      topbarBack.click(); return;
     }
     if (HB.currentTab !== 'home') {
       switchTab('home'); return;
@@ -8343,6 +8410,43 @@ function loadHomePrefs() {
 }
 function saveHomePrefs(prefs) {
   localStorage.setItem(HOME_PREFS_KEY, JSON.stringify(prefs));
+}
+
+function openHomeCustom() {
+  const prefs = loadHomePrefs();
+  // Precompila checkbox sezioni
+  const defaults = { search:true, quick:true, stats:true, alerts:true };
+  ['search','quick','stats','alerts'].forEach(k => {
+    const el = document.getElementById('hc-' + k);
+    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
+  });
+  // Precompila quick access
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs-home');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 8) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede');
+      }
+    };
+    container.appendChild(el);
+  });
+  // Tema
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
+  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
+  document.getElementById('home-custom-modal').style.display = 'flex';
 }
 
 function closeHomeCustom() {
@@ -8862,6 +8966,56 @@ function cfPrint(){
   const w=window.open('','_blank');
   w.document.write('<html><body style="text-align:center;font-family:monospace;padding:40px;"><h2>CODICE FISCALE</h2><div style="font-size:28px;font-weight:bold;letter-spacing:6px;margin:20px 0;">'+cf+'</div><svg id="bc"></svg><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#bc","'+cf+'",{format:"CODE128",width:3,height:80,displayValue:false});<\/script></body></html>');
   w.document.close();setTimeout(()=>w.print(),800);
+}
+
+function docsTogglePersonal(){
+  const form=document.getElementById('docs-personal-form');
+  const btn=document.getElementById('docs-personal-toggle');
+  if(!form)return;
+  const open=form.style.display!=='none';
+  form.style.display=open?'none':'block';
+  btn.textContent=open?'+ Espandi':'− Chiudi';
+  if(!open){try{const d=JSON.parse(localStorage.getItem(CF_PERSONAL_KEY)||'{}');
+    ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{const el=document.getElementById('cf_'+k);if(el&&d[k])el.value=d[k];});
+    if(d.cf){document.getElementById('cf_manual').value=d.cf;document.getElementById('cf_result').textContent=d.cf;cfGenBarcode(d.cf);}
+  }catch(e){}}
+}
+
+function docsPersonalSave(){
+  const d={};
+  ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{d[k]=document.getElementById('cf_'+k)?.value?.trim()||'';});
+  d.cf=document.getElementById('cf_manual')?.value?.trim()||document.getElementById('cf_result')?.textContent||'';
+  localStorage.setItem(CF_PERSONAL_KEY,JSON.stringify(d));
+  showToast('✅ Dati personali salvati');
+}
+
+function cfSaveAsDoc() {
+  const cognome = document.getElementById('cf_cognome')?.value.trim();
+  const nome    = document.getElementById('cf_nome')?.value.trim();
+  const cf      = document.getElementById('cf_manual')?.value.trim() || document.getElementById('cf_result')?.textContent;
+  if (!cognome || !nome) { showToast('Inserisci cognome e nome'); return; }
+  if (!cf || cf === '—' || cf.length !== 16) { showToast('CF non valido — inseriscilo manualmente'); return; }
+
+  // Salva come documento
+  const doc = {
+    id: 'doc_' + Date.now(),
+    type: 'cf', icon: '📋', label: 'Cod. Fiscale',
+    holder: cognome + ' ' + nome,
+    number: cf,
+    expiry: '', issue: '', issuer: '',
+    notes: [
+      document.getElementById('cf_nascita')?.value ? 'Nato/a il ' + document.getElementById('cf_nascita')?.value : '',
+      document.getElementById('cf_comune')?.value  ? 'a ' + document.getElementById('cf_comune')?.value : '',
+      document.getElementById('cf_residenza')?.value ? 'Res: ' + document.getElementById('cf_residenza')?.value : '',
+      document.getElementById('cf_via')?.value      ? document.getElementById('cf_via')?.value : '',
+    ].filter(Boolean).join(' | '),
+    photos: [],
+    createdAt: new Date().toISOString()
+  };
+  _docs.push(doc);
+  docsSaveAll();
+  docsShowList();
+  showToast('✅ Codice Fiscale salvato nei documenti');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -10052,26 +10206,22 @@ async function authLogout() {
 
 function fbLogout() { lockApp(); }
 
+function fbMsg(c){
+  return({'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata',
+    'auth/invalid-credential':'Email o password errata','auth/email-already-in-use':'Email già registrata',
+    'auth/invalid-email':'Email non valida','auth/weak-password':'Password troppo debole',
+    'auth/too-many-requests':'Troppi tentativi — riprova tra poco',
+    'auth/popup-closed-by-user':'Login annullato'})[c]||'Errore ('+c+')';
+}
+
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_calendar','hb13_turni_def','hb13_turni_days',
   'hb13_docs2','hb13_finance','hb13_server','hb13_shop_lists','hb13_calendar_shifts',
-  'hb13_pw_cats','hb13_shop_lists_v2'];
+  'hb13_pw_cats','hb13_shop_lists_v2','hb13_library'];
 
 // Timestamp helpers
 function _tsKey(k){ return 'hb_ts_' + k; }
 function _getLocalTs(k){ return parseInt(localStorage.getItem(_tsKey(k))||'0'); }
 function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(localStorage,_tsKey(k),t||Date.now()); }
-
-// Intercetta setItem per aggiornare timestamp automaticamente
-(function patchStorageTs() {
-  const origSet = Storage.prototype.setItem;
-  Storage.prototype.setItem = function(key, value) {
-    origSet.call(this, key, value);
-    // Se è una chiave dati HB e non stiamo già sincronizzando
-    if (HB_SYNC_KEYS && HB_SYNC_KEYS.includes(key) && !_syncInProgress) {
-      _setLocalTs(key, Date.now());
-    }
-  };
-})();
 
 function _getSyncKey(){
   let emailAddr = _emailOtpAddr || HB.user?.email || '';
@@ -10081,6 +10231,22 @@ function _getSyncKey(){
 }
 
 // Merge per array con ID
+function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
+  if(!local||!Array.isArray(local)) return cloud||[];
+  if(!cloud||!Array.isArray(cloud)) return local||[];
+  const map = {};
+  local.forEach(item => { if(item.id) map[item.id]=item; });
+  cloud.forEach(item => {
+    if(!item.id) return;
+    if(!map[item.id]) { map[item.id]=item; }
+    else {
+      const lt = new Date(map[item.id].deletedAt||map[item.id][tsField]||0).getTime();
+      const ct = new Date(item.deletedAt||item[tsField]||0).getTime();
+      if(ct>lt) map[item.id]=item;
+    }
+  });
+  return Object.values(map);
+}
 function markDeleted(arr,id){ return arr.map(i=>i.id===id?{...i,deleted:true,deletedAt:new Date().toISOString()}:i); }
 const MERGE_KEYS={'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,'hb13_cards':true,'hb13_wifi':true,'hb13_docs2':true,'hb13_finance':true,'hb13_server':true};
 
@@ -10100,10 +10266,7 @@ async function fbSyncLoad(){
       if(remoteTs > localTs && cloud[k]){
         let value = cloud[k];
         if(typeof value === 'string' && value.startsWith('hb12:')) { console.warn('Skip legacy:', k); continue; }
-        // Accetta sia JSON normale che dati cifrati hb13enc:
-        if(typeof value === 'string' && !value.startsWith('hb13enc:')) {
-          try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
-        }
+        try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
         _syncInProgress = true;
         localStorage.setItem(k, value);
         _syncInProgress = false;
@@ -10165,6 +10328,19 @@ async function fbSyncAll(silent=false){
 }
 
 let _syncInProgress = false;
+(function patchLocalStorage(){
+  const origSet = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value) {
+    origSet(key, value);
+    if(!_syncInProgress && HB_SYNC_KEYS.includes(key)){
+      _setLocalTs(key, Date.now());
+      if(fbReady && HB.user){
+        clearTimeout(window._syncDebounce);
+        window._syncDebounce = setTimeout(() => fbSyncAll(true), 3000);
+      }
+    }
+  };
+})();
 
 let _realtimeRef = null;
 function fbStartRealtime(){
@@ -10198,281 +10374,264 @@ function logout(){
 let _lastSyncTime = null;
 
 // ═══════════════════════════════════════════════════════════
-//  LISTA SPESA CONDIVISA — modello Bring
-//  Una lista unica su Firebase, tutti leggono e scrivono
-//  Path: /sharedLists/{listId}/
-//        /sharedLists/{listId}/members/{emailKey} = email
-//        /sharedLists/{listId}/items/{itemId} = {name,icon,checked,addedBy}
+//  CONDIVISIONE SELETTIVA — Lista Spesa e Calendario
 // ═══════════════════════════════════════════════════════════
+const SHAREABLE = {
+  shopping: { label: 'Lista Spesa', icon: '🛒', key: 'hb13_shop_lists_v2' },
+  calendar:  { label: 'Calendario',  icon: '📅', key: 'hb13_calendar' },
+};
 
-let _sharedListId   = null;  // ID lista condivisa attiva
-let _sharedListData = null;  // { name, members, items }
-let _sharedListRef  = null;  // Firebase ref listener
+let _myShares      = {}; // condivisioni create da me
+let _receivedShares = {}; // condivisioni ricevute
+let _sharedShopData = {}; // { shareId: { fromEmail, items[] } } dati lista spesa ricevuta
+let _shopCurSharedId = null; // shareId lista condivisa attiva
 
-// ── Crea o entra in una lista condivisa ──────────────────
-async function sharedListCreate() {
-  if (!fbReady || !fbDb) { showToast('⚠️ Devi essere connesso'); return; }
-  const myEmail   = _emailOtpAddr;
-  const myKey     = _getSyncKey();
-  if (!myEmail) { showToast('⚠️ Email non trovata'); return; }
-
-  showToast('📋 Creazione lista condivisa...');
+// ── Carica condivisioni da Firebase ──────────────────────
+async function loadShares() {
+  if (!fbReady || !fbDb) return;
+  const emailKey = _getSyncKey();
+  if (!emailKey) return;
   try {
-    const listId = 'bl_' + Date.now();
-    
-    // Importa elementi dalla lista locale attiva
-    const localItems = {};
-    if (_shopList && Object.keys(_shopList).length > 0) {
-      Object.entries(_shopList).forEach(([id, item]) => {
-        if (!item.deleted) {
-          localItems['i_' + Date.now() + '_' + Math.random().toString(36).slice(2,5)] = {
-            name: item.name,
-            icon: item.icon || '🛒',
-            checked: item.checked || false,
-            addedBy: myEmail,
-            addedAt: new Date().toISOString()
-          };
-        }
+    console.log('loadShares — emailKey:', emailKey);
+    const mySnap  = await fbDb.ref('userShares/' + emailKey + '/created').get();
+    _myShares     = mySnap.exists()  ? mySnap.val()  : {};
+    const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
+    _receivedShares = recSnap.exists() ? recSnap.val() : {};
+    console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
+    // Debug: mostra cosa c'è su Firebase
+    const allSnap = await fbDb.ref('userShares/' + emailKey).get();
+    console.log('userShares raw:', JSON.stringify(allSnap.val()));
+  } catch(e) { console.warn('loadShares:', e); }
+}
+
+// ── Crea condivisione ─────────────────────────────────────
+async function createShare(section, withEmail, permission) {
+  const myEmail = _emailOtpAddr;
+  if (!myEmail) { showToast('⚠️ Email non trovata'); return; }
+  if (withEmail.toLowerCase() === myEmail.toLowerCase()) { showToast('⚠️ Non puoi condividere con te stesso'); return; }
+
+  showToast('📤 Condivisione in corso...');
+  try {
+    const shareId  = 'sh_' + Date.now();
+    const myKey    = _getSyncKey();
+    const withKey  = btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+    const rawData  = localStorage.getItem(SHAREABLE[section]?.key);
+    const data     = rawData ? JSON.parse(rawData) : (section === 'shopping' ? {} : []);
+
+    // Salva in Firebase
+    await fbDb.ref('shared/' + shareId).set({
+      id: shareId, section, fromEmail: myEmail, fromKey: myKey,
+      withEmail: withEmail.toLowerCase(), withKey, permission,
+      createdAt: new Date().toISOString(), data
+    });
+    await fbDb.ref('userShares/' + myKey  + '/created/'  + shareId).set({ shareId, section, withEmail: withEmail.toLowerCase(), permission });
+    await fbDb.ref('userShares/' + withKey + '/received/' + shareId).set({ shareId, section, fromEmail: myEmail, permission });
+
+    _myShares[shareId] = { shareId, section, withEmail: withEmail.toLowerCase(), permission };
+    showToast('✅ Condiviso con ' + withEmail);
+  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+}
+
+// ── Rimuovi condivisione ──────────────────────────────────
+async function removeShare(shareId) {
+  const myKey = _getSyncKey();
+  const share = _myShares[shareId];
+  try {
+    await fbDb.ref('shared/' + shareId).remove();
+    await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
+    if (share?.withEmail) {
+      const withKey = btoa(share.withEmail).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+      await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
+    }
+    delete _myShares[shareId];
+    showToast('✅ Condivisione rimossa');
+    document.getElementById('_share_modal')?.remove();
+  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
+}
+
+// ── Rimuovi tutte le condivisioni (cleanup) ───────────────
+async function cleanupAllShares() {
+  if (!confirm('Rimuovere TUTTE le condivisioni?')) return;
+  const myKey = _getSyncKey();
+  for (const shareId of Object.keys(_myShares)) {
+    try { await fbDb.ref('shared/' + shareId).remove(); } catch(e){}
+  }
+  await fbDb.ref('userShares/' + myKey + '/created').remove();
+  await fbDb.ref('userShares/' + myKey + '/received').remove();
+  _myShares = {}; _receivedShares = {};
+  _sharedShopData = {}; _shopCurSharedId = null;
+  document.getElementById('_share_modal')?.remove();
+  shopRenderAll();
+  showToast('✅ Tutte le condivisioni rimosse');
+}
+
+// ── Listener realtime lista spesa condivisa ───────────────
+function startShopShareListener(shareId) {
+  if (!fbReady || !fbDb) return;
+  fbDb.ref('shared/' + shareId + '/data').on('value', snap => {
+    if (!snap.exists()) return;
+    const raw = snap.val();
+    // Estrai items da struttura { listId: { name, items: {...} } }
+    const items = [];
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      Object.values(raw).forEach(list => {
+        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
+          if (!item.deleted) items.push({ id, ...item });
+        });
       });
     }
-
-    await fbDb.ref('sharedLists/' + listId).set({
-      name: _shopLists[_shopCurId]?.name || 'Lista Condivisa',
-      createdBy: myEmail,
-      createdAt: new Date().toISOString(),
-      members: { [myKey]: myEmail },
-      items: localItems
-    });
-    localStorage.setItem('hb_shared_list_id', listId);
-    _sharedListId = listId;
-    const imported = Object.keys(localItems).length;
-    showToast('✅ Lista creata' + (imported > 0 ? ' con ' + imported + ' prodotti!' : '!'));
-    sharedListStart();
-    sharedListShowModal();
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-async function sharedListJoin(listId) {
-  if (!fbReady || !fbDb) { showToast('⚠️ Devi essere connesso'); return; }
-  const myEmail = _emailOtpAddr;
-  const myKey   = _getSyncKey();
-  if (!myEmail) return;
-  try {
-    const snap = await fbDb.ref('sharedLists/' + listId).get();
-    if (!snap.exists()) { showToast('⚠️ Lista non trovata — controlla il codice'); return; }
-    await fbDb.ref('sharedLists/' + listId + '/members/' + myKey).set(myEmail);
-    localStorage.setItem('hb_shared_list_id', listId);
-    _sharedListId = listId;
-    // Salva su path separato (non cifrato) per sync automatico
-    const myKey2 = _getSyncKey();
-    if (myKey2) fbDb.ref('userMeta/' + myKey2 + '/sharedListId').set(listId);
-    showToast('✅ Entrato nella lista condivisa!');
-    document.getElementById('_bring_modal')?.remove();
-    sharedListStart();
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-// ── Avvia listener realtime sulla lista condivisa ────────
-function sharedListStart() {
-  if (!_sharedListId || !fbReady || !fbDb) return;
-  if (_sharedListRef) { _sharedListRef.off(); }
-  _sharedListRef = fbDb.ref('sharedLists/' + _sharedListId);
-  _sharedListRef.on('value', snap => {
-    if (!snap.exists()) return;
-    _sharedListData = snap.val();
-    // Aggiorna lista spesa
-    if (HB.currentTab === 'shopping') {
-      if (_shopCurSharedId === 'bring') renderBringList();
-      else shopRenderListTabs();
-    }
-    updateBringBadge();
-  });
-  // Vai automaticamente al tab condiviso
-  _shopCurSharedId = 'bring';
-  if (HB.currentTab === 'shopping') shopRenderAll();
-  console.log('✅ Lista condivisa listener attivo:', _sharedListId);
-}
-
-// ── Aggiunge item alla lista condivisa ───────────────────
-async function sharedListAddItem(name, icon) {
-  if (!_sharedListId || !fbDb) return;
-  const myEmail = _emailOtpAddr;
-  const itemId  = 'i_' + Date.now();
-  await fbDb.ref('sharedLists/' + _sharedListId + '/items/' + itemId).set({
-    name, icon: icon||'🛒', checked: false,
-    addedBy: myEmail, addedAt: new Date().toISOString()
+    if (_sharedShopData[shareId]) _sharedShopData[shareId].items = items;
+    if (_shopCurSharedId === shareId) renderSharedShopTab();
   });
 }
 
-// ── Spunta/Despunta item ─────────────────────────────────
-async function sharedListToggle(itemId, currentChecked) {
-  if (!_sharedListId || !fbDb) return;
-  await fbDb.ref('sharedLists/' + _sharedListId + '/items/' + itemId + '/checked').set(!currentChecked);
-}
-
-// ── Rimuovi item ─────────────────────────────────────────
-async function sharedListRemove(itemId) {
-  if (!_sharedListId || !fbDb) return;
-  await fbDb.ref('sharedLists/' + _sharedListId + '/items/' + itemId).remove();
-}
-
-// ── Lascia la lista condivisa ────────────────────────────
-async function sharedListLeave() {
-  if (!confirm('Vuoi lasciare la lista condivisa?')) return;
-  const myKey = _getSyncKey();
-  if (_sharedListId && fbDb) {
-    try { await fbDb.ref('sharedLists/' + _sharedListId + '/members/' + myKey).remove(); } catch(e){}
-  }
-  if (_sharedListRef) { _sharedListRef.off(); _sharedListRef = null; }
-  localStorage.removeItem('hb_shared_list_id');
-  // Rimuovi anche da Firebase
-  const myKeyL = _getSyncKey();
-  if (myKeyL && fbDb) fbDb.ref('userMeta/' + myKeyL + '/sharedListId').remove();
-  _sharedListId   = null;
-  _sharedListData = null;
-  _shopCurSharedId = null;
-  shopRenderAll();
-  document.getElementById('_bring_modal')?.remove();
-  showToast('✅ Hai lasciato la lista condivisa');
-}
-
-// ── Render lista condivisa nella Lista Spesa ─────────────
-function renderBringList() {
+// ── Render tab lista spesa condivisa ─────────────────────
+function renderSharedShopTab() {
+  const shared = _sharedShopData[_shopCurSharedId];
+  if (!shared) return;
   const grid = document.getElementById('shop-active-grid');
   if (!grid) return;
-  const items = _sharedListData?.items ? Object.entries(_sharedListData.items) : [];
-  const members = _sharedListData?.members ? Object.values(_sharedListData.members) : [];
-
-  // Stesso stile griglia della lista locale - reset a griglia 2 colonne
-  grid.removeAttribute('style');
-  grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:10px;min-height:60px;';
-
+  const items = shared.items || [];
   if (!items.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:16px 0;color:var(--text3);font-size:12px;">Aggiungi prodotti alla lista condivisa</div>';
-    return;
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3);font-size:13px;">Lista vuota</div>';
+  } else {
+    grid.innerHTML = items.map(item => {
+      const done = item.checked || item.done;
+      return '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:6px;">'
+        + '<div style="font-size:22px;">' + (item.icon || '🛒') + '</div>'
+        + '<div style="flex:1;font-size:14px;font-weight:600;' + (done ? 'text-decoration:line-through;opacity:0.5;' : '') + '">' + (item.name || '?') + '</div>'
+        + (done ? '<span style="color:#10b981;font-size:18px;">✅</span>' : '')
+        + '</div>';
+    }).join('');
   }
-
-  grid.innerHTML = '';
-  const sorted = [...items].sort(([,a],[,b]) => (a.checked===b.checked ? 0 : a.checked ? 1 : -1));
-  sorted.forEach(([itemId, item]) => {
-    const qty = item.qty || 1;
-    const el = document.createElement('div');
-    el.className = 'shop-list-item';
-    el.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 6px 8px;gap:4px;position:relative;min-height:100px;'
-      + (item.checked ? 'opacity:0.4;' : '');
-
-    // Click sull'icona → spunta/despunta
-    el.innerHTML = `
-      <div style="font-size:28px;line-height:1;cursor:pointer;" onclick="sharedListToggle('${itemId}', ${item.checked})">${item.icon || '🛒'}</div>
-      <div style="font-size:9px;font-weight:800;text-transform:uppercase;color:${item.checked ? 'var(--text3)' : 'var(--accent)'};text-align:center;word-break:break-word;max-width:100%;padding:0 2px;${item.checked ? 'text-decoration:line-through;' : ''}">${item.name}</div>
-      <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
-        <button onclick="sharedListChangeQty('${itemId}', ${qty}, -1)" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;">−</button>
-        <span style="font-size:14px;font-weight:800;min-width:16px;text-align:center;color:var(--accent);">${qty}</span>
-        <button onclick="sharedListChangeQty('${itemId}', ${qty}, +1)" style="width:24px;height:24px;border-radius:6px;border:none;background:var(--accent);color:white;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;">+</button>
-      </div>
-      <button onclick="sharedListRemove('${itemId}')" style="position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:5px;border:none;background:rgba(239,68,68,0.15);color:#ef4444;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>`;
-    grid.appendChild(el);
-  });
-
-  // Aggiorna topbar
   const nameLabel = document.getElementById('shop-list-name-label');
-  if (nameLabel) nameLabel.textContent = '👥 ' + (_sharedListData?.name || 'Lista Condivisa');
+  if (nameLabel) nameLabel.textContent = '👥 ' + shared.fromEmail.split('@')[0];
   const sub = document.getElementById('topbar-sub');
-  if (sub) sub.textContent = items.filter(([,i])=>!i.checked).length + ' da comprare · ' + members.length + ' membri';
+  if (sub) sub.textContent = items.length + (items.length===1?' prodotto':' prodotti');
 }
 
-async function sharedListChangeQty(itemId, currentQty, delta) {
-  if (!_sharedListId || !fbDb) return;
-  const newQty = currentQty + delta;
-  if (newQty <= 0) { await sharedListRemove(itemId); return; }
-  await fbDb.ref('sharedLists/' + _sharedListId + '/items/' + itemId + '/qty').set(newQty);
+// ── Modal condivisione ────────────────────────────────────
+function showShareModal(section) {
+  if (!SHAREABLE[section]) return;
+  showToast('⏳ Caricamento...');
+  // Forza ricaricamento da Firebase ogni volta che apri il modal
+  loadShares().then(() => {
+    showToast('');
+    _showShareModalInner(section);
+  });
 }
 
-// ── Badge nella topbar lista spesa ───────────────────────
-function updateBringBadge() {
-  // Aggiorna il tab condiviso nei tab della lista spesa
-  const tabs = document.getElementById('shop-list-tabs');
-  if (!tabs) return;
-  const existing = document.getElementById('bring-tab-btn');
-  if (existing && _sharedListData) {
-    const pending = Object.values(_sharedListData.items||{}).filter(i=>!i.checked).length;
-    existing.textContent = '👥 Condivisa' + (pending > 0 ? ' (' + pending + ')' : '');
-  }
-}
-
-// ── Modal gestione lista condivisa ───────────────────────
-function sharedListShowModal() {
-  const hasList = !!_sharedListId;
-  const members = _sharedListData?.members ? Object.values(_sharedListData.members) : [];
+function _showShareModalInner(section) {
+  const sec = SHAREABLE[section];
+  const active   = Object.entries(_myShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
+  const received = Object.entries(_receivedShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
 
   const ov = document.createElement('div');
-  ov.id = '_bring_modal';
+  ov.id = '_share_modal';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
 
   const wrap = document.createElement('div');
   wrap.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;';
 
-  wrap.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
-    + '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">👥 Lista Spesa Condivisa</div>'
-    + '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Lista unica condivisa con altri — tutti possono aggiungere e spuntare</div>';
+  // Header
+  const header = document.createElement('div');
+  header.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
+    + '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">' + sec.icon + ' Condividi ' + sec.label + '</div>'
+    + '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Condividi con altri utenti HomeBull</div>';
+  wrap.appendChild(header);
 
-  if (hasList) {
-    // Mostra codice lista da condividere
-    const codeBox = document.createElement('div');
-    codeBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:12px;';
-    codeBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">CODICE LISTA (condividilo con chi vuoi far entrare)</div>'
-      + '<div style="display:flex;align-items:center;gap:10px;">'
-      + '<div style="flex:1;font-family:monospace;font-size:13px;font-weight:700;color:var(--accent);word-break:break-all;">' + _sharedListId + '</div>'
-      + '<button id="_copy_code_btn" style="padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;">Copia</button>'
-      + '</div>';
-    wrap.appendChild(codeBox);
-
-    // Membri
-    if (members.length) {
-      const membBox = document.createElement('div');
-      membBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:12px;';
-      membBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">MEMBRI (' + members.length + ')</div>'
-        + members.map(m => '<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);">👤 ' + m + '</div>').join('');
-      wrap.appendChild(membBox);
-    }
-
-    // Bottone lascia
-    const leaveBtn = document.createElement('button');
-    leaveBtn.textContent = '🚪 Lascia lista condivisa';
-    leaveBtn.style.cssText = 'width:100%;padding:12px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;';
-    leaveBtn.onclick = sharedListLeave;
-    wrap.appendChild(leaveBtn);
-
+  // Sezione "Condivisa con"
+  const activeBox = document.createElement('div');
+  activeBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:12px;margin-bottom:12px;';
+  activeBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">CONDIVISA CON</div>';
+  if (active.length) {
+    active.forEach(s => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);';
+      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Può modificare':'👁 Solo lettura') + '</div></div>';
+      const btn = document.createElement('button');
+      btn.textContent = 'Rimuovi';
+      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;';
+      btn.onclick = () => removeShare(s.shareId);
+      row.appendChild(btn);
+      activeBox.appendChild(row);
+    });
   } else {
-    // Crea o entra
-    const createBtn = document.createElement('button');
-    createBtn.textContent = '✨ Crea nuova lista condivisa';
-    createBtn.style.cssText = 'width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:12px;';
-    createBtn.onclick = () => { ov.remove(); sharedListCreate(); };
-    wrap.appendChild(createBtn);
-
-    const sep = document.createElement('div');
-    sep.style.cssText = 'text-align:center;font-size:12px;color:var(--text3);margin-bottom:12px;';
-    sep.textContent = '— oppure entra in una lista esistente —';
-    wrap.appendChild(sep);
-
-    const joinBox = document.createElement('div');
-    joinBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:12px;';
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.placeholder = 'Incolla il codice lista (bl_...)';
-    inp.style.cssText = 'width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;';
-    const joinBtn = document.createElement('button');
-    joinBtn.textContent = 'Entra nella lista';
-    joinBtn.style.cssText = 'width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
-    joinBtn.onclick = () => {
-      const code = inp.value.trim();
-      if (!code.startsWith('bl_')) { showToast('⚠️ Codice non valido'); return; }
-      ov.remove();
-      sharedListJoin(code);
-    };
-    joinBox.appendChild(inp); joinBox.appendChild(joinBtn);
-    wrap.appendChild(joinBox);
+    activeBox.innerHTML += '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px;">Nessuna condivisione attiva</div>';
   }
+  wrap.appendChild(activeBox);
+
+  // Sezione "Ricevute da"
+  if (received.length) {
+    const recBox = document.createElement('div');
+    recBox.style.cssText = 'background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:12px;margin-bottom:12px;';
+    recBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>';
+    received.forEach(s => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;';
+      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
+        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Puoi modificare':'👁 Solo lettura') + '</div></div>';
+      if (section === 'shopping') {
+        const btn = document.createElement('button');
+        btn.textContent = 'Vedi lista';
+        btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
+        btn.onclick = () => {
+          ov.remove();
+          openSharedShopList(s.shareId, s.fromEmail);
+        };
+        row.appendChild(btn);
+      }
+      recBox.appendChild(row);
+    });
+    wrap.appendChild(recBox);
+  }
+
+  // Form aggiungi condivisione
+  const form = document.createElement('div');
+  form.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:10px;';
+  form.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>';
+
+  const inp = document.createElement('input');
+  inp.type = 'email'; inp.placeholder = 'email@esempio.com';
+  inp.style.cssText = 'width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;';
+  form.appendChild(inp);
+
+  // Bottoni permesso
+  const permRow = document.createElement('div');
+  permRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;';
+  let selPerm = 'write';
+  const bWrite = document.createElement('button');
+  bWrite.textContent = '✏️ Modifica';
+  bWrite.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:2px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
+  const bRead = document.createElement('button');
+  bRead.textContent = '👁 Lettura';
+  bRead.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;';
+
+  bWrite.onclick = () => { selPerm='write'; bWrite.style.borderWidth='2px'; bWrite.style.background='var(--accent)'; bWrite.style.color='white'; bRead.style.background='var(--surface)'; bRead.style.color='var(--text)'; bRead.style.borderWidth='1px'; };
+  bRead.onclick  = () => { selPerm='read';  bRead.style.borderWidth='2px';  bRead.style.background='var(--accent)';  bRead.style.color='white'; bWrite.style.background='var(--surface)'; bWrite.style.color='var(--text)'; bWrite.style.borderWidth='1px'; };
+
+  permRow.appendChild(bWrite); permRow.appendChild(bRead);
+  form.appendChild(permRow);
+
+  const submitBtn = document.createElement('button');
+  submitBtn.textContent = 'Condividi';
+  submitBtn.style.cssText = 'width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
+  submitBtn.onclick = () => {
+    const email = inp.value.trim();
+    if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
+    ov.remove();
+    createShare(section, email, selPerm);
+  };
+  form.appendChild(submitBtn);
+  wrap.appendChild(form);
+
+  // Bottoni footer
+  const cleanBtn = document.createElement('button');
+  cleanBtn.textContent = '🗑 Rimuovi tutte le condivisioni';
+  cleanBtn.style.cssText = 'width:100%;padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;';
+  cleanBtn.onclick = cleanupAllShares;
+  wrap.appendChild(cleanBtn);
 
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Chiudi';
@@ -10482,14 +10641,54 @@ function sharedListShowModal() {
 
   ov.appendChild(wrap);
   document.body.appendChild(ov);
-
-  // Copia codice
-  document.getElementById('_copy_code_btn')?.addEventListener('click', () => {
-    navigator.clipboard?.writeText(_sharedListId).then(() => showToast('✅ Codice copiato!'));
-  });
 }
 
-let _shopCurSharedId = null; // 'bring' se lista condivisa attiva
+// ── Apri lista spesa condivisa come tab ──────────────────
+async function openSharedShopList(shareId, fromEmail) {
+  showToast('📥 Caricamento lista...');
+  try {
+    const snap = await fbDb.ref('shared/' + shareId + '/data').get();
+    if (!snap.exists()) { showToast('⚠️ Lista non disponibile'); return; }
+    const raw = snap.val();
+    const items = [];
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      Object.values(raw).forEach(list => {
+        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
+          if (!item.deleted) items.push({ id, ...item });
+        });
+      });
+    }
+    // Prima popola i dati, POI setta l'ID e switcha tab
+    _sharedShopData[shareId] = { fromEmail, items };
+    _shopCurSharedId = shareId;
+    
+    // Vai alla Lista Spesa — ma bypassa shopOpen per non resettare _shopCurSharedId
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    document.getElementById('panel-shopping')?.style.setProperty('display', 'flex');
+    HB.currentTab = 'shopping';
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+    document.querySelector('.sidebar-item[data-tab="shopping"]')?.classList.add('active');
+    shopLoad(); // carica dati locali
+    _shopCurSharedId = shareId; // ripristina dopo shopLoad
+    shopRenderListTabs();
+    renderSharedShopTab();
+    startShopShareListener(shareId);
+    showToast('✅ Lista di ' + fromEmail.split('@')[0] + ' caricata');
+  } catch(e) { 
+    console.error('openSharedShopList error:', e);
+    showToast('⚠️ Errore: ' + (e.message||e)); 
+  }
+}
+
+// ── Sincronizza lista spesa verso Firebase (dopo ogni save) ─
+async function syncShopShare() {
+  const myShopShares = Object.entries(_myShares).filter(([k,s]) => s.section==='shopping');
+  if (!myShopShares.length) return;
+  const data = (() => { try { return JSON.parse(localStorage.getItem(SHOP_LISTS_KEY)||'{}'); } catch(e) { return {}; }})();
+  for (const [k,s] of myShopShares) {
+    try { await fbDb.ref('shared/' + (s.shareId||k) + '/data').set(data); } catch(e){}
+  }
+}
 
 
 function cloudPageOpen(){
@@ -11260,19 +11459,13 @@ function calShowAddEvent() {
               <button onclick="driveBackupNow()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Backup</button>
             </div>
           </div>
-          <div style="padding:12px 16px;border-top:1px solid var(--border);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-              <div>
-                <div style="font-size:13px;font-weight:700;">Auto backup Drive</div>
-                <div style="font-size:11px;color:var(--text3);">Backup silenzioso automatico</div>
-              </div>
-              <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
-                <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
-              </div>
+          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:700;">Auto backup (ogni 24h)</div>
+              <div style="font-size:11px;color:var(--text3);">Backup silenzioso dopo ogni sync</div>
             </div>
-            <div style="display:flex;gap:8px;" id="drive-auto-mode-row">
-              <button onclick="driveSetAutoMode('save')" id="drive-mode-save" style="flex:1;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Ad ogni modifica</button>
-              <button onclick="driveSetAutoMode('30min')" id="drive-mode-30min" style="flex:1;padding:7px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">Ogni 30 minuti</button>
+            <div onclick="driveToggleAuto()" id="drive-auto-toggle" style="width:48px;height:26px;border-radius:99px;cursor:pointer;position:relative;transition:background .2s;">
+              <div id="drive-auto-thumb" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;"></div>
             </div>
           </div>
         </div>
@@ -11376,7 +11569,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA310</div>
+            <div style="font-size:13px;color:var(--text3);">BETA293</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -11403,7 +11596,6 @@ function calShowAddEvent() {
             <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
               <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">PDF completo o per singola sezione</span></div>
               <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup JSON completo</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Drive backup automatico (ultimi 10)</span></div>
             </div>
           </div>
         </div>
@@ -11736,7 +11928,7 @@ async function drivePruneOldBackups(token) {
     const result = await search.json();
     const files = result.files || [];
     // Elimina quelli oltre il 5°
-    const toDelete = files.slice(10);
+    const toDelete = files.slice(5);
     for (const f of toDelete) {
       await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, {
         method: 'DELETE', headers: { Authorization: 'Bearer ' + token }
@@ -11749,40 +11941,17 @@ async function drivePruneOldBackups(token) {
 
 // ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
 async function driveAutoBackup() {
+  // Auto backup solo se attivato dall'utente
   if (localStorage.getItem('hb_drive_auto') !== '1') return;
-  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
   const last = localStorage.getItem('hb_drive_backup_ts');
-  if (last && mode === '30min') {
+  if (last) {
     const diff = Date.now() - new Date(last).getTime();
-    if (diff < 30 * 60 * 1000) return;
+    if (diff < 24 * 60 * 60 * 1000) return; // meno di 24h fa
   }
-  // Se non abbiamo il token, prova a ottenerlo silenziosamente
-  if (!_driveBackupToken) {
-    console.log('Drive auto: token non disponibile, skip');
-    return;
-  }
-  console.log('🔄 Auto-backup Drive (' + mode + ')...');
-  await driveBackupNow(true);
-}
-
-// Avvia timer backup ogni 30 minuti
-function driveStartAutoTimer() {
-  clearInterval(window._driveAutoTimer);
-  if (localStorage.getItem('hb_drive_auto') !== '1') return;
-  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
-  if (mode === '30min') {
-    window._driveAutoTimer = setInterval(() => driveAutoBackup(), 30 * 60 * 1000);
-    console.log('⏱ Drive auto-backup ogni 30min attivo');
-  }
-}
-
-// Chiama dopo ogni salvataggio significativo
-function driveAutoBackupOnSave() {
-  if (localStorage.getItem('hb_drive_auto') !== '1') return;
-  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
-  if (mode === 'save') {
-    clearTimeout(window._driveBackupDebounce);
-    window._driveBackupDebounce = setTimeout(() => driveAutoBackup(), 5000);
+  // Esegui solo se token già disponibile (niente popup OAuth automatici)
+  if (_driveBackupToken) {
+    console.log('🔄 Auto-backup Drive silenzioso...');
+    await driveBackupNow(true);
   }
 }
 
@@ -11884,29 +12053,13 @@ function driveUpdateBackupUI() {
   const thm = document.getElementById('drive-auto-thumb');
   if (tog) tog.style.background = auto ? '#10b981' : '#6b7280';
   if (thm) thm.style.left = auto ? '25px' : '3px';
-  // Aggiorna bottoni modo
-  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
-  const modeRow = document.getElementById('drive-auto-mode-row');
-  if (modeRow) modeRow.style.display = auto ? 'flex' : 'none';
-  const btnSave = document.getElementById('drive-mode-save');
-  const btn30 = document.getElementById('drive-mode-30min');
-  if (btnSave) { btnSave.style.background = mode==='save' ? 'var(--accent)' : 'var(--surface)'; btnSave.style.color = mode==='save' ? 'white' : 'var(--text)'; btnSave.style.border = mode==='save' ? 'none' : '1px solid var(--border)'; }
-  if (btn30)  { btn30.style.background  = mode==='30min'? 'var(--accent)' : 'var(--surface)'; btn30.style.color  = mode==='30min'? 'white' : 'var(--text)'; btn30.style.border = mode==='30min'? 'none' : '1px solid var(--border)'; }
 }
 
 function driveToggleAuto() {
   const auto = localStorage.getItem('hb_drive_auto') === '1';
   localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
   driveUpdateBackupUI();
-  driveStartAutoTimer();
   showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
-}
-
-function driveSetAutoMode(mode) {
-  localStorage.setItem('hb_drive_auto_mode', mode);
-  driveUpdateBackupUI();
-  driveStartAutoTimer();
-  showToast(mode === 'save' ? '✅ Backup ad ogni modifica' : '✅ Backup ogni 30 minuti');
 }
 
 
