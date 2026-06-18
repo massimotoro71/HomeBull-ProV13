@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA319</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA320</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA319</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA320</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA319</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA320</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA319',
+  version: 'BETA320',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3677,7 +3677,7 @@ function unlockApp() {
       updateHomeStats();
     }).catch(()=>{});
     fbStartRealtime();
-    setTimeout(driveStartAutoTimer, 2000);
+    setTimeout(driveTokenSilentRefresh, 3000); // rinnova token Drive in background
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
@@ -4367,20 +4367,35 @@ function pwRenderCats(q='') {
   // Se _pwItems è vuoto prova a ricaricare
   if (!_pwItems.length) pwLoad();
 
-  // Se c'è una query — cerca in TUTTE le password (come la home)
+  // Se c'è una query — cerca in password E categorie
   if (q) {
     const ql = q.toLowerCase();
+    // Prima mostra categorie che matchano
+    const catMatches = _pwCats.filter(cat => cat.name.toLowerCase().includes(ql));
     const matches = _pwItems.filter(i => !i.deleted && (
       (i.title||'').toLowerCase().includes(ql) ||
       (i.username||'').toLowerCase().includes(ql) ||
       (i.url||'').toLowerCase().includes(ql) ||
       (i.notes||'').toLowerCase().includes(ql)
     ));
-    if (!matches.length) {
+    if (!matches.length && !catMatches.length) {
       grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessun risultato per "' + q + '"</div>';
       return;
     }
     grid.innerHTML = '';
+    // Mostra prima le categorie trovate
+    catMatches.forEach(cat => {
+      const count = _pwItems.filter(i => i.categoryId === cat.id && !i.deleted).length;
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.3);cursor:pointer;margin-bottom:8px;';
+      div.onclick = () => pwShowItems(cat.id, cat.name);
+      div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:var(--accent)20;border:1px solid var(--accent)40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📁</div>'
+        + '<div style="flex:1;min-width:0;">'
+        + '<div style="font-size:15px;font-weight:800;color:var(--text);">' + cat.name + '</div>'
+        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">📂 Categoria · ' + count + ' password</div>'
+        + '</div>';
+      grid.appendChild(div);
+    });
     matches.forEach(item => {
       const cat = _pwCats.find(c => c.id === item.categoryId);
       const s = getStrength(item.password||'');
@@ -8105,25 +8120,24 @@ let _backHandlerActive = false;
 // Avvia subito il buffer history E il listener — non aspettare unlock
 (function earlyBackHandler() {
   function fillHistory() {
-    // Riempie il buffer con 30 stati
-    for (let i = 0; i < 30; i++) history.pushState({ hb: 'app' }, '');
+    for (let i = 0; i < 50; i++) history.pushState({ hb: 'app', i }, '');
   }
 
   history.replaceState({ hb: 'root' }, '');
   fillHistory();
 
   window.addEventListener('popstate', (e) => {
-    // Rimetti subito uno stato per non svuotare il buffer
-    history.pushState({ hb: 'app' }, '');
+    fillHistory(); // riempie subito dopo ogni back
     if (typeof handleBackPress === 'function') handleBackPress();
   });
 
-  // Ricarica il buffer quando l'app torna in primo piano
+  // Ricarica sempre quando torna in primo piano
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') fillHistory();
   });
-  window.addEventListener('pageshow', () => fillHistory());
+  window.addEventListener('pageshow', (e) => { fillHistory(); });
   window.addEventListener('focus', () => fillHistory());
+  window.addEventListener('resume', () => fillHistory());
 })();
 
 function initBackHandler() {
@@ -11586,7 +11600,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA319</div>
+            <div style="font-size:13px;color:var(--text3);">BETA320</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -11852,7 +11866,7 @@ let _driveToken = null;
 let _driveBackupToken = null;
 let _driveBackupFileId = null; // ID file backup su Drive
 
-async function driveGetBackupToken() {
+async function driveGetBackupToken(silent=false) {
   await new Promise((resolve, reject) => {
     if (!window.google?.accounts) {
       const s = document.createElement('script');
@@ -11866,13 +11880,34 @@ async function driveGetBackupToken() {
       client_id: GDRIVE_CLIENT_ID,
       scope: GDRIVE_BACKUP_SCOPE,
       callback: (resp) => {
-        if (resp.error) { reject(resp.error); return; }
+        if (resp.error) { 
+          if (silent) { resolve(null); return; }
+          reject(resp.error); return; 
+        }
         _driveBackupToken = resp.access_token;
+        // Rinnova automaticamente prima della scadenza (55 min)
+        clearTimeout(window._driveTokenTimer);
+        window._driveTokenTimer = setTimeout(() => {
+          driveGetBackupToken(true).catch(()=>{});
+        }, 55 * 60 * 1000);
         resolve(resp.access_token);
       }
     });
-    client.requestAccessToken();
+    // Silent = no popup, prova rinnovo automatico
+    client.requestAccessToken(silent ? { prompt: '' } : {});
   });
+}
+
+// Prova rinnovo silenzioso del token all'avvio
+async function driveTokenSilentRefresh() {
+  if (!localStorage.getItem('hb_drive_connected')) return;
+  try {
+    await driveGetBackupToken(true);
+    if (_driveBackupToken) {
+      console.log('✅ Drive token rinnovato silenziosamente');
+      driveStartAutoTimer();
+    }
+  } catch(e) { console.log('Drive silent refresh fallito — richiede login manuale'); }
 }
 
 async function driveBackupNow(silent=false) {
