@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA318</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA319</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA318</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA319</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA318</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA319</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2278,7 +2278,7 @@ function cardsSearch(q) {
         <div style="padding:12px 14px 8px;flex-shrink:0;">
           <div class="pw-search-bar">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            <input id="pw-cat-search" type="text" placeholder="Cerca password o categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA318',
+  version: 'BETA319',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4327,6 +4327,7 @@ function pwLoad() {
 function pwSave() {
   localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
   localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
+  driveAutoBackupOnSave();
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -4363,6 +4364,9 @@ function pwShowCats(q='') {
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
   
+  // Se _pwItems è vuoto prova a ricaricare
+  if (!_pwItems.length) pwLoad();
+
   // Se c'è una query — cerca in TUTTE le password (come la home)
   if (q) {
     const ql = q.toLowerCase();
@@ -11582,7 +11586,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA318</div>
+            <div style="font-size:13px;color:var(--text3);">BETA319</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
