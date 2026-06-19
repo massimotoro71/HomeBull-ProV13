@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA321</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA323</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA321</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA323</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,8 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA321</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA323</span>
+          <span id="sync-indicator" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2481,7 +2482,7 @@ function cardsSearch(q) {
             <div style="display:flex;gap:8px;align-items:center;">
               <div class="pw-search-bar" style="flex:1;">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;"><select onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList()" style="background:none;border:none;outline:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit;"><option value="date">📅</option><option value="title">🔤</option><option value="modified">✏️</option></select>
               </div>
               <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3265,7 +3266,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA321',
+  version: 'BETA323',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4364,8 +4365,16 @@ function pwShowCats(q='') {
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
   
-  // Se _pwItems è vuoto prova a ricaricare
-  if (!_pwItems.length) pwLoad();
+  // Se dati vuoti — ricarica e riprova
+  if (!_pwItems.length || !_pwCats.length) {
+    pwLoad();
+    // Se ancora vuoto dopo load, esci — i dati sono cifrati e non ancora pronti
+    if (!_pwItems.length) {
+      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">⏳ Caricamento dati...</div>';
+      setTimeout(() => pwRenderCats(q), 800);
+      return;
+    }
+  }
 
   // Se c'è una query — cerca in password E categorie
   if (q) {
@@ -5597,9 +5606,22 @@ function noteShowList(q='') {
 function noteRenderList(q='') {
   const list = document.getElementById('note-list');
   if (!list) return;
-  // Ricarica se vuoto
-  if (!_notes.length) noteLoad();
-  let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  if (!_notes.length) {
+    noteLoad();
+    if (!_notes.length) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">⏳ Caricamento...</div>';
+      setTimeout(() => noteRenderList(q), 800);
+      return;
+    }
+  }
+  let notes = [..._notes].filter(n=>!n.deleted);
+  const noteSort = localStorage.getItem('hb_note_sort') || 'date';
+  notes.sort((a,b) => {
+    if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'', 'it');
+    if (noteSort === 'modified') return new Date(b.updatedAt||0) - new Date(a.updatedAt||0);
+    return new Date(b.createdAt||0) - new Date(a.createdAt||0);
+  });
+  notes = notes.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   if (q) notes = notes.filter(n =>
     (n.title+n.content).toLowerCase().includes(q.toLowerCase())
   );
@@ -8321,8 +8343,28 @@ function runSearch(q) {
   const ql = q.toLowerCase();
   const results = [];
 
+  // Ricarica dati se vuoti (dati cifrati non ancora decodificati)
+  if (!_pwItems.length) pwLoad();
+  if (!_notes.length) noteLoad();
+  if (!_otpAccounts.length && typeof otpLoad === 'function') otpLoad();
+  if (!_wifiNets.length && typeof wifiLoad === 'function') wifiLoad();
+  if (!_cards.length && typeof cardsLoad === 'function') cardsLoad();
+  if (!_docs2.length && typeof docsLoad === 'function') docsLoad();
+
   // ── Password ──────────────────────────────────────────
   if (typeof _pwItems !== 'undefined') {
+    // Cerca anche nelle categorie
+    _pwCats?.forEach(cat => {
+      if (cat.name.toLowerCase().includes(ql)) {
+        const count = _pwItems.filter(i => i.categoryId === cat.id && !i.deleted).length;
+        results.push({
+          icon: '📁', title: cat.name,
+          sub: count + ' password',
+          badge: '📂 Categoria',
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowItems(cat.id, cat.name), 300); }
+        });
+      }
+    });
     _pwItems.forEach(item => {
       if ([item.title, item.username, item.url, item.notes]
           .some(f => f && f.toLowerCase().includes(ql))) {
@@ -8407,6 +8449,37 @@ function runSearch(q) {
       }
     });
   }
+
+  // ── Documenti ─────────────────────────────────────────
+  if (typeof _docs2 !== 'undefined') {
+    _docs2.filter(d => !d.deleted).forEach(doc => {
+      const fields = [doc.label, doc.nome, doc.cognome, doc.number, doc.notes];
+      if (fields.some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📄', title: doc.label || 'Documento',
+          sub: [doc.nome, doc.cognome].filter(Boolean).join(' ') || doc.number || '',
+          badge: '📄 Documenti',
+          action: () => switchTab('documents')
+        });
+      }
+    });
+  }
+
+  // ── Finanze ───────────────────────────────────────────
+  if (typeof _financeItems !== 'undefined') {
+    _financeItems.filter(f => !f.deleted).forEach(fin => {
+      if ([fin.name, fin.iban, fin.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '💰', title: fin.name || 'Conto',
+          sub: fin.iban ? 'IBAN: ' + fin.iban.slice(-8) : 'Finanze',
+          badge: '💰 Finanze',
+          action: () => switchTab('finance')
+        });
+      }
+    });
+  }
+
+  // ── Categorie password (se non già trovate) ───────────
 
   if (!results.length) {
     container.innerHTML = '<div class="search-empty">Nessun risultato per "<strong>' + q + '</strong>"</div>';
@@ -10718,6 +10791,26 @@ async function syncShopShare() {
 }
 
 
+
+// ── Indicatore sync ──────────────────────────────────────
+function updateSyncIndicator(status) {
+  const el = document.getElementById('sync-indicator');
+  if (!el) return;
+  const now = new Date();
+  const time = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+  if (status === 'ok') {
+    el.innerHTML = '✅ Sincronizzato alle ' + time;
+    el.style.color = 'var(--text3)';
+    _lastSyncTime = now;
+  } else if (status === 'syncing') {
+    el.innerHTML = '🔄 Sincronizzazione...';
+    el.style.color = 'var(--accent)';
+  } else if (status === 'error') {
+    el.innerHTML = '⚠️ Sync non riuscita';
+    el.style.color = '#ef4444';
+  }
+}
+
 function cloudPageOpen(){
   driveUpdateBackupUI();
   gcalUpdateUI();
@@ -11602,7 +11695,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA321</div>
+            <div style="font-size:13px;color:var(--text3);">BETA323</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
