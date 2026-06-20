@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA323</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA324</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA323</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA324</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA323</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA324</span>
           <span id="sync-indicator" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
@@ -2421,13 +2421,22 @@ function cardsSearch(q) {
             <!-- Foto -->
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
                 <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  📸 Fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
+                  🖼️ Galleria fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
                 </label>
                 <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  📸 Retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
+                  🖼️ Galleria retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
                 </label>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:none;background:var(--accent);cursor:pointer;font-size:13px;font-weight:700;color:white;">
+                  📸 Scatta fronte <input type="file" accept="image/*" capture="environment" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
+                </label>
+                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:none;background:var(--accent);cursor:pointer;font-size:13px;font-weight:700;color:white;">
+                  📸 Scatta retro <input type="file" accept="image/*" capture="environment" onchange="docsAddPhoto(this,'retro')" style="display:none;">
+                </label>
+              </div>
               </div>
               <div id="dnew_photos_preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
             </div>
@@ -3266,7 +3275,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA323',
+  version: 'BETA324',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -11695,7 +11704,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA323</div>
+            <div style="font-size:13px;color:var(--text3);">BETA324</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
