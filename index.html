@@ -2034,7 +2034,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA326</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA327</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2136,7 +2136,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA326</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA327</div>
         </div>
       </div>
     </div>
@@ -2260,7 +2260,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA326</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA327</span>
           <span id="sync-indicator" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
@@ -3291,7 +3291,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA326',
+  version: 'BETA327',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3705,6 +3705,7 @@ function unlockApp() {
     fbStartRealtime();
     setTimeout(driveTokenSilentRefresh, 3000); // rinnova token Drive in background
     setTimeout(requestNotificationPermission, 5000);
+    applyAllSectionThemes();
     setTimeout(checkExpiryAndNotify, 8000);
     // Carica condivisioni dopo sync
     setTimeout(() => {
@@ -3742,12 +3743,12 @@ function logout() {
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: ['customize'] },
-  passwords: { title: 'Password',    sub: '', actions: ['search'] },
-  documents: { title: 'Documenti',   sub: '', actions: ['add'] },
-  notes:     { title: 'Note',        sub: '', actions: ['search'] },
+  passwords: { title: 'Password',    sub: '', actions: ['search','theme'] },
+  documents: { title: 'Documenti',   sub: '', actions: ['add','theme'] },
+  notes:     { title: 'Note',        sub: '', actions: ['search','theme'] },
   calendar:  { title: 'Calendario',  sub: '', actions: ['add'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
-  cards:     { title: 'Carte',       sub: '', actions: [] },
+  cards:     { title: 'Carte',       sub: '', actions: ['theme'] },
   wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
   finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
   server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
@@ -3780,6 +3781,7 @@ function switchTab(tab) {
 
   // Update topbar
   HB.currentTab = tab;  // ← deve essere prima di renderTopbarActions
+  applySectionTheme(tab); // applica tema sezione
   const cfg = TAB_CONFIG[tab] || { title: tab, sub: '', actions: [] };
   document.getElementById('topbar-title').textContent = cfg.title;
   document.getElementById('topbar-sub').textContent = cfg.sub;
@@ -8170,33 +8172,37 @@ let _backHandlerActive = false;
 
 // Avvia subito il buffer history E il listener — non aspettare unlock
 (function earlyBackHandler() {
-  // Strategia: mantieni sempre almeno 10 stati nel buffer
-  // Ricarica SINCRONO prima che il browser possa processare il popstate
+  // Strategia: mantieni SEMPRE almeno 50 stati nel buffer
+  // e ricaricali aggressivamente
   function ensureBuffer() {
-    const needed = Math.max(0, 10 - history.length);
-    for (let i = 0; i < needed + 5; i++) {
-      history.pushState({ hb: 'app', t: Date.now() }, '');
-    }
+    try {
+      if (history.length < 10) {
+        for (let i = 0; i < 50; i++) history.pushState({ hb: 'app', i }, '');
+      }
+    } catch(e) {}
   }
 
-  // Carica buffer iniziale
-  ensureBuffer();
+  // Riempimento iniziale
+  try {
+    history.replaceState({ hb: 'root' }, '');
+    for (let i = 0; i < 50; i++) history.pushState({ hb: 'app', i }, '');
+  } catch(e) {}
 
-  window.addEventListener('popstate', function(e) {
-    // Ricarica buffer IMMEDIATAMENTE prima di tutto
-    ensureBuffer();
-    // Piccolo delay per assicurarsi che il buffer sia stato aggiunto
-    setTimeout(() => {
-      if (typeof handleBackPress === 'function') handleBackPress();
-    }, 0);
+  window.addEventListener('popstate', (e) => {
+    // Riempi subito dopo ogni back
+    setTimeout(ensureBuffer, 0);
+    if (typeof handleBackPress === 'function') handleBackPress();
   });
 
-  // Ricarica buffer quando app torna in foreground
+  // Riempi in tutti i casi possibili
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') ensureBuffer();
   });
-  window.addEventListener('pageshow', () => ensureBuffer());
-  window.addEventListener('focus', () => ensureBuffer());
+  window.addEventListener('pageshow', ensureBuffer);
+  window.addEventListener('focus', ensureBuffer);
+
+  // Safety net ogni 10 secondi
+  setInterval(ensureBuffer, 10000);
 })();
 
 function initBackHandler() {
@@ -10894,6 +10900,37 @@ function checkExpiryAndNotify() {
   });
 }
 
+
+// ── Tema per sezione ──────────────────────────────────────
+const _sectionThemes = JSON.parse(localStorage.getItem('hb_section_themes') || '{}');
+
+function toggleSectionTheme() {
+  const tab = HB.currentTab;
+  const current = _sectionThemes[tab] || 'auto';
+  const next = current === 'auto' ? 'dark' : current === 'dark' ? 'light' : 'auto';
+  _sectionThemes[tab] = next;
+  localStorage.setItem('hb_section_themes', JSON.stringify(_sectionThemes));
+  applySectionTheme(tab);
+  const icons = { auto: '🎨', dark: '🌙', light: '☀️' };
+  showToast(icons[next] + ' Tema sezione: ' + next);
+  // Aggiorna icona bottone
+  const btn = document.getElementById('section-theme-btn');
+  if (btn) btn.textContent = icons[next];
+}
+
+function applySectionTheme(tab) {
+  const theme = _sectionThemes[tab];
+  const panel = document.getElementById('panel-' + tab);
+  if (!panel) return;
+  panel.removeAttribute('data-theme');
+  if (theme === 'dark') panel.setAttribute('data-theme', 'dark');
+  else if (theme === 'light') panel.setAttribute('data-theme', 'light');
+}
+
+function applyAllSectionThemes() {
+  Object.keys(_sectionThemes).forEach(tab => applySectionTheme(tab));
+}
+
 function cloudPageOpen(){
   driveUpdateBackupUI();
   gcalUpdateUI();
@@ -11779,7 +11816,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA326</div>
+            <div style="font-size:13px;color:var(--text3);">BETA327</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -12073,7 +12110,8 @@ async function driveGetBackupToken(silent=false) {
       }
     });
     // Silent = no popup, prova rinnovo automatico
-    client.requestAccessToken(silent ? { prompt: '' } : {});
+    const hint = localStorage.getItem('hb_drive_hint') || '';
+    client.requestAccessToken(silent ? { prompt: '', login_hint: hint } : {});
   });
 }
 
