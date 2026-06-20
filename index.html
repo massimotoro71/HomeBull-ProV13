@@ -1874,6 +1874,11 @@ html, body {
     font-size: 11px !important;
   }
 }
+
+/* ── Tema per sezione ─────────────────────────────────── */
+[data-section-theme="dark"] .tab-panel { background: #000 !important; }
+[data-section-theme="light"] .tab-panel { background: #fff !important; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -2018,7 +2023,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA324</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA325</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2125,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA324</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA325</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2249,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA324</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA325</span>
           <span id="sync-indicator" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
@@ -3275,7 +3280,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA324',
+  version: 'BETA325',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3688,6 +3693,8 @@ function unlockApp() {
     }).catch(()=>{});
     fbStartRealtime();
     setTimeout(driveTokenSilentRefresh, 3000); // rinnova token Drive in background
+    setTimeout(requestNotificationPermission, 5000);
+    setTimeout(checkExpiryAndNotify, 8000);
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
@@ -8152,25 +8159,33 @@ let _backHandlerActive = false;
 
 // Avvia subito il buffer history E il listener — non aspettare unlock
 (function earlyBackHandler() {
-  function fillHistory() {
-    for (let i = 0; i < 50; i++) history.pushState({ hb: 'app', i }, '');
+  // Strategia: mantieni sempre almeno 10 stati nel buffer
+  // Ricarica SINCRONO prima che il browser possa processare il popstate
+  function ensureBuffer() {
+    const needed = Math.max(0, 10 - history.length);
+    for (let i = 0; i < needed + 5; i++) {
+      history.pushState({ hb: 'app', t: Date.now() }, '');
+    }
   }
 
-  history.replaceState({ hb: 'root' }, '');
-  fillHistory();
+  // Carica buffer iniziale
+  ensureBuffer();
 
-  window.addEventListener('popstate', (e) => {
-    fillHistory(); // riempie subito dopo ogni back
-    if (typeof handleBackPress === 'function') handleBackPress();
+  window.addEventListener('popstate', function(e) {
+    // Ricarica buffer IMMEDIATAMENTE prima di tutto
+    ensureBuffer();
+    // Piccolo delay per assicurarsi che il buffer sia stato aggiunto
+    setTimeout(() => {
+      if (typeof handleBackPress === 'function') handleBackPress();
+    }, 0);
   });
 
-  // Ricarica sempre quando torna in primo piano
+  // Ricarica buffer quando app torna in foreground
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') fillHistory();
+    if (document.visibilityState === 'visible') ensureBuffer();
   });
-  window.addEventListener('pageshow', (e) => { fillHistory(); });
-  window.addEventListener('focus', () => fillHistory());
-  window.addEventListener('resume', () => fillHistory());
+  window.addEventListener('pageshow', () => ensureBuffer());
+  window.addEventListener('focus', () => ensureBuffer());
 })();
 
 function initBackHandler() {
@@ -10820,6 +10835,54 @@ function updateSyncIndicator(status) {
   }
 }
 
+
+// ── Notifiche push scadenze ───────────────────────────────
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') return;
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') showToast('🔔 Notifiche abilitate!');
+}
+
+function sendExpiryNotification(title, body) {
+  if (Notification.permission !== 'granted') return;
+  new Notification('HomeBull — ' + title, { 
+    body, 
+    icon: './icon-192.png',
+    badge: './icon-192.png'
+  });
+}
+
+// Controlla scadenze e invia notifiche
+function checkExpiryAndNotify() {
+  if (Notification.permission !== 'granted') return;
+  const today = new Date();
+  const soon = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+  
+  // Controlla carte
+  _cards.filter(c=>!c.deleted && c.exp).forEach(card => {
+    try {
+      const [mm,yy] = (card.exp||'').split('/');
+      const exp = new Date(2000+parseInt(yy), parseInt(mm)-1, 1);
+      if (exp <= soon && exp >= today) {
+        sendExpiryNotification('Carta in scadenza', 
+          (card.holder||'Carta') + ' scade il ' + card.exp);
+      }
+    } catch(e) {}
+  });
+  
+  // Controlla documenti
+  _docs2.filter(d=>!d.deleted && d.expiry).forEach(doc => {
+    try {
+      const exp = new Date(doc.expiry);
+      if (exp <= soon && exp >= today) {
+        sendExpiryNotification('Documento in scadenza',
+          (doc.label||'Documento') + ' di ' + (doc.nome||'') + ' scade il ' + doc.expiry);
+      }
+    } catch(e) {}
+  });
+}
+
 function cloudPageOpen(){
   driveUpdateBackupUI();
   gcalUpdateUI();
@@ -11580,7 +11643,8 @@ function calShowAddEvent() {
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
           <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</div>
+              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</span><span id="drive-conn-status" style="font-size:11px;color:var(--text3);">Non collegato</span></div>
+              <div style="font-size:11px;color:var(--text3);" id="drive-conn-status">Non connesso</div>
               <div style="font-size:11px;color:var(--text3);" id="drive-backup-ts">Nessun backup effettuato</div>
             </div>
             <div style="display:flex;gap:8px;">
@@ -11704,7 +11768,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA324</div>
+            <div style="font-size:13px;color:var(--text3);">BETA325</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -12006,12 +12070,20 @@ async function driveGetBackupToken(silent=false) {
 async function driveTokenSilentRefresh() {
   if (!localStorage.getItem('hb_drive_connected')) return;
   try {
-    await driveGetBackupToken(true);
-    if (_driveBackupToken) {
+    // Prima prova rinnovo silenzioso
+    const token = await Promise.race([
+      driveGetBackupToken(true),
+      new Promise(r => setTimeout(() => r(null), 5000)) // timeout 5s
+    ]);
+    if (token) {
       console.log('✅ Drive token rinnovato silenziosamente');
       driveStartAutoTimer();
+    } else {
+      console.log('Drive silent refresh: timeout, richiede azione utente');
     }
-  } catch(e) { console.log('Drive silent refresh fallito — richiede login manuale'); }
+  } catch(e) { 
+    console.log('Drive silent refresh fallito:', e.message);
+  }
 }
 
 async function driveBackupNow(silent=false) {
