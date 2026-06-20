@@ -1322,17 +1322,6 @@ html, body {
     padding-right: 14px;
   }
 
-  /* ── Note — griglia 2 colonne su desktop ─────────────── */
-  #note-list {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    align-content: start;
-  }
-  #note-list .note-card {
-    margin-bottom: 0 !important;
-  }
-
   /* ── Cards ────────────────────────────────────────────── */
   .pw-cat-tile,
   .note-card,
@@ -1885,11 +1874,6 @@ html, body {
     font-size: 11px !important;
   }
 }
-
-/* ── Tema per sezione ─────────────────────────────────── */
-[data-section-theme="dark"] .tab-panel { background: #000 !important; }
-[data-section-theme="light"] .tab-panel { background: #fff !important; }
-
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -2034,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA327</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA328</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2136,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA327</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA328</div>
         </div>
       </div>
     </div>
@@ -2260,8 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA327</span>
-          <span id="sync-indicator" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA328</span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2295,7 +2278,7 @@ function cardsSearch(q) {
         <div style="padding:12px 14px 8px;flex-shrink:0;">
           <div class="pw-search-bar">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input id="pw-cat-search" type="text" placeholder="Cerca password o categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
           </div>
         </div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -2437,22 +2420,13 @@ function cardsSearch(q) {
             <!-- Foto -->
             <div style="margin-bottom:14px;">
               <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                 <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  🖼️ Galleria fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
+                  📸 Fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
                 </label>
                 <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  🖼️ Galleria retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
+                  📸 Retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
                 </label>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:none;background:var(--accent);cursor:pointer;font-size:13px;font-weight:700;color:white;">
-                  📸 Scatta fronte <input type="file" accept="image/*" capture="environment" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
-                </label>
-                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:none;background:var(--accent);cursor:pointer;font-size:13px;font-weight:700;color:white;">
-                  📸 Scatta retro <input type="file" accept="image/*" capture="environment" onchange="docsAddPhoto(this,'retro')" style="display:none;">
-                </label>
-              </div>
               </div>
               <div id="dnew_photos_preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
             </div>
@@ -2507,7 +2481,7 @@ function cardsSearch(q) {
             <div style="display:flex;gap:8px;align-items:center;">
               <div class="pw-search-bar" style="flex:1;">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;"><select onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList()" style="background:none;border:none;outline:none;font-size:12px;color:var(--text3);cursor:pointer;font-family:inherit;"><option value="date">📅</option><option value="title">🔤</option><option value="modified">✏️</option></select>
+                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
               <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3291,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA327',
+  version: 'BETA328',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3698,15 +3672,9 @@ function unlockApp() {
   // Inizializza cache cifrata PRIMA di tutto
   initLocalCache().then(() => {
     updateHomeStats();
-    // Carica sempre dal cloud all'avvio
-    fbSyncLoad().then(() => {
-      updateHomeStats();
-    }).catch(()=>{});
+    fbSyncLoad().catch(()=>{});
     fbStartRealtime();
-    setTimeout(driveTokenSilentRefresh, 3000); // rinnova token Drive in background
-    setTimeout(requestNotificationPermission, 5000);
-    applyAllSectionThemes();
-    setTimeout(checkExpiryAndNotify, 8000);
+    setTimeout(driveStartAutoTimer, 2000);
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
@@ -3743,17 +3711,17 @@ function logout() {
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: ['customize'] },
-  passwords: { title: 'Password',    sub: '', actions: ['search','theme'] },
-  documents: { title: 'Documenti',   sub: '', actions: ['add','theme'] },
-  notes:     { title: 'Note',        sub: '', actions: ['search','theme'] },
-  calendar:  { title: 'Calendario',  sub: '', actions: ['add'] },
+  passwords: { title: 'Password',    sub: '', actions: ['search'] },
+  documents: { title: 'Documenti',   sub: '', actions: ['add'] },
+  notes:     { title: 'Note',        sub: '', actions: ['search'] },
+  calendar:  { title: 'Calendario',  sub: '', actions: ['add','share'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
-  cards:     { title: 'Carte',       sub: '', actions: ['theme'] },
+  cards:     { title: 'Carte',       sub: '', actions: [] },
   wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
   finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
   server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
-  shopping:  { title: 'Lista Spesa', sub: '', actions: [] },
+  shopping:  { title: 'Lista Spesa', sub: '', actions: ['share'] },
 };
 
 function switchTab(tab) {
@@ -3781,7 +3749,6 @@ function switchTab(tab) {
 
   // Update topbar
   HB.currentTab = tab;  // ← deve essere prima di renderTopbarActions
-  applySectionTheme(tab); // applica tema sezione
   const cfg = TAB_CONFIG[tab] || { title: tab, sub: '', actions: [] };
   document.getElementById('topbar-title').textContent = cfg.title;
   document.getElementById('topbar-sub').textContent = cfg.sub;
@@ -3945,6 +3912,15 @@ function renderTopbarActions(actions) {
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
+  }
+  if (actions.includes('share')) {
+    const shareBtn = document.createElement('div');
+    shareBtn.className = 'topbar-btn';
+    shareBtn.title = 'Condividi';
+    shareBtn.innerHTML = '👥';
+    shareBtn.style.fontSize = '18px';
+    shareBtn.onclick = () => showShareModal(HB.currentTab);
+    container.appendChild(shareBtn);
   }
 }
 
@@ -4182,7 +4158,7 @@ function updateHomeStats() {
 
   // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
-  const docsToCheck = (_docs2?.length ? _docs2 : (() => { try { const _r = localStorage.getItem('hb13_docs2'); return _r && !_r.startsWith('hb13enc:') ? JSON.parse(_r) : []; } catch(e) { return []; } })())
+  const docsToCheck = (_docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]'))
     .filter(d => !d.deleted);
   docsToCheck.forEach(doc => {
     if (!doc.expiry) return;
@@ -4197,7 +4173,7 @@ function updateHomeStats() {
   });
 
   // 2. Carte in scadenza
-  const cardsToCheck = (_cards?.length ? _cards : (() => { try { const _r = localStorage.getItem('hb13_cards'); return _r && !_r.startsWith('hb13enc:') ? JSON.parse(_r) : []; } catch(e) { return []; } })())
+  const cardsToCheck = (_cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]'))
     .filter(c => !c.deleted);
   cardsToCheck.forEach(card => {
     if (!card.exp) return;
@@ -4357,7 +4333,6 @@ function pwLoad() {
 function pwSave() {
   localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
   localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
-  driveAutoBackupOnSave();
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -4394,46 +4369,20 @@ function pwShowCats(q='') {
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
   
-  // Se dati vuoti — ricarica e riprova
-  if (!_pwItems.length || !_pwCats.length) {
-    pwLoad();
-    // Se ancora vuoto dopo load, esci — i dati sono cifrati e non ancora pronti
-    if (!_pwItems.length) {
-      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">⏳ Caricamento dati...</div>';
-      setTimeout(() => pwRenderCats(q), 800);
-      return;
-    }
-  }
-
-  // Se c'è una query — cerca in password E categorie
+  // Se c'è una query — cerca in TUTTE le password (come la home)
   if (q) {
     const ql = q.toLowerCase();
-    // Prima mostra categorie che matchano
-    const catMatches = _pwCats.filter(cat => cat.name.toLowerCase().includes(ql));
     const matches = _pwItems.filter(i => !i.deleted && (
       (i.title||'').toLowerCase().includes(ql) ||
       (i.username||'').toLowerCase().includes(ql) ||
       (i.url||'').toLowerCase().includes(ql) ||
       (i.notes||'').toLowerCase().includes(ql)
     ));
-    if (!matches.length && !catMatches.length) {
+    if (!matches.length) {
       grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessun risultato per "' + q + '"</div>';
       return;
     }
     grid.innerHTML = '';
-    // Mostra prima le categorie trovate
-    catMatches.forEach(cat => {
-      const count = _pwItems.filter(i => i.categoryId === cat.id && !i.deleted).length;
-      const div = document.createElement('div');
-      div.style.cssText = 'display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.3);cursor:pointer;margin-bottom:8px;';
-      div.onclick = () => pwShowItems(cat.id, cat.name);
-      div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:var(--accent)20;border:1px solid var(--accent)40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📁</div>'
-        + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-size:15px;font-weight:800;color:var(--text);">' + cat.name + '</div>'
-        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">📂 Categoria · ' + count + ' password</div>'
-        + '</div>';
-      grid.appendChild(div);
-    });
     matches.forEach(item => {
       const cat = _pwCats.find(c => c.id === item.categoryId);
       const s = getStrength(item.password||'');
@@ -5195,20 +5144,24 @@ const _iconCache = {};
 
 async function aiGetCatIcon(catName) {
   if (_iconCache[catName]) return _iconCache[catName];
-  // Mappa emoji locale — no API call
-  const map = {
-    'social':'📱','email':'📧','mail':'📧','banca':'🏦','bank':'🏦',
-    'lavoro':'💼','work':'💼','casa':'🏠','home':'🏠','shop':'🛒',
-    'acquisti':'🛒','giochi':'🎮','game':'🎮','viaggi':'✈️','travel':'✈️',
-    'salute':'🏥','health':'🏥','scuola':'🎓','school':'🎓',
-    'musica':'🎵','music':'🎵','video':'🎬','foto':'📷','photo':'📷',
-    'finanz':'💰','finance':'💰','governo':'🏛️','assicur':'🛡️',
-    'auto':'🚗','car':'🚗','sport':'⚽','food':'🍕','cibo':'🍕',
-  };
-  const low = catName.toLowerCase();
-  const emoji = Object.entries(map).find(([k]) => low.includes(k))?.[1] || '📁';
-  _iconCache[catName] = emoji;
-  return emoji;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 10,
+        messages: [{
+          role: 'user',
+          content: `Rispondi SOLO con un singolo emoji che rappresenta meglio la categoria password chiamata "${catName}". Solo l'emoji, nient'altro.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const emoji = data.content?.[0]?.text?.trim() || '📁';
+    _iconCache[catName] = emoji;
+    return emoji;
+  } catch(e) { return '📁'; }
 }
 
 async function pwEnrichIcons() {
@@ -5635,22 +5588,7 @@ function noteShowList(q='') {
 function noteRenderList(q='') {
   const list = document.getElementById('note-list');
   if (!list) return;
-  if (!_notes.length) {
-    noteLoad();
-    if (!_notes.length) {
-      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">⏳ Caricamento...</div>';
-      setTimeout(() => noteRenderList(q), 800);
-      return;
-    }
-  }
-  let notes = [..._notes].filter(n=>!n.deleted);
-  const noteSort = localStorage.getItem('hb_note_sort') || 'date';
-  notes.sort((a,b) => {
-    if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'', 'it');
-    if (noteSort === 'modified') return new Date(b.updatedAt||0) - new Date(a.updatedAt||0);
-    return new Date(b.createdAt||0) - new Date(a.createdAt||0);
-  });
-  notes = notes.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   if (q) notes = notes.filter(n =>
     (n.title+n.content).toLowerCase().includes(q.toLowerCase())
   );
@@ -8172,36 +8110,16 @@ let _backHandlerActive = false;
 
 // Avvia subito il buffer history E il listener — non aspettare unlock
 (function earlyBackHandler() {
-  // Strategia: mantieni SEMPRE almeno 50 stati nel buffer
-  // e ricaricali aggressivamente
   function ensureBuffer() {
-    try {
-      if (history.length < 10) {
-        for (let i = 0; i < 50; i++) history.pushState({ hb: 'app', i }, '');
-      }
-    } catch(e) {}
+    try { if (history.length < 10) for (let i = 0; i < 50; i++) history.pushState({ hb: 'app' }, ''); } catch(e) {}
   }
-
-  // Riempimento iniziale
   try {
     history.replaceState({ hb: 'root' }, '');
-    for (let i = 0; i < 50; i++) history.pushState({ hb: 'app', i }, '');
+    for (let i = 0; i < 50; i++) history.pushState({ hb: 'app' }, '');
   } catch(e) {}
-
-  window.addEventListener('popstate', (e) => {
-    // Riempi subito dopo ogni back
-    setTimeout(ensureBuffer, 0);
-    if (typeof handleBackPress === 'function') handleBackPress();
-  });
-
-  // Riempi in tutti i casi possibili
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') ensureBuffer();
-  });
+  window.addEventListener('popstate', () => { setTimeout(ensureBuffer, 0); if (typeof handleBackPress === 'function') handleBackPress(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') ensureBuffer(); });
   window.addEventListener('pageshow', ensureBuffer);
-  window.addEventListener('focus', ensureBuffer);
-
-  // Safety net ogni 10 secondi
   setInterval(ensureBuffer, 10000);
 })();
 
@@ -8239,11 +8157,6 @@ function handleBackPress() {
     }
     if (document.getElementById('home-custom-modal')?.style.display === 'flex') {
       closeHomeCustom(); return;
-    }
-    // Prima prova il bottone back interno del tab corrente
-    const topbarBack = document.getElementById('topbar-back');
-    if (topbarBack?.classList.contains('visible')) {
-      topbarBack.click(); return;
     }
     if (HB.currentTab !== 'home') {
       switchTab('home'); return;
@@ -8384,28 +8297,8 @@ function runSearch(q) {
   const ql = q.toLowerCase();
   const results = [];
 
-  // Ricarica dati se vuoti (dati cifrati non ancora decodificati)
-  if (!_pwItems.length) pwLoad();
-  if (!_notes.length) noteLoad();
-  if (!_otpAccounts.length && typeof otpLoad === 'function') otpLoad();
-  if (!_wifiNets.length && typeof wifiLoad === 'function') wifiLoad();
-  if (!_cards.length && typeof cardsLoad === 'function') cardsLoad();
-  if (!_docs2.length && typeof docsLoad === 'function') docsLoad();
-
   // ── Password ──────────────────────────────────────────
   if (typeof _pwItems !== 'undefined') {
-    // Cerca anche nelle categorie
-    _pwCats?.forEach(cat => {
-      if (cat.name.toLowerCase().includes(ql)) {
-        const count = _pwItems.filter(i => i.categoryId === cat.id && !i.deleted).length;
-        results.push({
-          icon: '📁', title: cat.name,
-          sub: count + ' password',
-          badge: '📂 Categoria',
-          action: () => { switchTab('passwords'); setTimeout(() => pwShowItems(cat.id, cat.name), 300); }
-        });
-      }
-    });
     _pwItems.forEach(item => {
       if ([item.title, item.username, item.url, item.notes]
           .some(f => f && f.toLowerCase().includes(ql))) {
@@ -8490,37 +8383,6 @@ function runSearch(q) {
       }
     });
   }
-
-  // ── Documenti ─────────────────────────────────────────
-  if (typeof _docs2 !== 'undefined') {
-    _docs2.filter(d => !d.deleted).forEach(doc => {
-      const fields = [doc.label, doc.nome, doc.cognome, doc.number, doc.notes];
-      if (fields.some(f => f && f.toLowerCase().includes(ql))) {
-        results.push({
-          icon: '📄', title: doc.label || 'Documento',
-          sub: [doc.nome, doc.cognome].filter(Boolean).join(' ') || doc.number || '',
-          badge: '📄 Documenti',
-          action: () => switchTab('documents')
-        });
-      }
-    });
-  }
-
-  // ── Finanze ───────────────────────────────────────────
-  if (typeof _financeItems !== 'undefined') {
-    _financeItems.filter(f => !f.deleted).forEach(fin => {
-      if ([fin.name, fin.iban, fin.notes].some(f => f && f.toLowerCase().includes(ql))) {
-        results.push({
-          icon: '💰', title: fin.name || 'Conto',
-          sub: fin.iban ? 'IBAN: ' + fin.iban.slice(-8) : 'Finanze',
-          badge: '💰 Finanze',
-          action: () => switchTab('finance')
-        });
-      }
-    });
-  }
-
-  // ── Categorie password (se non già trovate) ───────────
 
   if (!results.length) {
     container.innerHTML = '<div class="search-empty">Nessun risultato per "<strong>' + q + '</strong>"</div>';
@@ -9643,7 +9505,7 @@ async function exportPDFSection(section) {
   } else if (section === 'cards') {
     title = 'Carte';
     doc.text('HomeBull — ' + title, margin, 12);
-    const cards = (() => { try { const _r = localStorage.getItem('hb13_cards'); return _r && !_r.startsWith('hb13enc:') ? JSON.parse(_r) : []; } catch(e) { return []; } })().filter(c=>!c.deleted);
+    const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]').filter(c=>!c.deleted);
     cards.forEach(card => {
       row('Banca:', card.bank); row('Numero:', card.number);
       row('Intestatario:', card.holder); row('Scadenza:', card.exp);
@@ -9709,7 +9571,7 @@ async function exportPDFSection(section) {
   } else if (section === 'documents') {
     title = 'Documenti';
     doc.text('HomeBull — ' + title, margin, 12);
-    const docs = (() => { try { const _r = localStorage.getItem('hb13_docs2'); return _r && !_r.startsWith('hb13enc:') ? JSON.parse(_r) : []; } catch(e) { return []; } })().filter(d=>!d.deleted);
+    const docs = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').filter(d=>!d.deleted);
     docs.forEach(d => {
       row('Tipo:', d.label);
       row('Nome:', (d.nome||'') + ' ' + (d.cognome||''));
@@ -9862,7 +9724,7 @@ async function exportPDF() {
   }
 
   // ── CARTE ─────────────────────────────────────────────────
-  const cards = (() => { try { const _r = localStorage.getItem('hb13_cards'); return _r && !_r.startsWith('hb13enc:') ? JSON.parse(_r) : []; } catch(e) { return []; } })();
+  const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]');
   if (cards.length) {
     checkY(20); sectionTitle('Carte (' + cards.length + ')', '💳');
     cards.forEach(card => {
@@ -10832,105 +10694,6 @@ async function syncShopShare() {
 }
 
 
-
-// ── Indicatore sync ──────────────────────────────────────
-function updateSyncIndicator(status) {
-  const el = document.getElementById('sync-indicator');
-  if (!el) return;
-  const now = new Date();
-  const time = now.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
-  if (status === 'ok') {
-    el.innerHTML = '✅ Sincronizzato alle ' + time;
-    el.style.color = 'var(--text3)';
-    _lastSyncTime = now;
-  } else if (status === 'syncing') {
-    el.innerHTML = '🔄 Sincronizzazione...';
-    el.style.color = 'var(--accent)';
-  } else if (status === 'error') {
-    el.innerHTML = '⚠️ Sync non riuscita';
-    el.style.color = '#ef4444';
-  }
-}
-
-
-// ── Notifiche push scadenze ───────────────────────────────
-async function requestNotificationPermission() {
-  if (!('Notification' in window)) return;
-  if (Notification.permission === 'granted') return;
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') showToast('🔔 Notifiche abilitate!');
-}
-
-function sendExpiryNotification(title, body) {
-  if (Notification.permission !== 'granted') return;
-  new Notification('HomeBull — ' + title, { 
-    body, 
-    icon: './icon-192.png',
-    badge: './icon-192.png'
-  });
-}
-
-// Controlla scadenze e invia notifiche
-function checkExpiryAndNotify() {
-  if (Notification.permission !== 'granted') return;
-  const today = new Date();
-  const soon = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
-  
-  // Controlla carte
-  _cards.filter(c=>!c.deleted && c.exp).forEach(card => {
-    try {
-      const [mm,yy] = (card.exp||'').split('/');
-      const exp = new Date(2000+parseInt(yy), parseInt(mm)-1, 1);
-      if (exp <= soon && exp >= today) {
-        sendExpiryNotification('Carta in scadenza', 
-          (card.holder||'Carta') + ' scade il ' + card.exp);
-      }
-    } catch(e) {}
-  });
-  
-  // Controlla documenti
-  _docs2.filter(d=>!d.deleted && d.expiry).forEach(doc => {
-    try {
-      const exp = new Date(doc.expiry);
-      if (exp <= soon && exp >= today) {
-        sendExpiryNotification('Documento in scadenza',
-          (doc.label||'Documento') + ' di ' + (doc.nome||'') + ' scade il ' + doc.expiry);
-      }
-    } catch(e) {}
-  });
-}
-
-
-// ── Tema per sezione ──────────────────────────────────────
-const _sectionThemes = JSON.parse(localStorage.getItem('hb_section_themes') || '{}');
-
-function toggleSectionTheme() {
-  const tab = HB.currentTab;
-  const current = _sectionThemes[tab] || 'auto';
-  const next = current === 'auto' ? 'dark' : current === 'dark' ? 'light' : 'auto';
-  _sectionThemes[tab] = next;
-  localStorage.setItem('hb_section_themes', JSON.stringify(_sectionThemes));
-  applySectionTheme(tab);
-  const icons = { auto: '🎨', dark: '🌙', light: '☀️' };
-  showToast(icons[next] + ' Tema sezione: ' + next);
-  // Aggiorna icona bottone
-  const btn = document.getElementById('section-theme-btn');
-  if (btn) btn.textContent = icons[next];
-}
-
-function applySectionTheme(tab) {
-  const theme = _sectionThemes[tab];
-  const panel = document.getElementById('panel-' + tab);
-  if (!panel) return;
-  panel.removeAttribute('data-theme');
-  if (theme === 'dark') panel.setAttribute('data-theme', 'dark');
-  else if (theme === 'light') panel.setAttribute('data-theme', 'light');
-}
-
-function applyAllSectionThemes() {
-  Object.keys(_sectionThemes).forEach(tab => applySectionTheme(tab));
-}
-
 function cloudPageOpen(){
   driveUpdateBackupUI();
   gcalUpdateUI();
@@ -11691,8 +11454,7 @@ function calShowAddEvent() {
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
           <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</span><span id="drive-conn-status" style="font-size:11px;color:var(--text3);">Non collegato</span></div>
-              <div style="font-size:11px;color:var(--text3);" id="drive-conn-status">Non connesso</div>
+              <div style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</div>
               <div style="font-size:11px;color:var(--text3);" id="drive-backup-ts">Nessun backup effettuato</div>
             </div>
             <div style="display:flex;gap:8px;">
@@ -11816,7 +11578,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA327</div>
+            <div style="font-size:13px;color:var(--text3);">BETA328</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -12082,7 +11844,7 @@ let _driveToken = null;
 let _driveBackupToken = null;
 let _driveBackupFileId = null; // ID file backup su Drive
 
-async function driveGetBackupToken(silent=false) {
+async function driveGetBackupToken() {
   await new Promise((resolve, reject) => {
     if (!window.google?.accounts) {
       const s = document.createElement('script');
@@ -12096,43 +11858,13 @@ async function driveGetBackupToken(silent=false) {
       client_id: GDRIVE_CLIENT_ID,
       scope: GDRIVE_BACKUP_SCOPE,
       callback: (resp) => {
-        if (resp.error) { 
-          if (silent) { resolve(null); return; }
-          reject(resp.error); return; 
-        }
+        if (resp.error) { reject(resp.error); return; }
         _driveBackupToken = resp.access_token;
-        // Rinnova automaticamente prima della scadenza (55 min)
-        clearTimeout(window._driveTokenTimer);
-        window._driveTokenTimer = setTimeout(() => {
-          driveGetBackupToken(true).catch(()=>{});
-        }, 55 * 60 * 1000);
         resolve(resp.access_token);
       }
     });
-    // Silent = no popup, prova rinnovo automatico
-    const hint = localStorage.getItem('hb_drive_hint') || '';
-    client.requestAccessToken(silent ? { prompt: '', login_hint: hint } : {});
+    client.requestAccessToken();
   });
-}
-
-// Prova rinnovo silenzioso del token all'avvio
-async function driveTokenSilentRefresh() {
-  if (!localStorage.getItem('hb_drive_connected')) return;
-  try {
-    // Prima prova rinnovo silenzioso
-    const token = await Promise.race([
-      driveGetBackupToken(true),
-      new Promise(r => setTimeout(() => r(null), 5000)) // timeout 5s
-    ]);
-    if (token) {
-      console.log('✅ Drive token rinnovato silenziosamente');
-      driveStartAutoTimer();
-    } else {
-      console.log('Drive silent refresh: timeout, richiede azione utente');
-    }
-  } catch(e) { 
-    console.log('Drive silent refresh fallito:', e.message);
-  }
 }
 
 async function driveBackupNow(silent=false) {
