@@ -2018,7 +2018,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA329</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA330</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2120,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA329</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA330</div>
         </div>
       </div>
     </div>
@@ -2244,7 +2244,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA329</span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA330</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2481,7 +2481,7 @@ function cardsSearch(q) {
             <div style="display:flex;gap:8px;align-items:center;">
               <div class="pw-search-bar" style="flex:1;">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;"><select id="note-sort-sel" onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList(document.getElementById('note-search-inp')?.value||'')" style="background:none;border:none;outline:none;font-size:13px;color:var(--text3);cursor:pointer;font-family:inherit;padding:4px;"><option value="modified">✏️ Modifica</option><option value="created">📅 Data</option><option value="title">🔤 Titolo</option></select>
               </div>
               <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3265,7 +3265,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA329',
+  version: 'BETA330',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5605,7 +5605,15 @@ function noteRenderList(q='') {
   }
 
   if (!_notes.length) noteLoad();
-  let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  const noteSort = localStorage.getItem('hb_note_sort') || 'modified';
+  // Aggiorna select se presente
+  const sortSel = document.getElementById('note-sort-sel');
+  if (sortSel) sortSel.value = noteSort;
+  let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => {
+    if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'','it');
+    if (noteSort === 'created') return new Date(b.createdAt||0)-new Date(a.createdAt||0);
+    return new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0);
+  }).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   if (q) notes = notes.filter(n =>
     (n.title+n.content).toLowerCase().includes(q.toLowerCase())
   );
@@ -10535,21 +10543,6 @@ async function removeShare(shareId) {
 }
 
 // ── Rimuovi tutte le condivisioni (cleanup) ───────────────
-async function cleanupAllShares() {
-  if (!confirm('Rimuovere TUTTE le condivisioni?')) return;
-  const myKey = _getSyncKey();
-  for (const shareId of Object.keys(_myShares)) {
-    try { await fbDb.ref('shared/' + shareId).remove(); } catch(e){}
-  }
-  await fbDb.ref('userShares/' + myKey + '/created').remove();
-  await fbDb.ref('userShares/' + myKey + '/received').remove();
-  _myShares = {}; _receivedShares = {};
-  _sharedShopData = {}; _shopCurSharedId = null;
-  document.getElementById('_share_modal')?.remove();
-  shopRenderAll();
-  showToast('✅ Tutte le condivisioni rimosse');
-}
-
 // ── Listener realtime lista spesa condivisa ───────────────
 function startShopShareListener(shareId) {
   if (!fbReady || !fbDb) return;
@@ -10770,6 +10763,22 @@ async function syncShopShare() {
   }
 }
 
+
+
+// ── Indicatore ultimo sync ────────────────────────────────
+function updateSyncBadge() {
+  const el = document.getElementById('sync-time-badge');
+  if (!el || !_lastSyncTime) return;
+  const diff = Math.round((Date.now() - new Date(_lastSyncTime).getTime()) / 1000);
+  let label;
+  if (diff < 60) label = '✅ sync ' + diff + 's fa';
+  else if (diff < 3600) label = '✅ sync ' + Math.round(diff/60) + 'min fa';
+  else label = '⚠️ sync ' + Math.round(diff/3600) + 'h fa';
+  el.textContent = label;
+}
+
+// Aggiorna badge ogni 30 secondi
+setInterval(() => { if (HB.currentTab === 'home') updateSyncBadge(); }, 30000);
 
 function cloudPageOpen(){
   driveUpdateBackupUI();
@@ -11655,7 +11664,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA329</div>
+            <div style="font-size:13px;color:var(--text3);">BETA330</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
