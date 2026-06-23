@@ -2038,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA332</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA333</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2140,7 +2140,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA332</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA333</div>
         </div>
       </div>
     </div>
@@ -2153,7 +2153,7 @@ function cardsSearch(q) {
 
       <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        <span class="sidebar-item-label">Carte</span>
+        <span class="sidebar-item-label">Portafoglio</span>
       </div>
 
       <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
@@ -2163,7 +2163,7 @@ function cardsSearch(q) {
 
 
 
-      <div class="sidebar-item" data-tab="finance" onclick="switchTab('finance')">
+      <div class="sidebar-item" data-tab="finance-REMOVED" style="display:none" onclick="switchTab('finance')">
         <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         <span class="sidebar-item-label">Finanze</span>
       </div>
@@ -2249,7 +2249,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA332</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA333</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2593,6 +2593,12 @@ function cardsSearch(q) {
 
     <!-- CARTE -->
     <div class="tab-panel" id="panel-cards">
+      <!-- Tab interne Portafoglio -->
+      <div style="display:flex;gap:8px;padding:10px 14px 0;flex-shrink:0;">
+        <button id="wallet-tab-cards" class="netit-tab active" onclick="walletTab('cards')">💳 Carte</button>
+        <button id="wallet-tab-finance" class="netit-tab" onclick="walletTab('finance')">🏦 Conti / IBAN</button>
+      </div>
+      <div id="wallet-cards">
       <div>
 
         <!-- Lista carte -->
@@ -2693,11 +2699,7 @@ function cardsSearch(q) {
 
       </div>
     </div>
-
-    
-
-    <!-- FINANZE -->
-    <div class="tab-panel" id="panel-finance">
+      <div id="wallet-finance" style="display:none;">
       <div style="padding:14px 14px 100px;">
 
         <!-- Lista conti -->
@@ -2773,6 +2775,12 @@ function cardsSearch(q) {
 
       </div>
     </div>
+    </div>
+
+    
+
+    <!-- FINANZE -->
+    
 
     <!-- SERVER / IT -->
     <div class="tab-panel" id="panel-server">
@@ -2925,10 +2933,6 @@ function cardsSearch(q) {
       <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
         <div class="drawer-item-icon">📄</div>
         <div class="drawer-item-label">Documenti</div>
-      </div>
-      <div class="drawer-item" data-tab="finance" onclick="switchTabFromDrawer('finance')">
-        <div class="drawer-item-icon">📊</div>
-        <div class="drawer-item-label">Finanze</div>
       </div>
       <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
         <div class="drawer-item-icon">📝</div>
@@ -3093,7 +3097,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA332',
+  version: 'BETA333',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3102,7 +3106,7 @@ const HB = {
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
   otpCode: '',
-  tabs: ['home','passwords','documents','notes','otp','cards','finance','server']
+  tabs: ['home','passwords','documents','notes','otp','cards','server']
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -3542,8 +3546,7 @@ const TAB_CONFIG = {
   documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
-  cards:     { title: 'Carte',       sub: '', actions: [] },
-  finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
+  cards:     { title: 'Portafoglio', sub: 'Carte e conti', actions: [] },
   server:    { title: 'Rete & IT',   sub: 'Server, credenziali e Wi-Fi', actions: [] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
 };
@@ -3582,7 +3585,7 @@ function switchTab(tab) {
   const accentMap = {
     home:'#6366f1', passwords:'#10b981', documents:'#f59e0b',
     notes:'#8b5cf6', otp:'#06b6d4',
-    cards:'#f97316', finance:'#eab308',
+    cards:'#f97316',
     server:'#64748b'
   };
   const accent = accentMap[tab] || '#6366f1';
@@ -3602,8 +3605,7 @@ function switchTab(tab) {
     otp:       () => typeof otpOpen === 'function' && otpOpen(),
     passwords: () => typeof pwOpen === 'function' && pwOpen(),
     notes:     () => typeof noteOpen === 'function' && noteOpen(),
-    cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
-    finance:   () => typeof financeOpen === 'function' && financeOpen(),
+    cards:     () => { walletTab(_walletCurrent || 'cards'); },
     server:    () => { netitTab(_netitCurrent || 'server'); },
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
@@ -5571,6 +5573,28 @@ function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
 }
 function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
+
+let _walletCurrent = 'cards';
+function walletTab(which) {
+  _walletCurrent = which;
+  const cd = document.getElementById('wallet-cards');
+  const fn = document.getElementById('wallet-finance');
+  const tabCd = document.getElementById('wallet-tab-cards');
+  const tabFn = document.getElementById('wallet-tab-finance');
+  if (which === 'finance') {
+    if (cd) cd.style.display = 'none';
+    if (fn) fn.style.display = 'block';
+    tabCd?.classList.remove('active');
+    tabFn?.classList.add('active');
+    if (typeof financeOpen === 'function') financeOpen();
+  } else {
+    if (cd) cd.style.display = 'block';
+    if (fn) fn.style.display = 'none';
+    tabCd?.classList.add('active');
+    tabFn?.classList.remove('active');
+    if (typeof cardsOpen === 'function') cardsOpen();
+  }
+}
 
 function cardsOpen() {
   cardsLoad(); cardsShowList();
@@ -8042,8 +8066,7 @@ const ALL_TABS_META = [
   { id:'documents', icon:'📄', label:'Documenti' },
   { id:'notes',     icon:'📝', label:'Note' },
   { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
-  { id:'cards',     icon:'💳', label:'Carte' },
-  { id:'finance',   icon:'📊', label:'Finanze' },
+  { id:'cards',     icon:'💳', label:'Portafoglio' },
   { id:'server',    icon:'📡', label:'Rete & IT' },
 ];
 
@@ -9347,7 +9370,7 @@ function showPDFSectionPicker() {
     { id:'passwords', icon:'🔐', label:'Password' },
     { id:'documents', icon:'📄', label:'Documenti' },
     { id:'notes',     icon:'📝', label:'Note' },
-    { id:'cards',     icon:'💳', label:'Carte' },
+    { id:'cards',     icon:'💳', label:'Portafoglio' },
     { id:'wifi',      icon:'📶', label:'Wi-Fi' },
     { id:'finance',   icon:'💰', label:'Finanze' },
     { id:'server',    icon:'📡', label:'Rete & IT' },
@@ -11499,7 +11522,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA332</div>
+            <div style="font-size:13px;color:var(--text3);">BETA333</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
