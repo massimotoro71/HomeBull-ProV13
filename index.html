@@ -1874,6 +1874,26 @@ html, body {
     font-size: 11px !important;
   }
 }
+
+/* Tab interne Rete & IT */
+.netit-tab {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text3);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.netit-tab.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
 function shopAddCustom() {
@@ -2018,7 +2038,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA331</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA332</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2120,7 +2140,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA331</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA332</div>
         </div>
       </div>
     </div>
@@ -2167,9 +2187,9 @@ function cardsSearch(q) {
 
       <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-        <span class="sidebar-item-label">Server / IT</span>
+        <span class="sidebar-item-label">Rete & IT</span>
       </div>
-      <div class="sidebar-item" data-tab="wifi" onclick="switchTab('wifi')">
+      <div class="sidebar-item" data-tab="wifi-REMOVED" style="display:none" onclick="switchTab('wifi')">
         <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
         <span class="sidebar-item-label">Wi-Fi</span>
       </div>
@@ -2229,7 +2249,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA331</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA332</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2674,60 +2694,7 @@ function cardsSearch(q) {
       </div>
     </div>
 
-    <div class="tab-panel" id="panel-wifi">
-      <div>
-
-        <!-- Lista reti -->
-        <div id="wifi-view-list" style="display:flex;flex-direction:column;height:100%;">
-          <div style="padding:8px 14px;flex-shrink:0;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="wifi-search-inp" placeholder="Cerca rete..." oninput="wifiSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-            </div>
-          </div>
-          <div id="wifi-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 100px;"></div>
-        </div>
-
-        <!-- Aggiungi rete -->
-        <div id="wifi-view-add" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
-          <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
-            <button onclick="wifiShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Rete Wi-Fi</div>
-          </div>
-          <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
-            <div style="margin-bottom:12px;">
-              <button onclick="wifiScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Scansiona QR Wi-Fi</button>
-            </div>
-            <div style="margin-bottom:10px;text-align:center;font-size:11px;color:var(--text3);font-weight:600;">— oppure inserisci manualmente —</div>
-          <div style="margin-bottom:14px;">
-              <div class="pw-field-label" style="margin-bottom:6px;">Nome rete (SSID) *</div>
-              <input id="wifi-add-ssid" type="text" placeholder="es. Casa-5G"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-            </div>
-            <div style="margin-bottom:14px;">
-              <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
-              <div style="position:relative;">
-                <input id="wifi-add-pw" type="password" placeholder="Password rete"
-                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-                <button onclick="wifiToggleAddPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;" id="wifi-add-pw-eye">👁</button>
-              </div>
-            </div>
-            <div style="margin-bottom:14px;">
-              <div class="pw-field-label" style="margin-bottom:6px;">Sicurezza</div>
-              <div style="display:flex;gap:8px;">
-                <button class="wifi-sec-btn active" data-sec="WPA" onclick="wifiSelectSec(this,'WPA')">WPA/WPA2</button>
-                <button class="wifi-sec-btn" data-sec="WEP" onclick="wifiSelectSec(this,'WEP')">WEP</button>
-                <button class="wifi-sec-btn" data-sec="nopass" onclick="wifiSelectSec(this,'nopass')">Aperta</button>
-              </div>
-            </div>
-            <button onclick="wifiSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;">Salva Rete</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
+    
 
     <!-- FINANZE -->
     <div class="tab-panel" id="panel-finance">
@@ -2809,6 +2776,13 @@ function cardsSearch(q) {
 
     <!-- SERVER / IT -->
     <div class="tab-panel" id="panel-server">
+      <!-- Tab interne Rete & IT -->
+      <div style="display:flex;gap:8px;padding:10px 14px 0;flex-shrink:0;">
+        <button id="netit-tab-server" class="netit-tab active" onclick="netitTab('server')">📡 Server / IT</button>
+        <button id="netit-tab-wifi" class="netit-tab" onclick="netitTab('wifi')">🌐 Wi-Fi</button>
+      </div>
+      <!-- Contenuto Server -->
+      <div id="netit-server">
       <div style="padding:14px 14px 100px;">
 
         <!-- Vista lista -->
@@ -2878,6 +2852,62 @@ function cardsSearch(q) {
 
       </div>
     </div>
+      <!-- Contenuto WiFi -->
+      <div id="netit-wifi" style="display:none;">
+      <div>
+
+        <!-- Lista reti -->
+        <div id="wifi-view-list" style="display:flex;flex-direction:column;height:100%;">
+          <div style="padding:8px 14px;flex-shrink:0;">
+            <div class="pw-search-bar">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="wifi-search-inp" placeholder="Cerca rete..." oninput="wifiSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            </div>
+          </div>
+          <div id="wifi-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 100px;"></div>
+        </div>
+
+        <!-- Aggiungi rete -->
+        <div id="wifi-view-add" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+          <div style="padding:12px 14px 0;flex-shrink:0;display:flex;align-items:center;gap:10px;">
+            <button onclick="wifiShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Rete Wi-Fi</div>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:16px 14px 100px;">
+            <div style="margin-bottom:12px;">
+              <button onclick="wifiScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Scansiona QR Wi-Fi</button>
+            </div>
+            <div style="margin-bottom:10px;text-align:center;font-size:11px;color:var(--text3);font-weight:600;">— oppure inserisci manualmente —</div>
+          <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Nome rete (SSID) *</div>
+              <input id="wifi-add-ssid" type="text" placeholder="es. Casa-5G"
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
+              <div style="position:relative;">
+                <input id="wifi-add-pw" type="password" placeholder="Password rete"
+                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                <button onclick="wifiToggleAddPw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;" id="wifi-add-pw-eye">👁</button>
+              </div>
+            </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Sicurezza</div>
+              <div style="display:flex;gap:8px;">
+                <button class="wifi-sec-btn active" data-sec="WPA" onclick="wifiSelectSec(this,'WPA')">WPA/WPA2</button>
+                <button class="wifi-sec-btn" data-sec="WEP" onclick="wifiSelectSec(this,'WEP')">WEP</button>
+                <button class="wifi-sec-btn" data-sec="nopass" onclick="wifiSelectSec(this,'nopass')">Aperta</button>
+              </div>
+            </div>
+            <button onclick="wifiSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;">Salva Rete</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    </div>
 
     <!-- FAMIGLIA -->
     <!-- LIBRERIA PANEL -->
@@ -2907,10 +2937,6 @@ function cardsSearch(q) {
       <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
         <div class="drawer-item-icon">📡</div>
         <div class="drawer-item-label">Server/IT</div>
-      </div>
-      <div class="drawer-item" data-tab="wifi" onclick="switchTabFromDrawer('wifi')">
-        <div class="drawer-item-icon">🌐</div>
-        <div class="drawer-item-label">Wi-Fi</div>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
@@ -3067,7 +3093,7 @@ function cardsSearch(q) {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA331',
+  version: 'BETA332',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3076,7 +3102,7 @@ const HB = {
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
   otpCode: '',
-  tabs: ['home','passwords','documents','notes','otp','cards','wifi','finance','server']
+  tabs: ['home','passwords','documents','notes','otp','cards','finance','server']
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -3517,9 +3543,8 @@ const TAB_CONFIG = {
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Carte',       sub: '', actions: [] },
-  wifi:      { title: 'Wi-Fi',       sub: 'Reti salvate', actions: [] },
   finance:   { title: 'Finanze',     sub: 'IBAN e conti', actions: [] },
-  server:    { title: 'Server / IT', sub: 'SSH, API, credenziali', actions: [] },
+  server:    { title: 'Rete & IT',   sub: 'Server, credenziali e Wi-Fi', actions: [] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
 };
 
@@ -3557,7 +3582,7 @@ function switchTab(tab) {
   const accentMap = {
     home:'#6366f1', passwords:'#10b981', documents:'#f59e0b',
     notes:'#8b5cf6', otp:'#06b6d4',
-    cards:'#f97316', wifi:'#84cc16', finance:'#eab308',
+    cards:'#f97316', finance:'#eab308',
     server:'#64748b'
   };
   const accent = accentMap[tab] || '#6366f1';
@@ -3575,12 +3600,11 @@ function switchTab(tab) {
   // Chiama onOpen del modulo
   const moduleOpeners = {
     otp:       () => typeof otpOpen === 'function' && otpOpen(),
-    wifi:      () => typeof wifiOpen === 'function' && wifiOpen(),
     passwords: () => typeof pwOpen === 'function' && pwOpen(),
     notes:     () => typeof noteOpen === 'function' && noteOpen(),
     cards:     () => typeof cardsOpen === 'function' && cardsOpen(),
     finance:   () => typeof financeOpen === 'function' && financeOpen(),
-    server:    () => typeof serverOpen === 'function' && serverOpen(),
+    server:    () => { netitTab(_netitCurrent || 'server'); },
     documents: () => typeof docsOpen === 'function' && docsOpen(),
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
@@ -7211,6 +7235,28 @@ function serverLoad() {
 }
 function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
 
+let _netitCurrent = 'server';
+function netitTab(which) {
+  _netitCurrent = which;
+  const srv = document.getElementById('netit-server');
+  const wif = document.getElementById('netit-wifi');
+  const tabSrv = document.getElementById('netit-tab-server');
+  const tabWif = document.getElementById('netit-tab-wifi');
+  if (which === 'wifi') {
+    if (srv) srv.style.display = 'none';
+    if (wif) wif.style.display = 'block';
+    tabSrv?.classList.remove('active');
+    tabWif?.classList.add('active');
+    if (typeof wifiOpen === 'function') wifiOpen();
+  } else {
+    if (srv) srv.style.display = 'block';
+    if (wif) wif.style.display = 'none';
+    tabSrv?.classList.add('active');
+    tabWif?.classList.remove('active');
+    if (typeof serverOpen === 'function') serverOpen();
+  }
+}
+
 function serverOpen() {
   serverLoad(); serverShowList();
   document.getElementById('topbar-title').textContent = 'Server / IT';
@@ -7997,9 +8043,8 @@ const ALL_TABS_META = [
   { id:'notes',     icon:'📝', label:'Note' },
   { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
   { id:'cards',     icon:'💳', label:'Carte' },
-  { id:'wifi',      icon:'🌐', label:'Wi-Fi' },
   { id:'finance',   icon:'📊', label:'Finanze' },
-  { id:'server',    icon:'📡', label:'Server/IT' },
+  { id:'server',    icon:'📡', label:'Rete & IT' },
 ];
 
 const QA_KEY = 'hb12_quick_access';
@@ -9305,7 +9350,7 @@ function showPDFSectionPicker() {
     { id:'cards',     icon:'💳', label:'Carte' },
     { id:'wifi',      icon:'📶', label:'Wi-Fi' },
     { id:'finance',   icon:'💰', label:'Finanze' },
-    { id:'server',    icon:'📡', label:'Server/IT' },
+    { id:'server',    icon:'📡', label:'Rete & IT' },
   ];
 
   const opts = sections.map(s =>
@@ -11454,7 +11499,7 @@ function calShowAddEvent() {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA331</div>
+            <div style="font-size:13px;color:var(--text3);">BETA332</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
