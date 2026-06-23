@@ -29,6 +29,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -49,37 +50,59 @@
 </head>
 <body class="bg-darkbg text-slate-100 h-full font-sans antialiased overflow-hidden flex flex-col">
 
-  <!-- ════════ LOCK SCREEN ════════ -->
-  <div id="lock-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-darkbg bg-opacity-95 backdrop-blur-md transition-opacity duration-300">
+  <!-- ════════ AUTH SCREEN (email OTP + PIN + biometria) ════════ -->
+  <div id="auth-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-darkbg bg-opacity-95 backdrop-blur-md transition-opacity duration-300">
     <div class="glass-effect p-8 rounded-3xl max-w-md w-full mx-4 text-center shadow-2xl border border-indigo-500/20">
       <div class="w-20 h-20 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-400">
-        <i data-lucide="shield-alert" class="w-12 h-12 animate-pulse"></i>
+        <i data-lucide="shield-check" class="w-12 h-12"></i>
       </div>
       <h2 class="text-2xl font-bold tracking-tight mb-2">HomeBull Vault Pro</h2>
-      <p id="lock-subtitle" class="text-sm text-slate-400 mb-6">Inserisci il PIN di sblocco per accedere alla cassaforte.</p>
 
-      <div class="flex justify-center gap-3 mb-8">
-        <input type="password" maxlength="8" id="pin-input" readonly
-          class="w-56 py-3 text-center text-3xl font-extrabold tracking-[0.5em] bg-darkbg border border-slate-700 rounded-xl focus:border-indigo-500 outline-none text-indigo-400">
+      <!-- STEP 1: EMAIL -->
+      <div id="step-email" class="auth-step">
+        <p class="text-sm text-slate-400 mb-6">Accedi con la tua email. Ti invieremo un codice di verifica.</p>
+        <input type="email" id="auth-email" placeholder="tua@email.com" class="w-full bg-darkbg border border-slate-700 rounded-xl px-4 py-3 mb-2 outline-none focus:border-indigo-500 text-slate-200 text-center">
+        <p id="email-err" class="text-xs text-red-400 mb-4 h-4"></p>
+        <button onclick="sendAuthOTP()" id="send-otp-btn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2">Invia codice <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
       </div>
 
-      <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto mb-6">
-        <button onclick="pressPin('1')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">1</button>
-        <button onclick="pressPin('2')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">2</button>
-        <button onclick="pressPin('3')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">3</button>
-        <button onclick="pressPin('4')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">4</button>
-        <button onclick="pressPin('5')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">5</button>
-        <button onclick="pressPin('6')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">6</button>
-        <button onclick="pressPin('7')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">7</button>
-        <button onclick="pressPin('8')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">8</button>
-        <button onclick="pressPin('9')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">9</button>
-        <button onclick="clearPin()" class="py-3 text-red-400 hover:bg-red-500/10 rounded-xl font-bold text-sm transition duration-150">Cancella</button>
-        <button onclick="pressPin('0')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition duration-150">0</button>
-        <button onclick="submitPin()" class="py-3 text-emerald-400 hover:bg-emerald-500/10 rounded-xl font-bold text-sm transition duration-150">Entra</button>
+      <!-- STEP 2: OTP -->
+      <div id="step-otp" class="auth-step hidden">
+        <p class="text-sm text-slate-400 mb-2">Inserisci il codice inviato a</p>
+        <p id="otp-hint" class="text-sm text-indigo-400 font-semibold mb-6"></p>
+        <input type="text" inputmode="numeric" maxlength="6" id="auth-otp" placeholder="••••••" class="w-48 mx-auto block bg-darkbg border border-slate-700 rounded-xl px-4 py-3 mb-2 outline-none focus:border-indigo-500 text-indigo-400 text-center text-2xl font-bold tracking-[0.4em]">
+        <p id="otp-err" class="text-xs text-red-400 mb-2 h-4"></p>
+        <p id="otp-timer" class="text-xs text-slate-500 mb-4"></p>
+        <button onclick="verifyAuthOTP()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition mb-2">Verifica</button>
+        <button onclick="goAuthStep('email')" class="text-xs text-slate-500 hover:underline">← Cambia email</button>
       </div>
-      <p id="pin-hint" class="text-xs text-slate-500"></p>
+
+      <!-- STEP 3: PIN -->
+      <div id="step-pin" class="auth-step hidden">
+        <p id="pin-sub" class="text-sm text-slate-400 mb-6">Inserisci il PIN di sblocco.</p>
+        <div class="flex justify-center gap-3 mb-6">
+          <input type="password" maxlength="8" id="pin-input" readonly class="w-56 py-3 text-center text-3xl font-extrabold tracking-[0.5em] bg-darkbg border border-slate-700 rounded-xl outline-none text-indigo-400">
+        </div>
+        <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto mb-4">
+          <button onclick="pressPin('1')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">1</button>
+          <button onclick="pressPin('2')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">2</button>
+          <button onclick="pressPin('3')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">3</button>
+          <button onclick="pressPin('4')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">4</button>
+          <button onclick="pressPin('5')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">5</button>
+          <button onclick="pressPin('6')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">6</button>
+          <button onclick="pressPin('7')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">7</button>
+          <button onclick="pressPin('8')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">8</button>
+          <button onclick="pressPin('9')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">9</button>
+          <button onclick="clearPin()" class="py-3 text-red-400 hover:bg-red-500/10 rounded-xl font-bold text-sm transition">Cancella</button>
+          <button onclick="pressPin('0')" class="py-3 bg-slate-800/40 hover:bg-indigo-600/20 rounded-xl font-bold text-lg transition">0</button>
+          <button onclick="submitPin()" class="py-3 text-emerald-400 hover:bg-emerald-500/10 rounded-xl font-bold text-sm transition">Entra</button>
+        </div>
+        <button onclick="tryBiometric()" id="bio-login-btn" class="hidden mx-auto items-center gap-2 text-xs text-indigo-400 hover:underline mb-2"><i data-lucide="fingerprint" class="w-4 h-4"></i> Sblocca con biometria</button>
+        <p id="pin-hint" class="text-xs text-slate-500"></p>
+      </div>
     </div>
   </div>
+  <style>.auth-step{animation:fadeIn .3s ease;}@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}</style>
 
   <!-- ════════ MAIN VIEW ════════ -->
   <div class="flex h-full w-full overflow-hidden">
@@ -485,39 +508,128 @@
   let vault = JSON.parse(JSON.stringify(DEFAULT_VAULT));
   let activeTab = 'passwords';
   let pinBuffer = "";
-  let _setupMode = false; // true se è il primo avvio (impostazione PIN)
+  let _setupMode = false;
+  let _authEmail = '';
+  let _otpCode = '';
+  let _otpExpiry = 0;
+  let _otpTimerInt = null;
+  const LAST_EMAIL_KEY = 'hb15_last_email';
+  const PIN_CHECK_KEY = CHECK_KEY; // riusa il check cifrato
+  const BIO_KEY = 'hb15_bio';
 
   // ═══════════════════════════════════════════════════════════
-  //  LOCK SCREEN + SETUP PIN
+  //  AUTH FLOW (email OTP → PIN → biometria)
   // ═══════════════════════════════════════════════════════════
-  async function initLockScreen() {
-    // Se sync attivo, scarica prima lo stato dal cloud
-    if (syncEnabled()) {
-      const sub0 = document.getElementById('lock-subtitle');
-      sub0.textContent = '☁️ Sincronizzazione dal cloud...';
-      await fbPull();
-    }
-    const hasVault = localStorage.getItem(VAULT_KEY) !== null;
-    const hasCheck = localStorage.getItem(CHECK_KEY) !== null;
-    _setupMode = !hasCheck;
-    const sub = document.getElementById('lock-subtitle');
-    const hint = document.getElementById('pin-hint');
-    if (_setupMode) {
-      sub.textContent = 'Crea un PIN di sblocco (min 4 cifre). Cifrerà tutti i tuoi dati.';
-      hint.textContent = '⚠️ Se dimentichi il PIN, i dati non sono recuperabili.';
+  function goAuthStep(step) {
+    document.querySelectorAll('.auth-step').forEach(s => s.classList.add('hidden'));
+    const el = document.getElementById('step-' + step);
+    if (el) el.classList.remove('hidden');
+    lucide.createIcons();
+  }
+
+  async function initAuth() {
+    // Se ha già fatto login (email + PIN impostato), vai diretto al PIN
+    const lastEmail = localStorage.getItem(LAST_EMAIL_KEY);
+    const hasPin = localStorage.getItem(PIN_CHECK_KEY) !== null;
+    if (lastEmail && hasPin) {
+      _authEmail = lastEmail;
+      localStorage.setItem(SYNC_EMAIL_KEY, lastEmail); // attiva sync
+      // Scarica dal cloud
+      if (syncEnabled()) { await fbPull(); }
+      _setupMode = false;
+      goAuthStep('pin');
+      document.getElementById('pin-sub').textContent = 'Bentornato! Inserisci il tuo PIN.';
+      // Biometria
+      setTimeout(() => {
+        if (localStorage.getItem(BIO_KEY) && window.PublicKeyCredential) {
+          document.getElementById('bio-login-btn').classList.remove('hidden');
+          document.getElementById('bio-login-btn').classList.add('flex');
+          if (/Android|iPhone|iPad/i.test(navigator.userAgent)) setTimeout(tryBiometric, 500);
+        }
+      }, 300);
     } else {
-      sub.textContent = 'Inserisci il PIN per accedere alla cassaforte.';
-      hint.textContent = '';
+      goAuthStep('email');
     }
   }
 
+  // ── STEP 1: invio OTP via EmailJS ──────────────────────────
+  async function sendAuthOTP() {
+    const email = document.getElementById('auth-email').value.trim().toLowerCase();
+    const err = document.getElementById('email-err');
+    err.textContent = '';
+    if (!email || !email.includes('@')) { err.textContent = "Inserisci un'email valida"; return; }
+    const btn = document.getElementById('send-otp-btn');
+    btn.disabled = true; btn.textContent = 'Invio in corso...';
+
+    _otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    _authEmail = email;
+    _otpExpiry = Date.now() + 10 * 60 * 1000;
+
+    try {
+      emailjs.init('OGguPT8ZipdDXinUX');
+      await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
+        to_email: email, otp_code: _otpCode, name: 'HomeBull'
+      });
+      showToast('📧 Codice inviato a ' + email);
+    } catch (e) {
+      console.warn('EmailJS error:', e);
+      err.textContent = 'Errore invio email — riprova';
+      btn.disabled = false; btn.innerHTML = 'Invia codice';
+      lucide.createIcons();
+      return;
+    }
+    document.getElementById('otp-hint').textContent = email;
+    goAuthStep('otp');
+    startOTPTimer();
+    setTimeout(() => document.getElementById('auth-otp')?.focus(), 300);
+    btn.disabled = false; btn.innerHTML = 'Invia codice';
+  }
+
+  function startOTPTimer() {
+    clearInterval(_otpTimerInt);
+    const update = () => {
+      const left = Math.max(0, Math.round((_otpExpiry - Date.now()) / 1000));
+      const t = document.getElementById('otp-timer');
+      if (left <= 0) { clearInterval(_otpTimerInt); if (t) t.textContent = 'Codice scaduto — richiedi un nuovo codice'; return; }
+      if (t) t.textContent = `Il codice scade tra ${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`;
+    };
+    update();
+    _otpTimerInt = setInterval(update, 1000);
+  }
+
+  // ── STEP 2: verifica OTP ───────────────────────────────────
+  async function verifyAuthOTP() {
+    const code = document.getElementById('auth-otp').value.trim();
+    const err = document.getElementById('otp-err');
+    err.textContent = '';
+    if (Date.now() > _otpExpiry) { err.textContent = 'Codice scaduto'; return; }
+    if (code !== _otpCode) { err.textContent = 'Codice errato'; return; }
+
+    // OTP corretto → salva email, attiva sync, scarica dati
+    localStorage.setItem(LAST_EMAIL_KEY, _authEmail);
+    localStorage.setItem(SYNC_EMAIL_KEY, _authEmail);
+    clearInterval(_otpTimerInt);
+
+    // Scarica eventuale stato dal cloud (salt/check/vault)
+    if (fbInit()) { await fbPull(); }
+
+    const hasCheck = localStorage.getItem(PIN_CHECK_KEY) !== null;
+    _setupMode = !hasCheck;
+    goAuthStep('pin');
+    document.getElementById('pin-sub').textContent = _setupMode
+      ? 'Crea un PIN di sblocco (min 4 cifre). Cifrerà i tuoi dati.'
+      : 'Inserisci il tuo PIN.';
+    document.getElementById('pin-hint').textContent = _setupMode
+      ? '⚠️ Se dimentichi il PIN i dati non sono recuperabili.' : '';
+  }
+
+  // ── STEP 3: PIN ────────────────────────────────────────────
   function pressPin(num) {
     if (pinBuffer.length < 8) {
       pinBuffer += num;
       document.getElementById('pin-input').value = '•'.repeat(pinBuffer.length);
     }
   }
-
   function clearPin() {
     pinBuffer = "";
     document.getElementById('pin-input').value = "";
@@ -525,21 +637,21 @@
 
   async function submitPin() {
     if (pinBuffer.length < 4) { showToast('PIN troppo corto (min 4 cifre)'); return; }
-
     if (_setupMode) {
-      // Primo avvio — imposta il PIN e cifra
       _cryptoKey = await deriveKey(pinBuffer);
-      // Salva un valore di verifica cifrato
       const check = await encryptData('HOMEBULL_OK');
-      localStorage.setItem(CHECK_KEY, check);
-      vault = JSON.parse(JSON.stringify(DEFAULT_VAULT));
-      await saveVault();
+      localStorage.setItem(PIN_CHECK_KEY, check);
+      if (!localStorage.getItem(VAULT_KEY)) {
+        vault = JSON.parse(JSON.stringify(DEFAULT_VAULT));
+        await saveVault();
+      } else {
+        await loadVault();
+      }
+      offerBiometric();
       unlockSuccess();
     } else {
-      // Verifica PIN provando a decifrare il check
       _cryptoKey = await deriveKey(pinBuffer);
-      const checkRaw = localStorage.getItem(CHECK_KEY);
-      const dec = await decryptData(checkRaw);
+      const dec = await decryptData(localStorage.getItem(PIN_CHECK_KEY));
       if (dec === 'HOMEBULL_OK') {
         await loadVault();
         unlockSuccess();
@@ -551,13 +663,58 @@
     }
   }
 
+  function offerBiometric() {
+    if (!window.PublicKeyCredential || localStorage.getItem(BIO_KEY)) return;
+    if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      setTimeout(() => { if (confirm('Vuoi attivare lo sblocco con biometria (impronta/Face ID)?')) registerBiometric(); }, 800);
+    }
+  }
+
+  // ── Biometria (WebAuthn) ───────────────────────────────────
+  async function registerBiometric() {
+    try {
+      const cred = await navigator.credentials.create({ publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        rp: { name: 'HomeBull Vault' },
+        user: { id: new TextEncoder().encode(_authEmail || 'user'), name: _authEmail || 'user', displayName: 'HomeBull' },
+        pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+        authenticatorSelection: { userVerification: 'required' },
+        timeout: 60000
+      }});
+      if (cred) {
+        localStorage.setItem(BIO_KEY, '1');
+        // Salva il PIN cifrato con se stesso non è possibile; salviamo il PIN protetto in modo semplice
+        localStorage.setItem('hb15_bio_pin', btoa(pinBuffer));
+        showToast('🔐 Biometria attivata!');
+      }
+    } catch (e) { console.warn('Bio register:', e); showToast('Biometria non attivata'); }
+  }
+
+  async function tryBiometric() {
+    if (!localStorage.getItem(BIO_KEY)) return;
+    try {
+      const assertion = await navigator.credentials.get({ publicKey: {
+        challenge: crypto.getRandomValues(new Uint8Array(32)),
+        userVerification: 'required',
+        timeout: 60000
+      }});
+      if (assertion) {
+        const savedPin = atob(localStorage.getItem('hb15_bio_pin') || '');
+        if (savedPin) {
+          pinBuffer = savedPin;
+          _setupMode = false;
+          await submitPin();
+        }
+      }
+    } catch (e) { console.warn('Bio auth:', e); }
+  }
+
   function unlockSuccess() {
-    const lockScreen = document.getElementById('lock-screen');
-    lockScreen.classList.add('opacity-0');
-    setTimeout(() => lockScreen.classList.add('hidden'), 300);
+    const screen = document.getElementById('auth-screen');
+    screen.classList.add('opacity-0');
+    setTimeout(() => screen.classList.add('hidden'), 300);
     clearPin();
     initApp();
-    // Avvia il listener realtime se il sync è attivo
     if (syncEnabled()) setTimeout(fbStartRealtime, 1000);
   }
 
@@ -565,10 +722,9 @@
     _cryptoKey = null;
     pinBuffer = "";
     document.getElementById('pin-input').value = "";
-    initLockScreen();
-    const lockScreen = document.getElementById('lock-screen');
-    lockScreen.classList.remove('hidden');
-    setTimeout(() => lockScreen.classList.remove('opacity-0'), 50);
+    const screen = document.getElementById('auth-screen');
+    screen.classList.remove('hidden', 'opacity-0');
+    initAuth();
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -959,7 +1115,12 @@
   document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
     fbInit();
-    initLockScreen();
+    initAuth();
+    // Enter sull'OTP
+    const otpInput = document.getElementById('auth-otp');
+    if (otpInput) otpInput.addEventListener('keydown', e => { if (e.key === 'Enter') verifyAuthOTP(); });
+    const emailInput = document.getElementById('auth-email');
+    if (emailInput) emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendAuthOTP(); });
   });
   </script>
 </body>
