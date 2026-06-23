@@ -27,6 +27,8 @@
     }
   </script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -136,6 +138,9 @@
               class="w-64 pl-10 pr-4 py-1.5 bg-darkbg border border-slate-800 rounded-xl focus:border-indigo-500 outline-none text-sm text-slate-300">
             <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3.5 top-2.5"></i>
           </div>
+          <button onclick="openSyncModal()" id="sync-btn" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm px-3 py-2 rounded-xl transition duration-150" title="Sincronizzazione cloud">
+            <i data-lucide="cloud" class="w-4 h-4"></i>
+          </button>
           <button onclick="openAddModal()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm px-4 py-2 rounded-xl shadow-lg transition duration-150">
             <i data-lucide="plus" class="w-4 h-4"></i><span>Nuovo</span>
           </button>
@@ -201,6 +206,28 @@
         <button onclick="switchTab('network')" class="mobile-tab-btn flex flex-col items-center justify-center text-slate-400 text-xs gap-1 flex-1"><i data-lucide="wifi" class="w-5 h-5"></i><span>Rete</span></button>
       </nav>
     </main>
+  </div>
+
+  <!-- ════════ MODAL SYNC ════════ -->
+  <div id="sync-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="bg-darkcard w-full max-w-md rounded-3xl border border-slate-800 shadow-2xl flex flex-col">
+      <div class="flex items-center justify-between p-6 border-b border-slate-800">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="cloud" class="text-indigo-400"></i> Sincronizzazione Cloud</h3>
+        <button onclick="closeSyncModal()" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="p-6 space-y-4">
+        <p class="text-sm text-slate-400">Inserisci la tua email per sincronizzare il vault tra i tuoi dispositivi. Usa la stessa email su PC e mobile.</p>
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Email di sincronizzazione</label>
+          <input type="email" id="sync-email" placeholder="tua@email.com" class="w-full bg-darkbg border border-slate-800 rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 text-slate-200 text-sm">
+        </div>
+        <div id="sync-status" class="text-xs text-slate-500"></div>
+        <div class="flex gap-3">
+          <button onclick="enableSync()" class="flex-1 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Attiva Sync</button>
+          <button onclick="disableSync()" id="sync-off-btn" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-sm rounded-xl transition hidden">Disattiva</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ════════ MODAL ════════ -->
@@ -295,8 +322,163 @@
   }
 
   // ═══════════════════════════════════════════════════════════
-  //  DATABASE
+  //  FIREBASE SYNC (Fase 2)
+  //  Sincronizza salt + check + vault cifrato su hb15/{emailKey}/
   // ═══════════════════════════════════════════════════════════
+  const FB_CONFIG = {
+    apiKey: "AIzaSyBr6t6gKmanpthFfyUBqfSOMVICc8Efyjs",
+    authDomain: "homebull-f57fc.firebaseapp.com",
+    databaseURL: "https://homebull-f57fc-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "homebull-f57fc",
+    storageBucket: "homebull-f57fc.firebasestorage.app",
+    messagingSenderId: "140879408214",
+    appId: "1:140879408214:web:5aee6065b9895fbe471ff7"
+  };
+  const SYNC_EMAIL_KEY = 'hb15_sync_email';
+  let fbDb = null, fbReady = false, _fbRealtimeRef = null;
+
+  function fbInit() {
+    if (fbReady) return true;
+    try {
+      if (!window.firebase) return false;
+      firebase.initializeApp(FB_CONFIG);
+      fbDb = firebase.database();
+      fbReady = true;
+      console.log('✅ Firebase pronto');
+      return true;
+    } catch (e) { console.warn('Firebase init:', e); return false; }
+  }
+
+  function _getSyncKey() {
+    const email = localStorage.getItem(SYNC_EMAIL_KEY);
+    if (!email) return null;
+    return btoa(email).replace(/[^a-zA-Z0-9]/g, '').slice(0, 28);
+  }
+
+  function syncEnabled() { return !!localStorage.getItem(SYNC_EMAIL_KEY); }
+
+  // Push: carica salt + check + vault cifrato su Firebase
+  async function fbPush() {
+    if (!syncEnabled() || !fbInit()) return;
+    const key = _getSyncKey();
+    if (!key) return;
+    try {
+      const payload = {
+        salt: localStorage.getItem(SALT_KEY) || '',
+        check: localStorage.getItem(CHECK_KEY) || '',
+        vault: localStorage.getItem(VAULT_KEY) || '',
+        updated: Date.now()
+      };
+      await fbDb.ref('hb15/' + key).set(payload);
+      console.log('☁️ Push completato');
+    } catch (e) { console.warn('fbPush:', e); }
+  }
+
+  // Pull: scarica lo stato da Firebase nel localStorage
+  async function fbPull() {
+    if (!syncEnabled() || !fbInit()) return false;
+    const key = _getSyncKey();
+    if (!key) return false;
+    try {
+      const snap = await fbDb.ref('hb15/' + key).get();
+      if (!snap.exists()) return false;
+      const d = snap.val();
+      if (d.salt) localStorage.setItem(SALT_KEY, d.salt);
+      if (d.check) localStorage.setItem(CHECK_KEY, d.check);
+      if (d.vault) localStorage.setItem(VAULT_KEY, d.vault);
+      console.log('☁️ Pull completato');
+      return true;
+    } catch (e) { console.warn('fbPull:', e); return false; }
+  }
+
+  // Listener realtime — aggiorna il vault quando cambia su un altro dispositivo
+  function fbStartRealtime() {
+    if (!syncEnabled() || !fbInit()) return;
+    const key = _getSyncKey();
+    if (!key) return;
+    if (_fbRealtimeRef) _fbRealtimeRef.off();
+    _fbRealtimeRef = fbDb.ref('hb15/' + key + '/vault');
+    _fbRealtimeRef.on('value', async (snap) => {
+      if (!snap.exists()) return;
+      const remote = snap.val();
+      const local = localStorage.getItem(VAULT_KEY);
+      if (remote && remote !== local) {
+        localStorage.setItem(VAULT_KEY, remote);
+        await loadVault();
+        renderAll();
+        console.log('🔄 Vault aggiornato da altro dispositivo');
+      }
+    });
+  }
+
+  function fbStopRealtime() {
+    if (_fbRealtimeRef) { _fbRealtimeRef.off(); _fbRealtimeRef = null; }
+  }
+
+  // ── UI Sync ────────────────────────────────────────────────
+  function openSyncModal() {
+    document.getElementById('sync-modal').classList.remove('hidden');
+    const emailInput = document.getElementById('sync-email');
+    const offBtn = document.getElementById('sync-off-btn');
+    const status = document.getElementById('sync-status');
+    const cur = localStorage.getItem(SYNC_EMAIL_KEY);
+    if (cur) {
+      emailInput.value = cur;
+      offBtn.classList.remove('hidden');
+      status.innerHTML = '✅ Sync attivo su <strong>' + cur + '</strong>';
+      status.className = 'text-xs text-emerald-400';
+    } else {
+      offBtn.classList.add('hidden');
+      status.textContent = '';
+    }
+    lucide.createIcons();
+  }
+
+  function closeSyncModal() { document.getElementById('sync-modal').classList.add('hidden'); }
+
+  async function enableSync() {
+    const email = document.getElementById('sync-email').value.trim().toLowerCase();
+    if (!email || !email.includes('@')) { showToast('Inserisci una email valida'); return; }
+    const status = document.getElementById('sync-status');
+    status.textContent = '🔄 Connessione...';
+    status.className = 'text-xs text-slate-400';
+    localStorage.setItem(SYNC_EMAIL_KEY, email);
+    if (!fbInit()) { showToast('Firebase non disponibile'); return; }
+    const key = _getSyncKey();
+    try {
+      const snap = await fbDb.ref('hb15/' + key).get();
+      if (snap.exists() && snap.val().vault) {
+        // Esistono già dati sul cloud — chiedi conferma per adottarli
+        if (confirm('Trovati dati sincronizzati sul cloud per questa email.\n\nOK = scarica i dati dal cloud (sostituisce i dati locali)\nAnnulla = carica i dati locali sul cloud')) {
+          await fbPull();
+          showToast('☁️ Dati scaricati dal cloud! Riavvio...');
+          setTimeout(() => location.reload(), 1200);
+          return;
+        }
+      }
+      // Push dei dati locali sul cloud
+      await fbPush();
+      fbStartRealtime();
+      status.innerHTML = '✅ Sync attivato su <strong>' + email + '</strong>';
+      status.className = 'text-xs text-emerald-400';
+      document.getElementById('sync-off-btn').classList.remove('hidden');
+      showToast('☁️ Sincronizzazione attivata!');
+    } catch (e) {
+      console.warn(e);
+      showToast('Errore connessione cloud');
+    }
+  }
+
+  function disableSync() {
+    fbStopRealtime();
+    localStorage.removeItem(SYNC_EMAIL_KEY);
+    document.getElementById('sync-off-btn').classList.add('hidden');
+    document.getElementById('sync-status').textContent = '';
+    document.getElementById('sync-email').value = '';
+    showToast('Sincronizzazione disattivata');
+  }
+
+
   const DEFAULT_VAULT = {
     passwords: [], otp: [], notes: [], cards: [], network: []
   };
@@ -308,7 +490,13 @@
   // ═══════════════════════════════════════════════════════════
   //  LOCK SCREEN + SETUP PIN
   // ═══════════════════════════════════════════════════════════
-  function initLockScreen() {
+  async function initLockScreen() {
+    // Se sync attivo, scarica prima lo stato dal cloud
+    if (syncEnabled()) {
+      const sub0 = document.getElementById('lock-subtitle');
+      sub0.textContent = '☁️ Sincronizzazione dal cloud...';
+      await fbPull();
+    }
     const hasVault = localStorage.getItem(VAULT_KEY) !== null;
     const hasCheck = localStorage.getItem(CHECK_KEY) !== null;
     _setupMode = !hasCheck;
@@ -369,6 +557,8 @@
     setTimeout(() => lockScreen.classList.add('hidden'), 300);
     clearPin();
     initApp();
+    // Avvia il listener realtime se il sync è attivo
+    if (syncEnabled()) setTimeout(fbStartRealtime, 1000);
   }
 
   function lockApp() {
@@ -389,6 +579,8 @@
       const json = JSON.stringify(vault);
       const encrypted = await encryptData(json);
       localStorage.setItem(VAULT_KEY, encrypted);
+      // Sincronizza sul cloud se attivo
+      if (syncEnabled()) fbPush();
     } catch (e) {
       console.error('Save error:', e);
       showToast('Errore nel salvataggio');
@@ -766,6 +958,7 @@
   // ── Avvio ──────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
+    fbInit();
     initLockScreen();
   });
   </script>
