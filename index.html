@@ -2981,6 +2981,42 @@ function cardsSearch(q) {
 //  HOMEBULL PRO v12 — Core JS
 // ═══════════════════════════════════════════════════════════
 
+// ── Auth OTP globals ────────────────────────────────────────
+let _emailOtpCode = '';
+let _emailOtpAddr = '';
+let _otpCountdownTimer = null;
+let _emailOtpExpiry = 0;
+
+async function sendEmailOTP() {
+  const email = document.getElementById('fb-email').value.trim();
+  const err = document.getElementById('fb-error');
+  err.textContent = '';
+  if (!email || !email.includes('@')) { err.textContent = "Inserisci un'email valida"; return; }
+  const btn = document.getElementById('send-otp-btn');
+  btn.disabled = true; btn.textContent = 'Invio in corso...';
+  _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _emailOtpAddr = email;
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+  try {
+    emailjs.init('OGguPT8ZipdDXinUX');
+    await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
+      to_email: email, otp_code: _emailOtpCode, name: 'HomeBull'
+    });
+    showToast('📧 Codice inviato a ' + email);
+  } catch(e) {
+    console.warn('EmailJS error:', e);
+    err.textContent = 'Errore invio email — riprova';
+    btn.disabled = false; btn.textContent = 'Invia codice →';
+    return;
+  }
+  document.getElementById('otp-email-hint').textContent = email;
+  goToStep('otp');
+  startOTPTimer();
+  setTimeout(() => document.getElementById('otp-d1')?.focus(), 300);
+  setupOTPInputs();
+  btn.disabled = false; btn.textContent = 'Invia codice →';
+}
+
 'use strict';
 
 // ── State ──────────────────────────────────────────────────
@@ -3216,7 +3252,6 @@ function verifyOTP(){/* firebase */}
 
 // OTP digit navigation
 document.addEventListener('DOMContentLoaded', () => {
-  settingsApplyOnLoad();
   const digits = document.querySelectorAll('.otp-digit');
   digits.forEach((d, i) => {
     d.addEventListener('input', () => {
@@ -6863,7 +6898,6 @@ function cloudToggleAutoSync(){
   showToast(auto ? 'Sync automatico OFF' : '✅ Sync automatico ON');
 }
 
-fbInit();
 
 // ── Biometria PIN ──────────────────────────────────────────
 async function pinCheckBio() {
