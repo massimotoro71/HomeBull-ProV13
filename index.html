@@ -5342,6 +5342,2304 @@ async function pinBioAuth() {
   await tryBiometric();
 }
 
+
+// ── Recuperato da BETA333 righe 5228-5392 ──
+let _qrAnimFrame = null;
+
+function qrScannerOpen(label, callback) {
+  _qrCallback = callback;
+  document.getElementById('qr-scanner-label').textContent = label;
+  document.getElementById('qr-scanner-modal').style.display = 'flex';
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => {
+      _qrStream = stream;
+      const video = document.getElementById('qr-video');
+      video.srcObject = stream;
+      video.play();
+      qrScanFrame(video);
+    })
+    .catch(() => { showToast('⚠️ Camera non disponibile'); qrScannerClose(); });
+}
+
+function qrScanFrame(video) {
+  if (!video.videoWidth) { _qrAnimFrame = requestAnimationFrame(() => qrScanFrame(video)); return; }
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  try {
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    if (typeof jsQR !== 'undefined') {
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      if (code?.data) { qrScannerClose(); _qrCallback?.(code.data); return; }
+    }
+  } catch(e) {}
+  _qrAnimFrame = requestAnimationFrame(() => qrScanFrame(video));
+}
+
+function qrScannerClose() {
+  document.getElementById('qr-scanner-modal').style.display = 'none';
+  if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
+  if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+}
+
+function qrScanFromGallery() {
+  // Prima ferma la camera senza chiudere il modal
+  if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
+  if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+  // Piccolo delay per far completare lo stop
+  setTimeout(() => {
+    document.getElementById('qr-gallery-input').click();
+  }, 100);
+}
+
+function qrHandleGalleryImage(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  event.target.value = '';
+
+  showToast('🔍 Analisi immagine...');
+
+  const img = new Image();
+  img.onload = () => {
+    // Ridimensiona a max 1024px per migliorare lettura jsQR
+    const MAX = 1024;
+    let w = img.width, h = img.height;
+    if (w > MAX || h > MAX) {
+      if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+      else { w = Math.round(w * MAX / h); h = MAX; }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+
+    // Prova lettura diretta
+    const imageData = ctx.getImageData(0, 0, w, h);
+    let code = null;
+    if (typeof jsQR !== 'undefined') {
+      code = jsQR(imageData.data, w, h, { inversionAttempts: 'both' });
+    }
+
+    if (code?.data) {
+      qrScannerClose();
+      _qrCallback?.(code.data);
+      return;
+    }
+
+    // Prova con contrasto aumentato
+    const enhanced = ctx.getImageData(0, 0, w, h);
+    for (let i = 0; i < enhanced.data.length; i += 4) {
+      const avg = (enhanced.data[i] + enhanced.data[i+1] + enhanced.data[i+2]) / 3;
+      const val = avg > 128 ? 255 : 0;
+      enhanced.data[i] = enhanced.data[i+1] = enhanced.data[i+2] = val;
+    }
+    code = jsQR(enhanced.data, w, h, { inversionAttempts: 'both' });
+
+    if (code?.data) {
+      qrScannerClose();
+      _qrCallback?.(code.data);
+    } else {
+      showToast('⚠️ Nessun QR trovato — prova con un\'immagine più nitida');
+    }
+
+    URL.revokeObjectURL(img.src);
+  };
+  img.onerror = () => showToast('⚠️ Immagine non valida');
+  img.src = URL.createObjectURL(file);
+}
+
+// Parser otpauth:// per OTP
+function qrParseOTP(data) {
+  // otpauth://totp/Label?secret=XXX&issuer=YYY
+  if (!data.startsWith('otpauth://')) return null;
+  try {
+    const url = new URL(data);
+    const label  = decodeURIComponent(url.pathname.slice(1));
+    const secret = url.searchParams.get('secret');
+    const issuer = url.searchParams.get('issuer') || '';
+    const [name, user] = label.includes(':') ? label.split(':',2).map(s=>s.trim()) : [label,''];
+    return { name: issuer || name, user: user || name, secret };
+  } catch(e) { return null; }
+}
+
+// Parser WIFI: per WiFi
+function qrParseWifi(data) {
+  // WIFI:T:WPA;S:ssid;P:password;H:false;;
+  if (!data.startsWith('WIFI:')) return null;
+  const get = (key) => { const m = data.match(new RegExp(key+':([^;]*)')); return m?.[1]||''; };
+  return { ssid: get('S'), pw: get('P'), sec: get('T') || 'WPA' };
+}
+
+// ── Bottoni QR nelle schede ──────────────────────────────
+function otpScanQR() {
+  qrScannerOpen('Scansiona QR 2FA', (data) => {
+    const parsed = qrParseOTP(data);
+    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
+    document.getElementById('otp-add-name').value   = parsed.name;
+    document.getElementById('otp-add-user').value   = parsed.user;
+    document.getElementById('otp-add-secret').value = parsed.secret;
+    showToast('✅ QR letto — verifica i dati e salva');
+  });
+}
+
+function wifiScanQR() {
+  qrScannerOpen('Scansiona QR Wi-Fi', (data) => {
+    const parsed = qrParseWifi(data);
+    if (!parsed || !parsed.ssid) { showToast('❌ QR non riconosciuto'); return; }
+    document.getElementById('wifi-add-ssid').value = parsed.ssid;
+    document.getElementById('wifi-add-pw').value   = parsed.pw;
+    _wifiSec = parsed.sec || 'WPA';
+    document.querySelectorAll('.wifi-sec-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.sec === _wifiSec)
+    );
+    showToast('✅ Rete letta dal QR — verifica e salva');
+  });
+}
+
+// ── Fine QR Scanner ───────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  SCHEDA NOTE
+// ═══════════════════════════════════════════════════════════
+const NOTE_KEY = 'hb13_notes';
+let _notes = [];
+let _noteEditId = null; // null = nuova nota
+
+function noteLoad() {
+  try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
+
+// ── Recuperato da BETA333 righe 5391-5572 ──
+function noteLoad() {
+  try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
+}
+function noteSaveAll() {
+  localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
+  const el = document.getElementById('stat-notes');
+  if (el) el.textContent = _notes.length || '—';
+}
+
+function noteOpen() {
+  noteLoad();
+  noteShowList();
+  document.getElementById('topbar-title').textContent = 'Note';
+  document.getElementById('topbar-sub').textContent = _notes.length + ' note';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+// ── Lista ────────────────────────────────────────────────
+function noteShowList(q='') {
+  document.getElementById('note-view-list').style.display = 'flex';
+  document.getElementById('note-view-editor').style.display = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Note';
+  document.getElementById('topbar-sub').textContent = _notes.length + ' note';
+  noteRenderList(q);
+}
+
+function noteRenderList(q='') {
+  const list = document.getElementById('note-list');
+  if (!list) return;
+
+  // Se cache non pronta, riprova
+  if (!_lsCacheReady) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">⏳ Caricamento...</div>';
+    setTimeout(() => noteRenderList(q), 500);
+    return;
+  }
+
+  if (!_notes.length) noteLoad();
+  const noteSort = localStorage.getItem('hb_note_sort') || 'modified';
+  // Aggiorna select se presente
+  const sortSel = document.getElementById('note-sort-sel');
+  if (sortSel) sortSel.value = noteSort;
+  let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => {
+    if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'','it');
+    if (noteSort === 'created') return new Date(b.createdAt||0)-new Date(a.createdAt||0);
+    return new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0);
+  }).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  if (q) notes = notes.filter(n =>
+    (n.title+n.content).toLowerCase().includes(q.toLowerCase())
+  );
+  if (!notes.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">📝</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q ? 'Nessun risultato' : 'Nessuna nota'}</div>
+      <div style="font-size:13px;color:var(--text3);">${q ? 'Prova con un termine diverso' : 'Tocca + per aggiungere la prima nota'}</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  notes.forEach(note => {
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.onclick = () => noteEdit(note.id);
+    const d = new Date(note.updatedAt);
+    const dateStr = d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
+    const preview = (note.content||'').replace(/\n/g,' ').trim();
+    card.innerHTML = `
+      <div class="note-card-title">${note.title || 'Senza titolo'}</div>
+      ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
+      <div class="note-card-footer">
+        <span class="note-card-date">🕐 ${dateStr}</span>
+        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;">🗑</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function noteSearch(q) { noteRenderList(q); }
+
+// ── Editor ───────────────────────────────────────────────
+function noteNew() {
+  _noteEditId = null;
+  document.getElementById('note-title-inp').value = '';
+  document.getElementById('note-content-inp').value = '';
+  document.getElementById('note-editor-date').textContent = 'Nuova nota';
+  noteShowEditor();
+  setTimeout(() => document.getElementById('note-title-inp').focus(), 200);
+}
+
+function noteEdit(id) {
+  const note = _notes.find(n => n.id === id);
+  if (!note) return;
+  _noteEditId = id;
+  document.getElementById('note-title-inp').value = note.title || '';
+  document.getElementById('note-content-inp').value = note.content || '';
+  const d = new Date(note.updatedAt);
+  document.getElementById('note-editor-date').textContent =
+    'Modificata: ' + d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  noteShowEditor();
+}
+
+function noteShowEditor() {
+  document.getElementById('note-view-list').style.display = 'none';
+  document.getElementById('note-view-editor').style.display = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = _noteEditId ? 'Modifica nota' : 'Nuova nota';
+  document.getElementById('topbar-sub').textContent = '';
+}
+
+function noteSave() {
+  const title   = document.getElementById('note-title-inp').value.trim();
+  const content = document.getElementById('note-content-inp').value.trim();
+  if (!title && !content) { showToast('Scrivi qualcosa prima di salvare'); return; }
+  const now = new Date().toISOString();
+  if (_noteEditId) {
+    const note = _notes.find(n => n.id === _noteEditId);
+    if (note) { note.title = title; note.content = content; note.updatedAt = now; }
+  } else {
+    _notes.push({ id:'note_'+Date.now(), title, content, createdAt:now, updatedAt:now });
+  }
+  noteSaveAll();
+  showToast('✅ Nota salvata');
+  noteCloseEditor();
+}
+
+function noteCloseEditor() {
+  noteShowList(document.getElementById('note-search-inp')?.value || '');
+}
+
+function noteDelete(id) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">🗑</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_nd_cancel').onclick = () => overlay.remove();
+  document.getElementById('_nd_ok').onclick = () => {
+    overlay.remove();
+    _notes = markDeleted(_notes, id);
+    noteSaveAll();
+    noteRenderList('');
+    showToast('Nota eliminata');
+  };
+}
+
+// Import note dal backup v11
+function noteImportFromBackup(notesArr) {
+  if (!Array.isArray(notesArr)) return;
+  notesArr.forEach(n => {
+    if (!_notes.find(existing => existing.id === n.id)) {
+      _notes.push({
+        id: n.id || 'note_'+Date.now(),
+        title: n.title || '',
+        content: n.content || '',
+        createdAt: n.createdAt || new Date().toISOString(),
+        updatedAt: n.updatedAt || new Date().toISOString()
+      });
+    }
+  });
+  noteSaveAll();
+}
+
+// ── Fine Note ─────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  CARTE
+// ═══════════════════════════════════════════════════════════
+const CARDS_KEY = 'hb13_cards';
+let _cards = [];
+let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+
+function cardsLoad() {
+
+// ── Recuperato da BETA333 righe 5572-5922 ──
+function cardsLoad() {
+  try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
+}
+function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
+
+let _walletCurrent = 'cards';
+function walletTab(which) {
+  _walletCurrent = which;
+  const cd = document.getElementById('wallet-cards');
+  const fn = document.getElementById('wallet-finance');
+  const tabCd = document.getElementById('wallet-tab-cards');
+  const tabFn = document.getElementById('wallet-tab-finance');
+  if (which === 'finance') {
+    if (cd) cd.style.display = 'none';
+    if (fn) fn.style.display = 'block';
+    tabCd?.classList.remove('active');
+    tabFn?.classList.add('active');
+    if (typeof financeOpen === 'function') financeOpen();
+  } else {
+    if (cd) cd.style.display = 'block';
+    if (fn) fn.style.display = 'none';
+    tabCd?.classList.add('active');
+    tabFn?.classList.remove('active');
+    if (typeof cardsOpen === 'function') cardsOpen();
+  }
+}
+
+function cardsOpen() {
+  cardsLoad(); cardsShowList();
+  document.getElementById('topbar-title').textContent = 'Carte';
+  document.getElementById('topbar-sub').textContent = _cards.length + ' carte';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function cardsShowList() {
+  document.getElementById('cards-view-list').style.display = 'flex';
+  document.getElementById('cards-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Carte';
+  cardsRender();
+}
+
+function cardsRender() {
+  const list = document.getElementById('cards-list');
+  if (!list) return;
+  if (!_cards.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">💳</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna carta</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi carte di credito, debito o prepagate</div>
+      <button onclick="cardsShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi carta</button>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  _cards.filter(c=>!c.deleted).forEach(card => {
+    const num = card.number ? card.number.replace(/\d(?=\d{4})/g,'•') : '•••• •••• •••• ••••';
+    const expiring = cardIsExpiring(card.exp);
+    const tile = document.createElement('div');
+    tile.className = 'card-tile';
+    tile.style.background = card.color;
+    tile.onclick = () => cardsShowDetail(card.id);
+    tile.innerHTML = `
+      <div class="card-tile-ring" style="width:160px;height:160px;top:-40px;right:-40px;"></div>
+      <div class="card-tile-ring" style="width:120px;height:120px;bottom:-40px;left:-20px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
+        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.08em;">${card.label}</div>
+        <div style="font-size:22px;">${cardCircuit(card.number)}</div>
+      </div>
+      <div style="position:relative;">
+        <div class="card-number-display">${cardFormatDisplay(num)}</div>
+        <div style="display:flex;gap:20px;align-items:flex-end;">
+          <div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
+            <div style="font-size:14px;font-weight:700;color:${expiring?'#fbbf24':'white'};">${card.exp||'—'}${expiring?' ⚠️':''}</div>
+          </div>
+          ${card.holder ? `<div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
+            <div style="font-size:13px;font-weight:700;color:white;">${card.holder.toUpperCase()}</div>
+          </div>` : ''}
+          <div style="margin-left:auto;">
+            <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Numero</button>
+          </div>
+        </div>
+      </div>`;
+    list.appendChild(tile);
+  });
+}
+
+// ── Dettaglio carta ───────────────────────────────────────
+function cardsShowDetail(id) {
+  const card = _cards.find(c => c.id === id);
+  if (!card) return;
+  // Mostra modale dettaglio con CVV
+  const fields = [
+    card.number ? `<div class="pw-field-row">
+      <div class="pw-field-label">Numero</div>
+      <div class="pw-field-value" style="font-family:monospace;letter-spacing:0.1em;">${cardFormatDisplay(card.number)}</div>
+      <div class="pw-field-actions"><button class="pw-field-btn" onclick="cardsCopyNumber('${id}')">📋 Copia</button></div>
+    </div>` : '',
+    card.exp ? `<div class="pw-field-row">
+      <div class="pw-field-label">Scadenza</div>
+      <div class="pw-field-value">${card.exp} ${cardIsExpiring(card.exp)?'⚠️ In scadenza':''}</div>
+    </div>` : '',
+    card.cvv ? `<div class="pw-field-row">
+      <div class="pw-field-label">CVV</div>
+      <div class="pw-field-value" id="detail-cvv-${id}" style="font-family:monospace;">•••</div>
+      <div class="pw-field-actions">
+        <button class="pw-field-btn" onclick="toggleCVV('${id}','${card.cvv}')">👁 Mostra</button>
+        <button class="pw-field-btn" onclick="copyCVV('${id}','${card.cvv}')">📋 Copia</button>
+      </div>
+    </div>` : '',
+    card.holder ? `<div class="pw-field-row">
+      <div class="pw-field-label">Intestatario</div>
+      <div class="pw-field-value">${card.holder.toUpperCase()}</div>
+    </div>` : '',
+  ].filter(Boolean).join('');
+
+  // Usa un overlay semplice
+  const existing = document.getElementById('card-detail-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'card-detail-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;';
+  overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
+      <div style="${card.color.includes('gradient')?`background:${card.color};`:'background:var(--accent);'}border-radius:24px 24px 0 0;padding:20px 16px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:white;">${card.label}</div>
+          <div style="font-size:22px;">${cardCircuit(card.number)}</div>
+        </div>
+        <div style="font-family:monospace;font-size:16px;color:rgba(255,255,255,0.9);letter-spacing:0.1em;">${cardFormatDisplay(card.number||'•••• •••• •••• ••••')}</div>
+      </div>
+      <div style="padding:16px;">${fields}
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button onclick="document.getElementById('card-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
+          <button onclick="document.getElementById('card-detail-overlay').remove();cardsEdit('${id}')" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
+          <button onclick="cardsDelete('${id}');document.getElementById('card-detail-overlay').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function toggleCVV(id, cvv) {
+  const el = document.getElementById('detail-cvv-' + id);
+  if (el) el.textContent = el.textContent === '•••' ? cvv : '•••';
+}
+async function copyCVV(id, cvv) {
+  try { await navigator.clipboard.writeText(cvv); showToast('📋 CVV copiato'); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+
+async function cardsCopyNumber(id) {
+  const card = _cards.find(c => c.id === id);
+  if (!card?.number) return;
+  try { await navigator.clipboard.writeText(card.number.replace(/\s/g,'')); showToast('📋 Numero copiato'); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+
+function cardsEdit(id) {
+  const card = _cards.find(c => c.id === id);
+  if (!card) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Carta</div>
+    ${[['_ce_label','Nome carta',card.label||''],['_ce_number','Numero carta',card.number||''],['_ce_exp','Scadenza (MM/AA)',card.exp||''],['_ce_cvv','CVV',card.cvv||''],['_ce_holder','Intestatario',card.holder||'']].map(([id,label,val])=>`
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
+    <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_ce_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_ce_save').onclick = () => {
+    const label = document.getElementById('_ce_label').value.trim();
+    if (!label) { showToast('Inserisci il nome'); return; }
+    const idx = _cards.findIndex(c => c.id === id);
+    if (idx !== -1) { _cards[idx] = {..._cards[idx],
+      label, number: document.getElementById('_ce_number').value.trim(),
+      exp: document.getElementById('_ce_exp').value.trim(),
+      cvv: document.getElementById('_ce_cvv').value.trim(),
+      holder: document.getElementById('_ce_holder').value.trim(),
+      updatedAt: new Date().toISOString()
+    }; }
+    cardsSaveAll(); cardsRender(); ov.remove();
+    showToast('✅ Carta aggiornata');
+  };
+}
+
+function cardsDelete(id) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">💳</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_cd_cancel').onclick = () => overlay.remove();
+  document.getElementById('_cd_ok').onclick = () => {
+    overlay.remove();
+    // Chiudi il dettaglio se aperto
+    document.getElementById('card-detail-overlay')?.remove();
+    _cards = markDeleted(_cards, id);
+    cardsSaveAll(); cardsRender();
+    showToast('Carta rimossa');
+  };
+}
+
+// ── Riconoscimento circuito ───────────────────────────────
+function cardCircuit(number) {
+  if (!number) return '💳';
+  const n = number.replace(/\s/g,'');
+  if (/^4/.test(n)) return '💳'; // Visa — idealmente SVG Visa
+  if (/^5[1-5]/.test(n) || /^2[2-7]/.test(n)) return '💳'; // Mastercard
+  if (/^3[47]/.test(n)) return '💳'; // Amex
+  if (/^36|^38|^30[0-5]/.test(n)) return '💳'; // Diners
+  return '💳';
+}
+
+function cardIsExpiring(exp) {
+  if (!exp || exp.length < 5) return false;
+  const [mm, yy] = exp.split('/');
+  const expDate = new Date(2000 + parseInt(yy), parseInt(mm) - 1, 1);
+  const in30days = new Date(); in30days.setDate(in30days.getDate() + 30);
+  return expDate <= in30days;
+}
+
+// ── Form helpers ─────────────────────────────────────────
+function cardFormatNumber(inp) {
+  let v = inp.value.replace(/\D/g,'').slice(0,16);
+  inp.value = v.match(/.{1,4}/g)?.join(' ') || v;
+}
+function cardFormatExp(inp) {
+  let v = inp.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.slice(0,2) + '/' + v.slice(2,4);
+  inp.value = v;
+}
+function cardFormatDisplay(num) {
+  if (!num) return '•••• •••• •••• ••••';
+  return num.replace(/(.{4})/g,'$1 ').trim();
+}
+
+let _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+function cardSelectColor(el, color) {
+  _cardColorSelected = color;
+  document.querySelectorAll('.card-color-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const preview = document.getElementById('card-preview');
+  if (preview) preview.style.background = color;
+}
+
+function cardUpdatePreview() {
+  const label  = document.getElementById('card-add-label')?.value || 'Nome carta';
+  const number = document.getElementById('card-add-number')?.value || '•••• •••• •••• ••••';
+  const exp    = document.getElementById('card-add-exp')?.value || 'MM/AA';
+  const holder = document.getElementById('card-add-holder')?.value || 'NOME COGNOME';
+  const pn = document.getElementById('preview-number');
+  const pl = document.getElementById('preview-label');
+  const pe = document.getElementById('preview-exp');
+  const ph = document.getElementById('preview-holder');
+  if (pn) pn.textContent = number || '•••• •••• •••• ••••';
+  if (pl) pl.textContent = label || 'Nome carta';
+  if (pe) pe.textContent = exp || 'MM/AA';
+  if (ph) ph.textContent = (holder || 'NOME COGNOME').toUpperCase();
+}
+
+function cardsShowAdd() {
+  document.getElementById('cards-view-list').style.display = 'none';
+  document.getElementById('cards-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuova Carta';
+  // Reset form
+  ['card-add-label','card-add-number','card-add-exp','card-add-cvv','card-add-holder'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value='';
+  });
+  _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+  const preview = document.getElementById('card-preview');
+  if (preview) preview.style.background = _cardColorSelected;
+  cardUpdatePreview();
+}
+
+function cardSave() {
+  const label  = document.getElementById('card-add-label')?.value.trim();
+  const number = document.getElementById('card-add-number')?.value.trim();
+  const exp    = document.getElementById('card-add-exp')?.value.trim();
+  const cvv    = document.getElementById('card-add-cvv')?.value.trim();
+  const holder = document.getElementById('card-add-holder')?.value.trim();
+  if (!label) { showToast('Inserisci un nome per la carta'); return; }
+  if (!number) { showToast('Inserisci il numero della carta'); return; }
+  if (!exp) { showToast('Inserisci la data di scadenza'); return; }
+  _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv, holder, color:_cardColorSelected });
+  cardsSaveAll();
+  showToast('✅ Carta ' + label + ' salvata');
+  cardsShowList();
+}
+
+// ── Fine Carte ────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  FINANZE
+// ═══════════════════════════════════════════════════════════
+const FINANCE_KEY = 'hb13_finance';
+let _financeAccounts = [];
+let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
+
+function financeLoad() {
+  try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
+}
+function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
+
+function financeOpen() {
+  financeLoad(); financeShowList();
+  document.getElementById('topbar-title').textContent = 'Finanze';
+  document.getElementById('topbar-sub').textContent = _financeAccounts.length + ' conti';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function financeShowList() {
+  document.getElementById('finance-view-list').style.display = 'block';
+  document.getElementById('finance-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Finanze';
+  // Pulsante + nella topbar
+  const addBtn = document.getElementById('topbar-add-finance');
+  if(!addBtn) {
+    const btn = document.createElement('button');
+    btn.id = 'topbar-add-finance';
+    btn.onclick = financeShowAdd;
+    btn.style.cssText = 'position:absolute;right:16px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    btn.textContent = '+';
+    const topbar = document.querySelector('.topbar') || document.getElementById('topbar');
+    if(topbar) { topbar.style.position='relative'; topbar.appendChild(btn); }
+  } else { addBtn.style.display='flex'; }
+  financeRender();
+}
+
+function financeRender() {
+  const list = document.getElementById('finance-list');
+  if (!list) return;
+  const activeAccounts = _financeAccounts.filter(a=>!a.deleted);
+
+// ── Recuperato da BETA333 righe 6131-6455 ──
+function wifiLoad() {
+  try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
+}
+function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); }
+
+function wifiOpen() {
+  wifiLoad(); wifiShowList();
+  document.getElementById('topbar-title').textContent = 'Wi-Fi';
+  document.getElementById('topbar-sub').textContent = _wifiNets.length + ' reti';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+function wifiShowList() {
+  document.getElementById('wifi-view-list').style.display = 'flex';
+  document.getElementById('wifi-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Wi-Fi';
+  wifiRender();
+}
+
+function wifiRender() {
+  const list = document.getElementById('wifi-list');
+  if (!list) return;
+  if (!_wifiNets.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">📶</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna rete salvata</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Salva le password Wi-Fi di casa, ufficio e altri luoghi</div>
+      <button onclick="wifiShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi rete Wi-Fi</button>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  _wifiNets.filter(n=>!n.deleted).forEach(net => {
+    const card = document.createElement('div');
+    card.className = 'wifi-card';
+    const secColor = net.sec === 'nopass' ? '#f97316' : '#84cc16';
+    const secLabel = net.sec === 'nopass' ? 'Aperta' : net.sec;
+    card.innerHTML = `
+      <div class="wifi-card-header">
+        <div class="wifi-icon">📶</div>
+        <div style="flex:1;min-width:0;">
+          <div class="wifi-ssid">${net.ssid}</div>
+          <div style="margin-top:4px;"><span class="wifi-sec-badge" style="background:${secColor}20;color:${secColor};">${secLabel}</span></div>
+        </div>
+        <button onclick="wifiEdit('${net.id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:4px;font-size:16px;" title="Modifica">✏️</button>
+        <button onclick="wifiDelete('${net.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:16px;" title="Elimina">🗑️</button>
+      </div>
+      <div class="wifi-actions">
+        <button class="wifi-action-btn" onclick="wifiCopyPw('${net.id}')">📋 Copia password</button>
+        <button class="wifi-action-btn" onclick="wifiShowQR('${net.id}')">📱 QR Code</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+// ── Aggiungi rete ────────────────────────────────────────
+function wifiShowAdd() {
+  document.getElementById('wifi-view-list').style.display = 'none';
+  document.getElementById('wifi-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuova Rete';
+  document.getElementById('wifi-add-ssid').value = '';
+  document.getElementById('wifi-add-pw').value = '';
+  _wifiSec = 'WPA';
+  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.sec === 'WPA');
+  });
+}
+
+function wifiSelectSec(btn, sec) {
+  _wifiSec = sec;
+  document.querySelectorAll('.wifi-sec-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function wifiToggleAddPw() {
+  const inp = document.getElementById('wifi-add-pw');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function wifiEdit(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!net) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:360px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Rete Wi-Fi</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Nome rete (SSID)</div>
+    <input id="_we_ssid" value="${net.ssid}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Password</div>
+    <input id="_we_pw" value="${net.pw||''}" type="password" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_we_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_we_save').onclick = () => {
+    const ssid = document.getElementById('_we_ssid').value.trim();
+    const pw = document.getElementById('_we_pw').value;
+    if (!ssid) { showToast('Inserisci il nome della rete'); return; }
+    const idx = _wifiNets.findIndex(n => n.id === id);
+    if (idx !== -1) { _wifiNets[idx] = {..._wifiNets[idx], ssid, pw, updatedAt: new Date().toISOString()}; }
+    wifiSaveAll(); wifiRender(); ov.remove();
+    showToast('✅ Rete aggiornata');
+  };
+}
+
+function wifiSave() {
+  const ssid = document.getElementById('wifi-add-ssid').value.trim();
+  const pw   = document.getElementById('wifi-add-pw').value.trim();
+  if (!ssid) { showToast('Inserisci il nome della rete'); return; }
+  if (_wifiSec !== 'nopass' && !pw) { showToast('Inserisci la password'); return; }
+  _wifiNets.push({ id:'wifi_'+Date.now(), ssid, pw, sec:_wifiSec });
+  wifiSaveAll();
+  showToast('✅ Rete ' + ssid + ' salvata');
+  wifiShowList();
+}
+
+async function wifiCopyPw(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!net?.pw) { showToast('Rete aperta — nessuna password'); return; }
+  try { await navigator.clipboard.writeText(net.pw); showToast('📋 Password copiata'); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+
+function wifiDelete(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
+  _wifiNets = _wifiNets.filter(n => n.id !== id);
+  wifiSaveAll(); wifiRender();
+  showToast('Rete rimossa');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  QR CONDIVISIONE — Password temporanea (60 secondi)
+// ═══════════════════════════════════════════════════════════
+let _qrCountdownTimer = null;
+
+function pwShareQR(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  // Costruisce payload JSON leggibile da qualsiasi app
+  const payload = JSON.stringify({
+    app: 'HomeBull',
+    title: item.title,
+    username: item.username || '',
+    password: item.password || '',
+    url: item.url || '',
+    shared: new Date().toISOString()
+  });
+
+  const ov = document.createElement('div');
+  ov.id = '_qr_share_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:24px;padding:24px;max-width:320px;width:100%;text-align:center;">
+      <div style="font-size:13px;font-weight:800;color:#0a0a1f;margin-bottom:4px;">${item.title}</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:14px;">${item.username || ''}</div>
+      <canvas id="_qr_share_canvas" style="border-radius:12px;max-width:100%;"></canvas>
+      <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <div style="width:36px;height:36px;border-radius:50%;border:3px solid #6366f1;display:flex;align-items:center;justify-content:center;">
+          <span id="_qr_countdown" style="font-size:13px;font-weight:900;color:#6366f1;">60</span>
+        </div>
+        <div style="font-size:12px;color:#6b7280;text-align:left;line-height:1.4;">Il QR si cancella<br>automaticamente</div>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#ef4444;font-weight:600;">⚠️ Non condividere con persone non fidate</div>
+      <button onclick="pwCloseQR()" style="margin-top:14px;width:100%;padding:11px;border-radius:12px;border:none;background:#6366f1;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+    </div>`;
+  document.body.appendChild(ov);
+
+  // Disegna QR
+  const canvas = document.getElementById('_qr_share_canvas');
+  qrDraw(canvas, payload, 240);
+
+  // Countdown 60s
+  let secs = 60;
+  clearInterval(_qrCountdownTimer);
+  _qrCountdownTimer = setInterval(() => {
+    secs--;
+    const el = document.getElementById('_qr_countdown');
+    if (el) el.textContent = secs;
+    if (secs <= 0) pwCloseQR();
+  }, 1000);
+}
+
+function pwCloseQR() {
+  clearInterval(_qrCountdownTimer);
+  document.getElementById('_qr_share_ov')?.remove();
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  GOOGLE CALENDAR SYNC
+// ═══════════════════════════════════════════════════════════
+let _gcalToken = null;
+
+async function gcalGetToken() {
+  await new Promise((resolve, reject) => {
+    if (window.google?.accounts) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+      callback: (resp) => {
+        if (resp.error) { reject(resp.error); return; }
+        _gcalToken = resp.access_token;
+        resolve(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function gcalSync() {
+  try {
+    showToast('📅 Connessione Google Calendar...');
+    const token = _gcalToken || await gcalGetToken();
+
+    // Carica eventi dal calendario Google (prossimi 30 giorni)
+    const now = new Date().toISOString();
+    const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = data.items || [];
+
+    // Importa eventi in HomeBull (evita duplicati per gcal_id)
+    let added = 0;
+    items.forEach(ev => {
+      const date = (ev.start?.date || ev.start?.dateTime || '').slice(0, 10);
+      const time = ev.start?.dateTime ? ev.start.dateTime.slice(11, 16) : '';
+      const existing = _calEvents.find(e => e.gcal_id === ev.id);
+      if (!existing) {
+        _calEvents.push({
+          id:       'gcal_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+          gcal_id:  ev.id,
+          title:    ev.summary || 'Evento',
+          date,
+          time,
+          cat:      'personal',
+          color:    '#6366f1',
+        });
+        added++;
+      }
+    });
+
+    if (added > 0) {
+      calSaveAll();
+      if (typeof calRenderMonth === 'function') calRenderMonth();
+    }
+
+    // Aggiorna UI
+    const statusEl = document.getElementById('gcal-status');
+    const btnEl = document.getElementById('gcal-btn');
+    if (statusEl) statusEl.textContent = `Sincronizzato — ${items.length} eventi`;
+    if (btnEl) { btnEl.textContent = '🔄 Aggiorna'; }
+    localStorage.setItem('hb_gcal_connected', '1');
+    showToast(`✅ ${added} nuovi eventi importati da Google Calendar`);
+  } catch(e) {
+    console.warn('GCal sync error:', e);
+    showToast('⚠️ Errore Calendar: ' + (e.message || e));
+  }
+}
+
+function gcalUpdateUI() {
+  if (localStorage.getItem('hb_gcal_connected') === '1') {
+    const el = document.getElementById('gcal-status');
+    const btn = document.getElementById('gcal-btn');
+    if (el) el.textContent = 'Collegato — clicca per aggiornare';
+    if (btn) btn.textContent = '🔄 Aggiorna';
+  }
+}
+
+// ── QR Code generator ────────────────────────────────────
+function wifiShowQR(id) {
+  const net = _wifiNets.find(n => n.id === id);
+  if (!net) return;
+  const wifiStr = `WIFI:T:${net.sec};S:${net.ssid};P:${net.pw||''};H:false;;`;
+  document.getElementById('wifi-qr-ssid-label').textContent = net.ssid;
+  const canvas = document.getElementById('wifi-qr-canvas');
+  qrDraw(canvas, wifiStr, 220);
+  document.getElementById('wifi-qr-modal').classList.add('open');
+}
+
+function wifiCloseQR() {
+  document.getElementById('wifi-qr-modal').classList.remove('open');
+}
+
+function qrDraw(canvas, text, size) {
+  canvas.width = size; canvas.height = size;
+  if (typeof QRious !== 'undefined') {
+    new QRious({ element: canvas, value: text, size, background:'white', foreground:'#0a0a0f', level:'M' });
+  } else {
+    // Fallback testo
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white'; ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#0a0a0f'; ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText('QR non disponibile', size/2, size/2-8);
+    ctx.font = '12px monospace'; ctx.fillText('(offline)', size/2, size/2+12);
+  }
+}
+
+// ── Fine Wi-Fi ────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  OTP / 2FA — TOTP RFC 6238
+// ═══════════════════════════════════════════════════════════
+const OTP_KEY = 'hb13_otp_accounts';
+let _otpAccounts = [];
+let _otpTimer    = null;
+let _otpIcon     = '🔐';
+
+function otpLoad() {
+
+// ── Recuperato da BETA333 righe 6452-6782 ──
+let _otpTimer    = null;
+let _otpIcon     = '🔐';
+
+function otpLoad() {
+  try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
+}
+function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); }
+
+function otpOpen() {
+  otpLoad();
+  otpShowList();
+  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
+  document.getElementById('topbar-sub').textContent = _otpAccounts.length + ' account';
+  document.getElementById('topbar-back').classList.remove('visible');
+}
+
+// ── Vista lista ──────────────────────────────────────────
+function otpShowList(q='') {
+  document.getElementById('otp-view-list').style.display = 'flex';
+  document.getElementById('otp-view-add').style.display  = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
+  otpRenderList(q);
+  otpStartUpdater();
+}
+
+function otpRenderList(q='') {
+  const list = document.getElementById('otp-list');
+  if (!list) return;
+  let accounts = _otpAccounts.filter(a=>!a.deleted);
+  if (q) accounts = accounts.filter(a =>
+    (a.name+a.user).toLowerCase().includes(q.toLowerCase())
+  );
+  if (!accounts.length) {
+    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
+      <div style="font-size:48px;margin-bottom:12px;">🔑</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q?'Nessun risultato':'Nessun account'}</div>
+      <div style="font-size:13px;color:var(--text3);">${q?'Prova con un termine diverso':'Tocca + per aggiungere il primo account 2FA'}</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = '';
+  accounts.forEach(acc => {
+    const code = otpGenerate(acc.secret);
+    const remaining = 30 - (Math.floor(Date.now()/1000) % 30);
+    const pct = remaining / 30;
+    const expiring = remaining <= 7;
+    const card = document.createElement('div');
+    card.className = 'otp-card';
+    card.dataset.id = acc.id;
+    const circumference = 2 * Math.PI * 15;
+    const dashOffset = circumference * (1 - pct);
+    card.innerHTML = `
+      <div class="otp-card-header">
+        <div class="otp-card-icon">${acc.icon||'🔐'}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="otp-card-name">${acc.name}</div>
+          ${acc.user ? `<div class="otp-card-user">${acc.user}</div>` : ''}
+        </div>
+        <button onclick="event.stopPropagation();otpEdit('${acc.id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:4px;font-size:16px;" title="Modifica">✏️</button>
+        <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:16px;" title="Elimina">🗑️</button>
+      </div>
+      <div class="otp-code-row">
+        <div class="otp-code ${expiring?'expiring':''}" id="otp-code-${acc.id}">${otpFormat(code)}</div>
+        <svg class="otp-timer" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15" fill="none" stroke="var(--border2)" stroke-width="3"/>
+          <circle cx="18" cy="18" r="15" fill="none"
+            stroke="${expiring?'#ef4444':'var(--accent)'}" stroke-width="3"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
+            stroke-linecap="round" transform="rotate(-90 18 18)"
+            id="otp-circle-${acc.id}"/>
+          <text x="18" y="22" text-anchor="middle" font-size="10" font-weight="800"
+            fill="${expiring?'#ef4444':'var(--text3)'}" id="otp-secs-${acc.id}">${remaining}s</text>
+        </svg>
+        <button class="otp-copy-btn" onclick="event.stopPropagation();otpCopy('${acc.id}')" title="Copia codice">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function otpSearch(q) { otpRenderList(q); }
+
+// ── Updater: rinnova codici ogni secondo ─────────────────
+function otpStartUpdater() {
+  if (_otpTimer) clearInterval(_otpTimer);
+  _otpCountdownTimer = setInterval(() => {
+    if (HB.currentTab !== 'otp') { clearInterval(_otpTimer); return; }
+    const now  = Math.floor(Date.now()/1000);
+    const rem  = 30 - (now % 30);
+    const pct  = rem / 30;
+    const circ = 2 * Math.PI * 15;
+    _otpAccounts.forEach(acc => {
+      const codeEl   = document.getElementById('otp-code-' + acc.id);
+      const circleEl = document.getElementById('otp-circle-' + acc.id);
+      const secsEl   = document.getElementById('otp-secs-' + acc.id);
+      if (!codeEl) return;
+      const expiring = rem <= 7;
+      const code = otpGenerate(acc.secret);
+      codeEl.textContent = otpFormat(code);
+      codeEl.className = 'otp-code' + (expiring ? ' expiring' : '');
+      if (circleEl) {
+        circleEl.setAttribute('stroke-dashoffset', circ * (1-pct));
+        circleEl.setAttribute('stroke', expiring ? '#ef4444' : 'var(--accent)');
+      }
+      if (secsEl) {
+        secsEl.textContent = rem + 's';
+        secsEl.setAttribute('fill', expiring ? '#ef4444' : 'var(--text3)');
+      }
+    });
+  }, 1000);
+}
+
+// ── TOTP Algorithm (RFC 6238) ────────────────────────────
+function otpFormat(code) {
+  const s = String(code).padStart(6,'0');
+  return s.slice(0,3) + ' ' + s.slice(3);
+}
+
+function otpGenerate(secret) {
+  try {
+    const key   = base32Decode(secret.replace(/\s/g,'').toUpperCase());
+    const epoch = Math.floor(Date.now() / 30000);
+    const msg   = new ArrayBuffer(8);
+    const view  = new DataView(msg);
+    view.setUint32(4, epoch, false);
+    const hmac = hmacSHA1Sync(key, new Uint8Array(msg));
+    const offset = hmac[19] & 0xf;
+    const code = (((hmac[offset]&0x7f)<<24)|((hmac[offset+1]&0xff)<<16)|
+                  ((hmac[offset+2]&0xff)<<8)|(hmac[offset+3]&0xff)) % 1000000;
+    return code;
+  } catch(e) { return 0; }
+}
+
+// HMAC-SHA1 sincrono (WebCrypto è async, usiamo fallback puro JS)
+function hmacSHA1Sync(key, msg) {
+  // SHA1 puro JS
+  function sha1(data) {
+    let h0=0x67452301,h1=0xEFCDAB89,h2=0x98BADCFE,h3=0x10325476,h4=0xC3D2E1F0;
+    const len = data.length;
+    const bits = len * 8;
+    const arr = [...data, 0x80];
+    while (arr.length % 64 !== 56) arr.push(0);
+    arr.push(0,0,0,0, bits>>24&0xff, bits>>16&0xff, bits>>8&0xff, bits&0xff);
+    for (let i=0; i<arr.length; i+=64) {
+      const w = new Array(80);
+      for (let j=0;j<16;j++) w[j]=((arr[i+j*4])<<24)|((arr[i+j*4+1])<<16)|((arr[i+j*4+2])<<8)|(arr[i+j*4+3]);
+      for (let j=16;j<80;j++) { const n=w[j-3]^w[j-8]^w[j-14]^w[j-16]; w[j]=(n<<1)|(n>>>31); }
+      let [a,b,c,d,e]=[h0,h1,h2,h3,h4];
+      for (let j=0;j<80;j++) {
+        let f,k;
+        if(j<20){f=(b&c)|(~b&d);k=0x5A827999;}
+        else if(j<40){f=b^c^d;k=0x6ED9EBA1;}
+        else if(j<60){f=(b&c)|(b&d)|(c&d);k=0x8F1BBCDC;}
+        else{f=b^c^d;k=0xCA62C1D6;}
+        const t=(((a<<5)|(a>>>27))+f+e+k+w[j])>>>0;
+        e=d;d=c;c=(b<<30)|(b>>>2);b=a;a=t;
+      }
+      h0=(h0+a)>>>0;h1=(h1+b)>>>0;h2=(h2+c)>>>0;h3=(h3+d)>>>0;h4=(h4+e)>>>0;
+    }
+    return [h0,h1,h2,h3,h4].flatMap(n=>[n>>24&0xff,n>>16&0xff,n>>8&0xff,n&0xff]);
+  }
+  const BS = 64;
+  if (key.length > BS) key = sha1(key);
+  const ipad = new Array(BS).fill(0).map((_, i) => (key[i]||0) ^ 0x36);
+  const opad = new Array(BS).fill(0).map((_, i) => (key[i]||0) ^ 0x5C);
+  return sha1([...opad, ...sha1([...ipad, ...msg])]);
+}
+
+// Base32 decoder
+function base32Decode(s) {
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const cleaned = s.replace(/=+$/,'');
+  let bits = 0, val = 0;
+  const out = [];
+  for (const c of cleaned) {
+    const idx = alpha.indexOf(c);
+    if (idx === -1) continue;
+    val = (val << 5) | idx;
+    bits += 5;
+    if (bits >= 8) { bits -= 8; out.push((val >> bits) & 0xff); }
+  }
+  return out;
+}
+
+// ── Aggiungi account ─────────────────────────────────────
+function otpShowAdd() {
+  document.getElementById('otp-view-list').style.display = 'none';
+  document.getElementById('otp-view-add').style.display  = 'flex';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = 'Nuovo Account';
+  if (_otpTimer) clearInterval(_otpTimer);
+  // Reset form
+  document.getElementById('otp-add-name').value = '';
+  document.getElementById('otp-add-user').value = '';
+  document.getElementById('otp-add-secret').value = '';
+  _otpIcon = '🔐';
+  document.querySelectorAll('.otp-icon-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.icon === '🔐');
+  });
+}
+
+function otpSelectIcon(btn, icon) {
+  _otpIcon = icon;
+  document.querySelectorAll('.otp-icon-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function otpSaveAccount() {
+  const name   = document.getElementById('otp-add-name').value.trim();
+  const user   = document.getElementById('otp-add-user').value.trim();
+  const secret = document.getElementById('otp-add-secret').value.trim().replace(/\s/g,'');
+  if (!name) { showToast('Inserisci il nome dell\'account'); return; }
+  if (!secret) { showToast('Inserisci la chiave segreta'); return; }
+  // Verifica che il secret sia valido
+  const test = otpGenerate(secret);
+  if (test === 0 && secret.length < 8) {
+    showToast('Chiave segreta non valida — controlla e riprova');
+    return;
+  }
+  _otpAccounts.push({ id:'otp_'+Date.now(), name, user, secret, icon:_otpIcon });
+  otpSaveAll();
+  showToast('✅ ' + name + ' aggiunto — codice attivo');
+  otpShowList();
+}
+
+async function otpCopy(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
+  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
+  catch(e) { showToast('Copia non disponibile'); }
+}
+
+function otpEdit(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!acc) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:360px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica OTP</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Nome servizio</div>
+    <input id="_oe_name" value="${acc.name}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Username / Email</div>
+    <input id="_oe_user" value="${acc.user||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Chiave segreta (TOTP)</div>
+    <input id="_oe_secret" value="${acc.secret||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_oe_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_oe_save').onclick = () => {
+    const name = document.getElementById('_oe_name').value.trim();
+    const user = document.getElementById('_oe_user').value.trim();
+    const secret = document.getElementById('_oe_secret').value.trim();
+    if (!name) { showToast('Inserisci il nome'); return; }
+    const idx = _otpAccounts.findIndex(a => a.id === id);
+    if (idx !== -1) { _otpAccounts[idx] = {..._otpAccounts[idx], name, user, secret, updatedAt: new Date().toISOString()}; }
+    otpSaveAll(); otpRenderList(''); ov.remove();
+    showToast('✅ Account aggiornato');
+  };
+}
+
+function otpDeleteConfirm(id) {
+  const acc = _otpAccounts.find(a => a.id === id);
+  if (!confirm(`Rimuovere ${acc?.name || 'account'}?\n\nSenza questo account potresti perdere l\'accesso al servizio.`)) return;
+  _otpAccounts = _otpAccounts.filter(a => a.id !== id);
+  otpSaveAll();
+  otpRenderList('');
+  showToast('Account rimosso');
+}
+
+// ── Fine OTP ──────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════
+//  CALENDARIO
+// ═══════════════════════════════════════════════════════════
+const CAL_KEY = 'hb13_calendar';
+let _calEvents = [];
+let _calYear, _calMonth, _calSelectedDate = null;
+let _calCat = { id:'personale', color:'#6366f1' };
+let _calEditId = null;
+
+const CAL_MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+function calLoad() {
+  try { _calEvents = JSON.parse(localStorage.getItem(CAL_KEY)||'[]'); } catch(e) { _calEvents=[]; }
+}
+function calSaveAll() { localStorage.setItem(CAL_KEY, JSON.stringify(_calEvents)); }
+
+function calOpen() {
+  turniLoad();
+  calLoad();
+  const now = new Date();
+  _calYear  = now.getFullYear();
+  _calMonth = now.getMonth();
+  calRenderMonthNew();
+  calRenderEvents();
+  document.getElementById('topbar-title').textContent = 'Calendario';
+  document.getElementById('topbar-sub').textContent = _calEvents.length + ' eventi';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('cal-event-form').style.display = 'none';
+}
+
+// ── Render calendario ────────────────────────────────────
+function calRenderMonth() {
+  calRenderMonthNew();
+}
+
+function calPrevMonth() {
+  _calMonth--;
+  if (_calMonth < 0) { _calMonth = 11; _calYear--; }
+  _calSelectedDate = null;
+  calRenderMonth(); calRenderEvents();
+}
+function calNextMonth() {
+  _calMonth++;
+  if (_calMonth > 11) { _calMonth = 0; _calYear++; }
+  _calSelectedDate = null;
+  calRenderMonth(); calRenderEvents();
+}
+
+function calSelectDate(dateStr) {
+  _calSelectedDate = dateStr;
+  calRenderMonth();
+  calRenderEvents();
+}
+
+
+// ── Recuperato da BETA333 righe 8017-8471 ──
+function initBackHandler() {
+  // Il listener è già attivo — non fare nulla
+  _backHandlerActive = true;
+}
+
+function handleBackPress() {
+
+    // Chiudi qualsiasi modal/overlay aperto
+    if (document.getElementById('settings-overlay')?.style.display === 'flex') {
+      closeSettings(); return;
+    }
+    if (document.getElementById('mob-overlay')?.style.display === 'block') {
+      closeMobileMenu(); return;
+    }
+    if (document.getElementById('search-overlay')?.classList.contains('open')) {
+      closeGlobalSearch(); return;
+    }
+    if (document.getElementById('more-drawer')?.classList.contains('open')) {
+      closeMoreDrawer(); return;
+    }
+    if (document.getElementById('shop-detail-modal')?.style.display === 'flex') {
+      shopCloseDetail(); return;
+    }
+    if (document.getElementById('wifi-qr-modal')?.style.display === 'flex') {
+      wifiCloseQR(); return;
+    }
+    if (document.getElementById('qr-scanner-modal')?.style.display === 'flex') {
+      if(typeof stopQRScanner==='function') stopQRScanner(); return;
+    }
+    if (document.getElementById('qa-edit-modal')?.style.display === 'flex') {
+      closeQaEdit(); return;
+    }
+    if (document.getElementById('home-custom-modal')?.style.display === 'flex') {
+      closeHomeCustom(); return;
+    }
+    if (HB.currentTab !== 'home') {
+      switchTab('home'); return;
+    }
+    // Home: mostra toast ma NON uscire mai (PWA non deve chiudersi con back)
+    if (backPressCount === 0) {
+      backPressCount = 1;
+      showToast('Premi Home del dispositivo per uscire', 2000);
+      backPressTimer = setTimeout(() => { backPressCount = 0; }, 2200);
+    }
+}
+
+// ── Quick Access personalizzabile ─────────────────────────
+const ALL_TABS_META = [
+  { id:'passwords', icon:'🔐', label:'Password' },
+  { id:'documents', icon:'📄', label:'Documenti' },
+  { id:'notes',     icon:'📝', label:'Note' },
+  { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
+  { id:'cards',     icon:'💳', label:'Portafoglio' },
+  { id:'server',    icon:'📡', label:'Rete & IT' },
+];
+
+const QA_KEY = 'hb12_quick_access';
+let qaSelected = [];
+
+function loadQuickAccess() {
+  const def6 = ['passwords','notes','otp','cards','calendar','shopping'];
+  try {
+    const saved = JSON.parse(localStorage.getItem(QA_KEY));
+    // Se ha meno di 6, completa con quelli del default che mancano
+    if (Array.isArray(saved) && saved.length >= 6) return saved;
+    if (Array.isArray(saved) && saved.length > 0) {
+      const merged = [...saved];
+      for (const d of def6) {
+        if (!merged.includes(d) && merged.length < 8) merged.push(d);
+      }
+      return merged;
+    }
+  } catch(e) {}
+  return def6;
+}
+
+function renderQuickAccess() {
+  const tabs = loadQuickAccess();
+  const grid = document.getElementById('quick-access-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  grid.style.cssText = 'display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:12px!important;margin-bottom:24px;';
+  tabs.forEach(tabId => {
+    const meta = ALL_TABS_META.find(t => t.id === tabId);
+    if (!meta) return;
+    const card = document.createElement('div');
+    card.className = 'qa-card';
+    card.onclick = () => switchTab(tabId);
+    card.innerHTML = `<div class="qa-card-icon">${meta.icon}</div><div class="qa-card-label">${meta.label}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function editQuickAccess() {
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 8) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede nell\'accesso rapido');
+      }
+    };
+    container.appendChild(el);
+  });
+  document.getElementById('qa-edit-modal').classList.add('open');
+}
+
+function closeQaEdit() {
+  document.getElementById('qa-edit-modal').classList.remove('open');
+}
+
+function saveQaEdit() {
+  if (qaSelected.length === 0) { showToast('Seleziona almeno una scheda'); return; }
+  localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
+  renderQuickAccess();
+  closeQaEdit();
+  showToast('✅ Accesso rapido aggiornato');
+}
+
+// ── Ricerca Globale ────────────────────────────────────────
+function openGlobalSearch() {
+  document.getElementById('search-overlay').classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+}
+
+function closeGlobalSearch() {
+  document.getElementById('search-overlay').classList.remove('open');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
+}
+
+function handleSearchOverlayClick(e) {
+  if (e.target === document.getElementById('search-overlay')) closeGlobalSearch();
+}
+
+// Ctrl+K / Cmd+K apre la ricerca
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    openGlobalSearch();
+    return;
+  }
+  if (e.key === 'Escape') {
+    if (document.getElementById('search-overlay').classList.contains('open')) {
+      closeGlobalSearch(); return;
+    }
+  }
+});
+
+function runSearch(q) {
+  const container = document.getElementById('search-results');
+  if (!q.trim()) {
+    container.innerHTML = '<div class="search-empty">Inizia a digitare per cercare</div>';
+    return;
+  }
+
+  // Se la cache non è ancora pronta, attendi
+  if (!_lsCacheReady) {
+    container.innerHTML = '<div class="search-empty">⏳ Caricamento dati in corso...</div>';
+    setTimeout(() => runSearch(q), 500);
+    return;
+  }
+
+  // Ricarica dati in memoria se vuoti
+  if (!_pwItems?.length) { try { pwLoad(); } catch(e){} }
+  if (!_notes?.length) { try { noteLoad(); } catch(e){} }
+  if (!_cards?.length) { try { cardsLoad(); } catch(e){} }
+  if (!_wifiNets?.length) { try { wifiLoad(); } catch(e){} }
+  if (!_otpAccounts?.length) { try { otpLoad(); } catch(e){} }
+  
+  const ql = q.toLowerCase();
+  const results = [];
+
+  // ── Categorie Password ─────────────────────────────────
+  if (typeof _pwCats !== 'undefined') {
+    _pwCats.forEach(cat => {
+      if (cat.name.toLowerCase().includes(ql)) {
+        const count = _pwItems.filter(i => i.categoryId === cat.id && !i.deleted).length;
+        results.push({
+          icon: '📁', title: cat.name,
+          sub: count + ' password',
+          badge: '📂 Categoria',
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowItems(cat.id, cat.name), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Password ──────────────────────────────────────────
+  if (typeof _pwItems !== 'undefined') {
+    _pwItems.filter(i => !i.deleted).forEach(item => {
+      if ([item.title, item.username, item.url, item.notes]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        const cat = _pwCats?.find(c => c.id === item.categoryId);
+        results.push({
+          icon: cat?.icon || '🔐', title: item.title,
+          sub: item.username || item.url || 'Password',
+          badge: '🔐 Password',
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Note ──────────────────────────────────────────────
+  if (typeof _notes !== 'undefined') {
+    _notes.filter(n => !n.deleted).forEach(note => {
+      if ([note.title, note.content].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📝', title: note.title || 'Nota senza titolo',
+          sub: (note.content || '').slice(0, 60),
+          badge: '📝 Note',
+          action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── OTP ───────────────────────────────────────────────
+  if (typeof _otpAccounts !== 'undefined') {
+    _otpAccounts.forEach(acc => {
+      if ([acc.name, acc.user, acc.issuer].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: acc.icon || '🔑', title: acc.name,
+          sub: acc.user || acc.issuer || 'OTP / 2FA',
+          badge: '🔑 OTP',
+          action: () => switchTab('otp')
+        });
+      }
+    });
+  }
+
+  // ── Carte ─────────────────────────────────────────────
+  if (typeof _cards !== 'undefined') {
+    _cards.filter(c => !c.deleted).forEach(card => {
+      if ([card.holder, card.bank, card.number, card.type]
+          .some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '💳', title: card.holder || 'Carta',
+          sub: card.bank || card.type || '•••• ' + (card.number||'').slice(-4),
+          badge: '💳 Carte',
+          action: () => { switchTab('cards'); setTimeout(() => cardsShowDetail(card.id), 300); }
+        });
+      }
+    });
+  }
+
+  // ── Wi-Fi ─────────────────────────────────────────────
+  if (typeof _wifiNets !== 'undefined') {
+    _wifiNets.forEach(net => {
+      if ([net.ssid, net.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '📶', title: net.ssid,
+          sub: net.security || 'Rete Wi-Fi',
+          badge: '📶 Wi-Fi',
+          action: () => switchTab('wifi')
+        });
+      }
+    });
+  }
+
+  // ── Server ────────────────────────────────────────────
+  if (typeof _serverItems !== 'undefined') {
+    _serverItems.forEach(s => {
+      if ([s.name, s.host, s.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '🖥️', title: s.name,
+          sub: s.host || 'Server / IT',
+          badge: '📡 Server',
+          action: () => switchTab('server')
+        });
+      }
+    });
+  }
+
+  // ── Documenti ─────────────────────────────────────────
+
+  // ── Finanze ───────────────────────────────────────────
+  if (typeof _financeItems !== 'undefined') {
+    _financeItems.filter(f => !f.deleted).forEach(fin => {
+      if ([fin.name, fin.iban, fin.notes].some(f => f && f.toLowerCase().includes(ql))) {
+        results.push({
+          icon: '💰', title: fin.name || 'Conto',
+          sub: fin.iban ? '••••' + fin.iban.slice(-4) : 'Finanze',
+          badge: '💰 Finanze',
+          action: () => switchTab('finance')
+        });
+      }
+    });
+  }
+
+  if (!results.length) {
+    container.innerHTML = '<div class="search-empty">Nessun risultato per "<strong>' + q + '</strong>"</div>';
+    return;
+  }
+
+  container.innerHTML = '';
+  results.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'search-result-item';
+    el.style.cursor = 'pointer';
+    el.innerHTML =
+      '<div class="search-result-icon">' + r.icon + '</div>' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div class="search-result-title">' + r.title + '</div>' +
+        '<div class="search-result-sub">' + r.sub + '</div>' +
+      '</div>' +
+      '<div class="search-result-tab">' + r.badge + '</div>';
+    el.onclick = () => { closeGlobalSearch(); r.action(); };
+    container.appendChild(el);
+  });
+}
+
+
+// ── Home Customization ─────────────────────────────────────
+const HOME_PREFS_KEY = 'hb12_home_prefs';
+
+function loadHomePrefs() {
+  try { return JSON.parse(localStorage.getItem(HOME_PREFS_KEY)) || {}; } catch { return {}; }
+}
+function saveHomePrefs(prefs) {
+  localStorage.setItem(HOME_PREFS_KEY, JSON.stringify(prefs));
+}
+
+function openHomeCustom() {
+  const prefs = loadHomePrefs();
+  // Precompila checkbox sezioni
+  const defaults = { search:true, quick:true, stats:true, alerts:true };
+  ['search','quick','stats','alerts'].forEach(k => {
+    const el = document.getElementById('hc-' + k);
+    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
+  });
+  // Precompila quick access
+  qaSelected = [...loadQuickAccess()];
+  const container = document.getElementById('qa-all-tabs-home');
+  container.innerHTML = '';
+  ALL_TABS_META.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
+    el.onclick = () => {
+      if (qaSelected.includes(tab.id)) {
+        qaSelected = qaSelected.filter(t => t !== tab.id);
+        el.classList.remove('selected');
+      } else if (qaSelected.length < 8) {
+        qaSelected.push(tab.id);
+        el.classList.add('selected');
+      } else {
+        showToast('Massimo 6 schede');
+      }
+    };
+    container.appendChild(el);
+  });
+  // Tema
+  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
+  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
+  document.getElementById('home-custom-modal').style.display = 'flex';
+}
+
+function closeHomeCustom() {
+  document.getElementById('home-custom-modal').style.display = 'none';
+}
+
+function saveHomeCustom() {
+  const prefs = {
+    search: document.getElementById('hc-search').checked,
+    quick:  document.getElementById('hc-quick').checked,
+    alerts: document.getElementById('hc-alerts').checked,
+  };
+  saveHomePrefs(prefs);
+  if (qaSelected.length > 0) localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
+  applyHomePrefs();
+  renderQuickAccess();
+  closeHomeCustom();
+  showToast('✅ Home personalizzata');
+}
+
+function applyHomePrefs() {
+  const prefs = loadHomePrefs();
+  const map = {
+    search: 'home-search-bar',
+    quick:  'home-quick-section',
+    alerts: 'home-alerts-section',
+  };
+  Object.entries(map).forEach(([key, elId]) => {
+    const el = document.getElementById(elId);
+    if (el) el.style.display = (prefs[key] === false) ? 'none' : '';
+  });
+}
+
+// (setTheme definita più avanti — supporta anche 'auto')
+
+// ── Keyboard support per PIN ───────────────────────────────
+document.addEventListener('keydown', (e) => {
+  const pinScreen = document.getElementById('step-pin');
+  if (!pinScreen || !pinScreen.classList.contains('active')) return;
+  if (e.key >= '0' && e.key <= '9') { pinPress(e.key); return; }
+  if (e.key === 'Backspace' || e.key === 'Delete') { pinClear(); return; }
+  if (e.key === 'Enter') { pinConfirm(); return; }
+});
+
+// ── Password dimenticata — Reset via email OTP ────────────
+function startForgotPin() {
+  const user = loadUser();
+  if (!user || !user.email) {
+    showToast('Nessun account trovato — accedi prima con email');
+    return;
+  }
+  // Genera OTP reset
+  HB._resetOtp = String(Math.floor(100000 + Math.random() * 900000));
+  HB._resetEmail = user.email;
+  console.log('[HB12 Reset OTP]', HB._resetOtp);
+  // TODO: Firebase sendSignInLinkToEmail — per ora demo
+  alert('📧 Codice di reset inviato a ' + user.email + '\n\n[Demo] Codice: ' + HB._resetOtp);
+  promptResetOtp();
+}
+
+function promptResetOtp() {
+  const code = prompt('Inserisci il codice a 6 cifre ricevuto via email:');
+  if (!code) return;
+  if (code.trim() !== HB._resetOtp) {
+    alert('Codice non corretto. Riprova.');
+    return;
+  }
+  // OTP corretto → imposta nuovo PIN
+  HB.authState = 'pin-setup';
+  HB.pinMode = 'setup';
+  HB.pinBuffer = '';
+
+// ── Recuperato da BETA333 righe 10659-10678 ──
+async function cloudSyncNow(){
+  const btn = document.getElementById('cloud-sync-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳...';}
+  try{ await fbSyncAll(false); _lastSyncTime=new Date(); cloudPageOpen(); showToast('✅ Sync completato!'); }
+  catch(e){ showToast('⚠️ Sync fallito'); }
+  finally{ if(btn){btn.disabled=false;btn.textContent='↑↓ Sync ora';} }
+}
+
+function cloudToggleAutoSync(){
+  const auto = localStorage.getItem('hb_auto_sync') !== '0';
+  localStorage.setItem('hb_auto_sync', auto ? '0' : '1');
+  cloudPageOpen();
+  showToast(auto ? 'Sync automatico OFF' : '✅ Sync automatico ON');
+}
+
+fbInit();
+
+// ── Biometria PIN ──────────────────────────────────────────
+async function pinCheckBio() {
+  // Mostra tasto biometrico se supportato e abilitato
+
+// ── Recuperato da BETA333 righe 11811-12050 ──
+async function driveBackupNow(silent=false) {
+  try {
+    if (!silent) showToast('☁️ Backup Drive in corso...');
+    const token = _driveBackupToken || await driveGetBackupToken();
+
+    // Raccoglie tutti i dati
+    const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+                  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server'];
+    const data = {};
+    keys.forEach(k => {
+      const v = localStorage.getItem(k);
+      if (v) try { data[k] = JSON.parse(v); } catch(e) { data[k] = v; }
+    });
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
+    const fileName = `HomeBull-backup-${dateStr}.json`;
+    const payload = JSON.stringify({ version:'13.0.0', exportedAt: now.toISOString(), data }, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+
+    // Cerca se esiste già un backup di oggi
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name='${fileName}'+and+trashed=false&fields=files(id,name)`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const searchResult = await search.json();
+    const existingId = searchResult.files?.[0]?.id || null;
+
+    // Upload: aggiorna quello di oggi o crea nuovo
+    let response;
+    const form = new FormData();
+    if (existingId) {
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName })], { type: 'application/json' }));
+      form.append('file', blob);
+      response = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`,
+        { method: 'PATCH', headers: { Authorization: 'Bearer ' + token }, body: form }
+      );
+    } else {
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName, mimeType: 'application/json' })], { type: 'application/json' }));
+      form.append('file', blob);
+      response = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
+      );
+      // Mantieni solo gli ultimi 5 backup — elimina i più vecchi
+      setTimeout(() => drivePruneOldBackups(token), 2000);
+    }
+
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    localStorage.setItem('hb_drive_backup_ts', now.toISOString());
+    if (!silent) showToast('✅ Backup su Drive completato!');
+    driveUpdateBackupUI();
+  } catch(e) {
+    console.warn('Drive backup error:', e);
+    if (!silent) showToast('⚠️ Backup Drive fallito: ' + (e.message || e));
+  }
+}
+
+async function drivePruneOldBackups(token) {
+  try {
+    // Cerca tutti i backup HomeBull ordinati per data
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,createdTime)&orderBy=createdTime+desc`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const result = await search.json();
+    const files = result.files || [];
+    // Elimina quelli oltre il 5°
+    const toDelete = files.slice(10);
+    for (const f of toDelete) {
+      await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}`, {
+        method: 'DELETE', headers: { Authorization: 'Bearer ' + token }
+      });
+      console.log('🗑 Backup vecchio eliminato:', f.name);
+    }
+  } catch(e) { console.warn('Prune error:', e); }
+}
+
+
+// ── Drive Auto Backup (ogni 24h dopo sync Firebase) ───────
+async function driveAutoBackup() {
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  if (!_driveBackupToken) return;
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  if (mode === '30min') {
+    const last = localStorage.getItem('hb_drive_backup_ts');
+    if (last && Date.now() - new Date(last).getTime() < 30*60*1000) return;
+  }
+  console.log('🔄 Auto-backup Drive (' + mode + ')...');
+  await driveBackupNow(true);
+}
+
+function driveAutoBackupOnSave() {
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  if (!_driveBackupToken) return;
+  if (localStorage.getItem('hb_drive_auto_mode') === 'save') {
+    clearTimeout(window._driveBackupDebounce);
+    window._driveBackupDebounce = setTimeout(() => driveAutoBackup(), 5000);
+  }
+}
+
+function driveStartAutoTimer() {
+  clearInterval(window._driveAutoTimer);
+  if (localStorage.getItem('hb_drive_auto') !== '1') return;
+  if (localStorage.getItem('hb_drive_auto_mode') !== '30min') return;
+  window._driveAutoTimer = setInterval(() => driveAutoBackup(), 30*60*1000);
+  console.log('⏱ Drive auto-backup ogni 30min attivo');
+}
+
+async function driveRestoreNow() {
+  try {
+    showToast('☁️ Ricerca backup su Drive...');
+    const token = _driveBackupToken || await driveGetBackupToken();
+
+    // Cerca tutti i backup HomeBull (ultimi 5)
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&pageSize=5`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    const result = await search.json();
+    const files = result.files || [];
+    if (!files.length) { showToast('⚠️ Nessun backup trovato su Drive'); return; }
+
+    // Mostra lista backup da scegliere
+    const ov = document.createElement('div');
+    ov.id = '_dr_ov';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+    const rows = files.map((f, i) => {
+      const d = new Date(f.modifiedTime);
+      const label = d.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}) +
+                    ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+      return `<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;">📦 Backup ${i===0?'<span style=\"font-size:10px;background:rgba(99,102,241,0.15);color:var(--accent);padding:2px 7px;border-radius:99px;margin-left:6px;\">Più recente</span>':''}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;">${label}</div>
+        </div>
+        <button onclick="driveDoRestore('${f.id}','${label}',this)" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Ripristina</button>
+      </div>`;
+    }).join('');
+
+    ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;">
+      <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px;">☁️ Scegli backup</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">Ultimi ${files.length} backup disponibili</div>
+      ${rows}
+      <button onclick="document.getElementById('_dr_ov').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;">Annulla</button>
+    </div>`;
+    document.body.appendChild(ov);
+  } catch(e) {
+    console.warn('Drive restore error:', e);
+    showToast('⚠️ Errore: ' + (e.message || e));
+  }
+}
+
+async function driveDoRestore(fileId, dateLabel, btn) {
+  document.getElementById('_dr_ov')?.remove();
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:32px;margin-bottom:12px;">☁️</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Ripristina questo backup?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">${dateLabel}</div>
+    <div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_drc2" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_dro2" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Ripristina</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_drc2').onclick = () => ov.remove();
+  document.getElementById('_dro2').onclick = async () => {
+    ov.remove();
+    try {
+      showToast('⬇️ Download backup...');
+      const token = _driveBackupToken || await driveGetBackupToken();
+      const dl = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+        { headers: { Authorization: 'Bearer ' + token } }
+      );
+      const bk = await dl.json();
+      if (!bk.data) { showToast('⚠️ File backup non valido'); return; }
+      Object.entries(bk.data).forEach(([k, v]) => {
+        localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+      });
+      showToast('✅ Ripristino completato — ricarico...');
+      setTimeout(() => location.reload(), 1500);
+    } catch(e) { showToast('⚠️ Ripristino fallito: ' + (e.message || e)); }
+  };
+}
+
+function driveUpdateBackupUI() {
+  const ts = localStorage.getItem('hb_drive_backup_ts');
+  const el = document.getElementById('drive-backup-ts');
+  if (el) {
+    if (ts) {
+      const d = new Date(ts);
+      el.textContent = 'Ultimo: ' + d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    } else {
+      el.textContent = 'Nessun backup effettuato';
+    }
+  }
+  // Aggiorna toggle auto
+  const auto = localStorage.getItem('hb_drive_auto') === '1';
+  const tog = document.getElementById('drive-auto-toggle');
+  const thm = document.getElementById('drive-auto-thumb');
+  if (tog) tog.style.background = auto ? '#10b981' : '#6b7280';
+  if (thm) thm.style.left = auto ? '25px' : '3px';
+  const modeRow = document.getElementById('drive-mode-row');
+  if (modeRow) modeRow.style.display = auto ? 'flex' : 'none';
+  const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
+  const bS = document.getElementById('drive-mode-save');
+  const b3 = document.getElementById('drive-mode-30min');
+  if (bS) { bS.style.background = mode==='save'  ? 'var(--accent)':'var(--surface)'; bS.style.color = mode==='save'  ? 'white':'var(--text)'; bS.style.border = mode==='save'  ? 'none':'1px solid var(--border)'; }
+  if (b3) { b3.style.background  = mode==='30min' ? 'var(--accent)':'var(--surface)'; b3.style.color  = mode==='30min' ? 'white':'var(--text)'; b3.style.border  = mode==='30min' ? 'none':'1px solid var(--border)'; }
+}
+
+function driveToggleAuto() {
+  const auto = localStorage.getItem('hb_drive_auto') === '1';
+  localStorage.setItem('hb_drive_auto', auto ? '0' : '1');
+  driveUpdateBackupUI();
+  driveStartAutoTimer();
+  showToast(auto ? '⏸ Auto backup disattivato' : '✅ Auto backup attivato');
+}
+
+function driveSetAutoMode(mode) {
+  localStorage.setItem('hb_drive_auto_mode', mode);
+  driveUpdateBackupUI();
+  driveStartAutoTimer();
+  showToast(mode === 'save' ? '✅ Backup ad ogni modifica' : '✅ Backup ogni 30 minuti');
+}
+
+
+async function libPickFromDrive() {
+  // 1. Ottieni token OAuth Google
+  await new Promise((resolve, reject) => {
+    if(!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = resolve; s.onerror = reject;
+
+function cloudPageOpen(){
+  driveUpdateBackupUI();
+  gcalUpdateUI();
+  const online = navigator.onLine && fbReady;
+  const email  = HB.user?.email || JSON.parse(localStorage.getItem('hb_last_user')||'{}').email || '—';
+  const setEl  = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  const setStyle = (id,k,v) => { const e=document.getElementById(id); if(e) e.style[k]=v; };
+  setEl('cloud-email', email);
+  setEl('set-cloud-summary', email);
+  setEl('cloud-status-txt', online ? 'Online ✅' : 'Offline ❌');
+  setEl('cloud-last-sync-txt', _lastSyncTime ? 'Oggi ' + _lastSyncTime.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}) : 'Mai');
+  setStyle('cloud-status-dot','background', online ? '#10b981' : '#ef4444');
+  setStyle('set-cloud-dot','background', online ? '#10b981' : '#ef4444');
+  const auto = localStorage.getItem('hb_auto_sync') !== '0';
+  setStyle('cloud-auto-toggle','background', auto ? '#10b981' : '#6b7280');
+  setStyle('cloud-auto-thumb','right', auto ? '3px' : '25px');
+}
+
+async function driveGetBackupToken() {
+  await new Promise((resolve, reject) => {
+    if (!window.google?.accounts) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    } else resolve();
+  });
+  return new Promise((resolve, reject) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: GDRIVE_BACKUP_SCOPE,
+      callback: (resp) => {
+        if (resp.error) { reject(resp.error); return; }
+        _driveBackupToken = resp.access_token;
+        resolve(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+function pwEditItem(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item) return;
+  const catOpts = _pwCats.map(c =>
+    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+getCatIcon(c.id,c.name,c.icon)+' '+c.name+'</option>'
+  ).join('');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:92dvh;overflow-y:auto;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">',
+    '<div style="font-size:18px;font-weight:800;">✏️ Modifica Password</div>',
+    '<button id="_pwe_del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>',
+    '</div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
+    '<select id="_pwe_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
+    '<input id="_pwe_title" type="text" value="'+(item.title||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
+    '<input id="_pwe_url" type="url" value="'+(item.url||'')+'" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
+    '<input id="_pwe_user" type="text" value="'+(item.username||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password</div>',
+    '<div style="display:flex;gap:8px;"><input id="_pwe_pass" type="password" value="'+(item.password||'')+'" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
+    '<button id="_pwe_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button>',
+    '<button id="_pwe_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
+    '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
+    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
+    '<textarea id="_pwe_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;">'+(item.notes||'')+'</textarea></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_pwe_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_pwe_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva Modifiche</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_pwe_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwe_del').onclick = () => { overlay.remove(); pwDeleteConfirm(itemId); };
+  document.getElementById('_pwe_eye').onclick = () => {
+    const i = document.getElementById('_pwe_pass');
+    i.type = i.type === 'password' ? 'text' : 'password';
+  };
+  document.getElementById('_pwe_dice').onclick = () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let p = ''; a.forEach(b => p += c[b % c.length]);
+    const i = document.getElementById('_pwe_pass'); i.value = p; i.type = 'text';
+  };
+  document.getElementById('_pwe_save').onclick = () => {
+    const title = document.getElementById('_pwe_title')?.value.trim();
+    const pass  = document.getElementById('_pwe_pass')?.value;
+    if (!title) { showToast('Inserisci il titolo'); return; }
+    const idx = _pwItems.findIndex(i => i.id === itemId);
+    if (idx > -1) {
+      _pwItems[idx] = {
+        ...item,
+        title,
+        password: pass,
+        username: document.getElementById('_pwe_user')?.value.trim() || '',
+        url:      document.getElementById('_pwe_url')?.value.trim() || '',
+        pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
+        notes:    document.getElementById('_pwe_note')?.value.trim() || '',
+        categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
+        updatedAt: new Date().toISOString()
+      };
+      pwSave();
+    }
+    overlay.remove();
+    pwShowDetail(itemId);
+    showToast('✅ Password aggiornata');
+  };
+}
+
+function pwNewCategory() {
+  const EMO = ['📁','🔐','💳','🏦','📧','☁️','🏠','💻','🌐','🛡️',
+               '📱','🔑','👤','🏢','🖥️','📜','❤️','🎓','💼','📺',
+               '🍽️','📹','🔔','🔗','💾','🎮','✈️','🎵','⚙️','🛒'];
+  window._pwNewCatIcon = '📁';
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(24px + env(safe-area-inset-bottom,0px));';
+  const iconBtns = EMO.map(ic =>
+    '<button data-ic="'+ic+'" style="width:42px;height:42px;border-radius:10px;border:2px solid '+(ic==='📁'?'var(--accent)':'var(--border)')+';background:'+(ic==='📁'?'var(--accent-bg)':'var(--surface)')+';font-size:20px;cursor:pointer;">'+ic+'</button>'
+  ).join('');
+  box.innerHTML = [
+    '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 18px;"></div>',
+    '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">📁 Nuova Categoria</div>',
+    '<div style="margin-bottom:14px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:6px;">Nome *</div>',
+    '<input id="_nc_name" type="text" placeholder="es. Banca, Lavoro, Social..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
+    '<div style="margin-bottom:18px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Icona</div>',
+    '<div id="_nc_icons" style="display:flex;flex-wrap:wrap;gap:6px;">'+iconBtns+'</div></div>',
+    '<div style="display:flex;gap:10px;">',
+    '<button id="_nc_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
+    '<button id="_nc_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Crea Categoria</button>',
+    '</div>'
+  ].join('');
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  setTimeout(() => document.getElementById('_nc_name')?.focus(), 100);
+
+  // Selezione icona
+  box.querySelectorAll('#_nc_icons button').forEach(btn => {
+    btn.onclick = () => {
+      window._pwNewCatIcon = btn.dataset.ic || btn.textContent;
+      box.querySelectorAll('#_nc_icons button').forEach(b => {
+        const active = b === btn;
+        b.style.border = active ? '2px solid var(--accent)' : '2px solid var(--border)';
+        b.style.background = active ? 'var(--accent-bg)' : 'var(--surface)';
+      });
+    };
+  });
+
+  document.getElementById('_nc_cancel').onclick = () => overlay.remove();
+  document.getElementById('_nc_name').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('_nc_save').click();
+  });
+  document.getElementById('_nc_save').onclick = () => {
+    const name = document.getElementById('_nc_name')?.value.trim();
+    if (!name) { showToast('Inserisci il nome della categoria'); return; }
+    _pwCats.push({ id: 'cat_' + Date.now(), name, icon: window._pwNewCatIcon || '📁' });
+    pwSave();
+    overlay.remove();
+    pwShowCats();
+    showToast('✅ Categoria "' + name + '" creata');
+  };
+}
+
+function pwPickCategoryToDelete() {
+  if (!_pwCats.length) { showToast('Nessuna categoria da eliminare'); return; }
+  const sorted = [..._pwCats].sort((a,b) => a.name.localeCompare(b.name,'it'));
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:70dvh;display:flex;flex-direction:column;padding:20px 0 calc(16px + env(safe-area-inset-bottom,0px));';
+  const header = '<div style="padding:0 16px 14px;display:flex;align-items:center;justify-content:space-between;">'
+    + '<div style="font-size:17px;font-weight:800;">🗑 Elimina Categoria</div>'
+    + '<button id="_dpick_close" style="padding:6px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'
+    + '</div>'
+    + '<div style="height:1px;background:var(--border);margin-bottom:8px;"></div>';
+  const listHtml = sorted.map(cat => {
+    const count = _pwItems.filter(i => i.categoryId === cat.id).length;
+    return '<button data-catid="'+cat.id+'" data-catname="'+cat.name.replace(/"/g,'&quot;')+'" data-count="'+count+'" style="width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;border:none;background:transparent;cursor:pointer;color:var(--text);font-family:inherit;text-align:left;">'
+      + '<span style="font-size:22px;">'+(cat.icon||'📁')+'</span>'
+      + '<span style="flex:1;font-size:14px;font-weight:700;">'+cat.name+'</span>'
+      + '<span style="font-size:12px;color:'+(count>0?'#f97316':'var(--text3)')+';">'+(count>0?count+' pw':'vuota')+'</span>'
+      + '</button>';
+  }).join('');
+  box.innerHTML = header + '<div style="overflow-y:auto;flex:1;">' + listHtml + '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_dpick_close').onclick = () => overlay.remove();
+  box.querySelectorAll('button[data-catid]').forEach(btn => {
+    btn.onclick = () => {
+      const catId = btn.dataset.catid;
+      const catName = btn.dataset.catname;
+      const count = parseInt(btn.dataset.count);
+      overlay.remove();
+      pwDeleteCategory(catId, catName, count);
+    };
+  });
+}
+
+function wifiSearch(q) {
+  if (!q.trim()) { wifiRender(); return; }
+  const ql = q.toLowerCase();
+  const filtered = _wifiNets.filter(n =>
+    (n.ssid||'').toLowerCase().includes(ql) ||
+    (n.notes||'').toLowerCase().includes(ql)
+  );
+  const list = document.getElementById('wifi-list');
+  if (!list) return;
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna rete trovata</div>';
+    return;
+  }
+  const backup = _wifiNets;
+  _wifiNets = filtered;
+  wifiRender();
+  _wifiNets = backup;
+}
+
 let fbAuth=null, fbDb=null, fbReady=false;
 
 function fbInit(){
