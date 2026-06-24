@@ -4858,9 +4858,6 @@ async function exportPDFSection(section) {
     });
     if (!servers.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun server salvato', margin, y); }
 
-);
-    if (!fin.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun conto salvato', margin, y); }
-
   } else if (section === 'notes') {
     title = 'Note';
     doc.text('HomeBull — ' + title, margin, 12);
