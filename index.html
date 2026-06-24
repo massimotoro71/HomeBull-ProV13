@@ -3000,6 +3000,49 @@ function fbInit(){
 
 // ── Auth OTP globals ────────────────────────────────────────
 
+
+// ── Tab metadata ───────────────────────────────────────────
+const ALL_TABS_META = [
+  { id:'passwords', icon:'🔐', label:'Password' },
+  { id:'notes',     icon:'📝', label:'Note' },
+  { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
+  { id:'cards',     icon:'💳', label:'Portafoglio' },
+  { id:'server',    icon:'📡', label:'Rete & IT' },
+];
+
+const QA_KEY = 'hb12_quick_access';
+
+let _driveBackupToken = null;
+
+
+// ── Variabili globali ripristinate ─────────────────────────
+const SERVER_KEY   = 'hb13_server';
+let _serverItems   = [];
+let _serverType    = { id:'ssh', icon:'🔐', label:'SSH' };
+let _netitCurrent  = 'server';
+
+let backPressCount  = 0;
+let backPressTimer  = null;
+let _backHandlerActive = false;
+let qaSelected      = [];
+
+const HOME_PREFS_KEY  = 'hb12_home_prefs';
+const CF_PERSONAL_KEY = 'hb13_personal';
+const CF_MESI_LETTERE = ['A','B','C','D','E','H','L','M','P','R','S','T'];
+
+const DOCS_KEY2    = 'hb13_docs2';
+let _docs2         = [];
+let _docType2      = { id:'ci', icon:'🪪', label:'C. Identità' };
+let _docPhotos2    = { fronte: null, retro: null };
+
+const MERGE_KEYS = {
+  'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,
+  'hb13_cards':true,'hb13_wifi':true,'hb13_docs2':true,
+  'hb13_finance':true,'hb13_server':true
+};
+let _syncInProgress = false;
+let _realtimeRef    = null;
+
 // ── Costanti biometria e autolock ──────────────────────────
 const HB_BIO_KEY     = 'hb12_bio_credId';
 const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
