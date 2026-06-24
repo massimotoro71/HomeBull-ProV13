@@ -7130,6 +7130,12 @@ function cloudToggleAutoSync(){
   showToast(auto ? 'Sync automatico OFF' : '✅ Sync automatico ON');
 }
 
+let fbAuth=null, fbDb=null, fbReady=false;
+let _emailOtpCode = '';
+let _emailOtpAddr = '';
+let _otpCountdownTimer = null;
+let _emailOtpExpiry = 0;
+
 fbInit();
 
 // ── Recuperato da BETA333 righe 11811-12050 ──
@@ -7592,8 +7598,6 @@ function wifiSearch(q) {
   _wifiNets = backup;
 }
 
-let fbAuth=null, fbDb=null, fbReady=false;
-
 function fbInit(){
   try{
     if(FB_CFG.apiKey==='INSERISCI_API_KEY'){
@@ -7616,11 +7620,6 @@ function fbInit(){
 }
 
 // ── OTP Email Auth ───────────────────────────────────────
-let _emailOtpCode = '';
-let _emailOtpAddr = '';
-let _otpCountdownTimer = null;
-let _emailOtpExpiry = 0;
-
 async function sendEmailOTP() {
   const email = document.getElementById('fb-email').value.trim();
   const err = document.getElementById('fb-error');
