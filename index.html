@@ -1928,7 +1928,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA337</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA338</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2030,7 +2030,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA337</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA338</div>
         </div>
       </div>
     </div>
@@ -2139,7 +2139,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA337</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA338</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3253,7 +3253,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA337',
+  version: 'BETA338',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7726,9 +7726,9 @@ async function fbSyncAll(silent=false){
     const data = {}; const tsMap = {};
     HB_SYNC_KEYS.forEach(k=>{
       const v=localStorage.getItem(k);
-      if(v){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
+      if(v && v !== 'null'){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
     });
-    if(Object.keys(data).length === 0) return;
+    if(Object.keys(data).length === 0){ console.log('Nessun dato locale da sincronizzare'); return; }
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
@@ -7746,8 +7746,21 @@ async function fbSyncLoad(){
   if(!emailKey){console.warn('SyncLoad: no email key');return;}
   try{
     const snap = await fbDb.ref('hb13/' + emailKey).get();
-    if(!snap.exists()){ await fbSyncAll(true); return; }
-    const cloud = snap.val() || {};
+    if(!snap.exists()){
+      // Cloud vuoto: carica i dati locali sul cloud (non sovrascrivere il locale)
+      console.log('Cloud vuoto — upload dati locali');
+      await fbSyncAll(true);
+      return;
+    }
+    const cloudSnap = snap.val() || {};
+    // Protezione: se il cloud non ha nessuna chiave dati reale, non sovrascrivere il locale
+    const cloudHasData = HB_SYNC_KEYS.some(k => cloudSnap[k] && cloudSnap[k] !== 'null');
+    if(!cloudHasData){
+      console.log('Cloud senza dati reali — upload locale');
+      await fbSyncAll(true);
+      return;
+    }
+    const cloud = cloudSnap;
     const cloudTs = cloud._ts || {};
     let updated = false;
     for(const k of HB_SYNC_KEYS) {
@@ -9537,7 +9550,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA337</div>
+            <div style="font-size:13px;color:var(--text3);">BETA338</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
