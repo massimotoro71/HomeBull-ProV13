@@ -5503,13 +5503,6 @@ function wifiScanQR() {
 // ═══════════════════════════════════════════════════════════
 //  SCHEDA NOTE
 // ═══════════════════════════════════════════════════════════
-const NOTE_KEY = 'hb13_notes';
-let _notes = [];
-let _noteEditId = null; // null = nuova nota
-
-function noteLoad() {
-  try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
-
 // ── Recuperato da BETA333 righe 5391-5572 ──
 function noteLoad() {
   try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
@@ -5688,12 +5681,6 @@ function noteImportFromBackup(notesArr) {
 // ═══════════════════════════════════════════════════════════
 //  CARTE
 // ═══════════════════════════════════════════════════════════
-const CARDS_KEY = 'hb13_cards';
-let _cards = [];
-let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
-
-function cardsLoad() {
-
 // ── Recuperato da BETA333 righe 5572-5922 ──
 function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
@@ -6042,11 +6029,6 @@ function financeShowList() {
   financeRender();
 }
 
-function financeRender() {
-  const list = document.getElementById('finance-list');
-  if (!list) return;
-  const activeAccounts = _financeAccounts.filter(a=>!a.deleted);
-
 // ── Recuperato da BETA333 righe 6131-6455 ──
 function wifiLoad() {
   try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
@@ -6367,13 +6349,6 @@ function qrDraw(canvas, text, size) {
 // ═══════════════════════════════════════════════════════════
 //  OTP / 2FA — TOTP RFC 6238
 // ═══════════════════════════════════════════════════════════
-const OTP_KEY = 'hb13_otp_accounts';
-let _otpAccounts = [];
-let _otpTimer    = null;
-let _otpIcon     = '🔐';
-
-function otpLoad() {
-
 // ── Recuperato da BETA333 righe 6452-6782 ──
 let _otpTimer    = null;
 let _otpIcon     = '🔐';
@@ -7138,17 +7113,6 @@ function startForgotPin() {
   promptResetOtp();
 }
 
-function promptResetOtp() {
-  const code = prompt('Inserisci il codice a 6 cifre ricevuto via email:');
-  if (!code) return;
-  if (code.trim() !== HB._resetOtp) {
-    alert('Codice non corretto. Riprova.');
-    return;
-  }
-  // OTP corretto → imposta nuovo PIN
-  HB.authState = 'pin-setup';
-  HB.pinMode = 'setup';
-  HB.pinBuffer = '';
 
 // ── Recuperato da BETA333 righe 10659-10678 ──
 async function cloudSyncNow(){
@@ -7167,10 +7131,6 @@ function cloudToggleAutoSync(){
 }
 
 fbInit();
-
-// ── Biometria PIN ──────────────────────────────────────────
-async function pinCheckBio() {
-  // Mostra tasto biometrico se supportato e abilitato
 
 // ── Recuperato da BETA333 righe 11811-12050 ──
 async function driveBackupNow(silent=false) {
@@ -7405,14 +7365,6 @@ function driveSetAutoMode(mode) {
   showToast(mode === 'save' ? '✅ Backup ad ogni modifica' : '✅ Backup ogni 30 minuti');
 }
 
-
-async function libPickFromDrive() {
-  // 1. Ottieni token OAuth Google
-  await new Promise((resolve, reject) => {
-    if(!window.google?.accounts) {
-      const s = document.createElement('script');
-      s.src = 'https://accounts.google.com/gsi/client';
-      s.onload = resolve; s.onerror = reject;
 
 function cloudPageOpen(){
   driveUpdateBackupUI();
