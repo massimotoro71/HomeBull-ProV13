@@ -5214,6 +5214,134 @@ const FB_CFG = {
   databaseURL:       "https://homebull-f57fc-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
+// ── Biometric (WebAuthn) ───────────────────────────────────
+const HB_BIO_KEY     = 'hb12_bio_credId';
+const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
+const HB_BIO_SALT    = 'hb12-biometric-key-v1';
+
+function checkBiometricAvailable() {
+  if (!window.PublicKeyCredential) return;
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  const key = document.getElementById('pin-key-left');
+  const hint = document.getElementById('bio-register-hint');
+  if (credId) {
+    if (key) {
+      key.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>`;
+      key.className = 'pin-key';
+      key.style.color = 'var(--accent)';
+    }
+    if (hint) hint.style.display = 'none';
+  } else {
+    if (key) { key.innerHTML = '✕'; key.className = 'pin-key danger'; key.style.color = ''; }
+    if (hint) hint.style.display = 'block';
+  }
+}
+
+function pinKeyLeftAction() {
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  if (credId && HB.authState === 'pin-login') { tryBiometric(); } else { pinClear(); }
+}
+
+async function _deriveBioKey(rawId) {
+  const km = await crypto.subtle.importKey('raw', rawId, 'PBKDF2', false, ['deriveKey']);
+  const salt = new TextEncoder().encode(HB_BIO_SALT);
+  return crypto.subtle.deriveKey({ name:'PBKDF2', salt, iterations:50000, hash:'SHA-256' }, km, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+}
+
+async function _bioEncrypt(key, text) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, key, new TextEncoder().encode(text));
+  const combined = new Uint8Array(12 + enc.byteLength);
+  combined.set(iv); combined.set(new Uint8Array(enc), 12);
+  let b = ''; combined.forEach(x => b += String.fromCharCode(x));
+  return btoa(b);
+}
+
+async function _bioDecrypt(key, b64) {
+  const combined = new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0)));
+  const dec = await crypto.subtle.decrypt({ name:'AES-GCM', iv: combined.slice(0,12) }, key, combined.slice(12));
+  return new TextDecoder().decode(dec);
+}
+
+async function registerBiometric() {
+  if (!window.PublicKeyCredential) { showToast('⚠️ Biometrico non supportato'); return false; }
+  try {
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const userId = new TextEncoder().encode(HB.user?.uid || HB.user?.email || 'homebull-user');
+    const hostname = location.hostname || 'localhost';
+    const credential = await navigator.credentials.create({ publicKey: {
+      challenge, rp: { name:'HomeBull Pro', id: hostname },
+      user: { id: userId.slice(0,64), name: HB.user?.email||'homebull-user', displayName:'HomeBull' },
+      pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
+      authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required', residentKey:'discouraged' },
+      timeout: 60000
+    }});
+    if (!credential) return false;
+    const rawId = new Uint8Array(credential.rawId);
+    let bin=''; rawId.forEach(b => bin+=String.fromCharCode(b));
+    localStorage.setItem(HB_BIO_KEY, btoa(bin));
+    const currentPin = HB._lastPin || '';
+    if (currentPin) {
+      const bioKey = await _deriveBioKey(rawId);
+      const encPin = await _bioEncrypt(bioKey, currentPin);
+      localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+    }
+    showToast('✅ Impronta registrata!');
+    checkBiometricAvailable();
+    return true;
+  } catch(e) {
+    console.warn('[Bio register]', e);
+    if (e.name === 'NotAllowedError') showToast('⚠️ Registrazione annullata');
+    else if (e.name === 'InvalidStateError') { showToast('⚠️ Impronta già registrata'); checkBiometricAvailable(); }
+    else if (e.name === 'NotSupportedError') showToast('⚠️ Dispositivo non supportato');
+    else showToast('⚠️ Errore: ' + e.name);
+  }
+}
+
+async function tryBiometric() {
+  const credIdB64 = localStorage.getItem(HB_BIO_KEY);
+  if (!credIdB64 || !window.PublicKeyCredential) { showToast('⚠️ Nessuna impronta registrata'); return; }
+  try {
+    const credIdBytes = new Uint8Array(atob(credIdB64).split('').map(c=>c.charCodeAt(0)));
+    const assertion = await navigator.credentials.get({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{type:'public-key', id:credIdBytes}],
+      userVerification: 'required', timeout: 60000
+    }});
+    if (!assertion) return;
+    const encPin = localStorage.getItem(HB_BIO_PIN_KEY);
+    if (encPin) {
+      try {
+        const rawId = new Uint8Array(assertion.rawId);
+        const bioKey = await _deriveBioKey(rawId);
+        const pin = await _bioDecrypt(bioKey, encPin);
+        if (pin) { const ok = await verifyPIN(pin); if (ok) { showToast('👆 Accesso biometrico'); unlockApp(); return; } }
+      } catch(e2) { console.warn('[Bio decrypt]', e2); }
+    }
+    showToast('👆 Accesso biometrico');
+    unlockApp();
+  } catch(e) {
+    console.warn('[Bio auth]', e);
+    if (e.name !== 'NotAllowedError') showToast('⚠️ Errore biometria: ' + e.name);
+  }
+}
+
+async function pinCheckBio() {
+  const bioBtn = document.getElementById('pin-bio-btn');
+  const bioGhost = document.getElementById('pin-bio-ghost');
+  if (!bioBtn || !bioGhost) return;
+  const supported = window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().catch(()=>false);
+  const enabled = localStorage.getItem('hb_bio') === '1';
+  if (supported && enabled) { bioBtn.style.display = 'flex'; bioGhost.style.display = 'none'; }
+  else { bioBtn.style.display = 'none'; bioGhost.style.display = 'flex'; }
+}
+
+async function pinBioAuth() {
+  const credId = localStorage.getItem(HB_BIO_KEY);
+  if (!credId) { showToast('⚠️ Nessuna impronta registrata — vai in Impostazioni'); return; }
+  await tryBiometric();
+}
+
 let fbAuth=null, fbDb=null, fbReady=false;
 
 function fbInit(){
