@@ -2999,6 +2999,12 @@ function fbInit(){
 }
 
 // ── Auth OTP globals ────────────────────────────────────────
+
+// ── Costanti biometria e autolock ──────────────────────────
+const HB_BIO_KEY     = 'hb12_bio_credId';
+const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
+const HB_BIO_SALT    = 'hb12-biometric-key-v1';
+let _autolockTimer   = null;
 let _emailOtpCode = '';
 let _emailOtpAddr = '';
 let _otpCountdownTimer = null;
@@ -9134,6 +9140,15 @@ async function authLogout() {
   goToStep('login');
   showToast('Disconnesso');
 }
+
+// ── Keyboard support per PIN ───────────────────────────────
+document.addEventListener('keydown', (e) => {
+  const pinScreen = document.getElementById('step-pin');
+  if (!pinScreen || !pinScreen.classList.contains('active')) return;
+  if (e.key >= '0' && e.key <= '9') { pinPress(e.key); return; }
+  if (e.key === 'Backspace' || e.key === 'Delete') { pinClear(); return; }
+  if (e.key === 'Enter') { pinConfirm(); return; }
+});
 
 // ════════════════════════════════════════════════════════════
 
