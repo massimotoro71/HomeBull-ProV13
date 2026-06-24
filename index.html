@@ -1565,7 +1565,7 @@ html, body {
 
 .mob-item{display:flex;align-items:center;gap:12px;padding:13px 20px;font-size:15px;font-weight:700;color:var(--text);cursor:pointer;}
 .mob-item:active{background:var(--surface);}
-#cf_barcode_wrap{max-width:260px!important;margin:8px auto!important;overflow:hidden!important;} #cf_barcode_wrap svg{width:100%!important;max-width:260px!important;height:auto!important;display:block!important;margin:0 auto!important;}
+
 
 /* ══ MOBILE FIXES ════════════════════════════════════════ */
 @media (max-width: 899px) {
@@ -1601,16 +1601,16 @@ html, body {
   }
 
   /* Barcode CF */
-  #cf_barcode_wrap {
-    max-width: 240px !important;
-    margin: 12px auto 0 !important;
-    padding: 8px !important;
-    box-sizing: border-box !important;
+  
+  
+  
+  
+  
   }
-  #cf_barcode_wrap svg {
-    width: 100% !important;
-    max-width: 220px !important;
-    height: auto !important;
+  
+  
+  
+  
     display: block !important;
     margin: 0 auto !important;
   }
@@ -2158,7 +2158,7 @@ function cardsSearch(q) {
 
       <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <span class="sidebar-item-label">Documenti</span>
+        
       </div>
 
 
@@ -3543,7 +3543,6 @@ function logout() {
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: ['customize'] },
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
-  documents: { title: 'Documenti',   sub: '', actions: ['add'] },
   notes:     { title: 'Note',        sub: '', actions: ['search'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Portafoglio', sub: 'Carte e conti', actions: [] },
@@ -3607,7 +3606,6 @@ function switchTab(tab) {
     notes:     () => typeof noteOpen === 'function' && noteOpen(),
     cards:     () => { walletTab(_walletCurrent || 'cards'); },
     server:    () => { netitTab(_netitCurrent || 'server'); },
-    documents: () => typeof docsOpen === 'function' && docsOpen(),
     home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
@@ -3893,17 +3891,7 @@ function checkExpiryNotifications() {
 
   const toNotify = [];
 
-  // Documenti
-  (_docs2 || []).forEach(doc => {
-    if (!doc.expiry) return;
-    const days = Math.ceil((new Date(doc.expiry) - now) / 86400000);
-    if (days >= 0 && days <= 30)
-      toNotify.push(`📄 ${doc.label} di ${doc.nome} scade tra ${days} giorni`);
-    else if (days < 0)
-      toNotify.push(`📄 ${doc.label} di ${doc.nome} è scaduto!`);
-  });
-
-  // Carte
+    // Carte
   (_cards || []).forEach(card => {
     if (!card.exp) return;
     const parts = card.exp.split('/');
@@ -3978,8 +3966,7 @@ function updateHomeStats() {
   if (!alertBox) return;
   const alerts = [];
 
-  // 1. Documenti in scadenza (entro 90 giorni)
-  const now = new Date();
+    const now = new Date();
   const docsToCheck = (_docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]'))
     .filter(d => !d.deleted);
   docsToCheck.forEach(doc => {
@@ -6864,390 +6851,6 @@ function calSelectCat(btn) {
 
 
 // ═══════════════════════════════════════════════════════════
-//  GOOGLE CALENDAR — Push eventi (bidirezionale)
-// ═══════════════════════════════════════════════════════════
-async function gcalPushEvent(ev) {
-  if (localStorage.getItem('hb_gcal_connected') !== '1') return;
-  try {
-    const token = _gcalToken || await gcalGetToken();
-    const body = {
-      summary: ev.title,
-      start: ev.time ? { dateTime: ev.date + 'T' + ev.time + ':00', timeZone: 'Europe/Rome' }
-                      : { date: ev.date },
-      end:   ev.time ? { dateTime: ev.date + 'T' + ev.time + ':00', timeZone: 'Europe/Rome' }
-                      : { date: ev.date },
-    };
-
-    if (ev.gcal_id) {
-      // Aggiorna evento esistente
-      await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${ev.gcal_id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
-        body: JSON.stringify(body)
-      });
-    } else {
-      // Crea nuovo evento
-      const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json', Authorization: 'Bearer ' + token },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (data.id) {
-        ev.gcal_id = data.id;
-        calSaveAll();
-      }
-    }
-  } catch(e) { console.warn('GCal push error:', e); }
-}
-
-async function gcalDeleteEvent(gcalId) {
-  if (localStorage.getItem('hb_gcal_connected') !== '1' || !gcalId) return;
-  try {
-    const token = _gcalToken || await gcalGetToken();
-    await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${gcalId}`, {
-      method: 'DELETE',
-      headers: { Authorization: 'Bearer ' + token }
-    });
-  } catch(e) { console.warn('GCal delete error:', e); }
-}
-
-function calSaveEvent() {
-  const title = document.getElementById('cal-ev-title').value.trim();
-  const date  = document.getElementById('cal-ev-date').value;
-  if (!title) { showToast('Inserisci il titolo dell\'evento'); return; }
-  if (!date)  { showToast('Seleziona una data'); return; }
-  const time  = document.getElementById('cal-ev-time').value;
-
-  let savedEv;
-  if (_calEditId) {
-    savedEv = _calEvents.find(e => e.id === _calEditId);
-    if (savedEv) { savedEv.title = title; savedEv.date = date; savedEv.time = time; savedEv.cat = _calCat.id; savedEv.color = _calCat.color; }
-  } else {
-    savedEv = { id:'ev_'+Date.now(), title, date, time, cat:_calCat.id, color:_calCat.color };
-    _calEvents.push(savedEv);
-  }
-  calSaveAll();
-  calCloseForm();
-  calRenderMonth();
-  calRenderEvents();
-  showToast('✅ Evento salvato');
-
-  // Sync verso Google Calendar (se collegato)
-  if (savedEv) gcalPushEvent(savedEv);
-}
-
-function calDeleteEvent(id) {
-  const ev = _calEvents.find(e => e.id === id);
-  if (ev?.gcal_id) gcalDeleteEvent(ev.gcal_id);
-  _calEvents = _calEvents.filter(e => e.id !== id);
-  calSaveAll(); calRenderMonth(); calRenderEvents();
-  showToast('Evento rimosso');
-}
-
-// ── Fine Calendario ───────────────────────────────────────
-
-// ═══════════════════════════════════════════════════════════
-//  FAMIGLIA
-// ═══════════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════════
-//  DOCUMENTI
-// ═══════════════════════════════════════════════════════════
-const DOCS_KEY = 'hb13_documents';
-let _docs = [];
-let _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
-
-function docsLoad() {
-  try { _docs = JSON.parse(localStorage.getItem(DOCS_KEY)||'[]'); } catch(e) { _docs=[]; }
-}
-function docsSaveAll() { localStorage.setItem(DOCS_KEY, JSON.stringify(_docs)); }
-
-function docsOpen() {
-  docsLoad(); docsShowList();
-  document.getElementById('topbar-title').textContent = 'Documenti';
-  document.getElementById('topbar-sub').textContent = _docs.length + ' documenti';
-  document.getElementById('topbar-back').classList.remove('visible');
-}
-
-function docsShowList() {
-  document.getElementById('docs-view-list').style.display = 'block';
-  document.getElementById('docs-view-add').style.display  = 'none';
-  document.getElementById('topbar-back').classList.remove('visible');
-  document.getElementById('topbar-title').textContent = 'Documenti';
-  docsRender();
-}
-
-function docsRender() {
-  const list = document.getElementById('docs-list');
-  if (!list) return;
-  if (!_docs.length) {
-    list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">📄</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun documento</div>
-      <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">CI, passaporto, patente, tessere e altro</div>
-      <button onclick="docsShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi documento</button>
-    </div>`;
-    return;
-  }
-  list.innerHTML = '';
-  _docs.forEach(doc => {
-    const expStatus = docsExpStatus(doc.expiry);
-    const card = document.createElement('div');
-    card.className = 'finance-card';
-    card.onclick = () => docsShowDetail(doc.id);
-    card.innerHTML = `
-      <div class="finance-card-header">
-        <div class="finance-icon" style="background:rgba(99,102,241,0.12);">${doc.icon||'📄'}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="finance-label">${doc.holder}</div>
-          <div style="margin-top:3px;display:flex;gap:6px;align-items:center;">
-            <span class="finance-type-badge" style="background:rgba(99,102,241,0.15);color:#6366f1;">${doc.label}</span>
-            ${expStatus.badge}
-          </div>
-        </div>
-        <button onclick="event.stopPropagation();docsDelete('${doc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>
-      </div>
-      ${doc.number ? `<div style="font-family:monospace;font-size:13px;color:var(--text3);letter-spacing:0.06em;">N° ${doc.number}</div>` : ''}
-      ${doc.expiry ? `<div style="font-size:12px;color:${expStatus.color};margin-top:3px;font-weight:600;">${expStatus.text}</div>` : ''}`;
-    list.appendChild(card);
-  });
-}
-
-function docsExpStatus(expiry) {
-  if (!expiry) return { badge:'', text:'', color:'var(--text3)' };
-  const exp  = new Date(expiry);
-  const now  = new Date();
-  const days = Math.ceil((exp - now) / 86400000);
-  if (days < 0)   return { badge:'<span style="background:rgba(239,68,68,0.15);color:#ef4444;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">SCADUTO</span>', text:'⚠️ Scaduto il ' + exp.toLocaleDateString('it-IT'), color:'#ef4444' };
-  if (days <= 30)  return { badge:'<span style="background:rgba(251,191,36,0.15);color:#f59e0b;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">IN SCADENZA</span>', text:'⚠️ Scade tra ' + days + ' giorni', color:'#f59e0b' };
-  if (days <= 90)  return { badge:'<span style="background:rgba(251,191,36,0.1);color:#f59e0b;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;">' + days + ' giorni</span>', text:'Scade il ' + exp.toLocaleDateString('it-IT'), color:'var(--text3)' };
-  return { badge:'', text:'Scade il ' + exp.toLocaleDateString('it-IT'), color:'var(--text3)' };
-}
-
-function docsShowDetail(id) {
-  const doc = _docs.find(d => d.id === id);
-  if (!doc) return;
-  const existing = document.getElementById('docs-detail-overlay');
-  if (existing) existing.remove();
-  const expStatus = docsExpStatus(doc.expiry);
-  const overlay = document.createElement('div');
-  overlay.id = 'docs-detail-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;';
-  overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
-  const fields = [
-    doc.number ? `<div class="pw-field-row"><div class="pw-field-label">Numero</div><div class="pw-field-value" style="font-family:monospace;letter-spacing:0.06em;">${doc.number}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="docsCopy('${doc.id}','number')">📋 Copia</button></div></div>` : '',
-    doc.expiry ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${expStatus.color};">${new Date(doc.expiry).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})} ${expStatus.badge}</div></div>` : '',
-    doc.issued ? `<div class="pw-field-row"><div class="pw-field-label">Rilasciato il</div><div class="pw-field-value">${new Date(doc.issued).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}</div></div>` : '',
-    doc.issuer ? `<div class="pw-field-row"><div class="pw-field-label">Rilasciato da</div><div class="pw-field-value">${doc.issuer}</div></div>` : '',
-    doc.notes  ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value">${doc.notes}</div></div>` : '',
-    doc.photos?.length ? `<div class="pw-field-row"><div class="pw-field-label">Foto (${doc.photos.length})</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">${doc.photos.map(p=>`<img src="${p}" style="width:90px;height:90px;object-fit:cover;border-radius:10px;cursor:pointer;" onclick="docPhotoFullscreen('${p}')">`).join('')}</div></div>` : '',
-  ].filter(Boolean).join('');
-  overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
-    <div style="background:rgba(99,102,241,0.1);border-radius:24px 24px 0 0;padding:18px 16px;">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="font-size:32px;">${doc.icon||'📄'}</div>
-        <div>
-          <div style="font-size:17px;font-weight:800;">${doc.holder}</div>
-          <div style="font-size:11px;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">${doc.label}</div>
-        </div>
-      </div>
-    </div>
-    <div style="padding:14px;">${fields}
-      <div style="display:flex;gap:10px;margin-top:8px;">
-        <button onclick="document.getElementById('docs-detail-overlay').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Chiudi</button>
-        <button onclick="docsDelete('${doc.id}');document.getElementById('docs-detail-overlay').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
-      </div>
-    </div>
-  </div>`;
-  document.body.appendChild(overlay);
-}
-
-async function docsCopy(id, field) {
-  const doc = _docs.find(d => d.id === id);
-  try { await navigator.clipboard.writeText(doc?.[field]||''); showToast('📋 Copiato!'); }
-  catch(e) { showToast('Copia non disponibile'); }
-}
-
-function docsEdit(id) {
-  const doc = _docs2.find(d => d.id === id);
-  if (!doc) return;
-  // Chiudi dettaglio overlay se aperto
-  document.getElementById('docs-detail-overlay')?.remove();
-  const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
-  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
-    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Documento</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Etichetta</div>
-    <input id="_de_label" value="${doc.label||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Cognome</div>
-    <input id="_de_cognome" value="${doc.cognome||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Nome</div>
-    <input id="_de_nome" value="${doc.nome||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Numero documento</div>
-    <input id="_de_number" value="${doc.number||doc.cf||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Scadenza</div>
-    <input id="_de_exp" value="${doc.expiry||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
-    <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_de_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  document.getElementById('_de_save').onclick = () => {
-    const idx = _docs2.findIndex(d => d.id === id);
-    if (idx !== -1) { _docs2[idx] = {..._docs2[idx],
-      label: document.getElementById('_de_label').value.trim(),
-      cognome: document.getElementById('_de_cognome').value.trim(),
-      nome: document.getElementById('_de_nome').value.trim(),
-      number: document.getElementById('_de_number').value.trim(),
-      cf: document.getElementById('_de_number').value.trim(),
-      expiry: document.getElementById('_de_exp').value.trim(),
-      updatedAt: new Date().toISOString()
-    }; }
-    docsSaveAll2(); docsRender2(); ov.remove();
-    showToast('✅ Documento aggiornato');
-  };
-}
-
-function docsDelete(id) {
-  const doc = _docs.find(d => d.id === id);
-  if (!confirm('Eliminare documento di ' + doc?.holder + '?')) return;
-  _docs = _docs.filter(d => d.id !== id);
-  docsSaveAll(); docsRender();
-  showToast('Documento rimosso');
-}
-
-// Array temporaneo foto per il documento corrente
-let _docPhotos = []; // array di base64 string
-
-function docPhotoCapture(source) {
-  const inp = document.getElementById('doc-photo-input');
-  if (source === 'camera') {
-    inp.setAttribute('capture', 'environment');
-  } else {
-    inp.removeAttribute('capture');
-  }
-  inp.click();
-}
-
-function docPhotoSelected(input) {
-  const files = input.files;
-  if (!files?.length) return;
-  Array.from(files).forEach(file => {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      // Comprimi l'immagine prima di salvarla
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX = 800;
-        const ratio = Math.min(MAX/img.width, MAX/img.height, 1);
-        canvas.width  = Math.round(img.width  * ratio);
-        canvas.height = Math.round(img.height * ratio);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        const b64 = canvas.toDataURL('image/jpeg', 0.75);
-        _docPhotos.push(b64);
-        docRenderPhotos();
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-  input.value = '';
-}
-
-function docRenderPhotos() {
-  const preview = document.getElementById('doc-photos-preview');
-  if (!preview) return;
-  preview.innerHTML = '';
-  _docPhotos.forEach((b64, idx) => {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;flex-shrink:0;';
-    const img = document.createElement('img');
-    img.src = b64;
-    img.style.cssText = 'width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border);cursor:pointer;';
-    img.onclick = () => docPhotoFullscreen(b64);
-    const del = document.createElement('button');
-    del.textContent = '✕';
-    del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:white;border:none;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:900;padding:0;';
-    del.onclick = () => { _docPhotos.splice(idx,1); docRenderPhotos(); };
-    wrap.appendChild(img);
-    wrap.appendChild(del);
-    preview.appendChild(wrap);
-  });
-}
-
-function docPhotoFullscreen(b64) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9900;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;';
-  overlay.onclick = () => overlay.remove();
-  const img = document.createElement('img');
-  img.src = b64;
-  img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:12px;';
-  overlay.appendChild(img);
-  document.body.appendChild(overlay);
-}
-
-function docsShowAdd() {
-  document.getElementById('docs-view-list').style.display = 'none';
-  document.getElementById('docs-view-add').style.display  = 'block';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuovo Documento';
-  _docPhotos = []; docRenderPhotos();
-  ['doc-holder','doc-number','doc-expiry','doc-issued','doc-issuer','doc-notes'].forEach(id => {
-    const el = document.getElementById(id); if(el) el.value='';
-  });
-  _docType = { id:'ci', icon:'🪪', label:"Carta d'Identità" };
-  document.querySelectorAll('[data-dtype]').forEach(b =>
-    b.classList.toggle('active', b.dataset.dtype === 'ci')
-  );
-  // Nascondi sezione CF di default
-  const cfSec = document.getElementById('cf-section');
-  if (cfSec) cfSec.style.display = 'none';
-}
-
-function docsSelectType(btn, typeId, icon, label) {
-  _docType = { id:typeId, icon, label };
-  document.querySelectorAll('[data-dtype]').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  // Tipo CF: mostra form speciale
-  const cfForm = document.getElementById('docs-cf-form');
-  const stdForm = document.getElementById('docs-standard-form');
-  if (cfForm && stdForm) {
-    if (typeId === 'cf') {
-      cfForm.style.display = 'block';
-      stdForm.style.display = 'none';
-    } else {
-      cfForm.style.display = 'none';
-      stdForm.style.display = 'block';
-    }
-  }
-}
-
-function docsSave() {
-  const holder = document.getElementById('doc-holder')?.value.trim();
-  if (!holder) { showToast('Inserisci il nome del documento'); return; }
-  if (_docPhotos.length > 3) { showToast('Massimo 3 foto per documento'); return; }
-  _docs.push({
-    id: 'doc_' + Date.now(),
-    type: _docType.id, icon: _docType.icon, label: _docType.label,
-    holder,
-    number: document.getElementById('doc-number')?.value.trim().toUpperCase() || '',
-    expiry: document.getElementById('doc-expiry')?.value || '',
-    issued: document.getElementById('doc-issued')?.value || '',
-    issuer: document.getElementById('doc-issuer')?.value.trim() || '',
-    notes:  document.getElementById('doc-notes')?.value.trim() || '',
-    photos: [..._docPhotos],
-  });
-  docsSaveAll();
-  showToast('✅ Documento salvato');
-  docsShowList();
-}
-
-// ── Fine Documenti ────────────────────────────────────────
-
-// ═══════════════════════════════════════════════════════════
 //  SERVER / IT
 // ═══════════════════════════════════════════════════════════
 const SERVER_KEY = 'hb13_server';
@@ -8063,7 +7666,6 @@ function handleBackPress() {
 // ── Quick Access personalizzabile ─────────────────────────
 const ALL_TABS_META = [
   { id:'passwords', icon:'🔐', label:'Password' },
-  { id:'documents', icon:'📄', label:'Documenti' },
   { id:'notes',     icon:'📝', label:'Note' },
   { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
   { id:'cards',     icon:'💳', label:'Portafoglio' },
@@ -8848,174 +8450,8 @@ function pwPickCategoryToDelete() {
   });
 }
 
-// ── Codice Fiscale ───────────────────────────────────────
-const CF_PERSONAL_KEY = 'hb13_personal';
-const CF_MESI_LETTERE = ['A','B','C','D','E','H','L','M','P','R','S','T'];
-
-
-function cfCodComune(c){const k=(c||'').toUpperCase().trim().replace(/[^A-Z0-9 ]/g,'');return CF_COMUNI_MAP[k]||'Z000';}
-function cfEstraiCognome(s){s=s.toUpperCase().replace(/[^A-Z]/g,'');const co=s.split('').filter(c=>!'AEIOU'.includes(c));const vo=s.split('').filter(c=>'AEIOU'.includes(c));return(co.join('')+vo.join('')+'XXX').slice(0,3);}
-function cfEstraiNome(s){s=s.toUpperCase().replace(/[^A-Z]/g,'');const co=s.split('').filter(c=>!'AEIOU'.includes(c));const vo=s.split('').filter(c=>'AEIOU'.includes(c));if(co.length>=4)return co[0]+co[2]+co[3];return(co.join('')+vo.join('')+'XXX').slice(0,3);}
-function cfControllo(cf15){const O={0:1,1:0,2:5,3:7,4:9,5:13,6:15,7:17,8:19,9:21,A:1,B:0,C:5,D:7,E:9,F:13,G:15,H:17,I:19,J:21,K:2,L:4,M:18,N:20,O:11,P:3,Q:6,R:8,S:12,T:14,U:16,V:10,W:22,X:25,Y:24,Z:23};const E={0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,A:0,B:1,C:2,D:3,E:4,F:5,G:6,H:7,I:8,J:9,K:10,L:11,M:12,N:13,O:14,P:15,Q:16,R:17,S:18,T:19,U:20,V:21,W:22,X:23,Y:24,Z:25};let s=0;for(let i=0;i<15;i++){const c=cf15[i];s+=(i%2===0)?O[c]:E[c];}return String.fromCharCode(65+(s%26));}
-
-function cfCalcola(cognome,nome,nascita,comune,sesso){
-  if(!cognome||!nome||!nascita||!comune)return'';
-  const p=nascita.split('-');if(p.length!==3)return'';
-  const [aa,mm,gg]=p;
-  const c3=cfEstraiCognome(cognome),n3=cfEstraiNome(nome);
-  const anno=aa.slice(-2),mese=CF_MESI_LETTERE[parseInt(mm)-1];
-  const giorno=sesso==='F'?String(parseInt(gg)+40).padStart(2,'0'):gg.padStart(2,'0');
-  const cod=cfCodComune(comune);
-  const cf15=(c3+n3+anno+mese+giorno+cod).toUpperCase();
-  if(cf15.length!==15)return'';
-  return cf15+cfControllo(cf15);
 }
 
-function cfCalcAuto(){
-  const cf=cfCalcola(
-    document.getElementById('cf_cognome')?.value,
-    document.getElementById('cf_nome')?.value,
-    document.getElementById('cf_nascita')?.value,
-    document.getElementById('cf_comune')?.value,
-    document.getElementById('cf_sesso')?.value
-  );
-  const el=document.getElementById('cf_result');
-  if(el)el.textContent=cf||'—';
-  if(cf&&cf.length===16){document.getElementById('cf_manual').value=cf;cfGenBarcode(cf);}
-}
-
-function cfGenBarcode(cf){
-  if(!cf||cf.length!==16)return;
-  const wrap=document.getElementById('cf_barcode_wrap');
-  const lbl=document.getElementById('cf_barcode_label');
-  if(!wrap)return;
-  wrap.style.display='block';
-  setTimeout(()=>{
-    try{
-      const isMobile = window.innerWidth < 900;
-      const maxPx = isMobile ? 200 : 300;
-      const barW = isMobile ? 1 : 2;
-      const barH = isMobile ? 44 : 56;
-      JsBarcode('#cf_barcode',cf,{format:'CODE128',width:barW,height:barH,displayValue:false,background:'#ffffff',lineColor:'#000000',margin:2});
-      const svg=wrap.querySelector('svg');
-      if(svg){
-        // Forza dimensioni sugli attributi SVG — CSS non basta
-        svg.setAttribute('width', maxPx);
-        svg.setAttribute('height', barH + 8);
-        svg.style.cssText = 'display:block;margin:0 auto;max-width:'+maxPx+'px;height:auto;';
-      }
-      if(lbl)lbl.textContent=cf;
-    }catch(e){console.warn(e);}
-  },50);
-}
-
-function cfCopy(){const cf=document.getElementById('cf_result')?.textContent;if(!cf||cf==='—'){showToast('Nessun CF da copiare');return;}navigator.clipboard.writeText(cf).then(()=>showToast('📋 CF copiato!'));}
-
-function cfPrint(){
-  const cf=document.getElementById('cf_manual')?.value||document.getElementById('cf_result')?.textContent;
-  if(!cf||cf==='—'||cf.length!==16){showToast('CF non valido');return;}
-  const w=window.open('','_blank');
-  w.document.write('<html><body style="text-align:center;font-family:monospace;padding:40px;"><h2>CODICE FISCALE</h2><div style="font-size:28px;font-weight:bold;letter-spacing:6px;margin:20px 0;">'+cf+'</div><svg id="bc"></svg><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><script>JsBarcode("#bc","'+cf+'",{format:"CODE128",width:3,height:80,displayValue:false});<\/script></body></html>');
-  w.document.close();setTimeout(()=>w.print(),800);
-}
-
-function docsTogglePersonal(){
-  const form=document.getElementById('docs-personal-form');
-  const btn=document.getElementById('docs-personal-toggle');
-  if(!form)return;
-  const open=form.style.display!=='none';
-  form.style.display=open?'none':'block';
-  btn.textContent=open?'+ Espandi':'− Chiudi';
-  if(!open){try{const d=JSON.parse(localStorage.getItem(CF_PERSONAL_KEY)||'{}');
-    ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{const el=document.getElementById('cf_'+k);if(el&&d[k])el.value=d[k];});
-    if(d.cf){document.getElementById('cf_manual').value=d.cf;document.getElementById('cf_result').textContent=d.cf;cfGenBarcode(d.cf);}
-  }catch(e){}}
-}
-
-function docsPersonalSave(){
-  const d={};
-  ['cognome','nome','nascita','comune','sesso','residenza','via'].forEach(k=>{d[k]=document.getElementById('cf_'+k)?.value?.trim()||'';});
-  d.cf=document.getElementById('cf_manual')?.value?.trim()||document.getElementById('cf_result')?.textContent||'';
-  localStorage.setItem(CF_PERSONAL_KEY,JSON.stringify(d));
-  showToast('✅ Dati personali salvati');
-}
-
-function cfSaveAsDoc() {
-  const cognome = document.getElementById('cf_cognome')?.value.trim();
-  const nome    = document.getElementById('cf_nome')?.value.trim();
-  const cf      = document.getElementById('cf_manual')?.value.trim() || document.getElementById('cf_result')?.textContent;
-  if (!cognome || !nome) { showToast('Inserisci cognome e nome'); return; }
-  if (!cf || cf === '—' || cf.length !== 16) { showToast('CF non valido — inseriscilo manualmente'); return; }
-
-  // Salva come documento
-  const doc = {
-    id: 'doc_' + Date.now(),
-    type: 'cf', icon: '📋', label: 'Cod. Fiscale',
-    holder: cognome + ' ' + nome,
-    number: cf,
-    expiry: '', issue: '', issuer: '',
-    notes: [
-      document.getElementById('cf_nascita')?.value ? 'Nato/a il ' + document.getElementById('cf_nascita')?.value : '',
-      document.getElementById('cf_comune')?.value  ? 'a ' + document.getElementById('cf_comune')?.value : '',
-      document.getElementById('cf_residenza')?.value ? 'Res: ' + document.getElementById('cf_residenza')?.value : '',
-      document.getElementById('cf_via')?.value      ? document.getElementById('cf_via')?.value : '',
-    ].filter(Boolean).join(' | '),
-    photos: [],
-    createdAt: new Date().toISOString()
-  };
-  _docs.push(doc);
-  docsSaveAll();
-  docsShowList();
-  showToast('✅ Codice Fiscale salvato nei documenti');
-}
-
-// ════════════════════════════════════════════════════════════
-//  DOCUMENTI — nuovo sistema
-// ════════════════════════════════════════════════════════════
-const DOCS_KEY2 = 'hb13_docs2';
-let _docs2 = [];
-let _docType2 = { id:'ci', icon:'🪪', label:'C. Identità' };
-let _docPhotos2 = { fronte: null, retro: null };
-
-function docsLoad2() {
-  try { _docs2 = JSON.parse(localStorage.getItem(DOCS_KEY2)) || []; }
-  catch(e) { _docs2 = []; }
-}
-function docsSaveAll2() { localStorage.setItem(DOCS_KEY2, JSON.stringify(_docs2)); }
-
-function docsOpen() {
-  docsLoad2();
-  docsShowList();
-  document.getElementById('topbar-title').textContent = 'Documenti';
-  document.getElementById('topbar-sub').textContent = _docs2.length + ' documenti';
-}
-
-function docsShowList() {
-  document.getElementById('docs-view-list').style.display  = 'block';
-  document.getElementById('docs-view-add').style.display   = 'none';
-  document.getElementById('docs-view-detail').style.display= 'none';
-  document.getElementById('topbar-back').classList.remove('visible');
-  docsRender2();
-}
-
-function docsShowAdd() {
-  document.getElementById('docs-view-list').style.display  = 'none';
-  document.getElementById('docs-view-add').style.display   = 'block';
-  document.getElementById('docs-view-detail').style.display= 'none';
-  document.getElementById('topbar-back').classList.add('visible');
-  // Reset form
-  _docPhotos2 = { fronte: null, retro: null };
-  ['cognome','nome','nascita','luogo','sesso','residenza','via','nr','number','issue','issuer','expiry','notes'].forEach(k => {
-    const el = document.getElementById('dnew_'+k);
-    if (el) el.value = el.tagName==='SELECT' ? 'M' : '';
-  });
-  document.getElementById('dnew_photos_preview').innerHTML = '';
-  document.getElementById('cf_result').textContent = '—';
-  document.getElementById('cf_manual').value = '';
-  document.getElementById('cf_barcode_wrap').style.display = 'none';
-  // Reset tipo → CI
-  docsPickType(document.querySelector('.doc-type-btn[data-type="ci"]'), 'ci', '🪪', 'C. Identità');
-}
 
 function docsPickType(btn, typeId, icon, label) {
   _docType2 = { id:typeId, icon, label };
@@ -9368,7 +8804,6 @@ function setFontSize(px){document.documentElement.style.fontSize=px+'px';localSt
 function showPDFSectionPicker() {
   const sections = [
     { id:'passwords', icon:'🔐', label:'Password' },
-    { id:'documents', icon:'📄', label:'Documenti' },
     { id:'notes',     icon:'📝', label:'Note' },
     { id:'cards',     icon:'💳', label:'Portafoglio' },
     { id:'wifi',      icon:'📶', label:'Wi-Fi' },
@@ -9515,7 +8950,6 @@ async function exportPDFSection(section) {
     if (!notes.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessuna nota salvata', margin, y); }
 
   } else if (section === 'documents') {
-    title = 'Documenti';
     doc.text('HomeBull — ' + title, margin, 12);
     const docs = JSON.parse(localStorage.getItem('hb13_docs2')||'[]').filter(d=>!d.deleted);
     docs.forEach(d => {
@@ -10250,7 +9684,6 @@ async function fbSyncLoad(){
       else if(tab === 'otp' && typeof otpRender==='function') otpRender();
       else if(tab === 'cards' && typeof cardsRender==='function') cardsRender();
       else if(tab === 'calendar' && typeof calRender==='function') calRender();
-      else if(tab === 'documents' && typeof docsRender2==='function') docsRender2();
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
     await fbSyncAll(true);
@@ -11528,8 +10961,6 @@ function calShowAddEvent() {
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
             <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
               <div style="display:flex;align-items:center;gap:8px;">🔐 <span style="color:var(--text2);">Password, Note, OTP, Carte, Wi-Fi, Server</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📄 <span style="color:var(--text2);">Documenti con scadenze e Codice Fiscale</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📅 <span style="color:var(--text2);">Calendario + sync Google Calendar bidirezionale</span></div>
               <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Sync Firebase multi-dispositivo</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔒 <span style="color:var(--text2);">Cifratura AES-256 (cloud + locale)</span></div>
               <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup Google Drive (ultimi 5 + auto 24h)</span></div>
