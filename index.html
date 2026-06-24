@@ -1025,66 +1025,6 @@ html, body {
 }
 .otp-icon-btn.selected { border-color: var(--accent); background: var(--accent-bg); }
 
-/* ── Lista Spesa ───────────────────────────────────────── */
-.shop-product-btn {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 4px; padding: 10px 4px 8px; border-radius: 14px;
-  border: 2px solid transparent; background: var(--surface);
-  cursor: pointer; transition: all 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  font-family: inherit; min-width: 0;
-}
-.shop-product-btn:active { transform: scale(0.92); }
-.shop-product-btn.selected { border-color: var(--accent); background: var(--accent-bg); }
-.shop-product-icon { font-size: 22px; line-height: 1; }
-.shop-product-name {
-  font-size: 9px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.04em; color: var(--text2); text-align: center;
-  line-height: 1.2; max-width: 100%;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.shop-product-btn.selected .shop-product-name { color: var(--accent); }
-/* Prodotto nella lista (chip compatto) */
-.shop-list-item {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 4px; padding: 8px 4px 6px; border-radius: 12px;
-  background: var(--accent-bg); border: 2px solid var(--accent);
-  cursor: pointer; position: relative; min-width: 0;
-}
-.shop-list-item-icon { font-size: 16px; line-height: 1; }
-.shop-list-item-name {
-  font-size: 8px; font-weight: 800; text-transform: uppercase;
-  color: var(--accent); text-align: center; max-width: 100%;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.shop-list-item-del {
-  position: absolute; top: -5px; right: -5px;
-  width: 16px; height: 16px; border-radius: 50%;
-  background: #ef4444; color: white; border: none;
-  font-size: 9px; cursor: pointer; display: flex;
-  align-items: center; justify-content: center; font-weight: 900;
-}
-/* Accordion categoria */
-.shop-accordion {
-  border: 1px solid var(--border); border-radius: 14px;
-  margin-bottom: 8px; overflow: hidden;
-  transition: border-color 0.2s;
-}
-.shop-accordion:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
-.shop-accordion-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px; cursor: pointer;
-  background: var(--surface); user-select: none;
-}
-.shop-accordion-header:active { background: var(--surface2); }
-.shop-accordion-body {
-  display: grid; grid-template-columns: repeat(4,1fr);
-  gap: 8px; padding: 10px 10px 12px;
-  background: var(--bg);
-}
-@media (min-width: 500px) { .shop-accordion-body { grid-template-columns: repeat(5,1fr); } }
-@media (min-width: 900px) { .shop-accordion-body { grid-template-columns: repeat(8,1fr); } }
-
 /* ── Ricerca globale ───────────────────────────────────── */
 #search-overlay {
   position: fixed; inset: 0; z-index: 99998;
@@ -1225,7 +1165,6 @@ html, body {
 }
 
 /* Accordion testo visibile */
-.shop-accordion-header, .shop-accordion-header * { color: var(--text) !important; }
 
 /* ══════════════════════════════════════════════════════════
    CSS MOBILE — Samsung Galaxy S26 Ultra + iPhone 13 Pro
@@ -1747,17 +1686,7 @@ html, body {
 
 
 /* ── Lista spesa attiva — tile grandi ──────────────────── */
-@media (max-width: 899px) {
-  #shop-active-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-  }
-  .shop-list-item {
-    min-height: 90px !important;
-    padding: 12px 8px !important;
-    border-radius: 16px !important;
-  }
-  .shop-list-item-icon {
+@media (max-width: 899px) {  .shop-list-item-icon {
     font-size: 28px !important;
   }
   .shop-list-item-name {
@@ -1785,47 +1714,8 @@ html, body {
   border-color: var(--accent);
 }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js">
-function shopAddCustom() {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
-  overlay.innerHTML = `
-    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
-      <div style="font-size:17px;font-weight:800;margin-bottom:16px;">➕ Aggiungi prodotto</div>
-      <div style="margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Nome prodotto</div>
-        <input id="shop-custom-name" type="text" placeholder="es. Prosciutto crudo, Latte intero..." autocomplete="off"
-          style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
-      </div>
-      <div style="margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Emoji (opzionale)</div>
-        <input id="shop-custom-icon" type="text" placeholder="🛍️" maxlength="2"
-          style="width:80px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;outline:none;text-align:center;">
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('[style]').remove()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-        <button onclick="shopConfirmCustom(this)" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi alla lista</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('shop-custom-name')?.focus(), 100);
-  document.getElementById('shop-custom-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') overlay.querySelector('button:last-child').click();
-  });
-}
-
-function shopConfirmCustom(btn) {
-  const name = document.getElementById('shop-custom-name')?.value.trim();
-  const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
-  if (!name) { showToast('Inserisci il nome del prodotto'); return; }
-  const id = 'custom_' + Date.now();
-  _shopList[id] = { name, icon, qty: 1 };
-  shopSave();
-  btn.closest('[style]').remove();
-  shopRenderAll();
-  showToast('✅ ' + name + ' aggiunto!');
-}
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script>
 function wifiShowAdd() {
   document.getElementById('wifi-view-list').style.display = 'none';
   document.getElementById('wifi-view-add').style.display  = 'flex';
@@ -1928,7 +1818,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA340</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA341</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2030,7 +1920,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA340</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA341</div>
         </div>
       </div>
     </div>
@@ -2139,7 +2029,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA340</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA341</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3234,7 +3124,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA340',
+  version: 'BETA341',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3862,7 +3752,6 @@ function renderTopbarActions(actions) {
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
   if (HB.currentTab === 'documents') { docsShowAdd(); return; }
-  if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
@@ -5141,7 +5030,6 @@ const _origSwitchTab = switchTab;
 window.switchTab = function(tab) {
   _origSwitchTab(tab);
   if (tab === 'passwords') setTimeout(pwOpen, 50);
-  if (tab === 'shopping') setTimeout(shopOpen, 50);
   if (tab === 'notes') setTimeout(noteOpen, 50);
   if (tab === 'otp') setTimeout(otpOpen, 50);
   if (tab === 'wifi') setTimeout(wifiOpen, 50);
@@ -6581,7 +6469,6 @@ const SHAREABLE = {};
 let _myShares      = {}; // condivisioni create da me
 let _receivedShares = {}; // condivisioni ricevute
 let _sharedShopData = {}; // { shareId: { fromEmail, items[] } } dati lista spesa ricevuta
-let _shopCurSharedId = null; // shareId lista condivisa attiva
 
 // ── Carica condivisioni da Firebase ──────────────────────
 async function loadShares() {
@@ -6648,224 +6535,15 @@ async function removeShare(shareId) {
 
 // ── Rimuovi tutte le condivisioni (cleanup) ───────────────
 // ── Listener realtime lista spesa condivisa ───────────────
-function startShopShareListener(shareId) {
-  if (!fbReady || !fbDb) return;
-  fbDb.ref('shared/' + shareId + '/data').on('value', snap => {
-    if (!snap.exists()) return;
-    const raw = snap.val();
-    // Estrai items da struttura { listId: { name, items: {...} } }
-    const items = [];
-    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      Object.values(raw).forEach(list => {
-        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
-          if (!item.deleted) items.push({ id, ...item });
-        });
-      });
-    }
-    if (_sharedShopData[shareId]) _sharedShopData[shareId].items = items;
-    if (_shopCurSharedId === shareId) renderSharedShopTab();
-  });
-}
 
 // ── Render tab lista spesa condivisa ─────────────────────
-function renderSharedShopTab() {
-  const shared = _sharedShopData[_shopCurSharedId];
-  if (!shared) return;
-  const grid = document.getElementById('shop-active-grid');
-  if (!grid) return;
-  const items = shared.items || [];
-  if (!items.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text3);font-size:13px;">Lista vuota</div>';
-  } else {
-    grid.innerHTML = items.map(item => {
-      const done = item.checked || item.done;
-      return '<div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:6px;">'
-        + '<div style="font-size:22px;">' + (item.icon || '🛒') + '</div>'
-        + '<div style="flex:1;font-size:14px;font-weight:600;' + (done ? 'text-decoration:line-through;opacity:0.5;' : '') + '">' + (item.name || '?') + '</div>'
-        + (done ? '<span style="color:#10b981;font-size:18px;">✅</span>' : '')
-        + '</div>';
-    }).join('');
-  }
-  const nameLabel = document.getElementById('shop-list-name-label');
-  if (nameLabel) nameLabel.textContent = '👥 ' + shared.fromEmail.split('@')[0];
-  const sub = document.getElementById('topbar-sub');
-  if (sub) sub.textContent = items.length + (items.length===1?' prodotto':' prodotti');
-}
 
 // ── Modal condivisione ────────────────────────────────────
-function showShareModal(section) {
-  if (!SHAREABLE[section]) return;
-  loadShares().then(() => _showShareModalInner(section));
-}
 
-function _showShareModalInner(section) {
-  const sec = SHAREABLE[section];
-  const active   = Object.entries(_myShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
-  const received = Object.entries(_receivedShares).filter(([k,s]) => s.section === section).map(([k,s]) => ({...s, shareId: s.shareId||k}));
-
-  const ov = document.createElement('div');
-  ov.id = '_share_modal';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
-
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;';
-
-  // Header
-  const header = document.createElement('div');
-  header.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>'
-    + '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">' + sec.icon + ' Condividi ' + sec.label + '</div>'
-    + '<div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Condividi con altri utenti HomeBull</div>';
-  wrap.appendChild(header);
-
-  // Sezione "Condivisa con"
-  const activeBox = document.createElement('div');
-  activeBox.style.cssText = 'background:var(--surface);border-radius:12px;padding:12px;margin-bottom:12px;';
-  activeBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">CONDIVISA CON</div>';
-  if (active.length) {
-    active.forEach(s => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);';
-      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.withEmail + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Può modificare':'👁 Solo lettura') + '</div></div>';
-      const btn = document.createElement('button');
-      btn.textContent = 'Rimuovi';
-      btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;';
-      btn.onclick = () => removeShare(s.shareId);
-      row.appendChild(btn);
-      activeBox.appendChild(row);
-    });
-  } else {
-    activeBox.innerHTML += '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px;">Nessuna condivisione attiva</div>';
-  }
-  wrap.appendChild(activeBox);
-
-  // Sezione "Ricevute da"
-  if (received.length) {
-    const recBox = document.createElement('div');
-    recBox.style.cssText = 'background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);border-radius:12px;padding:12px;margin-bottom:12px;';
-    recBox.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">RICEVUTE DA</div>';
-    received.forEach(s => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;';
-      row.innerHTML = '<div style="flex:1;"><div style="font-size:13px;font-weight:700;">' + s.fromEmail + '</div>'
-        + '<div style="font-size:11px;color:var(--text3);">' + (s.permission==='write'?'✏️ Puoi modificare':'👁 Solo lettura') + '</div></div>';
-      if (section === 'shopping') {
-        const btn = document.createElement('button');
-        btn.textContent = 'Vedi lista';
-        btn.style.cssText = 'padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
-        btn.onclick = () => {
-          ov.remove();
-          openSharedShopList(s.shareId, s.fromEmail);
-        };
-        row.appendChild(btn);
-      }
-      recBox.appendChild(row);
-    });
-    wrap.appendChild(recBox);
-  }
-
-  // Form aggiungi condivisione
-  const form = document.createElement('div');
-  form.style.cssText = 'background:var(--surface);border-radius:12px;padding:14px;margin-bottom:10px;';
-  form.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:10px;">➕ Aggiungi condivisione</div>';
-
-  const inp = document.createElement('input');
-  inp.type = 'email'; inp.placeholder = 'email@esempio.com';
-  inp.style.cssText = 'width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:10px;';
-  form.appendChild(inp);
-
-  // Bottoni permesso
-  const permRow = document.createElement('div');
-  permRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;';
-  let selPerm = 'write';
-  const bWrite = document.createElement('button');
-  bWrite.textContent = '✏️ Modifica';
-  bWrite.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:2px solid var(--accent);background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;';
-  const bRead = document.createElement('button');
-  bRead.textContent = '👁 Lettura';
-  bRead.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;';
-
-  bWrite.onclick = () => { selPerm='write'; bWrite.style.borderWidth='2px'; bWrite.style.background='var(--accent)'; bWrite.style.color='white'; bRead.style.background='var(--surface)'; bRead.style.color='var(--text)'; bRead.style.borderWidth='1px'; };
-  bRead.onclick  = () => { selPerm='read';  bRead.style.borderWidth='2px';  bRead.style.background='var(--accent)';  bRead.style.color='white'; bWrite.style.background='var(--surface)'; bWrite.style.color='var(--text)'; bWrite.style.borderWidth='1px'; };
-
-  permRow.appendChild(bWrite); permRow.appendChild(bRead);
-  form.appendChild(permRow);
-
-  const submitBtn = document.createElement('button');
-  submitBtn.textContent = 'Condividi';
-  submitBtn.style.cssText = 'width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
-  submitBtn.onclick = () => {
-    const email = inp.value.trim();
-    if (!email || !email.includes('@')) { showToast('⚠️ Email non valida'); return; }
-    ov.remove();
-    createShare(section, email, selPerm);
-  };
-  form.appendChild(submitBtn);
-  wrap.appendChild(form);
-
-  // Bottoni footer
-  const cleanBtn = document.createElement('button');
-  cleanBtn.textContent = '🗑 Rimuovi tutte le condivisioni';
-  cleanBtn.style.cssText = 'width:100%;padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;';
-  cleanBtn.onclick = cleanupAllShares;
-  wrap.appendChild(cleanBtn);
-
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Chiudi';
-  closeBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
-  closeBtn.onclick = () => ov.remove();
-  wrap.appendChild(closeBtn);
-
-  ov.appendChild(wrap);
-  document.body.appendChild(ov);
-}
 
 // ── Apri lista spesa condivisa come tab ──────────────────
-async function openSharedShopList(shareId, fromEmail) {
-  showToast('📥 Caricamento lista...');
-  try {
-    const snap = await fbDb.ref('shared/' + shareId + '/data').get();
-    if (!snap.exists()) { showToast('⚠️ Lista non disponibile'); return; }
-    const raw = snap.val();
-    const items = [];
-    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
-      Object.values(raw).forEach(list => {
-        if (list.items) Object.entries(list.items).forEach(([id, item]) => {
-          if (!item.deleted) items.push({ id, ...item });
-        });
-      });
-    }
-    // Prima popola i dati, POI setta l'ID e switcha tab
-    _sharedShopData[shareId] = { fromEmail, items };
-    _shopCurSharedId = shareId;
-    
-    // Vai alla Lista Spesa — ma bypassa shopOpen per non resettare _shopCurSharedId
-    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-    document.getElementById('panel-shopping')?.style.setProperty('display', 'flex');
-    HB.currentTab = 'shopping';
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    document.querySelector('.sidebar-item[data-tab="shopping"]')?.classList.add('active');
-    shopLoad(); // carica dati locali
-    _shopCurSharedId = shareId; // ripristina dopo shopLoad
-    shopRenderListTabs();
-    renderSharedShopTab();
-    startShopShareListener(shareId);
-    showToast('✅ Lista di ' + fromEmail.split('@')[0] + ' caricata');
-  } catch(e) { 
-    console.error('openSharedShopList error:', e);
-    showToast('⚠️ Errore: ' + (e.message||e)); 
-  }
-}
 
 // ── Sincronizza lista spesa verso Firebase (dopo ogni save) ─
-async function syncShopShare() {
-  const myShopShares = Object.entries(_myShares).filter(([k,s]) => s.section==='shopping');
-  if (!myShopShares.length) return;
-  const data = (() => { try { return JSON.parse(localStorage.getItem(SHOP_LISTS_KEY)||'{}'); } catch(e) { return {}; }})();
-  for (const [k,s] of myShopShares) {
-    try { await fbDb.ref('shared/' + (s.shareId||k) + '/data').set(data); } catch(e){}
-  }
-}
 
 
 
@@ -7575,7 +7253,6 @@ async function fbSyncLoad(){
       try { if(typeof noteLoad==='function') { noteLoad(); } } catch(e){}
       try { if(typeof otpLoad==='function') otpLoad(); } catch(e){}
       try { if(typeof docsLoad2==='function') docsLoad2(); } catch(e){}
-      try { if(typeof shopLoad==='function') shopLoad(); } catch(e){}
       try { if(typeof cardsLoad==='function') cardsLoad(); } catch(e){}
       try { if(typeof wifiLoad==='function') wifiLoad(); } catch(e){}
       try { if(typeof financeLoad==='function') financeLoad(); } catch(e){}
@@ -7583,7 +7260,6 @@ async function fbSyncLoad(){
       const tab = HB.currentTab;
       if(tab === 'passwords' && typeof pwRenderCats==='function') pwRenderCats();
       else if(tab === 'notes' && typeof noteRenderList==='function') noteRenderList('');
-      else if(tab === 'shopping' && typeof shopRenderAll==='function') { shopLoad(); shopRenderAll(); }
       else if(tab === 'wifi' && typeof wifiRender==='function') wifiRender();
       else if(tab === 'finance' && typeof financeRender==='function') financeRender();
       else if(tab === 'otp' && typeof otpRender==='function') otpRender();
@@ -9340,7 +9016,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA340</div>
+            <div style="font-size:13px;color:var(--text3);">BETA341</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
