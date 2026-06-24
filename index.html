@@ -3184,9 +3184,9 @@ function checkAuthStatus() {
 }
 
 // ── Auth: Email OTP ────────────────────────────────────────
-async function sendOTP(){/* firebase */}
+async function sendOTP(){ return sendEmailOTP(); }
 
-function verifyOTP(){/* firebase */}
+function verifyOTP(){ return verifyEmailOTP(); }
 
 // OTP digit navigation
 document.addEventListener('DOMContentLoaded', () => {
