@@ -3016,6 +3016,151 @@ async function sendEmailOTP() {
   setupOTPInputs();
   btn.disabled = false; btn.textContent = 'Invia codice →';
 }
+let _lastSyncTime = null;
+
+
+function startOTPTimer() {
+  if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
+  const timerEl = document.getElementById('otp-timer');
+  const resendBtn = document.getElementById('resend-btn');
+  _otpCountdownTimer = setInterval(() => {
+    const remaining = Math.max(0, Math.floor((_emailOtpExpiry - Date.now()) / 1000));
+    if (timerEl) timerEl.textContent = remaining > 0 ? `Codice valido per ${remaining}s` : 'Codice scaduto';
+    if (resendBtn) resendBtn.disabled = remaining > 540; // disabilita reinvio per 1 minuto
+    if (remaining === 0) clearInterval(_otpCountdownTimer);
+  }, 1000);
+}
+
+async function verifyEmailOTP() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  const entered = ids.map(id => document.getElementById(id)?.value).join('');
+  const err = document.getElementById('otp-error');
+  err.textContent = '';
+
+  if (entered.length < 6) { err.textContent = 'Inserisci tutte le 6 cifre'; return; }
+  if (Date.now() > _emailOtpExpiry) { err.textContent = 'Codice scaduto — reinvia'; return; }
+
+  // Verifica OTP localmente
+  const valid = (_emailOtpCode && entered === _emailOtpCode);
+
+  if (!valid) {
+    err.textContent = 'Codice non valido';
+    ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.borderColor = '#ef4444'; });
+    setTimeout(() => ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.borderColor = ''; }), 1000);
+    return;
+  }
+
+  // Login Firebase con email+password stabile (deterministico)
+  let _fbUid = null;
+  if (fbReady) {
+    const stablePass = 'HB_' + btoa(_emailOtpAddr).replace(/=/g,'') + '_v1';
+    try {
+      const cred = await fbAuth.signInWithEmailAndPassword(_emailOtpAddr, stablePass);
+      _fbUid = cred.user.uid;
+      console.log('✅ Firebase login OK:', _fbUid);
+    } catch(e) {
+      console.warn('Firebase signIn fallito:', e.code);
+      if (e.code === 'auth/user-not-found') {
+        // Utente non esiste → crea
+        try {
+          const cred2 = await fbAuth.createUserWithEmailAndPassword(_emailOtpAddr, stablePass);
+          _fbUid = cred2.user.uid;
+          console.log('✅ Firebase nuovo utente creato:', _fbUid);
+        } catch(e2) {
+          if (e2.code === 'auth/email-already-in-use') {
+            // Race condition: usa uid deterministico basato sull'email
+            _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+            console.warn('Race condition auth, uso uid derivato:', _fbUid);
+          } else { console.warn('Firebase create:', e2); }
+        }
+      } else if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') {
+        // Account esiste ma password non corrisponde (creato con versione diversa)
+        // Tenta reset password silenziosa tramite re-autenticazione non disponibile
+        // → usa uid deterministico stabile basato su email
+        try {
+          // Ultima chance: aggiorna password se loggato con altro metodo
+          const currentUser = fbAuth.currentUser;
+          if (currentUser && currentUser.email === _emailOtpAddr) {
+            await currentUser.updatePassword(stablePass);
+            _fbUid = currentUser.uid;
+            console.log('✅ Password aggiornata, uid:', _fbUid);
+          } else {
+            // Usa uid deterministico — il sync userà la stessa chiave email-based
+            _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+            console.warn('Password mismatch, uso uid derivato:', _fbUid);
+          }
+        } catch(e3) {
+          _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+          console.warn('Fallback uid derivato:', _fbUid);
+        }
+      } else if (e.code === 'auth/email-already-in-use') {
+        _fbUid = 'hb_' + btoa(_emailOtpAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,24);
+        console.warn('Email già in uso con altro provider, uid derivato:', _fbUid);
+      } else if (e.code === 'auth/too-many-requests') {
+        err.textContent = 'Troppi tentativi — riprova tra qualche minuto';
+        return;
+      } else { console.warn('Firebase login errore:', e); }
+    }
+  }
+  // OTP verificato — salva utente con UID Firebase stabile
+  HB.user = { email: _emailOtpAddr, uid: _fbUid || ('local_' + btoa(_emailOtpAddr).slice(0,12)) };
+  localStorage.setItem('hb_last_user', JSON.stringify(HB.user));
+  if (_otpCountdownTimer) clearInterval(_otpCountdownTimer);
+
+  // Vai al PIN
+  const hasPIN = !!localStorage.getItem('hb12_pin_hash');
+  if (hasPIN) {
+    HB.authState = 'pin-login';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Inserisci il tuo PIN';
+    document.getElementById('pin-sub').textContent = '';
+    const fp = document.getElementById('forgot-pin-btn');
+    if (fp) fp.style.display = 'block';
+  } else {
+    HB.authState = 'pin-setup';
+    HB.pinMode = 'setup';
+    goToStep('pin');
+    document.getElementById('pin-label').textContent = 'Scegli il tuo PIN Master';
+    document.getElementById('pin-sub').textContent = "8 cifre — usato per sbloccare l'app";
+  }
+}
+
+function setupOTPInputs() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.value = '';
+    el.oninput = () => {
+      el.value = el.value.replace(/\D/g, '').slice(-1);
+      if (el.value && i < ids.length - 1) document.getElementById(ids[i+1])?.focus();
+      if (ids.every(x => document.getElementById(x)?.value)) verifyEmailOTP();
+    };
+    el.onkeydown = (e) => {
+      if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(ids[i-1])?.focus();
+    };
+  });
+}
+
+async function resendOTP() {
+  const ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+  _emailOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  _emailOtpExpiry = Date.now() + 10 * 60 * 1000;
+  startOTPTimer();
+  try {
+    emailjs.init('OGguPT8ZipdDXinUX');
+    await emailjs.send('service_gpuw6q6', 'template_0b3murl', {
+      to_email: _emailOtpAddr,
+      otp_code: _emailOtpCode,
+      name: 'HomeBull'
+    });
+    showToast('📧 Nuovo codice inviato');
+  } catch(e) {
+    showToast('Errore reinvio — riprova');
+  }
+}
+
 
 'use strict';
 
