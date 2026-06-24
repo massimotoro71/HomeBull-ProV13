@@ -715,7 +715,7 @@ html, body {
   gap: 20px;
   transition: opacity 0.4s;
 }
-#loading-overlay.hidden { opacity: 0; pointer-events: none; }
+#loading-overlay.hidden { opacity: 0; pointer-events: none; display: none; }
 
 .loading-logo {
   width: 64px; height: 64px; border-radius: 20px;
@@ -3118,21 +3118,20 @@ window.addEventListener('appinstalled', () => {
 window.addEventListener('load', () => {
   // Nascondi loading dopo 800ms
   setTimeout(() => {
-    document.getElementById('loading-overlay').classList.add('hidden');
+    const ol = document.getElementById('loading-overlay');
+    if (ol) { ol.classList.add('hidden'); ol.style.display = 'none'; }
   }, 800);
 
-  // Timeout di sicurezza — se Firebase non risponde entro 4s vai al login
+  // Timeout di sicurezza — se dopo 2s non siamo ancora in una schermata, forza login
   setTimeout(() => {
     const overlay = document.getElementById('loading-overlay');
-    if (overlay && !overlay.classList.contains('hidden')) {
-      overlay.classList.add('hidden');
-    }
+    if (overlay) { overlay.classList.add('hidden'); overlay.style.display = 'none'; }
     const authScreen = document.getElementById('auth-screen');
     const app = document.getElementById('app');
     if (authScreen && authScreen.style.display === 'none' && app && !app.classList.contains('visible')) {
       goToStep('login');
     }
-  }, 4000);
+  }, 2000);
 
   updateHomeDate();
   checkAuthStatus();
