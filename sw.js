@@ -1,4 +1,4 @@
-const CACHE = 'hb13-beta334b';
+const CACHE = 'hb13-beta334c';
 
 self.addEventListener('install', e => {
   e.waitUntil(
