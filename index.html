@@ -2571,9 +2571,16 @@ function cardsSearch(q) {
 
 'use strict';
 
+// ── Firebase globals (dichiarati subito per evitare TDZ) ───
+let fbAuth=null, fbDb=null, fbReady=false;
+let _emailOtpCode = '';
+let _emailOtpAddr = '';
+let _otpCountdownTimer = null;
+let _emailOtpExpiry = 0;
+
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA333',
+  version: 'BETA334',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7129,12 +7136,6 @@ function cloudToggleAutoSync(){
   cloudPageOpen();
   showToast(auto ? 'Sync automatico OFF' : '✅ Sync automatico ON');
 }
-
-let fbAuth=null, fbDb=null, fbReady=false;
-let _emailOtpCode = '';
-let _emailOtpAddr = '';
-let _otpCountdownTimer = null;
-let _emailOtpExpiry = 0;
 
 fbInit();
 
