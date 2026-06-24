@@ -2057,12 +2057,12 @@ function cardsSearch(q) {
         <span id="otp-email-hint" style="color:var(--accent);font-weight:700;"></span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px;max-width:320px;margin-left:auto;margin-right:auto;">
-        <input type="text" class="auth-input" id="otp-d1" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
-        <input type="text" class="auth-input" id="otp-d2" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
-        <input type="text" class="auth-input" id="otp-d3" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
-        <input type="text" class="auth-input" id="otp-d4" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
-        <input type="text" class="auth-input" id="otp-d5" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
-        <input type="text" class="auth-input" id="otp-d6" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input otp-digit" id="otp-d1" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input otp-digit" id="otp-d2" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input otp-digit" id="otp-d3" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input otp-digit" id="otp-d4" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input otp-digit" id="otp-d5" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
+        <input type="text" class="auth-input otp-digit" id="otp-d6" maxlength="1" inputmode="numeric" style="width:100%;text-align:center;font-size:20px;font-weight:700;padding:10px 0;box-sizing:border-box;">
       </div>
       <div id="otp-error" class="auth-error" style="min-height:20px;margin:6px 0;font-size:13px;color:#ef4444;"></div>
       <button class="auth-btn" onclick="verifyEmailOTP()">Verifica →</button>
@@ -7819,6 +7819,17 @@ function cloudToggleAutoSync(){
   localStorage.setItem('hb_auto_sync', auto ? '0' : '1');
   cloudPageOpen();
   showToast(auto ? 'Sync automatico OFF' : '✅ Sync automatico ON');
+}
+
+// ── Google Calendar (stub — non ancora implementato) ───────
+function gcalUpdateUI() {
+  const el = document.getElementById('gcal-status');
+  if (el) el.textContent = 'Non collegato';
+  const btn = document.getElementById('gcal-btn');
+  if (btn) btn.textContent = 'Collega';
+}
+function gcalSync() {
+  showToast('Google Calendar non ancora disponibile in questa versione');
 }
 
 fbInit();
