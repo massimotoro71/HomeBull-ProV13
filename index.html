@@ -1975,7 +1975,7 @@ function otpShowList(q='') {
   otpRenderList(q);
   otpStartUpdater();
 }
-function otpCopy(id) {
+async function otpCopy(id) {
   const acc = _otpAccounts.find(a => a.id === id);
   if (!acc) return;
   const code = String(otpGenerate(acc.secret)).padStart(6,'0');
