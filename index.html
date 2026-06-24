@@ -3043,6 +3043,27 @@ const MERGE_KEYS = {
 let _syncInProgress = false;
 let _realtimeRef    = null;
 
+
+// ── Google Drive & Firebase config ────────────────────────
+const GDRIVE_CLIENT_ID    = '140879408214-fih8n3ed3jp0hre6ujso7lcq2mkbss1d.apps.googleusercontent.com';
+const GDRIVE_SCOPE        = 'https://www.googleapis.com/auth/drive.readonly';
+const GDRIVE_BACKUP_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const GDRIVE_API_KEY      = 'AIzaSyBiNWhEAUlsZlfWRiiZOtOU7j3cVvZnBXw';
+
+const FB_CFG = {
+  apiKey:            "AIzaSyBr6t6gKmanpthFfyUBqfSOMVICc8Efyjs",
+  authDomain:        "homebull-f57fc.firebaseapp.com",
+  projectId:         "homebull-f57fc",
+  storageBucket:     "homebull-f57fc.firebasestorage.app",
+  messagingSenderId: "140879408214",
+  appId:             "1:140879408214:web:5aee6065b9895fbe471ff7",
+  databaseURL:       "https://homebull-f57fc-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi',
+  'hb13_docs2','hb13_finance','hb13_server',
+  'hb13_pw_cats'];
+
 // ── Costanti biometria e autolock ──────────────────────────
 const HB_BIO_KEY     = 'hb12_bio_credId';
 const HB_BIO_PIN_KEY = 'hb12_bio_pin_enc';
