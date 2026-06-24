@@ -43,7 +43,6 @@
   /* Tab accent colors */
   --tab-home:    #6366f1;
   --tab-pass:    #10b981;
-  --tab-docs:    #f59e0b;
   --tab-notes:   #8b5cf6;
   --tab-cal:     #ef4444;
   --tab-otp:     #06b6d4;
@@ -1255,7 +1254,6 @@ html, body {
   /* ── Griglie 2 colonne → 1 colonna su schermi molto stretti */
   @media (max-width: 360px) {
     .home-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-    .docs-type-grid  { grid-template-columns: repeat(2, 1fr) !important; }
   }
 
   /* ── Modali bottom sheet ──────────────────────────────── */
@@ -1295,8 +1293,6 @@ html, body {
 
   /* ── Scroll momentum ──────────────────────────────────── */
   .tab-panel,
-  #docs-view-list,
-  #docs-view-add,
   #pw-cats-grid,
   #pw-items-list {
     -webkit-overflow-scrolling: touch;
@@ -1818,7 +1814,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA341</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA342</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1920,7 +1916,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA341</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA342</div>
         </div>
       </div>
     </div>
@@ -1936,10 +1932,7 @@ function cardsSearch(q) {
         <span class="sidebar-item-label">Portafoglio</span>
       </div>
 
-      <div class="sidebar-item" data-tab="documents" onclick="switchTab('documents')">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <span class="sidebar-item-label">Documenti</span>
-      </div>
+
 
 
 
@@ -2029,7 +2022,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA341</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA342</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2128,115 +2121,6 @@ function cardsSearch(q) {
           <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
           <input type="file" id="pw-csv-input" accept=".csv" style="display:none;" onchange="pwHandleCSV(event)">
         </div>
-      </div>
-    </div>
-
-    <!-- DOCUMENTI -->
-    <!-- DOCUMENTI -->
-    <div class="tab-panel" id="panel-documents">
-      <div style="height:100%;display:flex;flex-direction:column;">
-
-        <!-- LISTA DOCUMENTI -->
-        <div id="docs-view-list" style="flex:1;overflow-y:auto;padding:14px 14px 100px;">
-          <button onclick="docsShowAdd()" style="width:100%;padding:13px;border-radius:14px;border:1px dashed var(--accent);background:var(--accent-bg);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:14px;">+ Nuovo Documento</button>
-          <div id="docs-list"></div>
-          <div id="docs-empty" style="display:none;text-align:center;padding:48px 20px;">
-            <div style="font-size:48px;margin-bottom:12px;">📄</div>
-            <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun documento</div>
-            <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi i tuoi documenti personali.</div>
-            <button onclick="docsShowAdd()" style="padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">+ Nuovo Documento</button>
-          </div>
-        </div>
-
-        <!-- FORM NUOVO DOCUMENTO -->
-        <div id="docs-view-add" style="display:none;flex:1;overflow-y:auto;padding:14px 14px 100px;">
-
-          <!-- Header -->
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-            <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div style="font-size:17px;font-weight:800;">Nuovo Documento</div>
-          </div>
-
-          <!-- Tipo documento -->
-          <div style="margin-bottom:18px;">
-            <div class="pw-field-label" style="margin-bottom:10px;">Tipo documento</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="docs-type-grid">
-              <button class="doc-type-btn active" data-type="ci"   onclick="docsPickType(this,'ci','🪪','C. Identità')"   style="padding:12px 8px;border-radius:12px;border:2px solid var(--accent);background:var(--accent-bg);cursor:pointer;font-size:11px;font-weight:800;color:var(--accent);font-family:inherit;text-align:center;">🪪<br>C. Identità</button>
-              <button class="doc-type-btn"        data-type="pass" onclick="docsPickType(this,'pass','🛂','Passaporto')"  style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🛂<br>Passaporto</button>
-              <button class="doc-type-btn"        data-type="pat"  onclick="docsPickType(this,'pat','🚗','Patente')"      style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🚗<br>Patente</button>
-              <button class="doc-type-btn"        data-type="ts"   onclick="docsPickType(this,'ts','🏥','Tessera San.')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">🏥<br>Tessera San.</button>
-              <button class="doc-type-btn"        data-type="cf"   onclick="docsPickType(this,'cf','📋','Cod. Fiscale')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📋<br>Cod. Fiscale</button>
-              <button class="doc-type-btn"        data-type="alt"  onclick="docsPickType(this,'alt','📄','Altro')"       style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:800;color:var(--text2);font-family:inherit;text-align:center;">📄<br>Altro</button>
-            </div>
-          </div>
-
-          <!-- Dati anagrafici (comuni a tutti) -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Cognome *</div><input id="dnew_cognome" type="text" placeholder="Rossi" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Nome *</div><input id="dnew_nome" type="text" placeholder="Mario" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:10px;">
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Data di nascita</div><input id="dnew_nascita" type="date" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Luogo di nascita</div><input id="dnew_luogo" type="text" placeholder="Roma" oninput="cfCalcAuto()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Sesso</div><select id="dnew_sesso" onchange="cfCalcAuto()" style="width:100%;padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;"><option value="M">M</option><option value="F">F</option></select></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;margin-bottom:14px;">
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Residenza</div><input id="dnew_residenza" type="text" placeholder="Milano" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Via</div><input id="dnew_via" type="text" placeholder="Via Roma" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-            <div><div class="pw-field-label" style="margin-bottom:5px;">Nr.</div><input id="dnew_nr" type="text" placeholder="1" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-          </div>
-
-          <!-- Dati documento (nascosti per CF) -->
-          <div id="docs-doc-fields">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-              <div><div class="pw-field-label" style="margin-bottom:5px;">Numero documento</div><input id="dnew_number" type="text" placeholder="AX0000000" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;text-transform:uppercase;"></div>
-              <div><div class="pw-field-label" style="margin-bottom:5px;">Data di rilascio</div><input id="dnew_issue" type="date" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-              <div><div class="pw-field-label" style="margin-bottom:5px;">Ente rilasciante</div><input id="dnew_issuer" type="text" placeholder="Comune, Questura..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>
-              <div><div class="pw-field-label" style="margin-bottom:5px;">Scadenza</div><input id="dnew_expiry" type="date" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;"></div>
-            </div>
-            <div style="margin-bottom:14px;">
-              <div class="pw-field-label" style="margin-bottom:5px;">Informazioni aggiuntive</div>
-              <textarea id="dnew_notes" rows="2" placeholder="Note..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
-            </div>
-            <!-- Foto -->
-            <div style="margin-bottom:14px;">
-              <div class="pw-field-label" style="margin-bottom:8px;">📷 Foto documento</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  📸 Fronte <input type="file" accept="image/*" onchange="docsAddPhoto(this,'fronte')" style="display:none;">
-                </label>
-                <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);cursor:pointer;font-size:13px;font-weight:700;color:var(--text3);">
-                  📸 Retro <input type="file" accept="image/*" onchange="docsAddPhoto(this,'retro')" style="display:none;">
-                </label>
-              </div>
-              <div id="dnew_photos_preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
-            </div>
-          </div>
-
-
-          <!-- Tasti azione -->
-          <div style="display:flex;gap:10px;">
-            <button onclick="docsNewSave()" style="flex:2;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
-          </div>
-        </div>
-
-        <!-- DETTAGLIO DOCUMENTO -->
-        <div id="docs-view-detail" style="display:none;flex:1;overflow-y:auto;padding:14px 14px 100px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-            <button onclick="docsShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div id="docs-detail-title" style="font-size:17px;font-weight:800;flex:1;"></div>
-            <button id="docs-detail-edit" style="padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;margin-right:6px;">✏️</button>
-            <button id="docs-detail-del" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;">🗑</button>
-          </div>
-          <div id="docs-detail-content"></div>
-        </div>
-
       </div>
     </div>
 
@@ -2901,14 +2785,10 @@ let qaSelected      = [];
 
 const HOME_PREFS_KEY  = 'hb12_home_prefs';
 
-const DOCS_KEY2    = 'hb13_docs2';
-let _docs2         = [];
-let _docType2      = { id:'ci', icon:'🪪', label:'C. Identità' };
-let _docPhotos2    = { fronte: null, retro: null };
 
 const MERGE_KEYS = {
   'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,
-  'hb13_cards':true,'hb13_wifi':true,'hb13_docs2':true,
+  'hb13_cards':true,'hb13_wifi':true,
   'hb13_finance':true,'hb13_server':true
 };
 let _syncInProgress = false;
@@ -2932,7 +2812,7 @@ const FB_CFG = {
 };
 
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi',
-  'hb13_docs2','hb13_finance','hb13_server',
+  'hb13_finance','hb13_server',
   'hb13_pw_cats'];
 
 // ── Costanti biometria e autolock ──────────────────────────
@@ -3124,7 +3004,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA341',
+  version: 'BETA342',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3144,7 +3024,7 @@ const HB = {
 
 const _SENSITIVE_KEYS = [
   'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
-  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance',
+  'hb13_cards','hb13_wifi','hb13_finance',
   'hb13_server'
 ];
 
@@ -3720,7 +3600,6 @@ function renderTopbarActions(actions) {
     btn.onclick = () => {
       if (HB.currentTab === 'documents') {
     const addView = document.getElementById('docs-view-add');
-    if (addView && addView.style.display !== 'none') { docsShowList(); return; }
     const overlay = document.getElementById('docs-detail-overlay');
     if (overlay) { overlay.remove(); return; }
   }
@@ -3751,7 +3630,6 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
-  if (HB.currentTab === 'documents') { docsShowAdd(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
@@ -3770,7 +3648,6 @@ function renderTopbarActions(actions) {
 function topbarBack() {
   if (HB.currentTab === 'documents') {
     const addView = document.getElementById('docs-view-add');
-    if (addView && addView.style.display !== 'none') { docsShowList(); return; }
     const overlay = document.getElementById('docs-detail-overlay');
     if (overlay) { overlay.remove(); return; }
   }
@@ -3911,14 +3788,6 @@ function checkExpiryNotifications() {
   const toNotify = [];
 
   // Documenti
-  (_docs2 || []).forEach(doc => {
-    if (!doc.expiry) return;
-    const days = Math.ceil((new Date(doc.expiry) - now) / 86400000);
-    if (days >= 0 && days <= 30)
-      toNotify.push(`📄 ${doc.label} di ${doc.nome} scade tra ${days} giorni`);
-    else if (days < 0)
-      toNotify.push(`📄 ${doc.label} di ${doc.nome} è scaduto!`);
-  });
 
   // Carte
   (_cards || []).forEach(card => {
@@ -3951,7 +3820,6 @@ function updateHomeStats() {
   try { pwLoad(); } catch(e) {}
   try { notesLoad(); } catch(e) {}
   try { otpLoad(); } catch(e) {}
-  try { docsLoad2(); } catch(e) {}
 
   const pw   = document.getElementById('stat-passwords');
   const nt   = document.getElementById('stat-notes');
@@ -3963,7 +3831,7 @@ function updateHomeStats() {
   const pwCount  = (_pwItems||[]).filter(i=>!i.deleted).length;
   const ntCount  = (_notes||[]).filter(i=>!i.deleted).length;
   const otpCount = (_otpAccounts||[]).filter(i=>!i.deleted).length;
-  const docCount = (_docs2||[]).filter(i=>!i.deleted).length;
+  const docCount = 0;
 
   if (pw)   pw.textContent   = pwCount;
   if (nt)   nt.textContent   = ntCount;
@@ -3997,19 +3865,6 @@ function updateHomeStats() {
 
   // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
-  const docsToCheck = (_docs2?.length ? _docs2 : JSON.parse(localStorage.getItem('hb13_docs2')||'[]'))
-    .filter(d => !d.deleted);
-  docsToCheck.forEach(doc => {
-    if (!doc.expiry) return;
-    const exp = new Date(doc.expiry);
-    if (isNaN(exp.getTime())) return;
-    const days = Math.ceil((exp - now) / 86400000);
-    if (days < 0) {
-      alerts.push({ icon:'⚠️', color:'#ef4444', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scaduto', time: 'Scaduto', tab: 'documents' });
-    } else if (days <= 90) {
-      alerts.push({ icon:'⏰', color:'#f97316', text: doc.label + ' di ' + doc.cognome + ' ' + doc.nome + ' scade tra ' + days + ' giorni', time: days + 'gg', tab: 'documents' });
-    }
-  });
 
   // 2. Carte in scadenza
   const cardsToCheck = (_cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]'))
@@ -5035,7 +4890,6 @@ window.switchTab = function(tab) {
   if (tab === 'wifi') setTimeout(wifiOpen, 50);
   if (tab === 'finance') setTimeout(financeOpen, 50);
   if (tab === 'server') setTimeout(serverOpen, 50);
-  if (tab === 'documents') setTimeout(docsOpen, 50);
   if (tab === 'cards') setTimeout(cardsOpen, 50);
 };
 
@@ -6669,7 +6523,7 @@ function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSe
 
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
 
-function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
+function settingsExport(){const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_finance','hb13_server'];const data={};keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{data[k]=JSON.parse(v);}catch(e){data[k]=v;}});const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';a.click();showToast('✅ Backup esportato!');}
 
 function settingsImport(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{try{const bk=JSON.parse(e.target.result);if(!bk.data){showToast('File non valido');return;}const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div><div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div><div style="display:flex;gap:10px;"><button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_ic').onclick=()=>ov.remove();document.getElementById('_io').onclick=()=>{Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));ov.remove();closeSettings();showToast('✅ Importato!');setTimeout(()=>location.reload(),1200);};}catch(err){showToast('Errore: file non valido');}};reader.readAsText(file);event.target.value='';}
 
@@ -7021,7 +6875,6 @@ function runSearch(q) {
   if (!_cards?.length) { try { cardsLoad(); } catch(e){} }
   if (!_wifiNets?.length) { try { wifiLoad(); } catch(e){} }
   if (!_otpAccounts?.length) { try { otpLoad(); } catch(e){} }
-  if (!_docs2?.length) { try { docsLoad(); } catch(e){} }
 
   const ql = q.toLowerCase();
   const results = [];
@@ -7128,20 +6981,7 @@ function runSearch(q) {
     });
   }
 
-  // ── Documenti ─────────────────────────────────────────
-  if (typeof _docs2 !== 'undefined') {
-    _docs2.filter(d => !d.deleted).forEach(doc => {
-      if ([doc.label, doc.nome, doc.cognome, doc.number, doc.notes]
-          .some(f => f && f.toLowerCase().includes(ql))) {
-        results.push({
-          icon: '📄', title: doc.label || 'Documento',
-          sub: [doc.nome, doc.cognome].filter(Boolean).join(' ') || doc.number || '',
-          badge: '📄 Documenti',
-          action: () => switchTab('documents')
-        });
-      }
-    });
-  }
+
 
   // ── Finanze ───────────────────────────────────────────
   if (typeof _financeItems !== 'undefined') {
@@ -7252,7 +7092,6 @@ async function fbSyncLoad(){
       try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
       try { if(typeof noteLoad==='function') { noteLoad(); } } catch(e){}
       try { if(typeof otpLoad==='function') otpLoad(); } catch(e){}
-      try { if(typeof docsLoad2==='function') docsLoad2(); } catch(e){}
       try { if(typeof cardsLoad==='function') cardsLoad(); } catch(e){}
       try { if(typeof wifiLoad==='function') wifiLoad(); } catch(e){}
       try { if(typeof financeLoad==='function') financeLoad(); } catch(e){}
@@ -7265,7 +7104,6 @@ async function fbSyncLoad(){
       else if(tab === 'otp' && typeof otpRender==='function') otpRender();
       else if(tab === 'cards' && typeof cardsRender==='function') cardsRender();
       else if(tab === 'calendar' && typeof calRender==='function') calRender();
-      else if(tab === 'documents' && typeof docsRender2==='function') docsRender2();
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
     await fbSyncAll(true);
@@ -8163,7 +8001,7 @@ async function driveBackupNow(silent=false) {
 
     // Raccoglie tutti i dati
     const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
-                  'hb13_cards','hb13_wifi','hb13_docs2','hb13_finance','hb13_server'];
+                  'hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
     const data = {};
     keys.forEach(k => {
       const v = localStorage.getItem(k);
@@ -9016,7 +8854,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA341</div>
+            <div style="font-size:13px;color:var(--text3);">BETA342</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -9064,7 +8902,7 @@ document.addEventListener('keydown', (e) => {
   <div style="padding:6px 0;flex:1;overflow-y:auto;">
     <div class="mob-item" onclick="switchTab('home');closeMobileMenu()">🏠 Home</div>
     <div class="mob-item" onclick="switchTab('cards');closeMobileMenu()">💳 Carte</div>
-    <div class="mob-item" onclick="switchTab('documents');closeMobileMenu()">📄 Documenti</div>
+    
     <div class="mob-item" onclick="switchTab('finance');closeMobileMenu()">💰 Finanze</div>
     <div class="mob-item" onclick="switchTab('notes');closeMobileMenu()">📝 Note</div>
     <div class="mob-item" onclick="switchTab('otp');closeMobileMenu()">🔑 OTP / 2FA</div>
