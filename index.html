@@ -2175,11 +2175,8 @@ function cardsSearch(q) {
 
     <!-- CARTE -->
     <div class="tab-panel" id="panel-cards">
-      <!-- Tab interne Portafoglio -->
-      <div style="display:flex;gap:8px;padding:10px 14px 0;flex-shrink:0;">
-        <button id="wallet-tab-cards" class="netit-tab active" onclick="walletTab('cards')">💳 Carte</button>
-        <button id="wallet-tab-finance" class="netit-tab" onclick="walletTab('finance')">🏦 Conti / IBAN</button>
-      </div>
+
+      <div id="wallet-finance" style="display:none;"></div>
       <div id="wallet-cards">
       <div>
 
@@ -2577,6 +2574,30 @@ let _emailOtpCode = '';
 let _emailOtpAddr = '';
 let _otpCountdownTimer = null;
 let _emailOtpExpiry = 0;
+
+// ── Variabili dati globali ──────────────────────────────────
+let _notes = [];
+let _noteEditId = null;
+let _cards = [];
+let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+let _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+let _walletCurrent = 'cards';
+let _wifiNets = [];
+let _wifiSec = 'WPA';
+let _otpAccounts = [];
+let _otpTimer = null;
+let _otpIcon = '🔐';
+let _financeAccounts = [];
+let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
+let _driveBackupToken = null;
+let _gcalToken = null;
+let _lastSyncTime = null;
+let _syncInProgress = false;
+let _realtimeRef = null;
+let _autolockTimer = null;
+let _backHandlerActive = false;
+let backPressCount = 0;
+let backPressTimer = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
@@ -5694,26 +5715,11 @@ function cardsLoad() {
 }
 function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
 
-let _walletCurrent = 'cards';
 function walletTab(which) {
-  _walletCurrent = which;
+  _walletCurrent = 'cards';
   const cd = document.getElementById('wallet-cards');
-  const fn = document.getElementById('wallet-finance');
-  const tabCd = document.getElementById('wallet-tab-cards');
-  const tabFn = document.getElementById('wallet-tab-finance');
-  if (which === 'finance') {
-    if (cd) cd.style.display = 'none';
-    if (fn) fn.style.display = 'block';
-    tabCd?.classList.remove('active');
-    tabFn?.classList.add('active');
-    if (typeof financeOpen === 'function') financeOpen();
-  } else {
-    if (cd) cd.style.display = 'block';
-    if (fn) fn.style.display = 'none';
-    tabCd?.classList.add('active');
-    tabFn?.classList.remove('active');
-    if (typeof cardsOpen === 'function') cardsOpen();
-  }
+  if (cd) cd.style.display = 'block';
+  if (typeof cardsOpen === 'function') cardsOpen();
 }
 
 function cardsOpen() {
@@ -5942,7 +5948,6 @@ function cardFormatDisplay(num) {
   return num.replace(/(.{4})/g,'$1 ').trim();
 }
 
-let _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 function cardSelectColor(el, color) {
   _cardColorSelected = color;
   document.querySelectorAll('.card-color-btn').forEach(b => b.classList.remove('active'));
@@ -6002,8 +6007,6 @@ function cardSave() {
 //  FINANZE
 // ═══════════════════════════════════════════════════════════
 const FINANCE_KEY = 'hb13_finance';
-let _financeAccounts = [];
-let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 
 function financeLoad() {
   try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
@@ -6235,8 +6238,6 @@ function pwCloseQR() {
 // ═══════════════════════════════════════════════════════════
 //  GOOGLE CALENDAR SYNC
 // ═══════════════════════════════════════════════════════════
-let _gcalToken = null;
-
 async function gcalGetToken() {
   await new Promise((resolve, reject) => {
     if (window.google?.accounts) { resolve(); return; }
@@ -6357,9 +6358,6 @@ function qrDraw(canvas, text, size) {
 //  OTP / 2FA — TOTP RFC 6238
 // ═══════════════════════════════════════════════════════════
 // ── Recuperato da BETA333 righe 6452-6782 ──
-let _otpTimer    = null;
-let _otpIcon     = '🔐';
-
 function otpLoad() {
   try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
 }
@@ -7815,8 +7813,6 @@ function skipBioAndEnter() {
 // ═══════════════════════════════════════════════════════════
 //  TIMEOUT SESSIONE — blocco automatico per inattività
 // ═══════════════════════════════════════════════════════════
-let _autolockTimer = null;
-
 function autolockReset() {
   const min = parseInt(localStorage.getItem('hb_autolock') || '0');
   if (!min) return;
@@ -7998,7 +7994,6 @@ async function fbSyncAll(silent=false){
   }
 }
 
-let _syncInProgress = false;
 (function patchLocalStorage(){
   const origSet = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function(key, value) {
@@ -8013,7 +8008,6 @@ let _syncInProgress = false;
   };
 })();
 
-let _realtimeRef = null;
 function fbStartRealtime(){
   if(!fbReady||!HB.user||!fbDb)return;
   const emailKey = _getSyncKey();
@@ -8042,7 +8036,6 @@ function logout(){
   fbLogout(); HB.sessionKey=null; HB.user=null; location.reload();
 }
 
-let _lastSyncTime = null;
 
 </script>
 
