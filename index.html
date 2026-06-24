@@ -3428,8 +3428,7 @@ function updateHomeStats() {
   const alerts = [];
 
   // 1. Carte in scadenza
-  const cardsToCheck = (_cards?.length ? _cards : JSON.parse(localStorage.getItem('hb13_cards')||'[]'))
-    .filter(c => !c.deleted);
+  const cardsToCheck = (_cards||[]).filter(c => !c.deleted);
   cardsToCheck.forEach(card => {
     if (!card.exp) return;
     // Supporta formati: MM/YY, MM/YYYY, YYYY-MM
@@ -4830,8 +4829,8 @@ async function exportPDFSection(section) {
   if (section === 'passwords') {
     title = 'Password';
     doc.text('HomeBull — ' + title, margin, 12);
-    const cats = JSON.parse(localStorage.getItem('hb13_pw_cats')||'[]');
-    const pws  = JSON.parse(localStorage.getItem('hb13_passwords')||'[]').filter(p=>!p.deleted);
+    const cats = _pwCats||[];
+    const pws  = (_pwItems||[]).filter(p=>!p.deleted);
     cats.forEach(cat => {
       const catItems = pws.filter(p => p.categoryId === cat.id);
       if (!catItems.length) return;
@@ -4851,7 +4850,7 @@ async function exportPDFSection(section) {
   } else if (section === 'cards') {
     title = 'Carte';
     doc.text('HomeBull — ' + title, margin, 12);
-    const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]').filter(c=>!c.deleted);
+    const cards = (_cards||[]).filter(c=>!c.deleted);
     cards.forEach(card => {
       row('Banca:', card.bank); row('Numero:', card.number);
       row('Intestatario:', card.holder); row('Scadenza:', card.exp);
@@ -4864,7 +4863,7 @@ async function exportPDFSection(section) {
   } else if (section === 'wifi') {
     title = 'Wi-Fi';
     doc.text('HomeBull — ' + title, margin, 12);
-    const wifis = JSON.parse(localStorage.getItem('hb13_wifi')||'[]').filter(w=>!w.deleted);
+    const wifis = (_wifiNets||[]).filter(w=>!w.deleted);
     wifis.forEach(w => {
       row('Rete:', w.ssid); row('Password:', w.pw);
       if (w.notes) row('Note:', w.notes);
@@ -4875,7 +4874,7 @@ async function exportPDFSection(section) {
   } else if (section === 'server') {
     title = 'Server / IT';
     doc.text('HomeBull — ' + title, margin, 12);
-    const servers = JSON.parse(localStorage.getItem('hb13_server')||'[]').filter(s=>!s.deleted);
+    const servers = (_serverItems||[]).filter(s=>!s.deleted);
     servers.forEach(s => {
       row('Nome:', s.name);
       if (s.host) row('Host:', s.host);
@@ -4889,7 +4888,7 @@ async function exportPDFSection(section) {
   } else if (section === 'notes') {
     title = 'Note';
     doc.text('HomeBull — ' + title, margin, 12);
-    const notes = JSON.parse(localStorage.getItem('hb13_notes')||'[]').filter(n=>!n.deleted);
+    const notes = (_notes||[]).filter(n=>!n.deleted);
     notes.forEach(n => {
       if (y>270){doc.addPage();y=20;}
       doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(60,60,60);
@@ -4994,8 +4993,8 @@ async function exportPDF() {
   y += 10;
 
   // ── PASSWORD ──────────────────────────────────────────────
-  const cats = JSON.parse(localStorage.getItem('hb13_pw_cats')||'[]');
-  const pws  = JSON.parse(localStorage.getItem('hb13_passwords')||'[]');
+  const cats = _pwCats||[];
+  const pws  = _pwItems||[];
   if (pws.length) {
     sectionTitle('Password (' + pws.length + ')', '🔐');
     cats.forEach(cat => {
@@ -5029,7 +5028,7 @@ async function exportPDF() {
   }
 
   // ── NOTE ──────────────────────────────────────────────────
-  const notes = JSON.parse(localStorage.getItem('hb13_notes')||'[]');
+  const notes = _notes||[];
   if (notes.length) {
     newPage(); header();
     sectionTitle('Note (' + notes.length + ')', '📝');
@@ -5045,7 +5044,7 @@ async function exportPDF() {
   }
 
   // ── CARTE ─────────────────────────────────────────────────
-  const cards = JSON.parse(localStorage.getItem('hb13_cards')||'[]');
+  const cards = _cards||[];
   if (cards.length) {
     checkY(20); sectionTitle('Carte (' + cards.length + ')', '💳');
     cards.forEach(card => {
@@ -5061,7 +5060,7 @@ async function exportPDF() {
   }
 
   // ── WIFI ──────────────────────────────────────────────────
-  const wifis = JSON.parse(localStorage.getItem('hb13_wifi')||'[]');
+  const wifis = _wifiNets||[];
   if (wifis.length) {
     checkY(20); sectionTitle('Wi-Fi (' + wifis.length + ')', '📶');
     wifis.forEach(w => {
@@ -5074,7 +5073,7 @@ async function exportPDF() {
   }
 
   // ── SERVER ────────────────────────────────────────────────
-  const servers = JSON.parse(localStorage.getItem('hb13_server')||'[]');
+  const servers = _serverItems||[];
   if (servers.length) {
     checkY(20); sectionTitle('Server / IT (' + servers.length + ')', '🖥️');
     servers.forEach(s => {
@@ -5089,7 +5088,7 @@ async function exportPDF() {
   }
 
   // ── FINANZE ───────────────────────────────────────────────
-  const fin = JSON.parse(localStorage.getItem('hb13_finance')||'[]');
+  const fin = _financeAccounts||[];
   if (fin.length) {
     newPage(); header();
     sectionTitle('Finanze (' + fin.length + ')', '💰');
