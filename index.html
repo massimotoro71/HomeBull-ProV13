@@ -1656,37 +1656,6 @@ html, body {
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
-function shopAddCustom() {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);';
-  overlay.innerHTML = `
-    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
-      <div style="font-size:17px;font-weight:800;margin-bottom:16px;">➕ Aggiungi prodotto</div>
-      <div style="margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Nome prodotto</div>
-        <input id="shop-custom-name" type="text" placeholder="es. Prosciutto crudo, Latte intero..." autocomplete="off"
-          style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;">
-      </div>
-      <div style="margin-bottom:16px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:6px;">Emoji (opzionale)</div>
-        <input id="shop-custom-icon" type="text" placeholder="🛍️" maxlength="2"
-          style="width:80px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;outline:none;text-align:center;">
-      </div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('[style]').remove()" style="flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-        <button onclick="shopConfirmCustom(this)" style="flex:2;padding:12px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Aggiungi alla lista</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-  setTimeout(() => document.getElementById('shop-custom-name')?.focus(), 100);
-  document.getElementById('shop-custom-name').addEventListener('keydown', e => {
-    if (e.key === 'Enter') overlay.querySelector('button:last-child').click();
-  });
-}
-
-function shopConfirmCustom(btn) {
-  const name = document.getElementById('shop-custom-name')?.value.trim();
-  const icon = document.getElementById('shop-custom-icon')?.value.trim() || '🛍️';
 function wifiShowAdd() {
   document.getElementById('wifi-view-list').style.display = 'none';
   document.getElementById('wifi-view-add').style.display  = 'flex';
@@ -1932,10 +1901,6 @@ function cardsSearch(q) {
       <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Rete & IT</span>
-      </div>
-      <div class="sidebar-item" data-tab="wifi-REMOVED" style="display:none" onclick="switchTab('wifi')">
-        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-        <span class="sidebar-item-label">Wi-Fi</span>
       </div>
 
     </div>
@@ -2316,88 +2281,6 @@ function cardsSearch(q) {
 
       </div>
     </div>
-      <div id="wallet-finance" style="display:none;">
-      <div style="padding:14px 14px 100px;">
-
-        <!-- Lista conti -->
-        <div id="finance-view-list">
-          <div id="finance-list"></div>
-        </div>
-
-        <!-- Aggiungi conto -->
-        <div id="finance-view-add" style="display:none;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-            <button onclick="financeShowList()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;">Aggiungi Conto</div>
-          </div>
-
-          <!-- Tipo conto -->
-          <div style="margin-bottom:14px;">
-            <div class="pw-field-label" style="margin-bottom:8px;">Tipo</div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;" id="finance-type-grid">
-              <button class="finance-type-btn active" data-type="conto" onclick="financeSelectType(this,'conto','🏦','Conto Corrente')">🏦<br>Corrente</button>
-              <button class="finance-type-btn" data-type="risparmio" onclick="financeSelectType(this,'risparmio','💰','Conto Risparmio')">💰<br>Risparmio</button>
-              <button class="finance-type-btn" data-type="investimento" onclick="financeSelectType(this,'investimento','📈','Investimento')">📈<br>Investimento</button>
-              <button class="finance-type-btn" data-type="paypal" onclick="financeSelectType(this,'paypal','🅿️','PayPal')">🅿️<br>PayPal</button>
-              <button class="finance-type-btn" data-type="crypto" onclick="financeSelectType(this,'crypto','₿','Crypto')">₿<br>Crypto</button>
-              <button class="finance-type-btn" data-type="altro" onclick="financeSelectType(this,'altro','💼','Altro')">💼<br>Altro</button>
-            </div>
-          </div>
-
-          <div style="margin-bottom:12px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">Nome / Etichetta *</div>
-            <input id="fin-label" type="text" placeholder="es. Intesa, Fineco, Revolut..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-          </div>
-          <div style="margin-bottom:12px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">IBAN</div>
-            <input id="fin-iban" type="text" placeholder="IT60 X054 2811 1010 0000 0123 456"
-              oninput="financeFormatIBAN(this)"
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;letter-spacing:0.05em;text-transform:uppercase;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-            <div>
-              <div class="pw-field-label" style="margin-bottom:6px;">BIC / SWIFT</div>
-              <input id="fin-bic" type="text" placeholder="BCITITMM"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;text-transform:uppercase;">
-            </div>
-            <div>
-              <div class="pw-field-label" style="margin-bottom:6px;">Intestatario</div>
-              <input id="fin-holder" type="text" placeholder="Nome Cognome"
-                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-            </div>
-          </div>
-          <div style="margin-bottom:12px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">Username / Email accesso</div>
-            <input id="fin-user" type="text" placeholder="Username home banking"
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-          </div>
-          <div style="margin-bottom:20px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">Password accesso</div>
-            <div style="position:relative;">
-              <input id="fin-pw" type="password" placeholder="Password home banking"
-                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
-              <button onclick="financeTogglePw()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
-            </div>
-          </div>
-          <div style="margin-bottom:20px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">Note aggiuntive</div>
-            <textarea id="fin-notes" placeholder="PIN, informazioni aggiuntive..."
-              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;height:80px;"></textarea>
-          </div>
-          <button onclick="financeSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Conto</button>
-        </div>
-
-      </div>
-    </div>
-    </div>
-
-    
-
-    <!-- FINANZE -->
-    
 
     <!-- SERVER / IT -->
     <div class="tab-panel" id="panel-server">
@@ -3101,8 +2984,7 @@ function unlockApp() {
     setTimeout(() => {
       loadShares().then(() => {
         // Notifica condivisioni presenti
-        const cnt = Object.keys(_receivedShares).length;
-        if (cnt > 0) updateHomeStats();
+        updateHomeStats();
       });
     }, 3000);
     setTimeout(checkExpiryNotifications, 3000);
@@ -3279,38 +3161,27 @@ function renderTopbarActions(actions) {
     btn.title = 'Aggiungi';
     btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
     btn.onclick = () => {
-      if (HB.currentTab === 'calendar') {
-    const form = document.getElementById('cal-event-form');
-    if (form && form.style.display !== 'none') { calCloseForm(); return; }
-  }
-  if (HB.currentTab === 'server') {
-    const addView = document.getElementById('server-view-add');
-    if (addView && addView.style.display !== 'none') { serverShowList(); return; }
-    const overlay = document.getElementById('server-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'finance') {
-    const addView = document.getElementById('finance-view-add');
-    if (addView && addView.style.display !== 'none') { financeShowList(); return; }
-    const overlay = document.getElementById('finance-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'cards') {
-    const addView = document.getElementById('cards-view-add');
-    if (addView && addView.style.display !== 'none') { cardsShowList(); return; }
-    const overlay = document.getElementById('card-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'wifi') {
-    const addView = document.getElementById('wifi-view-add');
-    if (addView && addView.style.display !== 'none') { wifiShowList(); return; }
-  }
-  if (HB.currentTab === 'otp') {
-    const addView = document.getElementById('otp-view-add');
-    if (addView && addView.style.display !== 'none') { otpShowList(); return; }
-  }
-  if (HB.currentTab === 'notes') { noteNew(); return; }
-  if (HB.currentTab === 'shopping') { shopAddCustom(); return; }
+      if (HB.currentTab === 'server') {
+        const addView = document.getElementById('server-view-add');
+        if (addView && addView.style.display !== 'none') { serverShowList(); return; }
+        const overlay = document.getElementById('server-detail-overlay');
+        if (overlay) { overlay.remove(); return; }
+      }
+      if (HB.currentTab === 'cards') {
+        const addView = document.getElementById('cards-view-add');
+        if (addView && addView.style.display !== 'none') { cardsShowList(); return; }
+        const overlay = document.getElementById('card-detail-overlay');
+        if (overlay) { overlay.remove(); return; }
+      }
+      if (HB.currentTab === 'wifi') {
+        const addView = document.getElementById('wifi-view-add');
+        if (addView && addView.style.display !== 'none') { wifiShowList(); return; }
+      }
+      if (HB.currentTab === 'otp') {
+        const addView = document.getElementById('otp-view-add');
+        if (addView && addView.style.display !== 'none') { otpShowList(); return; }
+      }
+      if (HB.currentTab === 'notes') { noteNew(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
@@ -3327,20 +3198,10 @@ function renderTopbarActions(actions) {
 }
 
 function topbarBack() {
-  if (HB.currentTab === 'calendar') {
-    const form = document.getElementById('cal-event-form');
-    if (form && form.style.display !== 'none') { calCloseForm(); return; }
-  }
   if (HB.currentTab === 'server') {
     const addView = document.getElementById('server-view-add');
     if (addView && addView.style.display !== 'none') { serverShowList(); return; }
     const overlay = document.getElementById('server-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'finance') {
-    const addView = document.getElementById('finance-view-add');
-    if (addView && addView.style.display !== 'none') { financeShowList(); return; }
-    const overlay = document.getElementById('finance-detail-overlay');
     if (overlay) { overlay.remove(); return; }
   }
   if (HB.currentTab === 'cards') {
@@ -4883,8 +4744,7 @@ function showPDFSectionPicker() {
     { id:'notes',     icon:'📝', label:'Note' },
     { id:'cards',     icon:'💳', label:'Portafoglio' },
     { id:'wifi',      icon:'📶', label:'Wi-Fi' },
-    { id:'finance',   icon:'💰', label:'Finanze' },
-    { id:'server',    icon:'📡', label:'Rete & IT' },
+      { id:'server',    icon:'📡', label:'Rete & IT' },
   ];
 
   const opts = sections.map(s =>
@@ -4997,17 +4857,7 @@ async function exportPDFSection(section) {
     });
     if (!servers.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun server salvato', margin, y); }
 
-  } else if (section === 'finance') {
-    title = 'Finanze';
-    doc.text('HomeBull — ' + title, margin, 12);
-    const fin = JSON.parse(localStorage.getItem('hb13_finance')||'[]').filter(f=>!f.deleted);
-    fin.forEach(f => {
-      row('Conto:', f.name);
-      if (f.iban) row('IBAN:', f.iban);
-      if (f.bic) row('BIC:', f.bic);
-      if (f.notes) row('Note:', f.notes);
-      divider();
-    });
+);
     if (!fin.length) { doc.setFontSize(11); doc.setTextColor(150,150,150); doc.text('Nessun conto salvato', margin, y); }
 
   } else if (section === 'notes') {
@@ -6011,16 +5861,7 @@ let _lastSyncTime = null;
             </div>
           </div>
         </div>
-        <!-- Google Calendar Sync -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
-          <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <div style="font-size:13px;font-weight:700;">📅 Google Calendar</div>
-              <div style="font-size:11px;color:var(--text3);" id="gcal-status">Non collegato</div>
-            </div>
-            <button onclick="gcalSync()" id="gcal-btn" style="padding:9px 16px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Collega</button>
-          </div>
-        </div>
+
 
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;">
           <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
@@ -6155,7 +5996,6 @@ let _lastSyncTime = null;
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
             <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
               <div style="display:flex;align-items:center;gap:8px;">🔐 <span style="color:var(--text2);">Password, Note, OTP, Carte, Wi-Fi, Server</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📅 <span style="color:var(--text2);">Calendario + sync Google Calendar bidirezionale</span></div>
               <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Sync Firebase multi-dispositivo</span></div>
               <div style="display:flex;align-items:center;gap:8px;">🔒 <span style="color:var(--text2);">Cifratura AES-256 (cloud + locale)</span></div>
               <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup Google Drive (ultimi 5 + auto 24h)</span></div>
@@ -6182,6 +6022,7 @@ let _lastSyncTime = null;
 
     </div>
   </div>
+</div>
 </div>
 </div>
 </div>
