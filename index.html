@@ -170,18 +170,8 @@ html, body {
 .auth-btn:active { transform: scale(0.98); }
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.auth-hint {
-  font-size: 12px; color: var(--text3); margin-top: 12px;
-  text-align: center; line-height: 1.6;
-}
-.auth-link {
-  color: var(--accent2); cursor: pointer; text-decoration: underline;
-}
 
 /* OTP digits */
-.otp-grid {
-  display: flex; gap: 10px; justify-content: center; margin-bottom: 4px;
-}
 .otp-digit {
   width: 46px; height: 58px; text-align: center;
   background: var(--bg3); border: 1px solid var(--border);
@@ -204,10 +194,6 @@ html, body {
 }
 .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
 
-.pin-pad {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; max-width: 260px; margin: 0 auto;
-}
 .pin-key {
   height: 60px; border-radius: var(--radius-sm);
   background: var(--surface2); border: 1px solid var(--border);
@@ -492,11 +478,6 @@ html, body {
   background: var(--accent-bg); color: var(--accent);
 }
 
-.sidebar-section-title {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.1em; color: var(--text3);
-  padding: 12px 12px 6px; margin-top: 8px;
-}
 
 .sidebar-footer {
   padding: 12px 10px;
@@ -518,43 +499,12 @@ html, body {
 }
 
 /* Section headers */
-.section-header {
-  margin-bottom: 24px;
-}
 .section-title {
   font-family: 'Syne', sans-serif;
   font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
 }
-.section-sub {
-  color: var(--text3); font-size: 13px; font-weight: 500; margin-top: 4px;
-}
 
 /* Placeholder card */
-.placeholder-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 48px 24px;
-  text-align: center;
-  margin-top: 24px;
-}
-.placeholder-icon {
-  font-size: 48px; margin-bottom: 16px;
-}
-.placeholder-title {
-  font-family: 'Syne', sans-serif;
-  font-size: 18px; font-weight: 800; margin-bottom: 8px;
-}
-.placeholder-sub {
-  color: var(--text3); font-size: 13px; line-height: 1.6;
-}
-.placeholder-badge {
-  display: inline-block;
-  background: var(--accent-bg); color: var(--accent2);
-  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; padding: 4px 12px;
-  border-radius: 99px; margin-top: 16px;
-}
 
 /* HOME dashboard */
 .home-grid {
@@ -572,17 +522,6 @@ html, body {
 }
 .home-stat-card:hover { border-color: var(--border2); transform: translateY(-1px); }
 .home-stat-card:active { transform: scale(0.98); }
-.hsc-icon { font-size: 24px; margin-bottom: 12px; }
-.hsc-value {
-  font-family: 'Syne', sans-serif;
-  font-size: 28px; font-weight: 800; letter-spacing: -0.02em;
-  line-height: 1;
-}
-.hsc-label {
-  font-size: 11px; color: var(--text3); font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.06em;
-  margin-top: 4px;
-}
 
 .home-welcome {
   font-family: 'Syne', sans-serif;
@@ -591,10 +530,6 @@ html, body {
 }
 .home-date { color: var(--text3); font-size: 13px; margin-bottom: 24px; }
 
-.home-quick-actions {
-  display: flex; gap: 10px; margin-bottom: 24px;
-  overflow-x: auto; padding-bottom: 4px;
-}
 .qa-btn {
   display: flex; align-items: center; gap: 8px;
   padding: 10px 16px; border-radius: var(--radius-sm);
@@ -612,20 +547,12 @@ html, body {
   letter-spacing: 0.1em; color: var(--text3); margin-bottom: 12px;
 }
 
-.alert-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 16px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  margin-bottom: 8px;
-}
 .alert-dot {
   width: 8px; height: 8px; border-radius: 50%;
   flex-shrink: 0;
 }
 .alert-dot.red { background: #ef4444; }
 .alert-dot.yellow { background: #f59e0b; }
-.alert-text { flex: 1; font-size: 13px; font-weight: 500; }
-.alert-time { font-size: 11px; color: var(--text3); }
 
 /* ═══════════════════════════════════════════════════════════
    MORE DRAWER (schede extra su mobile)
@@ -750,22 +677,6 @@ html, body {
   min-width: 0;
 }
 .h12-tile:active { transform: scale(0.93); }
-.h12-tile-icon {
-  width: 44px; height: 44px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.h12-tile-label {
-  font-size: 10px; font-weight: 900;
-  text-transform: uppercase; letter-spacing: 0.05em;
-  color: var(--text); text-align: center; margin: 0;
-  overflow: hidden; text-overflow: ellipsis;
-  white-space: nowrap; max-width: 100%;
-}
-.h12-tile-count {
-  font-size: 9px; font-weight: 700;
-  color: var(--text3); text-align: center; margin: 0;
-}
 
 /* ── Scheda Password ───────────────────────────────────── */
 .pw-search-bar {
@@ -789,11 +700,6 @@ html, body {
 .pw-cat-name {
   font-size: 15px; font-weight: 800; flex: 1; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.pw-cat-badge {
-  background: var(--surface2); color: var(--text3);
-  font-size: 11px; font-weight: 700; padding: 3px 10px;
-  border-radius: 99px; flex-shrink: 0;
 }
 .pw-item-card {
   background: var(--surface); border: 1px solid var(--border);
@@ -1065,18 +971,6 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 .otp-card:active { transform: scale(0.98); }
-.otp-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-.otp-card-icon {
-  width: 44px; height: 44px; border-radius: 14px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-  background: rgba(6,182,212,0.12);
-}
-.otp-card-name { font-size: 15px; font-weight: 800; }
-.otp-card-user { font-size: 12px; color: var(--text3); margin-top: 1px; }
-.otp-code-row {
-  display: flex; align-items: center; gap: 12px;
-}
 .otp-code {
   font-family: 'Syne', monospace;
   font-size: 32px; font-weight: 900; letter-spacing: 0.12em;
@@ -1706,20 +1600,6 @@ html, body {
 }
 .stat-card:hover { border-color: var(--accent); transform: translateY(-1px); }
 .stat-card:active { transform: scale(0.97); }
-.stat-icon { font-size: 24px; margin-bottom: 2px; }
-.stat-num {
-  font-size: 28px;
-  font-weight: 900;
-  color: var(--accent);
-  line-height: 1;
-}
-.stat-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text3);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
 
 /* ── PIN Numpad ─────────────────────────────────────────── */
 .pin-numpad {
@@ -1896,7 +1776,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA371</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA372</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1998,7 +1878,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA371</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA372</div>
         </div>
       </div>
     </div>
@@ -2013,9 +1893,6 @@ function cardsSearch(q) {
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <span class="sidebar-item-label">Portafoglio</span>
       </div>
-
-
-
 
 
       <div class="sidebar-item" data-tab="finance-REMOVED" style="display:none" onclick="switchTab('finance')">
@@ -2104,7 +1981,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA371</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA372</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3083,7 +2960,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA371',
+  version: 'BETA372',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4487,8 +4364,6 @@ function getStrength(pw) {
   if (s >= 6)       return { label:'Media', bg:'rgba(234,179,8,0.15)',   col:'#eab308' };
   return              { label:'Debole', bg:'rgba(239,68,68,0.15)',   col:'#ef4444' };
 }
-
-
 
 
 // ═══════════════════════════════════════════════════════════
@@ -6523,7 +6398,6 @@ function otpDeleteConfirm(id) {
 // ═══════════════════════════════════════════════════════════
 //  CONDIVISIONE SELETTIVA — Lista Spesa e Calendario
 // ═══════════════════════════════════════════════════════════
-const SHAREABLE = {};
 
 let _myShares      = {}; // condivisioni create da me
 let _receivedShares = {}; // condivisioni ricevute
@@ -6605,7 +6479,6 @@ async function removeShare(shareId) {
 // ── Sincronizza lista spesa verso Firebase (dopo ogni save) ─
 
 
-
 // ── Indicatore ultimo sync ────────────────────────────────
 function updateSyncBadge() {
   const el = document.getElementById('sync-time-badge');
@@ -6682,7 +6555,6 @@ async function pinBioAuth() {
 }
 
 
-
 function earlyBackHandler() {
   function ensureBuffer() {
     try {
@@ -6748,7 +6620,6 @@ function settingsBack() { settingsPage('main'); }
 function settingsChangePin(){closeSettings();setTimeout(()=>{if(typeof showPinSetup==='function')showPinSetup();else showToast('Cambio PIN disponibile dopo login');},300);}
 
 function settingsCheckBio(){const s=document.getElementById('bio-status');const b=document.getElementById('bio-btn');if(!s||!b)return;const enabled=localStorage.getItem('hb_bio')==='1';if(window.PublicKeyCredential){s.textContent='Disponibile';b.textContent=enabled?'Disattiva biometria':'Attiva biometria';b.style.background=enabled?'rgba(239,68,68,0.1)':'var(--accent)';b.style.color=enabled?'#ef4444':'white';b.style.border=enabled?'1px solid rgba(239,68,68,0.3)':'none';}else{s.textContent='Non disponibile';b.textContent='Non supportata';b.disabled=true;}}
-
 
 
 function settingsLogout(){const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';const bx=document.createElement('div');bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">🚪</div><div style="font-size:15px;font-weight:800;margin-bottom:8px;">Disconnetti?</div><div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tornerai alla schermata di login</div><div style="display:flex;gap:10px;"><button id="_lc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_lo" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Esci</button></div>';ov.appendChild(bx);document.body.appendChild(ov);document.getElementById('_lc').onclick=()=>ov.remove();document.getElementById('_lo').onclick=()=>{ov.remove();authLogout();};}
@@ -7209,7 +7080,6 @@ function runSearch(q) {
   }
 
 
-
   // ── Finanze ───────────────────────────────────────────
   if (typeof _financeItems !== 'undefined') {
     _financeItems.filter(f => !f.deleted).forEach(fin => {
@@ -7565,8 +7435,6 @@ function netitTab(which) {
     document.getElementById('netit-wifi')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
-
-
 
 
 async function forceAppUpdate() {
@@ -9053,7 +8921,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA371</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA372</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
