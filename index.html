@@ -1776,7 +1776,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA377</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA378</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1878,7 +1878,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA377</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA378</div>
         </div>
       </div>
     </div>
@@ -1981,7 +1981,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA377</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA378</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2284,6 +2284,10 @@ function cardsSearch(q) {
                 <div class="card-color-btn" data-color="linear-gradient(135deg,#7c2d12,#f97316)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7c2d12,#f97316)')" style="background:linear-gradient(135deg,#7c2d12,#f97316);"></div>
                 <div class="card-color-btn" data-color="linear-gradient(135deg,#1a1a1a,#374151)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1a1a1a,#374151)')" style="background:linear-gradient(135deg,#1a1a1a,#374151);"></div>
                 <div class="card-color-btn" data-color="linear-gradient(135deg,#92400e,#d97706)" onclick="cardSelectColor(this,'linear-gradient(135deg,#92400e,#d97706)')" style="background:linear-gradient(135deg,#92400e,#d97706);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#831843,#ec4899)" onclick="cardSelectColor(this,'linear-gradient(135deg,#831843,#ec4899)')" style="background:linear-gradient(135deg,#831843,#ec4899);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#1e3a8a,#3b82f6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1e3a8a,#3b82f6)')" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#7f1d1d,#ef4444)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7f1d1d,#ef4444)')" style="background:linear-gradient(135deg,#7f1d1d,#ef4444);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#134e4a,#06b6d4)" onclick="cardSelectColor(this,'linear-gradient(135deg,#134e4a,#06b6d4)')" style="background:linear-gradient(135deg,#134e4a,#06b6d4);"></div>
               </div>
             </div>
             <button onclick="cardSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Carta</button>
@@ -2960,7 +2964,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA377',
+  version: 'BETA378',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8330,6 +8334,8 @@ function openAddModal(section) {
     sel.value = map[section] || 'password';
   }
   addModalAdapt();
+  // Reset colore carta
+  window._amCardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
   // Focus primo campo dopo animazione
   setTimeout(() => {
     const first = document.querySelector('#add-modal-fields input, #add-modal-fields textarea');
@@ -8396,6 +8402,21 @@ function addModalAdapt() {
           <input id="am-card-pin" type="password" placeholder="PIN carta" inputmode="numeric"
             style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
           <button onclick="const e=document.getElementById('am-card-pin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
+        <div id="am-card-palette" style="display:flex;flex-wrap:wrap;gap:8px;">
+          <div onclick="amCardSelectColor(this,'linear-gradient(135deg,#6366f1,#8b5cf6)')" title="Viola" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);cursor:pointer;border:2px solid transparent; border:3px solid white;box-shadow:0 0 0 2px #6366f1;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e3a5f)')" title="Navy" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#1e3a5f);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#065f46,#10b981)')" title="Verde" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#065f46,#10b981);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#7c2d12,#f97316)')" title="Arancio" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c2d12,#f97316);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#1a1a1a,#374151)')" title="Nero" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a1a1a,#374151);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#92400e,#d97706)')" title="Oro" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#831843,#ec4899)')" title="Rosa" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#831843,#ec4899);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#1e3a8a,#3b82f6)')" title="Blu" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#7f1d1d,#ef4444)')" title="Rosso" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7f1d1d,#ef4444);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#134e4a,#06b6d4)')" title="Teal" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#134e4a,#06b6d4);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
         </div>
       </div>
     `,
@@ -8508,7 +8529,7 @@ function addModalSave() {
     if (!label) { showToast('Inserisci il nome carta'); return; }
     if (!number) { showToast('Inserisci il numero'); return; }
     if (!exp) { showToast('Inserisci la scadenza'); return; }
-    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), pin:document.getElementById('am-card-pin')?.value||'', color:'linear-gradient(135deg,#6366f1,#8b5cf6)' });
+    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), pin:document.getElementById('am-card-pin')?.value||'', color:window._amCardColor||'linear-gradient(135deg,#6366f1,#8b5cf6)' });
     cardsSaveAll(); showToast('✅ Carta salvata');
     if (typeof cardsRender === 'function') cardsRender();
 
@@ -8613,6 +8634,18 @@ function financeTogglePinCard(id, pin) {
     el.textContent = '••••';
     if (btn) btn.textContent = '👁 Mostra';
   }
+}
+
+// Selezione colore carta nel modal
+let _amCardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+function amCardSelectColor(el, color) {
+  _amCardColor = color;
+  document.querySelectorAll('#am-card-palette > div').forEach(b => {
+    b.style.border = '2px solid transparent';
+    b.style.boxShadow = 'none';
+  });
+  el.style.border = '3px solid white';
+  el.style.boxShadow = '0 0 0 2px #6366f1';
 }
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
 function _autoSyncAfterSave() {
@@ -8954,7 +8987,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA377</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA378</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
