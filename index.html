@@ -1776,7 +1776,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA382</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA383</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1878,7 +1878,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA382</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA383</div>
         </div>
       </div>
     </div>
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA382</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA383</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2968,7 +2968,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA382',
+  version: 'BETA383',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4914,16 +4914,27 @@ function qrScannerOpen(label, callback) {
 
 function qrScanFrame(video) {
   if (!video.videoWidth) { _qrAnimFrame = requestAnimationFrame(() => qrScanFrame(video)); return; }
+  if (typeof jsQR === 'undefined') {
+    showToast('⚠️ Libreria QR non caricata');
+    qrScannerClose(); return;
+  }
+  const vw = video.videoWidth, vh = video.videoHeight;
   const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.width = vw; canvas.height = vh;
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0);
   try {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    if (typeof jsQR !== 'undefined') {
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-      if (code?.data) { qrScannerClose(); _qrCallback?.(code.data); return; }
-    }
+    // 1. Prova su frame completo con inversione
+    let imageData = ctx.getImageData(0, 0, vw, vh);
+    let code = jsQR(imageData.data, vw, vh, { inversionAttempts: 'both' });
+    if (code?.data) { qrScannerClose(); _qrCallback?.(code.data); return; }
+
+    // 2. Prova solo sul quadrato centrale (dove punta il mirino)
+    const size = Math.min(vw, vh) * 0.75;
+    const sx = (vw - size) / 2, sy = (vh - size) / 2;
+    const crop = ctx.getImageData(sx, sy, size, size);
+    code = jsQR(crop.data, size, size, { inversionAttempts: 'both' });
+    if (code?.data) { qrScannerClose(); _qrCallback?.(code.data); return; }
   } catch(e) {}
   _qrAnimFrame = requestAnimationFrame(() => qrScanFrame(video));
 }
@@ -9022,7 +9033,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA382</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA383</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
