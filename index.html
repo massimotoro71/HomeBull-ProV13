@@ -1896,7 +1896,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA368</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA369</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1998,7 +1998,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA368</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA369</div>
         </div>
       </div>
     </div>
@@ -2104,7 +2104,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA368</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA369</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3083,7 +3083,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA368',
+  version: 'BETA369',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9050,36 +9050,26 @@ document.addEventListener('keydown', (e) => {
       <!-- ── PAGINA INFO ── -->
       <div id="set-page-info" style="display:none;padding:20px;">
         <div style="display:flex;flex-direction:column;gap:12px;">
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
-            <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
-            <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA368</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
+            <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA369</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
-            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
-              <div style="display:flex;align-items:center;gap:8px;">🔐 <span style="color:var(--text2);">Password, Note, OTP, Carte, Wi-Fi, Server</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📄 <span style="color:var(--text2);">Documenti con scadenze e Codice Fiscale</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📅 <span style="color:var(--text2);">Calendario + sync Google Calendar bidirezionale</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">☁️ <span style="color:var(--text2);">Sync Firebase multi-dispositivo</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔒 <span style="color:var(--text2);">Cifratura AES-256 (cloud + locale)</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup Google Drive (ultimi 5 + auto 24h)</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">Esporta PDF / JSON</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📥 <span style="color:var(--text2);">Import CSV da Chrome/Firefox/1Password</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📊 <span style="color:var(--text2);">Statistiche e analisi password</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📱 <span style="color:var(--text2);">Condivisione e scansione QR password</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔔 <span style="color:var(--text2);">Notifiche scadenze</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">⏱️ <span style="color:var(--text2);">Blocco automatico per inattività</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🔍 <span style="color:var(--text2);">Ricerca globale</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🏠 <span style="color:var(--text2);">Home personalizzabile (accesso rapido)</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">🎨 <span style="color:var(--text2);">Tema chiaro/scuro/automatico</span></div>
-            </div>
-          </div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:10px;">📋 Export</div>
-            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
-              <div style="display:flex;align-items:center;gap:8px;">📋 <span style="color:var(--text2);">PDF completo o per singola sezione</span></div>
-              <div style="display:flex;align-items:center;gap:8px;">📦 <span style="color:var(--text2);">Backup JSON completo</span></div>
+            <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
+            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:10px;">🔐 <span style="color:var(--text2);">Password con categorie</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">📝 <span style="color:var(--text2);">Note</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">🔑 <span style="color:var(--text2);">OTP / 2FA</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">💳 <span style="color:var(--text2);">Portafoglio — Carte e Conti</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">📡 <span style="color:var(--text2);">Rete & IT — Server e Wi-Fi</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">☁️ <span style="color:var(--text2);">Sync Firebase multi-dispositivo</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">📦 <span style="color:var(--text2);">Backup Google Drive automatico</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">📤 <span style="color:var(--text2);">Esporta / Importa JSON</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">📷 <span style="color:var(--text2);">Scansione QR (OTP e Wi-Fi)</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">🔍 <span style="color:var(--text2);">Ricerca globale</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">⏱️ <span style="color:var(--text2);">Blocco automatico per inattività</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">🎨 <span style="color:var(--text2);">Tema chiaro / scuro</span></div>
             </div>
           </div>
         </div>
