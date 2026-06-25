@@ -1882,7 +1882,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA349</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA350</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1984,7 +1984,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA349</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA350</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA349</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA350</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3077,7 +3077,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA349',
+  version: 'BETA350',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4099,7 +4099,10 @@ function pwLoad() {
 // Salva
 function pwSave() {
   localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
+  _setLocalTs(PW_CATS);
   localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
+  _setLocalTs(PW_KEY);
+  if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); }
   // Aggiorna badge nella bottombar
   const badge = document.getElementById('bb-pass-badge');
   if (badge) { badge.style.display = 'none'; }  // Badge rimosso
@@ -5142,6 +5145,8 @@ function noteLoad() {
 }
 function noteSaveAll() {
   localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
+  _setLocalTs(NOTE_KEY);
+  if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); }
   const el = document.getElementById('stat-notes');
   if (el) el.textContent = _notes.length || '—';
 }
@@ -5321,7 +5326,7 @@ let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
 }
-function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); }
+function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); _setLocalTs(CARDS_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
 
 let _walletCurrent = 'cards';
 function walletTab(which) {
@@ -5681,7 +5686,7 @@ let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 function financeLoad() {
   try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
 }
-function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); }
+function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); _setLocalTs(FINANCE_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -5924,7 +5929,7 @@ let _wifiSec  = 'WPA';
 function wifiLoad() {
   try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
 }
-function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); }
+function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); _setLocalTs(WIFI_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -6162,7 +6167,7 @@ let _otpIcon     = '🔐';
 function otpLoad() {
   try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
 }
-function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); }
+function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
 
 function otpOpen() {
   otpLoad();
@@ -7325,7 +7330,7 @@ function serverSave() {
   serverShowList();
 }
 
-function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); }
+function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); _setLocalTs(SERVER_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
 
 function serverShowAdd() {
   document.getElementById('server-view-list').style.display = 'none';
@@ -8301,6 +8306,16 @@ function settingsImport(event){
   event.target.value='';
 }
 
+// ── Auto-sync Firebase dopo salvataggio ───────────────────
+function _autoSyncAfterSave() {
+  if (_syncInProgress) return;
+  // Debounce: aspetta 1.5s prima di fare sync (evita troppe chiamate)
+  clearTimeout(window._autoSyncTimer);
+  window._autoSyncTimer = setTimeout(() => {
+    if (fbReady && HB.user) fbSyncAll(true);
+  }, 1500);
+}
+
 // ── Inizializzazione Firebase ─────────────────────────────
 fbInit();
 
@@ -8629,7 +8644,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA349</div>
+            <div style="font-size:13px;color:var(--text3);">BETA350</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
