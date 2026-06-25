@@ -1894,7 +1894,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA355</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA358</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1996,7 +1996,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA355</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA358</div>
         </div>
       </div>
     </div>
@@ -2102,7 +2102,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA355</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA358</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2478,6 +2478,14 @@ function cardsSearch(q) {
             <div class="pw-field-label" style="margin-bottom:6px;">Username / Email accesso</div>
             <input id="fin-user" type="text" placeholder="Username home banking"
               style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">PIN (opzionale)</div>
+            <div style="position:relative;">
+              <input id="fin-pin" type="password" placeholder="PIN carta/conto" inputmode="numeric"
+                style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+              <button onclick="const e=document.getElementById('fin-pin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+            </div>
           </div>
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">Password accesso</div>
@@ -3086,7 +3094,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA355',
+  version: 'BETA358',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5126,16 +5134,31 @@ function otpScanQR() {
   });
 }
 
-function wifiScanQR() {
+function wifiScanQR(fromModal) {
   qrScannerOpen('Scansiona QR Wi-Fi', (data) => {
     const parsed = qrParseWifi(data);
     if (!parsed || !parsed.ssid) { showToast('❌ QR non riconosciuto'); return; }
-    document.getElementById('wifi-add-ssid').value = parsed.ssid;
-    document.getElementById('wifi-add-pw').value   = parsed.pw;
-    _wifiSec = parsed.sec || 'WPA';
-    document.querySelectorAll('.wifi-sec-btn').forEach(b =>
-      b.classList.toggle('active', b.dataset.sec === _wifiSec)
-    );
+    if (fromModal) {
+      // Riempi i campi del modal unico
+      const ssidEl = document.getElementById('am-wifi-ssid');
+      const pwEl   = document.getElementById('am-wifi-pw');
+      if (ssidEl) ssidEl.value = parsed.ssid;
+      if (pwEl)   pwEl.value   = parsed.pw || '';
+      window._amWifiSec = parsed.sec || 'WPA';
+      document.querySelectorAll('#add-modal .wifi-sec-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.sec === window._amWifiSec)
+      );
+    } else {
+      // Riempi i campi del pannello WiFi
+      const ssidEl = document.getElementById('wifi-add-ssid');
+      const pwEl   = document.getElementById('wifi-add-pw');
+      if (ssidEl) ssidEl.value = parsed.ssid;
+      if (pwEl)   pwEl.value   = parsed.pw || '';
+      _wifiSec = parsed.sec || 'WPA';
+      document.querySelectorAll('.wifi-sec-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.sec === _wifiSec)
+      );
+    }
     showToast('✅ Rete letta dal QR — verifica e salva');
   });
 }
@@ -5204,7 +5227,7 @@ function noteRenderList(q='') {
   );
   if (!notes.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">📝</div>
+      <div style="font-size:32px;margin-bottom:8px;">📝</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q ? 'Nessun risultato' : 'Nessuna nota'}</div>
       <div style="font-size:13px;color:var(--text3);">${q ? 'Prova con un termine diverso' : 'Tocca + per aggiungere la prima nota'}</div>
     </div>`;
@@ -5379,7 +5402,7 @@ function cardsRender() {
   if (!list) return;
   if (!_cards.filter(c=>!c.deleted).length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">💳</div>
+      <div style="font-size:32px;margin-bottom:8px;">💳</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna carta</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi carte di credito, debito o prepagate</div>
     </div>`;
@@ -5413,7 +5436,7 @@ function cardsRender() {
             <div style="width:42px;height:30px;background:rgba(251,191,36,0.85);border-radius:6px;margin-bottom:12px;"></div>
             <div style="font-family:'DM Sans',monospace;font-size:17px;font-weight:700;letter-spacing:0.18em;color:white;text-align:center;">${numMasked}</div>
           </div>
-          <!-- Bottom: holder + scadenza -->
+          <!-- Bottom: holder + scadenza + copia numero -->
           <div style="display:flex;align-items:flex-end;justify-content:space-between;">
             <div>
               <div style="font-size:7px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Card Holder</div>
@@ -5423,6 +5446,7 @@ function cardsRender() {
               <div style="font-size:7px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Scadenza</div>
               <div style="font-size:12px;font-weight:700;color:${expiring?'#fbbf24':'white'};font-family:monospace;">${card.exp||'—'}${expiring?' ⚠️':''}</div>
             </div>
+            <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);color:white;padding:5px 10px;border-radius:8px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;">📋</button>
           </div>
         </div>
 
@@ -5430,21 +5454,24 @@ function cardsRender() {
         <div class="card-3d-back" style="background:#1e293b;border:1px solid #2d3f55;display:flex;flex-direction:column;justify-content:space-between;padding:0;box-shadow:inset 0 0 30px rgba(0,0,0,0.3);">
           <!-- Striscia magnetica -->
           <div style="width:100%;height:46px;background:#000;margin-top:16px;"></div>
-          <!-- CVV -->
+          <!-- PIN — campo segreto principale -->
           <div style="padding:0 16px;">
-            <div style="background:rgba(255,255,255,0.95);color:#111;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
-              <span>CVV: <span id="cvv-box-${card.id}" style="font-weight:900;font-size:15px;letter-spacing:0.1em;">${card.cvv ? '•••' : '—'}</span></span>
-              ${card.cvv ? `<button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.cvv}','cvv-box-${card.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6366f1;font-weight:700;">Mostra</button>` : ''}
-            </div>
+            ${card.pin ? `<div style="margin-bottom:8px;">
+              <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">PIN</div>
+              <div style="background:rgba(255,255,255,0.95);color:#111;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:15px;display:flex;align-items:center;justify-content:space-between;">
+                <span id="pin-box-${card.id}" style="font-weight:900;letter-spacing:0.15em;">••••</span>
+                <button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.pin}','pin-box-${card.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6366f1;font-weight:700;">👁 Mostra</button>
+              </div>
+            </div>` : ''}
+            <!-- CVV -->
+            ${card.cvv ? `<div>
+              <div style="font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">CVV</div>
+              <div style="background:rgba(255,255,255,0.95);color:#111;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:15px;display:flex;align-items:center;justify-content:space-between;">
+                <span id="cvv-box-${card.id}" style="font-weight:900;letter-spacing:0.1em;">•••</span>
+                <button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.cvv}','cvv-box-${card.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6366f1;font-weight:700;">👁 Mostra</button>
+              </div>
+            </div>` : ''}
           </div>
-          <!-- PIN opzionale -->
-          ${card.pin ? `<div style="padding:0 16px;margin-top:8px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;min-width:28px;">PIN</span>
-              <div style="background:rgba(255,255,255,0.95);color:#111;padding:5px 12px;border-radius:6px;font-family:monospace;font-size:13px;font-weight:900;letter-spacing:0.15em;flex:1;" id="pin-box-${card.id}">••••</div>
-              <button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.pin}','pin-box-${card.id}')" style="background:none;border:none;color:#818cf8;font-size:11px;font-weight:700;cursor:pointer;">👁</button>
-            </div>
-          </div>` : ''}
           <!-- Nota confidenziale -->
           <div style="padding:0 16px;font-size:8px;color:#64748b;line-height:1.4;">
             Le informazioni visualizzate sono confidenziali. Conserva in un luogo sicuro.
@@ -5716,7 +5743,7 @@ function financeRender() {
   const activeAccounts = _financeAccounts.filter(a=>!a.deleted);
   if (!activeAccounts.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">💰</div>
+      <div style="font-size:32px;margin-bottom:8px;">💰</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun conto salvato</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">IBAN, conti correnti, PayPal, Crypto</div>
     </div>`;
@@ -5739,10 +5766,16 @@ function financeRender() {
       </div>
       ${ibanMasked ? `<div class="finance-iban">IBAN: ${ibanMasked}</div>` : ''}
       ${acc.holder ? `<div style="font-size:12px;color:var(--text3);margin-top:3px;">👤 ${acc.holder}</div>` : ''}
+      ${acc.pin ? `<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);">
+        <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;">PIN</span>
+        <span id="fin-pin-card-${acc.id}" style="font-family:monospace;font-size:14px;font-weight:800;color:var(--text);letter-spacing:0.15em;flex:1;">••••</span>
+        <button onclick="event.stopPropagation();financeTogglePinCard('${acc.id}','${acc.pin}')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:700;padding:2px 6px;">👁 Mostra</button>
+        <button onclick="event.stopPropagation();navigator.clipboard.writeText('${acc.pin}');showToast('📋 PIN copiato')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 6px;">📋</button>
+      </div>` : ''}
       <div class="finance-actions">
         ${acc.iban ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeCopy('${acc.id}','iban')">📋 IBAN</button>` : ''}
         ${acc.bic  ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeCopy('${acc.id}','bic')">📋 BIC</button>` : ''}
-        ${(acc.user||acc.pw||acc.pin) ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeShowDetail('${acc.id}')">🔐 Credenziali</button>` : ''}
+        ${(acc.user||acc.pw) ? `<button class="finance-action-btn" onclick="event.stopPropagation();financeShowDetail('${acc.id}')">🔐 Credenziali</button>` : ''}
       </div>`;
     list.appendChild(card);
   });
@@ -5901,6 +5934,7 @@ function financeSave() {
     bic:    document.getElementById('fin-bic')?.value.trim().toUpperCase() || '',
     holder: document.getElementById('fin-holder')?.value.trim() || '',
     user:   document.getElementById('fin-user')?.value.trim() || '',
+    pin:    document.getElementById('fin-pin')?.value || '',
     pw:     document.getElementById('fin-pw')?.value || '',
     notes:  document.getElementById('fin-notes')?.value.trim() || '',
   };
@@ -5944,7 +5978,7 @@ function wifiRender() {
   if (!list) return;
   if (!_wifiNets.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">📶</div>
+      <div style="font-size:28px;margin-bottom:8px;">📶</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna rete salvata</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Salva le password Wi-Fi di casa, ufficio e altri luoghi</div>
     </div>`;
@@ -6188,7 +6222,7 @@ function otpRenderList(q='') {
   );
   if (!accounts.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">🔑</div>
+      <div style="font-size:32px;margin-bottom:8px;">🔑</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q?'Nessun risultato':'Nessun account'}</div>
       <div style="font-size:13px;color:var(--text3);">${q?'Prova con un termine diverso':'Usa il bottone + per aggiungere il primo account 2FA'}</div>
     </div>`;
@@ -7277,7 +7311,7 @@ function serverRender() {
   if (!list) return;
   if (!_serverItems.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
-      <div style="font-size:48px;margin-bottom:12px;">📡</div>
+      <div style="font-size:28px;margin-bottom:8px;">📡</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna credenziale</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">SSH, API keys, database, VPN e altro</div>
     </div>`;
@@ -8394,6 +8428,14 @@ function addModalAdapt() {
       ${inp('fin-iban','IBAN','IT60 X054 2811 1010 0000 0123 456')}
       ${inp('fin-bic','BIC / SWIFT','BCITITMM')}
       ${inp('fin-holder','Intestatario','Mario Rossi')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">PIN (opzionale)</div>
+        <div style="position:relative;">
+          <input id="am-fin-pin" type="password" placeholder="PIN carta/conto" inputmode="numeric"
+            style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+          <button onclick="const e=document.getElementById('am-fin-pin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+        </div>
+      </div>
       ${pwToggle('fin-pw')}
       ${inp('fin-notes','Note','Note aggiuntive...')}
     `,
@@ -8491,7 +8533,7 @@ function addModalSave() {
     const finType = document.getElementById('am-fin-type')?.value || 'conto';
     const icons = {conto:'🏦',paypal:'💙',crypto:'🟡',altro:'💳'};
     const labels = {conto:'Conto Corrente',paypal:'PayPal',crypto:'Crypto',altro:'Altro'};
-    _financeAccounts.push({ id:'fin_'+Date.now(), type:finType, icon:icons[finType], typeLabel:labels[finType], label, iban:g('fin-iban').replace(/\s/g,'').toUpperCase(), bic:g('fin-bic').toUpperCase(), holder:g('fin-holder'), pw:g('fin-pw'), notes:g('fin-notes') });
+    _financeAccounts.push({ id:'fin_'+Date.now(), type:finType, icon:icons[finType], typeLabel:labels[finType], label, iban:g('fin-iban').replace(/\s/g,'').toUpperCase(), bic:g('fin-bic').toUpperCase(), holder:g('fin-holder'), pin:document.getElementById('am-fin-pin')?.value||'', pw:g('fin-pw'), notes:g('fin-notes') });
     financeSaveAll(); showToast('✅ Conto salvato');
     if (typeof financeRender === 'function') financeRender();
 
@@ -8559,7 +8601,7 @@ function otpScanQRFromModal() {
 }
 
 function wifiScanQRFromModal() {
-  wifiScanQR(); // apre la camera
+  wifiScanQR(true); // apre la camera, fromModal=true
   // Intercetta il risultato
   const origParse = window.wifiParseQR;
   window.wifiParseQR = function(ssid, pw, sec) {
@@ -8574,6 +8616,19 @@ function wifiScanQRFromModal() {
   };
 }
 
+
+function financeTogglePinCard(id, pin) {
+  const el = document.getElementById('fin-pin-card-' + id);
+  if (!el) return;
+  const btn = el.nextElementSibling;
+  if (el.textContent === '••••') {
+    el.textContent = pin;
+    if (btn) btn.textContent = '🙈 Nascondi';
+  } else {
+    el.textContent = '••••';
+    if (btn) btn.textContent = '👁 Mostra';
+  }
+}
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
 function _autoSyncAfterSave() {
   if (_syncInProgress) return;
@@ -8912,7 +8967,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA355</div>
+            <div style="font-size:13px;color:var(--text3);">BETA358</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
