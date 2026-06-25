@@ -911,6 +911,14 @@ html, body {
   position: absolute; border-radius: 50%;
   background: rgba(255,255,255,0.08);
 }
+
+/* ── Password categorie grid ─────────────────────────────── */
+@media (min-width: 700px) {
+  #pw-cats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}
+@media (min-width: 1100px) {
+  #pw-cats-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}
 /* ── OTP grid responsive ─────────────────────────────── */
 @media (min-width: 580px) {
   #otp-list { grid-template-columns: repeat(2, 1fr) !important; }
@@ -1894,7 +1902,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA361</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA362</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1996,7 +2004,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA361</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA362</div>
         </div>
       </div>
     </div>
@@ -2102,7 +2110,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA361</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA362</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3083,7 +3091,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA361',
+  version: 'BETA362',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4145,15 +4153,15 @@ function pwShowCats(q='') {
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
 
-  // Se cache non pronta, riprova
   if (!_lsCacheReady) {
     grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">⏳ Caricamento...</div>';
     setTimeout(() => pwRenderCats(q), 500);
     return;
   }
 
-  // Ricarica se vuoto
   if (!_pwItems.length || !_pwCats.length) pwLoad();
+
+  // Modalità ricerca — lista verticale
   if (q) {
     const ql = q.toLowerCase();
     const matches = _pwItems.filter(i => !i.deleted && (
@@ -4166,14 +4174,16 @@ function pwRenderCats(q='') {
       grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessun risultato per "' + q + '"</div>';
       return;
     }
+    grid.style.display = 'flex';
+    grid.style.flexDirection = 'column';
     grid.innerHTML = '';
     matches.forEach(item => {
       const cat = _pwCats.find(c => c.id === item.categoryId);
       const s = getStrength(item.password||'');
       const div = document.createElement('div');
-      div.style.cssText = 'display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-bottom:8px;';
+      div.style.cssText = 'display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);cursor:pointer;margin-bottom:8px;';
       div.onclick = () => pwShowDetail(item.id);
-      div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:var(--accent)20;border:1px solid var(--accent)40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🔐</div>'
+      div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🔐</div>'
         + '<div style="flex:1;min-width:0;">'
         + '<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (item.title||'Senza nome') + '</div>'
         + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||'') + (cat ? ' · ' + cat.name : '') + '</div>'
@@ -4187,34 +4197,44 @@ function pwRenderCats(q='') {
   const cats = _pwCats
     .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name, 'it'));
+
   if (!cats.length) {
+    grid.style.display = 'flex';
     grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna categoria trovata</div>';
     return;
   }
+
+  // Griglia card
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+  grid.style.gap = '12px';
   grid.innerHTML = '';
-  cats.forEach(cat => {
-    const count = _pwItems.filter(i => i.categoryId === cat.id).length;
-    // mostra sempre tutte le categorie
+
+  const palette = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
+
+  cats.forEach((cat, ci) => {
+    const count = _pwItems.filter(i => i.categoryId === cat.id && !i.deleted).length;
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
+    const color = cat.color || palette[ci % palette.length];
+
     const div = document.createElement('div');
-    const ci = cats.indexOf(cat);
-    const color = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'][ci % 8];
-    div.style.cssText = `display:flex!important;align-items:center;gap:14px;padding:13px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};cursor:pointer;margin-bottom:8px;transition:background 0.15s;`;
-    div.onmouseenter = () => div.style.background = 'var(--surface2,var(--bg3))';
-    div.onmouseleave = () => div.style.background = 'var(--surface)';
+    div.style.cssText = `background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px 16px;cursor:pointer;transition:transform 0.15s,background 0.15s;position:relative;overflow:hidden;`;
+    div.onmouseenter = () => { div.style.background='var(--surface2,var(--bg3))'; div.style.transform='translateY(-2px)'; };
+    div.onmouseleave = () => { div.style.background='var(--surface)'; div.style.transform=''; };
     div.onclick = () => pwShowItems(cat.id, cat.name);
-    div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:'+color+'20;border:1px solid '+color+'40;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">'+icon+'</div>'
-      +'<div style="flex:1;min-width:0;">'
-        +'<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+cat.name+'</div>'
-      +'</div>'
-      +'<div style="width:26px;height:26px;border-radius:99px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--text3);flex-shrink:0;">'+count+'</div>';
-    // Bottone rinomina ✏️
-    const editBtn = document.createElement('button');
-    editBtn.style.cssText = 'width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface2,var(--bg3));color:var(--text3);font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-left:4px;';
-    editBtn.innerHTML = '✏️';
-    editBtn.title = 'Rinomina';
-    editBtn.onclick = (e) => { e.stopPropagation(); pwRenameCategory(cat.id, cat.name); };
-    div.appendChild(editBtn);
+
+    div.innerHTML = `
+      <!-- Decorazione colore in cima -->
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color};border-radius:18px 18px 0 0;"></div>
+      <!-- Icona -->
+      <div style="width:48px;height:48px;border-radius:14px;background:${color}20;border:1px solid ${color}40;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;">${icon}</div>
+      <!-- Nome -->
+      <div style="font-size:14px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;">${cat.name}</div>
+      <!-- Contatore -->
+      <div style="font-size:12px;color:var(--text3);">${count} password</div>
+      <!-- Badge contatore in alto a destra -->
+      <div style="position:absolute;top:12px;right:12px;min-width:22px;height:22px;border-radius:99px;background:${color}20;border:1px solid ${color}40;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${color};padding:0 6px;">${count}</div>`;
+
     grid.appendChild(div);
   });
 }
@@ -8971,7 +8991,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA361</div>
+            <div style="font-size:13px;color:var(--text3);">BETA362</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
