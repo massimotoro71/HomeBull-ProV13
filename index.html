@@ -911,6 +911,14 @@ html, body {
   position: absolute; border-radius: 50%;
   background: rgba(255,255,255,0.08);
 }
+/* ── OTP grid responsive ─────────────────────────────── */
+@media (min-width: 580px) {
+  #otp-list { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (min-width: 1100px) {
+  #otp-list { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
 /* ── Carte 3D flip ─────────────────────────────────────── */
 .card-3d-container {
   perspective: 1200px;
@@ -919,10 +927,13 @@ html, body {
   cursor: pointer;
   margin-bottom: 14px;
 }
-/* 1 colonna su mobile, 2 su tablet+ */
-@media (min-width: 580px) {
+/* Griglia carte responsive */
+@media (min-width: 540px) {
   .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding-bottom: 100px; }
   .cards-grid .card-3d-container { margin-bottom: 0; }
+}
+@media (min-width: 1100px) {
+  .cards-grid { grid-template-columns: repeat(3, 1fr); }
 }
 .card-3d-inner {
   position: relative;
@@ -1883,7 +1894,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA354</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA355</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1985,7 +1996,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA354</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA355</div>
         </div>
       </div>
     </div>
@@ -2091,7 +2102,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA354</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA355</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2251,7 +2262,7 @@ function cardsSearch(q) {
               </div>
             </div>
           </div>
-          <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+          <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;display:grid;grid-template-columns:1fr;gap:12px;align-content:start;"></div>
         </div>
 
         <!-- Vista aggiungi account -->
@@ -2326,7 +2337,7 @@ function cardsSearch(q) {
               </div>
             </div>
           </div>
-          <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+          <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;max-width:1200px;"></div>
         </div>
 
         <!-- Aggiungi carta -->
@@ -3075,7 +3086,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA354',
+  version: 'BETA355',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5426,6 +5437,14 @@ function cardsRender() {
               ${card.cvv ? `<button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.cvv}','cvv-box-${card.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6366f1;font-weight:700;">Mostra</button>` : ''}
             </div>
           </div>
+          <!-- PIN opzionale -->
+          ${card.pin ? `<div style="padding:0 16px;margin-top:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;min-width:28px;">PIN</span>
+              <div style="background:rgba(255,255,255,0.95);color:#111;padding:5px 12px;border-radius:6px;font-family:monospace;font-size:13px;font-weight:900;letter-spacing:0.15em;flex:1;" id="pin-box-${card.id}">••••</div>
+              <button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.pin}','pin-box-${card.id}')" style="background:none;border:none;color:#818cf8;font-size:11px;font-weight:700;cursor:pointer;">👁</button>
+            </div>
+          </div>` : ''}
           <!-- Nota confidenziale -->
           <div style="padding:0 16px;font-size:8px;color:#64748b;line-height:1.4;">
             Le informazioni visualizzate sono confidenziali. Conserva in un luogo sicuro.
@@ -5688,16 +5707,6 @@ function financeShowList() {
   document.getElementById('topbar-back').classList.remove('visible');
   document.getElementById('topbar-title').textContent = 'Finanze';
   // Pulsante + nella topbar
-  const addBtn = document.getElementById('topbar-add-finance');
-  if(!addBtn) {
-    const btn = document.createElement('button');
-    btn.id = 'topbar-add-finance';
-    btn.onclick = financeShowAdd;
-    btn.style.cssText = 'position:absolute;right:16px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;';
-    btn.textContent = '+';
-    const topbar = document.querySelector('.topbar') || document.getElementById('topbar');
-    if(topbar) { topbar.style.position='relative'; topbar.appendChild(btn); }
-  } else { addBtn.style.display='flex'; }
   financeRender();
 }
 
@@ -5851,8 +5860,6 @@ function financeDelete(id) {
 
 // ── Aggiungi ─────────────────────────────────────────────
 function financeShowAdd() {
-  const addBtn = document.getElementById('topbar-add-finance');
-  if(addBtn) addBtn.style.display = 'none';
   document.getElementById('finance-view-list').style.display = 'none';
   document.getElementById('finance-view-add').style.display  = 'block';
   document.getElementById('topbar-back').classList.add('visible');
@@ -6183,46 +6190,51 @@ function otpRenderList(q='') {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:48px;margin-bottom:12px;">🔑</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q?'Nessun risultato':'Nessun account'}</div>
-      <div style="font-size:13px;color:var(--text3);">${q?'Prova con un termine diverso':'Tocca + per aggiungere il primo account 2FA'}</div>
+      <div style="font-size:13px;color:var(--text3);">${q?'Prova con un termine diverso':'Usa il bottone + per aggiungere il primo account 2FA'}</div>
     </div>`;
     return;
   }
   list.innerHTML = '';
   accounts.forEach(acc => {
     const code = otpGenerate(acc.secret);
+    const formatted = otpFormat(code);
     const remaining = 30 - (Math.floor(Date.now()/1000) % 30);
     const pct = remaining / 30;
     const expiring = remaining <= 7;
-    const card = document.createElement('div');
-    card.className = 'otp-card';
-    card.dataset.id = acc.id;
-    const circumference = 2 * Math.PI * 15;
+    const circumference = 2 * Math.PI * 20;
     const dashOffset = circumference * (1 - pct);
+
+    const card = document.createElement('div');
+    card.dataset.id = acc.id;
+    card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color 0.2s;';
     card.innerHTML = `
-      <div class="otp-card-header">
-        <div class="otp-card-icon">${acc.icon||'🔐'}</div>
+      <!-- Header: icona + nome -->
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${acc.icon||'🔐'}</div>
         <div style="flex:1;min-width:0;">
-          <div class="otp-card-name">${acc.name}</div>
-          ${acc.user ? `<div class="otp-card-user">${acc.user}</div>` : ''}
+          <div style="font-size:14px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.name}</div>
+          ${acc.user ? `<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.user}</div>` : ''}
         </div>
-        <button onclick="event.stopPropagation();otpEdit('${acc.id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:4px;font-size:16px;" title="Modifica">✏️</button>
-        <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:16px;" title="Elimina">🗑️</button>
+        <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>
-      <div class="otp-code-row">
-        <div class="otp-code ${expiring?'expiring':''}" id="otp-code-${acc.id}">${otpFormat(code)}</div>
-        <svg class="otp-timer" viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="15" fill="none" stroke="var(--border2)" stroke-width="3"/>
-          <circle cx="18" cy="18" r="15" fill="none"
-            stroke="${expiring?'#ef4444':'var(--accent)'}" stroke-width="3"
-            stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
-            stroke-linecap="round" transform="rotate(-90 18 18)"
-            id="otp-circle-${acc.id}"/>
-          <text x="18" y="22" text-anchor="middle" font-size="10" font-weight="800"
-            fill="${expiring?'#ef4444':'var(--text3)'}" id="otp-secs-${acc.id}">${remaining}s</text>
-        </svg>
-        <button class="otp-copy-btn" onclick="event.stopPropagation();otpCopy('${acc.id}')" title="Copia codice">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <!-- Codice OTP grande -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <span id="otp-code-${acc.id}" style="font-size:26px;font-weight:900;letter-spacing:0.2em;color:${expiring?'#ef4444':'#10b981'};font-family:'DM Sans',monospace;">${formatted}</span>
+        <button onclick="event.stopPropagation();otpCopy('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;" title="Copia">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
+      </div>
+      <!-- Timer ad anello -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="28" height="28" viewBox="0 0 48 48" id="otp-circle-${acc.id}">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="4"/>
+          <circle cx="24" cy="24" r="20" fill="none"
+            stroke="${expiring?'#ef4444':'#10b981'}" stroke-width="4"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
+            stroke-linecap="round" transform="rotate(-90 24 24)"/>
+        </svg>
+        <span id="otp-secs-${acc.id}" style="font-size:12px;font-weight:700;color:${expiring?'#ef4444':'var(--text3)'};">${remaining}s</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:2px;">· si rinnova ogni 30s</span>
       </div>`;
     list.appendChild(card);
   });
@@ -8388,7 +8400,14 @@ function addModalAdapt() {
     otp: `
       ${inp('otp-name','Nome account *','es. Google, GitHub...')}
       ${inp('otp-user','Email / Username','nome@email.com')}
-      ${inp('otp-secret','Chiave segreta *','JBSWY3DPEHPK3PXP')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Chiave segreta *</div>
+        <div style="display:flex;gap:8px;">
+          <input id="am-otp-secret" type="text" placeholder="JBSWY3DPEHPK3PXP" autocomplete="off"
+            style="flex:1;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:monospace;outline:none;box-sizing:border-box;" oninput="this.value=this.value.toUpperCase().replace(/\s/g,'')">
+          <button onclick="otpScanQRFromModal()" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;cursor:pointer;font-family:inherit;">📷 QR</button>
+        </div>
+      </div>
     `,
     note: `
       ${inp('note-title','Titolo','Titolo nota...')}
@@ -8399,6 +8418,10 @@ function addModalAdapt() {
       </div>
     `,
     wifi: `
+      <div style="margin-bottom:10px;">
+        <button onclick="wifiScanQRFromModal()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📷 Scansiona QR Wi-Fi</button>
+      </div>
+      <div style="margin-bottom:10px;text-align:center;font-size:11px;color:var(--text3);">— oppure inserisci manualmente —</div>
       ${inp('wifi-ssid','Nome rete (SSID) *','es. Casa-5G')}
       ${pwToggle('wifi-pw')}
       <div style="margin-bottom:12px;">
@@ -8473,7 +8496,7 @@ function addModalSave() {
     if (typeof financeRender === 'function') financeRender();
 
   } else if (type === 'otp') {
-    const name = g('otp-name'), secret = g('otp-secret').replace(/\s/g,'');
+    const name = g('otp-name'), secret = (document.getElementById('am-otp-secret')?.value||'').trim().replace(/\s/g,'').toUpperCase();
     if (!name) { showToast('Inserisci il nome account'); return; }
     if (!secret) { showToast('Inserisci la chiave segreta'); return; }
     _otpAccounts.push({ id:'otp_'+Date.now(), name, user:g('otp-user'), secret, icon:'🔐' });
@@ -8505,6 +8528,50 @@ function addModalSave() {
   }
 
   closeAddModal();
+}
+
+
+// ── QR scan per modal unico ────────────────────────────────
+function otpScanQRFromModal() {
+  // Usa la funzione esistente otpScanQR ma poi riempie il campo del modal
+  const originalShowAdd = window._otpShowAddOverride;
+  otpScanQR(); // apre la camera
+  // Intercetta il risultato: quando otpScanQR legge il QR, chiama otpParseQR
+  // Monkey-patch temporaneo per redirect al modal
+  const origParse = window.otpParseQR;
+  window.otpParseQR = function(url) {
+    try {
+      const u = new URL(url);
+      const secret = u.searchParams.get('secret') || '';
+      const name = u.searchParams.get('issuer') || decodeURIComponent(u.pathname.split(':')[1] || '');
+      const inp = document.getElementById('am-otp-secret');
+      const nameInp = document.getElementById('am-otp-name');
+      if (inp) inp.value = secret.toUpperCase();
+      if (nameInp && name) nameInp.value = name;
+      // Chiudi la camera se aperta
+      const cam = document.getElementById('otp-qr-overlay');
+      if (cam) cam.remove();
+    } catch(e) {
+      if (origParse) origParse(url);
+    }
+    window.otpParseQR = origParse;
+  };
+}
+
+function wifiScanQRFromModal() {
+  wifiScanQR(); // apre la camera
+  // Intercetta il risultato
+  const origParse = window.wifiParseQR;
+  window.wifiParseQR = function(ssid, pw, sec) {
+    const ssidInp = document.getElementById('am-wifi-ssid');
+    const pwInp = document.getElementById('am-wifi-pw');
+    if (ssidInp) ssidInp.value = ssid || '';
+    if (pwInp) pwInp.value = pw || '';
+    window._amWifiSec = sec || 'WPA';
+    const cam = document.getElementById('wifi-qr-overlay');
+    if (cam) cam.remove();
+    window.wifiParseQR = origParse;
+  };
 }
 
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
@@ -8845,7 +8912,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA354</div>
+            <div style="font-size:13px;color:var(--text3);">BETA355</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
