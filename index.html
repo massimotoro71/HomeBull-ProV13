@@ -1894,7 +1894,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA360</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA361</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1996,7 +1996,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA360</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA361</div>
         </div>
       </div>
     </div>
@@ -2102,7 +2102,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA360</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA361</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2389,6 +2389,14 @@ function cardsSearch(q) {
               <input id="card-add-holder" type="text" placeholder="NOME COGNOME"
                 oninput="cardUpdatePreview()"
                 style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;text-transform:uppercase;">
+            </div>
+            <div style="margin-bottom:12px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">PIN (opzionale)</div>
+              <div style="position:relative;">
+                <input id="card-add-pin" type="password" placeholder="PIN carta" inputmode="numeric"
+                  style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+                <button onclick="const e=document.getElementById('card-add-pin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+              </div>
             </div>
             <div style="margin-bottom:20px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
@@ -3075,7 +3083,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA360',
+  version: 'BETA361',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4319,6 +4327,7 @@ function pwRenderItems(q='') {
         <button class="pw-copy-btn" onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
+        <button onclick="event.stopPropagation();pwEditItem('${item.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="event.stopPropagation();pwDeleteConfirm('${item.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑</button>
       </div>`;
     list.appendChild(card);
@@ -5227,6 +5236,7 @@ function noteRenderList(q='') {
       ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}</span>
+        <button onclick="event.stopPropagation();noteEdit('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--accent);font-size:14px;cursor:pointer;margin-right:6px;">✏️</button>
         <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;">🗑</button>
       </div>`;
     list.appendChild(card);
@@ -5460,6 +5470,7 @@ function cardsRender() {
           <!-- Footer: copia + elimina -->
           <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-top:1px solid #334155;">
             <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')" style="background:none;border:none;color:#818cf8;font-size:11px;font-weight:700;cursor:pointer;text-decoration:underline;font-family:inherit;">Copia Numero</button>
+            <button onclick="event.stopPropagation();cardsEdit('${card.id}')" style="background:none;border:none;color:#475569;cursor:pointer;font-size:14px;" onmouseover="this.style.color='#818cf8'" onmouseout="this.style.color='#475569'" title="Modifica">✏️</button>
             <button onclick="event.stopPropagation();cardsDelete('${card.id}')" style="background:none;border:none;color:#475569;cursor:pointer;font-size:14px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#475569'">🗑</button>
           </div>
         </div>
@@ -5664,7 +5675,7 @@ function cardsShowAdd() {
   document.getElementById('topbar-back').classList.add('visible');
   document.getElementById('topbar-title').textContent = 'Nuova Carta';
   // Reset form
-  ['card-add-label','card-add-number','card-add-exp','card-add-cvv','card-add-holder'].forEach(id => {
+  ['card-add-label','card-add-number','card-add-exp','card-add-cvv','card-add-holder','card-add-pin'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value='';
   });
   _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
@@ -5682,7 +5693,8 @@ function cardSave() {
   if (!label) { showToast('Inserisci un nome per la carta'); return; }
   if (!number) { showToast('Inserisci il numero della carta'); return; }
   if (!exp) { showToast('Inserisci la data di scadenza'); return; }
-  _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv, holder, color:_cardColorSelected });
+  const pin = document.getElementById('card-add-pin')?.value || '';
+  _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv, holder, pin, color:_cardColorSelected });
   cardsSaveAll();
   showToast('✅ Carta ' + label + ' salvata');
   cardsShowList();
@@ -5743,7 +5755,8 @@ function financeRender() {
           <div class="finance-label">${acc.label}</div>
           <div style="margin-top:3px;"><span class="finance-type-badge">${acc.typeLabel||acc.type}</span></div>
         </div>
-        <button onclick="event.stopPropagation();financeDelete('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>
+        <button onclick="event.stopPropagation();financeEdit('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
+        <button onclick="event.stopPropagation();financeDelete('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>
       ${ibanMasked ? `<div class="finance-iban">IBAN: ${ibanMasked}</div>` : ''}
       ${acc.holder ? `<div style="font-size:12px;color:var(--text3);margin-top:3px;">👤 ${acc.holder}</div>` : ''}
@@ -6230,6 +6243,7 @@ function otpRenderList(q='') {
           <div style="font-size:14px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.name}</div>
           ${acc.user ? `<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.user}</div>` : ''}
         </div>
+        <button onclick="event.stopPropagation();otpEdit('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>
       <!-- Codice OTP grande -->
@@ -7317,7 +7331,8 @@ function serverRender() {
       <div style="display:flex;gap:8px;margin-top:8px;">
         ${item.host ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverCopy('${item.id}','host')" title="Copia host"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>` : ''}
         ${item.pw   ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverCopy('${item.id}','pw')" title="Copia password/token"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>` : ''}
-        <button onclick="event.stopPropagation();serverDelete('${item.id}')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;">✕</button>
+        <button onclick="event.stopPropagation();serverEdit('${item.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
+        <button onclick="event.stopPropagation();serverDelete('${item.id}')" style="margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>`;
     list.appendChild(card);
   });
@@ -8394,6 +8409,14 @@ function addModalAdapt() {
       ${inp('card-exp','Scadenza *','MM/YY','text','maxlength="5"')}
       ${inp('card-cvv','CVV','•••','password','maxlength="4" inputmode="numeric"')}
       ${inp('card-holder','Intestatario','MARIO ROSSI')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">PIN (opzionale)</div>
+        <div style="position:relative;">
+          <input id="am-card-pin" type="password" placeholder="PIN carta" inputmode="numeric"
+            style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+          <button onclick="const e=document.getElementById('am-card-pin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+        </div>
+      </div>
     `,
     finance: `
       ${inp('fin-label','Nome conto *','es. Conto Intesa, PayPal...')}
@@ -8504,7 +8527,7 @@ function addModalSave() {
     if (!label) { showToast('Inserisci il nome carta'); return; }
     if (!number) { showToast('Inserisci il numero'); return; }
     if (!exp) { showToast('Inserisci la scadenza'); return; }
-    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), color:'linear-gradient(135deg,#6366f1,#8b5cf6)' });
+    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), pin:document.getElementById('am-card-pin')?.value||'', color:'linear-gradient(135deg,#6366f1,#8b5cf6)' });
     cardsSaveAll(); showToast('✅ Carta salvata');
     if (typeof cardsRender === 'function') cardsRender();
 
@@ -8948,7 +8971,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA360</div>
+            <div style="font-size:13px;color:var(--text3);">BETA361</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
