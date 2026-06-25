@@ -11879,7 +11879,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA384</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA385</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -11981,7 +11981,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA384</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA385</div>
         </div>
       </div>
     </div>
@@ -12088,7 +12088,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA384</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA385</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -12699,7 +12699,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 </div>
 
 <!-- QR Scanner Modal (OTP + WiFi) -->
-<div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.75);flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+<div id="qr-scanner-modal" style="display:none;position:fixed;inset:0;z-index:9900;background:rgba(0,0,0,0.75);flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div style="background:#111;border-radius:24px;overflow:hidden;width:360px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.1);">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:#1a1a1a;">
@@ -13071,7 +13071,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA384',
+  version: 'BETA385',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -18708,29 +18708,20 @@ function addModalSave() {
 
 // ── QR scan per modal unico ────────────────────────────────
 function otpScanQRFromModal() {
-  // Usa la funzione esistente otpScanQR ma poi riempie il campo del modal
-  const originalShowAdd = window._otpShowAddOverride;
-  otpScanQR(); // apre la camera
-  // Intercetta il risultato: quando otpScanQR legge il QR, chiama otpParseQR
-  // Monkey-patch temporaneo per redirect al modal
-  const origParse = window.otpParseQR;
-  window.otpParseQR = function(url) {
-    try {
-      const u = new URL(url);
-      const secret = u.searchParams.get('secret') || '';
-      const name = u.searchParams.get('issuer') || decodeURIComponent(u.pathname.split(':')[1] || '');
-      const inp = document.getElementById('am-otp-secret');
-      const nameInp = document.getElementById('am-otp-name');
-      if (inp) inp.value = secret.toUpperCase();
-      if (nameInp && name) nameInp.value = name;
-      // Chiudi la camera se aperta
-      const cam = document.getElementById('otp-qr-overlay');
-      if (cam) cam.remove();
-    } catch(e) {
-      if (origParse) origParse(url);
+  qrScannerOpen('Scansiona QR 2FA', (data) => {
+    const parsed = qrParseOTP(data);
+    if (!parsed || !parsed.secret) {
+      showToast('❌ QR non riconosciuto — inserisci manualmente');
+      return;
     }
-    window.otpParseQR = origParse;
-  };
+    const nameInp = document.getElementById('am-otp-name');
+    const userInp = document.getElementById('am-otp-user');
+    const secInp  = document.getElementById('am-otp-secret');
+    if (nameInp && parsed.name) nameInp.value = parsed.name;
+    if (userInp && parsed.user) userInp.value = parsed.user;
+    if (secInp)  secInp.value = parsed.secret.toUpperCase();
+    showToast('✅ QR letto — verifica e salva');
+  });
 }
 
 function wifiScanQRFromModal() {
@@ -19136,7 +19127,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA384</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA385</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
