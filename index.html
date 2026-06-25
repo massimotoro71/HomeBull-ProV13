@@ -900,8 +900,8 @@ html, body {
 
 /* ── Carte ─────────────────────────────────────────────── */
 .card-tile {
-  border-radius: 18px; padding: 20px 18px;
-  margin-bottom: 14px; min-height: 150px;
+  border-radius: 18px; padding: 14px 16px;
+  margin-bottom: 0; min-height: 0; height: 100%;
   display: flex; flex-direction: column; justify-content: space-between;
   cursor: pointer; position: relative; overflow: hidden;
   transition: transform 0.15s;
@@ -915,9 +915,13 @@ html, body {
 .card-3d-container {
   perspective: 1000px;
   width: 100%;
-  height: 200px;
+  height: 160px;
   cursor: pointer;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+@media (min-width: 500px) {
+  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .card-3d-container { margin-bottom: 0; }
 }
 .card-3d-inner {
   position: relative;
@@ -943,13 +947,13 @@ html, body {
   border: 1px solid rgba(255,255,255,0.1);
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 14px 16px;
 }
 .card-3d-stripe {
-  width: calc(100% + 40px);
-  height: 44px;
+  width: calc(100% + 32px);
+  height: 34px;
   background: #000;
-  margin: 0 -20px 16px;
+  margin: 0 -16px 12px;
 }
 .card-3d-cvv-row {
   display: flex;
@@ -1878,7 +1882,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA348</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA349</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1980,7 +1984,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA348</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA349</div>
         </div>
       </div>
     </div>
@@ -2086,7 +2090,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA348</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA349</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2324,7 +2328,7 @@ function cardsSearch(q) {
               </button>
             </div>
           </div>
-          <div id="cards-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
+          <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
         </div>
 
         <!-- Aggiungi carta -->
@@ -2349,11 +2353,11 @@ function cardsSearch(q) {
                 <div style="font-family:'DM Sans',monospace;font-size:18px;font-weight:700;color:white;letter-spacing:0.12em;margin-bottom:12px;font-variant-numeric:tabular-nums;" id="preview-number">•••• •••• •••• ••••</div>
                 <div style="display:flex;gap:24px;">
                   <div>
-                    <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
+                    <div style="font-size:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
                     <div style="font-size:14px;font-weight:700;color:white;font-variant-numeric:tabular-nums;" id="preview-exp">MM/AA</div>
                   </div>
                   <div>
-                    <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
+                    <div style="font-size:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
                     <div style="font-size:14px;font-weight:700;color:white;" id="preview-holder">NOME COGNOME</div>
                   </div>
                 </div>
@@ -3073,7 +3077,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA348',
+  version: 'BETA349',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5386,26 +5390,26 @@ function cardsRender() {
       <div id="card-inner-${card.id}" class="card-3d-inner">
 
         <!-- FRONTE -->
-        <div class="card-3d-front card-tile" style="background:${card.color};height:200px;">
+        <div class="card-3d-front card-tile" style="background:${card.color};">
           <div class="card-tile-ring" style="width:160px;height:160px;top:-40px;right:-40px;"></div>
           <div class="card-tile-ring" style="width:120px;height:120px;bottom:-40px;left:-20px;"></div>
           <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
-            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.08em;">${card.label}</div>
-            <div style="font-size:22px;">${circuit}</div>
+            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.08em;">${card.label}</div>
+            <div style="font-size:18px;">${circuit}</div>
           </div>
           <div style="position:relative;margin-top:auto;">
             <div class="card-number-display">${numDisplay}</div>
             <div style="display:flex;gap:20px;align-items:flex-end;">
               <div>
-                <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
-                <div style="font-size:14px;font-weight:700;color:${expiring?'#fbbf24':'white'};">${card.exp||'—'}${expiring?' ⚠️':''}</div>
+                <div style="font-size:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
+                <div style="font-size:12px;font-weight:700;color:${expiring?'#fbbf24':'white'};">${card.exp||'—'}${expiring?' ⚠️':''}</div>
               </div>
               ${card.holder ? `<div>
-                <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
-                <div style="font-size:13px;font-weight:700;color:white;">${card.holder.toUpperCase()}</div>
+                <div style="font-size:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
+                <div style="font-size:11px;font-weight:700;color:white;">${card.holder.toUpperCase()}</div>
               </div>` : ''}
               <div style="margin-left:auto;">
-                <div style="font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:4px;">🔄 Gira</div>
+                <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-bottom:2px;">🔄</div>
               </div>
             </div>
           </div>
@@ -8625,7 +8629,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA348</div>
+            <div style="font-size:13px;color:var(--text3);">BETA349</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
