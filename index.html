@@ -1681,6 +1681,8 @@ function wifiShowAdd() {
   document.getElementById('topbar-title').textContent = 'Nuova Rete';
   document.getElementById('wifi-add-ssid').value = '';
   document.getElementById('wifi-add-pw').value = '';
+  const notesEl = document.getElementById('wifi-add-notes');
+  if (notesEl) notesEl.value = '';
   _wifiSec = 'WPA';
   document.querySelectorAll('.wifi-sec-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.sec === 'WPA');
@@ -1778,7 +1780,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA387</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA389</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1880,7 +1882,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA387</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA389</div>
         </div>
       </div>
     </div>
@@ -1987,7 +1989,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA387</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA389</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2519,6 +2521,11 @@ function cardsSearch(q) {
                 <button class="wifi-sec-btn" data-sec="nopass" onclick="wifiSelectSec(this,'nopass')">Aperta</button>
               </div>
             </div>
+            <div style="margin-bottom:14px;">
+              <div class="pw-field-label" style="margin-bottom:6px;">Note (opzionale)</div>
+              <input id="wifi-add-notes" type="text" placeholder="es. Casa, Ufficio, Bar..."
+                style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
             <button onclick="wifiSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;">Salva Rete</button>
           </div>
         </div>
@@ -2970,7 +2977,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA387',
+  version: 'BETA389',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5962,11 +5969,19 @@ function wifiRender() {
         <div class="wifi-icon">📶</div>
         <div style="flex:1;min-width:0;">
           <div class="wifi-ssid">${net.ssid}</div>
-          <div style="margin-top:4px;"><span class="wifi-sec-badge" style="background:${secColor}20;color:${secColor};">${secLabel}</span></div>
+          <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span class="wifi-sec-badge" style="background:${secColor}20;color:${secColor};">${secLabel}</span>
+            ${net.notes ? `<span style="font-size:11px;color:var(--text3);">· ${net.notes}</span>` : ''}
+          </div>
         </div>
-        <button onclick="wifiEdit('${net.id}')" style="background:none;border:none;color:var(--accent);cursor:pointer;padding:4px;font-size:16px;" title="Modifica">✏️</button>
-        <button onclick="wifiDelete('${net.id}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:4px;font-size:16px;" title="Elimina">🗑️</button>
+        <button onclick="wifiEdit('${net.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
+        <button onclick="wifiDelete('${net.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:15px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑️</button>
       </div>
+      ${net.pw ? `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border-radius:10px;margin-top:8px;border:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">Password</span>
+        <span id="wifi-pw-${net.id}" style="font-family:monospace;font-size:13px;color:var(--text);flex:1;letter-spacing:0.1em;">••••••••</span>
+        <button onclick="const e=document.getElementById('wifi-pw-${net.id}');e.textContent=e.textContent==='••••••••'?'${net.pw}':'••••••••'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'">👁</button>
+      </div>` : ''}
       <div class="wifi-actions">
         <button class="wifi-action-btn" onclick="wifiCopyPw('${net.id}')">📋 Copia password</button>
         <button class="wifi-action-btn" onclick="wifiShowQR('${net.id}')">📱 QR Code</button>
@@ -6004,25 +6019,42 @@ function wifiEdit(id) {
   const net = _wifiNets.find(n => n.id === id);
   if (!net) return;
   const ov = document.createElement('div');
+  ov.id = '_wifi_edit_ov';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:360px;width:100%;border:1px solid var(--border);">
-    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Rete Wi-Fi</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Nome rete (SSID)</div>
-    <input id="_we_ssid" value="${net.ssid}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Password</div>
-    <input id="_we_pw" value="${net.pw||''}" type="password" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
-    <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_we_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
-    </div>
-  </div>`;
+  ov.innerHTML = `
+    <div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-size:15px;font-weight:800;">✏️ Modifica Rete Wi-Fi</div>
+        <button id="_we_close" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      </div>
+      <div class="pw-field-label" style="margin-bottom:6px;">Nome rete (SSID)</div>
+      <input id="_we_ssid" value="${net.ssid}" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;outline:none;">
+      <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
+      <div style="position:relative;margin-bottom:12px;">
+        <input id="_we_pw" value="${net.pw||''}" type="password" style="width:100%;padding:12px 44px 12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:monospace;outline:none;">
+        <button id="_we_eye" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+      </div>
+      <div class="pw-field-label" style="margin-bottom:6px;">Note (opzionale)</div>
+      <input id="_we_notes" value="${net.notes||''}" placeholder="es. Casa, Ufficio..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;outline:none;">
+      <div style="display:flex;gap:10px;">
+        <button id="_we_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+        <button id="_we_save" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
+      </div>
+    </div>`;
   document.body.appendChild(ov);
+  document.getElementById('_we_close').onclick  = () => ov.remove();
+  document.getElementById('_we_cancel').onclick = () => ov.remove();
+  document.getElementById('_we_eye').onclick = () => {
+    const inp = document.getElementById('_we_pw');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  };
   document.getElementById('_we_save').onclick = () => {
-    const ssid = document.getElementById('_we_ssid').value.trim();
-    const pw = document.getElementById('_we_pw').value;
+    const ssid  = document.getElementById('_we_ssid').value.trim();
+    const pw    = document.getElementById('_we_pw').value;
+    const notes = document.getElementById('_we_notes').value.trim();
     if (!ssid) { showToast('Inserisci il nome della rete'); return; }
     const idx = _wifiNets.findIndex(n => n.id === id);
-    if (idx !== -1) { _wifiNets[idx] = {..._wifiNets[idx], ssid, pw, updatedAt: new Date().toISOString()}; }
+    if (idx !== -1) { _wifiNets[idx] = {..._wifiNets[idx], ssid, pw, notes, updatedAt: new Date().toISOString()}; }
     wifiSaveAll(); wifiRender(); ov.remove();
     showToast('✅ Rete aggiornata');
   };
@@ -6033,7 +6065,8 @@ function wifiSave() {
   const pw   = document.getElementById('wifi-add-pw').value.trim();
   if (!ssid) { showToast('Inserisci il nome della rete'); return; }
   if (_wifiSec !== 'nopass' && !pw) { showToast('Inserisci la password'); return; }
-  _wifiNets.push({ id:'wifi_'+Date.now(), ssid, pw, sec:_wifiSec });
+  const notes = document.getElementById('wifi-add-notes')?.value.trim() || '';
+  _wifiNets.push({ id:'wifi_'+Date.now(), ssid, pw, sec:_wifiSec, notes });
   wifiSaveAll();
   showToast('✅ Rete ' + ssid + ' salvata');
   wifiShowList();
@@ -8504,6 +8537,7 @@ function addModalAdapt() {
       <div style="margin-bottom:10px;text-align:center;font-size:11px;color:var(--text3);">— oppure inserisci manualmente —</div>
       ${inp('wifi-ssid','Nome rete (SSID) *','es. Casa-5G')}
       ${pwToggle('wifi-pw')}
+      ${inp('wifi-notes','Note (opzionale)','es. Casa, Ufficio, Bar...')}
       <div style="margin-bottom:12px;">
         <div class="pw-field-label" style="margin-bottom:6px;">Sicurezza</div>
         <div style="display:flex;gap:8px;">
@@ -8594,7 +8628,7 @@ function addModalSave() {
   } else if (type === 'wifi') {
     const ssid = g('wifi-ssid'), pw = g('wifi-pw');
     if (!ssid) { showToast('Inserisci il nome rete'); return; }
-    _wifiNets.push({ id:'wifi_'+Date.now(), ssid, pw, sec: window._amWifiSec || 'WPA' });
+    _wifiNets.push({ id:'wifi_'+Date.now(), ssid, pw, sec: window._amWifiSec || 'WPA', notes: g('wifi-notes') });
     wifiSaveAll(); showToast('✅ Rete salvata');
     if (typeof wifiRender === 'function') wifiRender();
 
@@ -9049,7 +9083,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA387</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA389</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
