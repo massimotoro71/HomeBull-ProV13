@@ -1878,7 +1878,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA347</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA348</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1980,7 +1980,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA347</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA348</div>
         </div>
       </div>
     </div>
@@ -2086,7 +2086,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA347</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA348</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2493,14 +2493,14 @@ function cardsSearch(q) {
 
     <!-- SERVER / IT -->
     <div class="tab-panel" id="panel-server">
-      <!-- Tab interne Rete & IT -->
-      <div style="display:flex;gap:8px;padding:10px 14px 0;flex-shrink:0;">
-        <button id="netit-tab-server" class="netit-tab active" onclick="netitTab('server')">📡 Server / IT</button>
-        <button id="netit-tab-wifi" class="netit-tab" onclick="netitTab('wifi')">🌐 Wi-Fi</button>
-      </div>
+      <!-- Rete & IT — sezioni unificate -->
       <!-- Contenuto Server -->
       <div id="netit-server">
-      <div style="padding:14px 14px 100px;">
+      <div style="padding:0 14px 8px 14px;">
+        <div style="padding:14px 0 8px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:16px;">📡</span>
+          <span style="font-size:14px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">Server / IT</span>
+        </div>
 
         <!-- Vista lista -->
         <div id="server-view-list">
@@ -2570,7 +2570,11 @@ function cardsSearch(q) {
       </div>
     </div>
       <!-- Contenuto WiFi -->
-      <div id="netit-wifi" style="display:none;">
+      <div id="netit-wifi">
+      <div style="margin:8px 14px 0;padding:14px 0 8px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;">
+        <span style="font-size:16px;">🌐</span>
+        <span style="font-size:14px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">Wi-Fi</span>
+      </div>
       <div>
 
         <!-- Lista reti -->
@@ -3069,7 +3073,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA347',
+  version: 'BETA348',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7439,23 +7443,11 @@ function serverToggleDetailPw(id) {
 }
 
 function netitTab(which) {
+  // Sezioni unificate — entrambe sempre visibili
   _netitCurrent = which;
-  const srv = document.getElementById('netit-server');
-  const wif = document.getElementById('netit-wifi');
-  const tabSrv = document.getElementById('netit-tab-server');
-  const tabWif = document.getElementById('netit-tab-wifi');
+  // Scroll alla sezione richiesta se chiamata esternamente
   if (which === 'wifi') {
-    if (srv) srv.style.display = 'none';
-    if (wif) wif.style.display = 'block';
-    tabSrv?.classList.remove('active');
-    tabWif?.classList.add('active');
-    if (typeof wifiOpen === 'function') wifiOpen();
-  } else {
-    if (srv) srv.style.display = 'block';
-    if (wif) wif.style.display = 'none';
-    tabSrv?.classList.add('active');
-    tabWif?.classList.remove('active');
-    if (typeof serverOpen === 'function') serverOpen();
+    document.getElementById('netit-wifi')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -8633,7 +8625,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA347</div>
+            <div style="font-size:13px;color:var(--text3);">BETA348</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
