@@ -1813,7 +1813,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA345</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA346</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA345</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA346</div>
         </div>
       </div>
     </div>
@@ -2021,7 +2021,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA345</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA346</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3004,7 +3004,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA345',
+  version: 'BETA346',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8143,6 +8143,60 @@ async function authLogout() {
   showToast('Disconnesso');
 }
 
+
+// ── Backup locale ──────────────────────────────────────────
+function settingsExport(){
+  const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+               'hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
+  const data={};
+  keys.forEach(k=>{
+    const v=localStorage.getItem(k);
+    if(v) try{ data[k]=JSON.parse(v); } catch(e){ data[k]=v; }
+  });
+  const blob=new Blob([JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data},null,2)],
+    {type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  showToast('✅ Backup esportato!');
+}
+
+function settingsImport(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const bk=JSON.parse(e.target.result);
+      if(!bk.data){ showToast('File non valido'); return; }
+      const ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+      const bx=document.createElement('div');
+      bx.style.cssText='background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';
+      bx.innerHTML='<div style="font-size:32px;margin-bottom:12px;">📥</div>'+
+        '<div style="font-size:15px;font-weight:800;margin-bottom:8px;">Importa backup?</div>'+
+        '<div style="font-size:12px;color:#f97316;background:rgba(249,115,22,0.1);border-radius:8px;padding:8px;margin-bottom:16px;">⚠️ I dati attuali verranno sovrascritti</div>'+
+        '<div style="display:flex;gap:10px;">'+
+        '<button id="_ic" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>'+
+        '<button id="_io" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button>'+
+        '</div>';
+      ov.appendChild(bx);
+      document.body.appendChild(ov);
+      document.getElementById('_ic').onclick=()=>ov.remove();
+      document.getElementById('_io').onclick=()=>{
+        Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
+        ov.remove();
+        closeSettings();
+        showToast('✅ Importato!');
+        setTimeout(()=>location.reload(),1200);
+      };
+    } catch(err){ showToast('Errore: file non valido'); }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
 // ── Inizializzazione Firebase ─────────────────────────────
 fbInit();
 
@@ -8386,12 +8440,14 @@ document.addEventListener('keydown', (e) => {
       <!-- ── PAGINA BACKUP ── -->
       <div id="set-page-backup" style="display:none;padding:20px;">
         <div style="display:flex;flex-direction:column;gap:12px;">
-          
-          
-          
+          <button onclick="settingsExport()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">📤</span>
+            <div><div style="margin-bottom:3px;">Esporta backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Salva tutti i dati in un file JSON</div></div>
+          </button>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
             <span style="font-size:28px;">📥</span>
             <div><div style="margin-bottom:3px;">Importa backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Ripristina da un file JSON</div></div>
+            <input type="file" accept=".json,.hbb" style="display:none;" onchange="settingsImport(event)">
           </label>
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
@@ -8469,7 +8525,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA345</div>
+            <div style="font-size:13px;color:var(--text3);">BETA346</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
