@@ -913,15 +913,16 @@ html, body {
 }
 /* ── Carte 3D flip ─────────────────────────────────────── */
 .card-3d-container {
-  perspective: 1000px;
+  perspective: 1200px;
   width: 100%;
-  height: 160px;
+  aspect-ratio: 1.586 / 1;
   cursor: pointer;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
-@media (min-width: 500px) {
-  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .card-3d-container { margin-bottom: 0; }
+/* 1 colonna su mobile, 2 su tablet+ */
+@media (min-width: 580px) {
+  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding-bottom: 100px; }
+  .cards-grid .card-3d-container { margin-bottom: 0; }
 }
 .card-3d-inner {
   position: relative;
@@ -1882,7 +1883,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA352</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA354</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1984,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA352</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA354</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2091,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA352</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA354</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2099,6 +2100,12 @@ function cardsSearch(q) {
           <span style="color:var(--text3);font-size:14px;font-weight:500;flex:1;">Cerca in tutto HomeBull...</span>
           <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--text3);font-family:inherit;">⌘K</kbd>
         </div>
+
+        <!-- Bottone aggiungi principale -->
+        <button onclick="openAddModal(HB.currentTab||'passwords')" style="width:100%;padding:18px;border-radius:18px;border:none;background:var(--accent);color:white;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;box-shadow:0 4px 20px rgba(99,102,241,0.4);letter-spacing:0.02em;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Aggiungi nuovo dato
+        </button>
 
         <!-- Accesso rapido personalizzabile -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -2122,9 +2129,12 @@ function cardsSearch(q) {
       <!-- Vista: Lista categorie -->
       <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
-          <div class="pw-search-bar">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="pw-search-bar" style="flex:1;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+            </div>
+            <button onclick="pwNewCategory()" style="flex-shrink:0;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Categoria</button>
           </div>
         </div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -2203,10 +2213,6 @@ function cardsSearch(q) {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;"><select id="note-sort-sel" onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList(document.getElementById('note-search-inp')?.value||'')" style="background:none;border:none;outline:none;font-size:13px;color:var(--text3);cursor:pointer;font-family:inherit;padding:4px;"><option value="modified">✏️ Modifica</option><option value="created">📅 Data</option><option value="title">🔤 Titolo</option></select>
               </div>
-              <button onclick="openAddModal('notes')" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Nuova
-              </button>
             </div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -2243,10 +2249,6 @@ function cardsSearch(q) {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
-              <button onclick="openAddModal('otp')" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Aggiungi
-              </button>
             </div>
           </div>
           <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -2322,10 +2324,6 @@ function cardsSearch(q) {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
-              <button onclick="openAddModal('cards')" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Aggiungi
-              </button>
             </div>
           </div>
           <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -3077,7 +3075,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA352',
+  version: 'BETA354',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5373,7 +5371,6 @@ function cardsRender() {
       <div style="font-size:48px;margin-bottom:12px;">💳</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna carta</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi carte di credito, debito o prepagate</div>
-      <button onclick="openAddModal('cards')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi carta</button>
     </div>`;
     return;
   }
@@ -5394,34 +5391,34 @@ function cardsRender() {
       <div id="card-inner-${card.id}" class="card-3d-inner">
 
         <!-- FRONTE stile TEST -->
-        <div class="card-3d-front" style="background:${card.color};display:flex;flex-direction:column;justify-content:space-between;padding:16px 18px;">
+        <div class="card-3d-front" style="background:${card.color};display:flex;flex-direction:column;justify-content:space-between;padding:20px 22px;">
           <!-- Top: label + circuito -->
           <div style="display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:0.1em;">${card.label}</span>
+            <span style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:0.1em;">${card.label}</span>
             <span style="font-size:16px;font-weight:900;font-style:italic;color:white;">${circuit}</span>
           </div>
           <!-- Chip + numero -->
           <div>
-            <div style="width:36px;height:26px;background:rgba(251,191,36,0.85);border-radius:5px;margin-bottom:10px;"></div>
-            <div style="font-family:'DM Sans',monospace;font-size:15px;font-weight:700;letter-spacing:0.15em;color:white;text-align:center;">${numMasked}</div>
+            <div style="width:42px;height:30px;background:rgba(251,191,36,0.85);border-radius:6px;margin-bottom:12px;"></div>
+            <div style="font-family:'DM Sans',monospace;font-size:17px;font-weight:700;letter-spacing:0.18em;color:white;text-align:center;">${numMasked}</div>
           </div>
           <!-- Bottom: holder + scadenza -->
           <div style="display:flex;align-items:flex-end;justify-content:space-between;">
             <div>
               <div style="font-size:7px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Card Holder</div>
-              <div style="font-size:11px;font-weight:700;color:white;font-family:monospace;">${card.holder ? card.holder.toUpperCase() : '—'}</div>
+              <div style="font-size:12px;font-weight:700;color:white;font-family:monospace;">${card.holder ? card.holder.toUpperCase() : '—'}</div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:7px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Scadenza</div>
-              <div style="font-size:11px;font-weight:700;color:${expiring?'#fbbf24':'white'};font-family:monospace;">${card.exp||'—'}${expiring?' ⚠️':''}</div>
+              <div style="font-size:12px;font-weight:700;color:${expiring?'#fbbf24':'white'};font-family:monospace;">${card.exp||'—'}${expiring?' ⚠️':''}</div>
             </div>
           </div>
         </div>
 
         <!-- RETRO stile TEST -->
-        <div class="card-3d-back" style="background:#1e293b;border:1px solid #334155;display:flex;flex-direction:column;justify-content:space-between;padding:0;">
+        <div class="card-3d-back" style="background:#1e293b;border:1px solid #2d3f55;display:flex;flex-direction:column;justify-content:space-between;padding:0;box-shadow:inset 0 0 30px rgba(0,0,0,0.3);">
           <!-- Striscia magnetica -->
-          <div style="width:100%;height:38px;background:#000;margin-top:14px;"></div>
+          <div style="width:100%;height:46px;background:#000;margin-top:16px;"></div>
           <!-- CVV -->
           <div style="padding:0 16px;">
             <div style="background:rgba(255,255,255,0.95);color:#111;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
@@ -5713,7 +5710,6 @@ function financeRender() {
       <div style="font-size:48px;margin-bottom:12px;">💰</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun conto salvato</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">IBAN, conti correnti, PayPal, Crypto</div>
-      <button onclick="openAddModal('finance')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi conto</button>
     </div>`;
     return;
   }
@@ -5944,7 +5940,6 @@ function wifiRender() {
       <div style="font-size:48px;margin-bottom:12px;">📶</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna rete salvata</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Salva le password Wi-Fi di casa, ufficio e altri luoghi</div>
-      <button onclick="openAddModal('wifi')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi rete Wi-Fi</button>
     </div>`;
     return;
   }
@@ -7273,7 +7268,6 @@ function serverRender() {
       <div style="font-size:48px;margin-bottom:12px;">📡</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna credenziale</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">SSH, API keys, database, VPN e altro</div>
-      <button onclick="openAddModal('server')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi credenziale</button>
     </div>`;
     return;
   }
@@ -8350,10 +8344,21 @@ function addModalAdapt() {
 
   const templates = {
     password: `
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Categoria *</div>
+        <select id="am-pw-cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;">
+          ${_pwCats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+        </select>
+      </div>
       ${inp('pw-title','Nome / Sito *','es. Google, Instagram...')}
       ${inp('pw-user','Email / Username','nome@email.com')}
       ${pwToggle('pw-pass')}
       ${inp('pw-url','URL (opzionale)','https://...')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">PIN (opzionale)</div>
+        <input id="am-pw-pin" type="password" placeholder="PIN carta, codice..." inputmode="numeric"
+          style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+      </div>
       ${inp('pw-notes','Note','Note aggiuntive...')}
     `,
     card: `
@@ -8443,10 +8448,9 @@ function addModalSave() {
   if (type === 'password') {
     const title = g('pw-title');
     if (!title) { showToast('Inserisci il nome'); return; }
-    // Usa la categoria corrente o la prima disponibile
-    const catId = _pwCurCat || (_pwCats[0]?.id);
+    const catId = document.getElementById('am-pw-cat')?.value || _pwCurCat || (_pwCats[0]?.id);
     if (!catId) { showToast('Crea prima una categoria password'); closeAddModal(); switchTab('passwords'); return; }
-    _pwItems.push({ id:'pw_'+Date.now(), categoryId:catId, title, username:g('pw-user'), password:g('pw-pass'), url:g('pw-url'), notes:g('pw-notes') });
+    _pwItems.push({ id:'pw_'+Date.now(), categoryId:catId, title, username:g('pw-user'), password:g('pw-pass'), url:g('pw-url'), pin:g('pw-pin'), notes:g('pw-notes') });
     pwSave(); showToast('✅ Password salvata');
 
   } else if (type === 'card') {
@@ -8841,7 +8845,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA352</div>
+            <div style="font-size:13px;color:var(--text3);">BETA354</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -8900,7 +8904,7 @@ document.addEventListener('keydown', (e) => {
 </div>
 
 </div>
-<button id="mob-fab" onclick="if(HB.currentTab && HB.currentTab!=='home'){openAddModal(HB.currentTab)}else{openMobileMenu()}" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
+<button id="mob-fab" onclick="openAddModal(HB.currentTab||'passwords')" style="display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;width:56px;height:56px;padding:0;">＋</button>
 
 
 <!-- ══ MODAL UNICO AGGIUNTA DATI ══════════════════════ -->
