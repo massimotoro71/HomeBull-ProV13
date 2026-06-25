@@ -1896,7 +1896,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA365</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA366</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1998,7 +1998,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA365</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA366</div>
         </div>
       </div>
     </div>
@@ -2104,7 +2104,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA365</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA366</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3083,7 +3083,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA365',
+  version: 'BETA366',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4212,7 +4212,7 @@ function pwRenderCats(q='') {
     const color = cat.color || palette[ci % palette.length];
 
     const div = document.createElement('div');
-    div.style.cssText = `background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px 18px;cursor:pointer;transition:background 0.15s,transform 0.15s;display:flex;align-items:center;gap:14px;`;
+    div.style.cssText = `background:var(--surface);border:1px solid var(--border);border-left:4px solid ${color};border-radius:18px;padding:16px 18px;cursor:pointer;transition:background 0.15s,transform 0.15s;display:flex;align-items:center;gap:14px;`;
     div.onmouseenter = () => { div.style.background='var(--surface2,var(--bg3))'; div.style.transform='translateY(-1px)'; };
     div.onmouseleave = () => { div.style.background='var(--surface)'; div.style.transform=''; };
     div.onclick = () => pwShowItems(cat.id, cat.name);
@@ -5572,27 +5572,57 @@ function cardsEdit(id) {
   const card = _cards.find(c => c.id === id);
   if (!card) return;
   const ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
-  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
-    <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Carta</div>
-    ${[['_ce_label','Nome carta',card.label||''],['_ce_number','Numero carta',card.number||''],['_ce_exp','Scadenza (MM/AA)',card.exp||''],['_ce_cvv','CVV',card.cvv||''],['_ce_holder','Intestatario',card.holder||'']].map(([id,label,val])=>`
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
-    <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
-    <div style="display:flex;gap:10px;margin-top:6px;">
-      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_ce_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;overflow-y:auto;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;padding:24px;max-width:560px;width:100%;border:1px solid var(--border);border-bottom:none;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:8px;">✏️ Modifica Carta</div>
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">Nome carta *</div>
+    <input id="_ce_label" value="${card.label||''}" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;outline:none;">
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">Numero carta</div>
+    <input id="_ce_number" value="${card.number||''}" inputmode="numeric" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:monospace;letter-spacing:0.1em;outline:none;">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">Scadenza</div>
+        <input id="_ce_exp" value="${card.exp||''}" placeholder="MM/YY" maxlength="5" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:monospace;outline:none;">
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">CVV</div>
+        <div style="position:relative;">
+          <input id="_ce_cvv" type="password" value="${card.cvv||''}" maxlength="4" inputmode="numeric" style="width:100%;padding:12px 40px 12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:monospace;outline:none;">
+          <button onclick="const e=document.getElementById('_ce_cvv');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;">👁</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">PIN</div>
+    <div style="position:relative;margin-bottom:12px;">
+      <input id="_ce_pin" type="password" value="${card.pin||''}" inputmode="numeric" placeholder="PIN carta (opzionale)" style="width:100%;padding:12px 40px 12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:monospace;outline:none;">
+      <button onclick="const e=document.getElementById('_ce_pin');e.type=e.type==='password'?'text':'password'" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;">👁</button>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">Intestatario</div>
+    <input id="_ce_holder" value="${card.holder||''}" placeholder="NOME COGNOME" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:20px;font-family:monospace;text-transform:uppercase;outline:none;">
+
+    <div style="display:flex;gap:10px;">
+      <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_ce_save" style="flex:2;padding:13px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
+  ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
   document.getElementById('_ce_save').onclick = () => {
     const label = document.getElementById('_ce_label').value.trim();
     if (!label) { showToast('Inserisci il nome'); return; }
     const idx = _cards.findIndex(c => c.id === id);
     if (idx !== -1) { _cards[idx] = {..._cards[idx],
-      label, number: document.getElementById('_ce_number').value.trim(),
-      exp: document.getElementById('_ce_exp').value.trim(),
-      cvv: document.getElementById('_ce_cvv').value.trim(),
-      holder: document.getElementById('_ce_holder').value.trim(),
+      label,
+      number: document.getElementById('_ce_number').value.trim(),
+      exp:    document.getElementById('_ce_exp').value.trim(),
+      cvv:    document.getElementById('_ce_cvv').value.trim(),
+      pin:    document.getElementById('_ce_pin').value.trim(),
+      holder: document.getElementById('_ce_holder').value.trim().toUpperCase(),
       updatedAt: new Date().toISOString()
     }; }
     cardsSaveAll(); cardsRender(); ov.remove();
@@ -8989,7 +9019,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA365</div>
+            <div style="font-size:13px;color:var(--text3);">BETA366</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
