@@ -1882,7 +1882,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA350</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA351</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1984,7 +1984,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA350</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA351</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA350</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA351</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2203,7 +2203,7 @@ function cardsSearch(q) {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;"><select id="note-sort-sel" onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList(document.getElementById('note-search-inp')?.value||'')" style="background:none;border:none;outline:none;font-size:13px;color:var(--text3);cursor:pointer;font-family:inherit;padding:4px;"><option value="modified">✏️ Modifica</option><option value="created">📅 Data</option><option value="title">🔤 Titolo</option></select>
               </div>
-              <button onclick="noteNew()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+              <button onclick="openAddModal('notes')" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Nuova
               </button>
@@ -2243,7 +2243,7 @@ function cardsSearch(q) {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
-              <button onclick="otpShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+              <button onclick="openAddModal('otp')" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Aggiungi
               </button>
@@ -2322,7 +2322,7 @@ function cardsSearch(q) {
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
               </div>
-              <button onclick="cardsShowAdd()" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
+              <button onclick="openAddModal('cards')" style="flex-shrink:0;padding:10px 16px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Aggiungi
               </button>
@@ -3077,7 +3077,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA350',
+  version: 'BETA351',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5373,7 +5373,7 @@ function cardsRender() {
       <div style="font-size:48px;margin-bottom:12px;">💳</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna carta</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Aggiungi carte di credito, debito o prepagate</div>
-      <button onclick="cardsShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi carta</button>
+      <button onclick="openAddModal('cards')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi carta</button>
     </div>`;
     return;
   }
@@ -5723,7 +5723,7 @@ function financeRender() {
       <div style="font-size:48px;margin-bottom:12px;">💰</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessun conto salvato</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">IBAN, conti correnti, PayPal, Crypto</div>
-      <button onclick="financeShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi conto</button>
+      <button onclick="openAddModal('finance')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi conto</button>
     </div>`;
     return;
   }
@@ -5954,7 +5954,7 @@ function wifiRender() {
       <div style="font-size:48px;margin-bottom:12px;">📶</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna rete salvata</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">Salva le password Wi-Fi di casa, ufficio e altri luoghi</div>
-      <button onclick="wifiShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi rete Wi-Fi</button>
+      <button onclick="openAddModal('wifi')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi rete Wi-Fi</button>
     </div>`;
     return;
   }
@@ -7283,7 +7283,7 @@ function serverRender() {
       <div style="font-size:48px;margin-bottom:12px;">📡</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna credenziale</div>
       <div style="font-size:13px;color:var(--text3);margin-bottom:20px;">SSH, API keys, database, VPN e altro</div>
-      <button onclick="serverShowAdd()" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi credenziale</button>
+      <button onclick="openAddModal('server')" style="padding:14px 28px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi credenziale</button>
     </div>`;
     return;
   }
@@ -8306,6 +8306,213 @@ function settingsImport(event){
   event.target.value='';
 }
 
+
+// ══ MODAL UNICO AGGIUNTA DATI ════════════════════════════
+
+function openAddModal(section) {
+  const modal = document.getElementById('add-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  // Preseleziona la sezione giusta
+  const sel = document.getElementById('add-modal-type');
+  if (section && sel) {
+    const map = {
+      'passwords':'password','cards':'card','finance':'finance',
+      'otp':'otp','notes':'note','server':'server','wifi':'wifi'
+    };
+    sel.value = map[section] || 'password';
+  }
+  addModalAdapt();
+  // Focus primo campo dopo animazione
+  setTimeout(() => {
+    const first = document.querySelector('#add-modal-fields input, #add-modal-fields textarea');
+    if (first) first.focus();
+  }, 300);
+}
+
+function closeAddModal() {
+  const modal = document.getElementById('add-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function addModalAdapt() {
+  const type = document.getElementById('add-modal-type')?.value;
+  const fields = document.getElementById('add-modal-fields');
+  if (!fields) return;
+
+  const inp = (id, label, placeholder, type='text', extra='') =>
+    `<div style="margin-bottom:12px;">
+      <div class="pw-field-label" style="margin-bottom:6px;">${label}</div>
+      <input id="am-${id}" type="${type}" placeholder="${placeholder}" ${extra}
+        style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+    </div>`;
+
+  const pwToggle = (id) =>
+    `<div style="margin-bottom:12px;">
+      <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
+      <div style="position:relative;">
+        <input id="am-${id}" type="password" placeholder="Password"
+          style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
+        <button onclick="const e=document.getElementById('am-${id}');e.type=e.type==='password'?'text':'password'"
+          style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+      </div>
+    </div>`;
+
+  const templates = {
+    password: `
+      ${inp('pw-title','Nome / Sito *','es. Google, Instagram...')}
+      ${inp('pw-user','Email / Username','nome@email.com')}
+      ${pwToggle('pw-pass')}
+      ${inp('pw-url','URL (opzionale)','https://...')}
+      ${inp('pw-notes','Note','Note aggiuntive...')}
+    `,
+    card: `
+      ${inp('card-label','Nome carta *','es. Visa Intesa, Mastercard...')}
+      ${inp('card-number','Numero carta *','1234 5678 9012 3456','text','inputmode="numeric" maxlength="19"')}
+      ${inp('card-exp','Scadenza *','MM/YY','text','maxlength="5"')}
+      ${inp('card-cvv','CVV','•••','password','maxlength="4" inputmode="numeric"')}
+      ${inp('card-holder','Intestatario','MARIO ROSSI')}
+    `,
+    finance: `
+      ${inp('fin-label','Nome conto *','es. Conto Intesa, PayPal...')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Tipo</div>
+        <select id="am-fin-type" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;">
+          <option value="conto">🏦 Conto Corrente</option>
+          <option value="paypal">💙 PayPal</option>
+          <option value="crypto">🟡 Crypto</option>
+          <option value="altro">💳 Altro</option>
+        </select>
+      </div>
+      ${inp('fin-iban','IBAN','IT60 X054 2811 1010 0000 0123 456')}
+      ${inp('fin-bic','BIC / SWIFT','BCITITMM')}
+      ${inp('fin-holder','Intestatario','Mario Rossi')}
+      ${pwToggle('fin-pw')}
+      ${inp('fin-notes','Note','Note aggiuntive...')}
+    `,
+    otp: `
+      ${inp('otp-name','Nome account *','es. Google, GitHub...')}
+      ${inp('otp-user','Email / Username','nome@email.com')}
+      ${inp('otp-secret','Chiave segreta *','JBSWY3DPEHPK3PXP')}
+    `,
+    note: `
+      ${inp('note-title','Titolo','Titolo nota...')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Contenuto</div>
+        <textarea id="am-note-content" placeholder="Scrivi qui la tua nota..." rows="6"
+          style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;resize:none;line-height:1.6;"></textarea>
+      </div>
+    `,
+    wifi: `
+      ${inp('wifi-ssid','Nome rete (SSID) *','es. Casa-5G')}
+      ${pwToggle('wifi-pw')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Sicurezza</div>
+        <div style="display:flex;gap:8px;">
+          <button class="wifi-sec-btn active" data-sec="WPA" onclick="document.querySelectorAll('#add-modal .wifi-sec-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amWifiSec='WPA'">WPA/WPA2</button>
+          <button class="wifi-sec-btn" data-sec="WEP" onclick="document.querySelectorAll('#add-modal .wifi-sec-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amWifiSec='WEP'">WEP</button>
+          <button class="wifi-sec-btn" data-sec="nopass" onclick="document.querySelectorAll('#add-modal .wifi-sec-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amWifiSec='nopass'">Aperta</button>
+        </div>
+      </div>
+    `,
+    server: `
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Tipo</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+          <button class="finance-type-btn active" onclick="document.querySelectorAll('#add-modal .finance-type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amSrvType={id:'ssh',icon:'🔐',label:'SSH'}">🔐<br>SSH</button>
+          <button class="finance-type-btn" onclick="document.querySelectorAll('#add-modal .finance-type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amSrvType={id:'api',icon:'🔑',label:'API Key'}">🔑<br>API Key</button>
+          <button class="finance-type-btn" onclick="document.querySelectorAll('#add-modal .finance-type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amSrvType={id:'db',icon:'🗄️',label:'Database'}">🗄️<br>DB</button>
+          <button class="finance-type-btn" onclick="document.querySelectorAll('#add-modal .finance-type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amSrvType={id:'ftp',icon:'📁',label:'FTP'}">📁<br>FTP</button>
+          <button class="finance-type-btn" onclick="document.querySelectorAll('#add-modal .finance-type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amSrvType={id:'vpn',icon:'🛡️',label:'VPN'}">🛡️<br>VPN</button>
+          <button class="finance-type-btn" onclick="document.querySelectorAll('#add-modal .finance-type-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');window._amSrvType={id:'altro',icon:'💻',label:'Altro'}">💻<br>Altro</button>
+        </div>
+      </div>
+      ${inp('srv-label','Nome / Etichetta *','es. Server produzione, AWS...')}
+      ${inp('srv-host','Host / URL','es. 192.168.1.1 o api.example.com')}
+      ${inp('srv-port','Porta','22','text','inputmode="numeric"')}
+      ${inp('srv-user','Username','root, admin...')}
+      ${pwToggle('srv-pw')}
+      <div style="margin-bottom:12px;">
+        <div class="pw-field-label" style="margin-bottom:6px;">Note</div>
+        <textarea id="am-srv-notes" placeholder="Comandi, connection string..." rows="3"
+          style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:monospace;outline:none;box-sizing:border-box;resize:none;line-height:1.6;"></textarea>
+      </div>
+    `,
+  };
+
+  fields.innerHTML = templates[type] || '';
+  // Inizializza variabili stato
+  window._amWifiSec = 'WPA';
+  window._amSrvType = { id:'ssh', icon:'🔐', label:'SSH' };
+}
+
+function addModalSave() {
+  const type = document.getElementById('add-modal-type')?.value;
+  const g = (id) => document.getElementById('am-' + id)?.value?.trim() || '';
+
+  if (type === 'password') {
+    const title = g('pw-title');
+    if (!title) { showToast('Inserisci il nome'); return; }
+    // Usa la categoria corrente o la prima disponibile
+    const catId = _pwCurCat || (_pwCats[0]?.id);
+    if (!catId) { showToast('Crea prima una categoria password'); closeAddModal(); switchTab('passwords'); return; }
+    _pwItems.push({ id:'pw_'+Date.now(), categoryId:catId, title, username:g('pw-user'), password:g('pw-pass'), url:g('pw-url'), notes:g('pw-notes') });
+    pwSave(); showToast('✅ Password salvata');
+
+  } else if (type === 'card') {
+    const label = g('card-label'), number = g('card-number'), exp = g('card-exp');
+    if (!label) { showToast('Inserisci il nome carta'); return; }
+    if (!number) { showToast('Inserisci il numero'); return; }
+    if (!exp) { showToast('Inserisci la scadenza'); return; }
+    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), color:'linear-gradient(135deg,#6366f1,#8b5cf6)' });
+    cardsSaveAll(); showToast('✅ Carta salvata');
+    if (typeof cardsRender === 'function') cardsRender();
+
+  } else if (type === 'finance') {
+    const label = g('fin-label');
+    if (!label) { showToast('Inserisci il nome conto'); return; }
+    const finType = document.getElementById('am-fin-type')?.value || 'conto';
+    const icons = {conto:'🏦',paypal:'💙',crypto:'🟡',altro:'💳'};
+    const labels = {conto:'Conto Corrente',paypal:'PayPal',crypto:'Crypto',altro:'Altro'};
+    _financeAccounts.push({ id:'fin_'+Date.now(), type:finType, icon:icons[finType], typeLabel:labels[finType], label, iban:g('fin-iban').replace(/\s/g,'').toUpperCase(), bic:g('fin-bic').toUpperCase(), holder:g('fin-holder'), pw:g('fin-pw'), notes:g('fin-notes') });
+    financeSaveAll(); showToast('✅ Conto salvato');
+    if (typeof financeRender === 'function') financeRender();
+
+  } else if (type === 'otp') {
+    const name = g('otp-name'), secret = g('otp-secret').replace(/\s/g,'');
+    if (!name) { showToast('Inserisci il nome account'); return; }
+    if (!secret) { showToast('Inserisci la chiave segreta'); return; }
+    _otpAccounts.push({ id:'otp_'+Date.now(), name, user:g('otp-user'), secret, icon:'🔐' });
+    otpSaveAll(); showToast('✅ Account OTP aggiunto');
+    if (typeof otpRenderList === 'function') otpRenderList();
+
+  } else if (type === 'note') {
+    const title = g('note-title') || 'Senza titolo';
+    const content = document.getElementById('am-note-content')?.value?.trim() || '';
+    const now = new Date().toISOString();
+    _notes.push({ id:'note_'+Date.now(), title, content, createdAt:now, updatedAt:now });
+    noteSaveAll(); showToast('✅ Nota salvata');
+    if (typeof noteRenderList === 'function') noteRenderList('');
+
+  } else if (type === 'wifi') {
+    const ssid = g('wifi-ssid'), pw = g('wifi-pw');
+    if (!ssid) { showToast('Inserisci il nome rete'); return; }
+    _wifiNets.push({ id:'wifi_'+Date.now(), ssid, pw, sec: window._amWifiSec || 'WPA' });
+    wifiSaveAll(); showToast('✅ Rete salvata');
+    if (typeof wifiRender === 'function') wifiRender();
+
+  } else if (type === 'server') {
+    const label = g('srv-label');
+    if (!label) { showToast('Inserisci il nome'); return; }
+    const t = window._amSrvType || { id:'ssh', icon:'🔐', label:'SSH' };
+    _serverItems.push({ id:'srv_'+Date.now(), type:t.id, icon:t.icon, label_type:t.label, label, host:g('srv-host'), port:g('srv-port'), user:g('srv-user'), pw:g('srv-pw'), notes:document.getElementById('am-srv-notes')?.value?.trim()||'' });
+    serverSaveAll(); showToast('✅ Credenziale salvata');
+    if (typeof serverRender === 'function') serverRender();
+  }
+
+  closeAddModal();
+}
+
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
 function _autoSyncAfterSave() {
   if (_syncInProgress) return;
@@ -8644,7 +8851,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA350</div>
+            <div style="font-size:13px;color:var(--text3);">BETA351</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
@@ -8703,7 +8910,37 @@ document.addEventListener('keydown', (e) => {
 </div>
 
 </div>
-<button id="mob-fab" onclick="openMobileMenu()" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
+<button id="mob-fab" onclick="if(HB.currentTab && HB.currentTab!=='home'){openAddModal(HB.currentTab)}else{openMobileMenu()}" style="display:flex;align-items:center;gap:6px;">☰ <span>Menu</span></button>
+
+
+<!-- ══ MODAL UNICO AGGIUNTA DATI ══════════════════════ -->
+<div id="add-modal" onclick="if(event.target===this)closeAddModal()" style="display:none;position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;">
+  <div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:560px;max-height:90dvh;display:flex;flex-direction:column;">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 20px 0;">
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;">➕ Aggiungi</div>
+      <button onclick="closeAddModal()" style="width:32px;height:32px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--text2);">✕</button>
+    </div>
+    <!-- Select sezione -->
+    <div style="padding:16px 20px 0;">
+      <select id="add-modal-type" onchange="addModalAdapt()" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;font-family:inherit;outline:none;cursor:pointer;">
+        <option value="password">🔐 Password</option>
+        <option value="card">💳 Carta di credito/debito</option>
+        <option value="finance">🏦 Conto / IBAN</option>
+        <option value="otp">🔑 OTP / 2FA</option>
+        <option value="note">📝 Nota</option>
+        <option value="wifi">📶 Rete Wi-Fi</option>
+        <option value="server">📡 Server / Credenziale IT</option>
+      </select>
+    </div>
+    <!-- Campi dinamici -->
+    <div id="add-modal-fields" style="flex:1;overflow-y:auto;padding:16px 20px 24px;"></div>
+    <!-- Bottone salva -->
+    <div style="padding:0 20px 24px;">
+      <button onclick="addModalSave()" style="width:100%;padding:16px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">💾 Salva</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
