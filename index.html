@@ -1776,7 +1776,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA378</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA379</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1878,7 +1878,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA378</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA379</div>
         </div>
       </div>
     </div>
@@ -1981,7 +1981,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA378</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA379</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2724,6 +2724,7 @@ const ALL_TABS_META = [
   { id:'notes',     icon:'📝', label:'Note' },
   { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
   { id:'cards',     icon:'💳', label:'Portafoglio' },
+  { id:'finance',   icon:'💰', label:'Finanze' },
   { id:'server',    icon:'📡', label:'Rete & IT' },
 ];
 
@@ -2964,7 +2965,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA378',
+  version: 'BETA379',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6825,7 +6826,7 @@ function editQuickAccess() {
 }
 
 function loadQuickAccess() {
-  const def6 = ['passwords','notes','otp','cards','calendar','shopping'];
+  const def6 = ['passwords','notes','otp','cards','server','finance'];
   try {
     const saved = JSON.parse(localStorage.getItem(QA_KEY));
     // Se ha meno di 6, completa con quelli del default che mancano
@@ -6842,7 +6843,12 @@ function loadQuickAccess() {
 }
 
 function renderQuickAccess() {
-  const tabs = loadQuickAccess();
+  let tabs = loadQuickAccess();
+  // Filtra tab non esistenti (rimosse in versioni precedenti)
+  const validIds = ALL_TABS_META.map(t => t.id);
+  tabs = tabs.filter(id => validIds.includes(id));
+  // Se nessuna tab valida, usa il default
+  if (!tabs.length) tabs = ['passwords','notes','otp','cards','finance','server'];
   const grid = document.getElementById('quick-access-grid');
   if (!grid) return;
   grid.innerHTML = '';
@@ -8987,7 +8993,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA378</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA379</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
