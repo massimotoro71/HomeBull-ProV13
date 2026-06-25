@@ -1776,7 +1776,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA375</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA376</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1878,7 +1878,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA375</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA376</div>
         </div>
       </div>
     </div>
@@ -1981,7 +1981,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA375</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA376</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2960,7 +2960,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA375',
+  version: 'BETA376',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5148,8 +5148,10 @@ function noteRenderList(q='') {
       ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}</span>
-        <button onclick="event.stopPropagation();noteEdit('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--accent);font-size:14px;cursor:pointer;margin-right:6px;">✏️</button>
-        <button class="note-card-del" onclick="event.stopPropagation();noteDelete('${note.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;cursor:pointer;">🗑</button>
+        <div style="display:flex;gap:6px;">
+          <button onclick="event.stopPropagation();noteEdit('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
+          <button onclick="event.stopPropagation();noteDelete('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑</button>
+        </div>
       </div>`;
     list.appendChild(card);
   });
@@ -8948,7 +8950,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA375</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA376</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
