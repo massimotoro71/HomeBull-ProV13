@@ -1882,7 +1882,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA351</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA352</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1984,7 +1984,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA351</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA352</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA351</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA352</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3077,7 +3077,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA351',
+  version: 'BETA352',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5368,7 +5368,7 @@ function cardsShowList() {
 function cardsRender() {
   const list = document.getElementById('cards-list');
   if (!list) return;
-  if (!_cards.length) {
+  if (!_cards.filter(c=>!c.deleted).length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:48px;margin-bottom:12px;">💳</div>
       <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Nessuna carta</div>
@@ -5379,74 +5379,64 @@ function cardsRender() {
   }
   list.innerHTML = '';
   _cards.filter(c=>!c.deleted).forEach(card => {
-    const num = card.number ? card.number.replace(/\d(?=\d{4})/g,'•') : '•••• •••• •••• ••••';
+    const num = card.number ? card.number.replace(/\s/g,'').replace(/(.{4})/g,'$1 ').trim() : '•••• •••• •••• ••••';
+    const numMasked = card.number ? card.number.replace(/\d(?=\d{4})/g,'•').replace(/\s/g,'').replace(/(.{4})/g,'$1 ').trim() : '•••• •••• •••• ••••';
     const expiring = cardIsExpiring(card.exp);
     const circuit = cardCircuit(card.number);
-    const numDisplay = cardFormatDisplay(num);
 
     const wrap = document.createElement('div');
     wrap.className = 'card-3d-container';
     wrap.onclick = () => {
-      const inner = document.getElementById('card-inner-' + card.id);
-      if (inner) inner.classList.toggle('flipped');
+      document.getElementById('card-inner-' + card.id)?.classList.toggle('flipped');
     };
 
     wrap.innerHTML = `
       <div id="card-inner-${card.id}" class="card-3d-inner">
 
-        <!-- FRONTE -->
-        <div class="card-3d-front card-tile" style="background:${card.color};">
-          <div class="card-tile-ring" style="width:160px;height:160px;top:-40px;right:-40px;"></div>
-          <div class="card-tile-ring" style="width:120px;height:120px;bottom:-40px;left:-20px;"></div>
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
-            <div style="font-family:'Syne',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.08em;">${card.label}</div>
-            <div style="font-size:18px;">${circuit}</div>
+        <!-- FRONTE stile TEST -->
+        <div class="card-3d-front" style="background:${card.color};display:flex;flex-direction:column;justify-content:space-between;padding:16px 18px;">
+          <!-- Top: label + circuito -->
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:0.1em;">${card.label}</span>
+            <span style="font-size:16px;font-weight:900;font-style:italic;color:white;">${circuit}</span>
           </div>
-          <div style="position:relative;margin-top:auto;">
-            <div class="card-number-display">${numDisplay}</div>
-            <div style="display:flex;gap:20px;align-items:flex-end;">
-              <div>
-                <div style="font-size:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
-                <div style="font-size:12px;font-weight:700;color:${expiring?'#fbbf24':'white'};">${card.exp||'—'}${expiring?' ⚠️':''}</div>
-              </div>
-              ${card.holder ? `<div>
-                <div style="font-size:8px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
-                <div style="font-size:11px;font-weight:700;color:white;">${card.holder.toUpperCase()}</div>
-              </div>` : ''}
-              <div style="margin-left:auto;">
-                <div style="font-size:8px;color:rgba(255,255,255,0.5);margin-bottom:2px;">🔄</div>
-              </div>
+          <!-- Chip + numero -->
+          <div>
+            <div style="width:36px;height:26px;background:rgba(251,191,36,0.85);border-radius:5px;margin-bottom:10px;"></div>
+            <div style="font-family:'DM Sans',monospace;font-size:15px;font-weight:700;letter-spacing:0.15em;color:white;text-align:center;">${numMasked}</div>
+          </div>
+          <!-- Bottom: holder + scadenza -->
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+            <div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Card Holder</div>
+              <div style="font-size:11px;font-weight:700;color:white;font-family:monospace;">${card.holder ? card.holder.toUpperCase() : '—'}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:7px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:2px;">Scadenza</div>
+              <div style="font-size:11px;font-weight:700;color:${expiring?'#fbbf24':'white'};font-family:monospace;">${card.exp||'—'}${expiring?' ⚠️':''}</div>
             </div>
           </div>
         </div>
 
-        <!-- RETRO -->
-        <div class="card-3d-back">
-          <div class="card-3d-stripe"></div>
-          <div class="card-3d-cvv-row">
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-right:4px;">CVV</div>
-            <div class="card-3d-cvv-box" id="cvv-box-${card.id}">${card.cvv ? '•••' : '—'}</div>
-            ${card.cvv ? `<button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.cvv}')"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">
-              👁 Mostra</button>` : ''}
+        <!-- RETRO stile TEST -->
+        <div class="card-3d-back" style="background:#1e293b;border:1px solid #334155;display:flex;flex-direction:column;justify-content:space-between;padding:0;">
+          <!-- Striscia magnetica -->
+          <div style="width:100%;height:38px;background:#000;margin-top:14px;"></div>
+          <!-- CVV -->
+          <div style="padding:0 16px;">
+            <div style="background:rgba(255,255,255,0.95);color:#111;padding:8px 14px;border-radius:6px;font-family:monospace;font-size:13px;display:flex;align-items:center;justify-content:space-between;">
+              <span>CVV: <span id="cvv-box-${card.id}" style="font-weight:900;font-size:15px;letter-spacing:0.1em;">${card.cvv ? '•••' : '—'}</span></span>
+              ${card.cvv ? `<button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.cvv}','cvv-box-${card.id}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:#6366f1;font-weight:700;">Mostra</button>` : ''}
+            </div>
           </div>
-          ${card.pin ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;">PIN</div>
-            <div class="card-3d-cvv-box" id="pin-box-${card.id}">••••</div>
-            <button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.pin}','pin-box-${card.id}')"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">
-              👁</button>
-          </div>` : ''}
-          <div class="card-3d-back-actions">
-            <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')"
-              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
-              📋 Numero</button>
-            <button onclick="event.stopPropagation();cardsShowDetail('${card.id}')"
-              style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
-              ✏️ Dettaglio</button>
-            <button onclick="event.stopPropagation();cardsDelete('${card.id}')"
-              style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
-              🗑</button>
+          <!-- Nota confidenziale -->
+          <div style="padding:0 16px;font-size:8px;color:#64748b;line-height:1.4;">
+            Le informazioni visualizzate sono confidenziali. Conserva in un luogo sicuro.
+          </div>
+          <!-- Footer: copia + elimina -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;border-top:1px solid #334155;">
+            <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')" style="background:none;border:none;color:#818cf8;font-size:11px;font-weight:700;cursor:pointer;text-decoration:underline;font-family:inherit;">Copia Numero</button>
+            <button onclick="event.stopPropagation();cardsDelete('${card.id}')" style="background:none;border:none;color:#475569;cursor:pointer;font-size:14px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#475569'">🗑</button>
           </div>
         </div>
 
@@ -8851,7 +8841,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA351</div>
+            <div style="font-size:13px;color:var(--text3);">BETA352</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
