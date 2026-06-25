@@ -1894,7 +1894,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA358</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA360</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1996,7 +1996,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA358</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA360</div>
         </div>
       </div>
     </div>
@@ -2102,7 +2102,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA358</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA360</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2176,12 +2176,7 @@ function cardsSearch(q) {
               <option value="strong">Prima le forti</option>
             </select>
           </div>
-          <div id="pw-item-search-wrap" style="display:none;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input id="pw-item-search" type="text" placeholder="Cerca password..." oninput="pwFilterItems(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-            </div>
-          </div>
+
         </div>
         <div id="pw-items-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 14px 100px;"></div>
       </div>
@@ -2220,10 +2215,11 @@ function cardsSearch(q) {
         <div id="note-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
             <div style="display:flex;gap:8px;align-items:center;">
-              <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca nelle note..." id="note-search-inp" oninput="noteSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;"><select id="note-sort-sel" onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList(document.getElementById('note-search-inp')?.value||'')" style="background:none;border:none;outline:none;font-size:13px;color:var(--text3);cursor:pointer;font-family:inherit;padding:4px;"><option value="modified">✏️ Modifica</option><option value="created">📅 Data</option><option value="title">🔤 Titolo</option></select>
-              </div>
+              <select id="note-sort-sel" onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList('')" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;outline:none;">
+                <option value="modified">✏️ Per modifica</option>
+                <option value="created">📅 Per data</option>
+                <option value="title">🔤 Per titolo</option>
+              </select>
             </div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
@@ -2255,12 +2251,7 @@ function cardsSearch(q) {
         <!-- Vista lista OTP -->
         <div id="otp-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca account..." id="otp-search-inp" oninput="otpSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-              </div>
-            </div>
+
           </div>
           <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;display:grid;grid-template-columns:1fr;gap:12px;align-content:start;"></div>
         </div>
@@ -2330,12 +2321,7 @@ function cardsSearch(q) {
         <!-- Lista carte -->
         <div id="cards-view-list" style="display:flex;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:center;">
-              <div class="pw-search-bar" style="flex:1;">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                <input type="text" placeholder="Cerca carta..." id="cards-search-inp" oninput="cardsSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-              </div>
-            </div>
+
           </div>
           <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;max-width:1200px;"></div>
         </div>
@@ -2600,12 +2586,7 @@ function cardsSearch(q) {
 
         <!-- Lista reti -->
         <div id="wifi-view-list" style="display:flex;flex-direction:column;height:100%;">
-          <div style="padding:8px 14px;flex-shrink:0;">
-            <div class="pw-search-bar">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="wifi-search-inp" placeholder="Cerca rete..." oninput="wifiSearch(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
-            </div>
-          </div>
+
           <div id="wifi-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 100px;"></div>
         </div>
 
@@ -3094,7 +3075,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA358',
+  version: 'BETA360',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5221,7 +5202,7 @@ function noteRenderList(q='') {
     if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'','it');
     if (noteSort === 'created') return new Date(b.createdAt||0)-new Date(a.createdAt||0);
     return new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0);
-  }).sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  });
   if (q) notes = notes.filter(n =>
     (n.title+n.content).toLowerCase().includes(q.toLowerCase())
   );
@@ -8967,7 +8948,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA358</div>
+            <div style="font-size:13px;color:var(--text3);">BETA360</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
