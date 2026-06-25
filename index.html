@@ -11879,7 +11879,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA385</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA386</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -11981,7 +11981,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA385</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA386</div>
         </div>
       </div>
     </div>
@@ -12088,7 +12088,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA385</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA386</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -13071,7 +13071,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA385',
+  version: 'BETA386',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -15046,6 +15046,12 @@ function qrScannerClose() {
   document.getElementById('qr-scanner-modal').style.display = 'none';
   if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
   if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+  // Se il modal aggiunta era nascosto, riaprilo
+  const addModal = document.getElementById('add-modal');
+  if (addModal && addModal.style.display === 'none' && window._addModalWasOpen) {
+    addModal.style.display = 'flex';
+    window._addModalWasOpen = false;
+  }
 }
 
 function qrScanFromGallery() {
@@ -18708,7 +18714,12 @@ function addModalSave() {
 
 // ── QR scan per modal unico ────────────────────────────────
 function otpScanQRFromModal() {
+  // Nascondi temporaneamente il modal aggiunta
+  const addModal = document.getElementById('add-modal');
+  if (addModal) addModal.style.display = 'none';
   qrScannerOpen('Scansiona QR 2FA', (data) => {
+    // Riapri il modal aggiunta
+    if (addModal) addModal.style.display = 'flex';
     const parsed = qrParseOTP(data);
     if (!parsed || !parsed.secret) {
       showToast('❌ QR non riconosciuto — inserisci manualmente');
@@ -18722,22 +18733,34 @@ function otpScanQRFromModal() {
     if (secInp)  secInp.value = parsed.secret.toUpperCase();
     showToast('✅ QR letto — verifica e salva');
   });
+  // Riapri modal anche se si annulla lo scanner
+  const origClose = window._qrCloseCallback;
+  window._qrCloseCallback = () => {
+    if (addModal) addModal.style.display = 'flex';
+    if (origClose) origClose();
+  };
 }
 
 function wifiScanQRFromModal() {
-  wifiScanQR(true); // apre la camera, fromModal=true
-  // Intercetta il risultato
-  const origParse = window.wifiParseQR;
-  window.wifiParseQR = function(ssid, pw, sec) {
-    const ssidInp = document.getElementById('am-wifi-ssid');
-    const pwInp = document.getElementById('am-wifi-pw');
-    if (ssidInp) ssidInp.value = ssid || '';
-    if (pwInp) pwInp.value = pw || '';
-    window._amWifiSec = sec || 'WPA';
-    const cam = document.getElementById('wifi-qr-overlay');
-    if (cam) cam.remove();
-    window.wifiParseQR = origParse;
-  };
+  const addModal = document.getElementById('add-modal');
+  if (addModal) addModal.style.display = 'none';
+  qrScannerOpen('Scansiona QR Wi-Fi', (data) => {
+    if (addModal) addModal.style.display = 'flex';
+    const parsed = qrParseWifi(data);
+    if (!parsed || !parsed.ssid) {
+      showToast('❌ QR non riconosciuto');
+      return;
+    }
+    const ssidEl = document.getElementById('am-wifi-ssid');
+    const pwEl   = document.getElementById('am-wifi-pw');
+    if (ssidEl) ssidEl.value = parsed.ssid;
+    if (pwEl)   pwEl.value   = parsed.pw || '';
+    window._amWifiSec = parsed.sec || 'WPA';
+    document.querySelectorAll('#add-modal .wifi-sec-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.sec === window._amWifiSec)
+    );
+    showToast('✅ Rete letta — verifica e salva');
+  });
 }
 
 
@@ -19127,7 +19150,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA385</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA386</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
