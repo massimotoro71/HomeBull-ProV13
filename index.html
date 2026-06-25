@@ -911,6 +911,71 @@ html, body {
   position: absolute; border-radius: 50%;
   background: rgba(255,255,255,0.08);
 }
+/* ── Carte 3D flip ─────────────────────────────────────── */
+.card-3d-container {
+  perspective: 1000px;
+  width: 100%;
+  height: 200px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.card-3d-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4,0.2,0.2,1);
+  transform-style: preserve-3d;
+}
+.card-3d-inner.flipped {
+  transform: rotateY(180deg);
+}
+.card-3d-front, .card-3d-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+.card-3d-back {
+  transform: rotateY(180deg);
+  background: #1a1a2e;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+.card-3d-stripe {
+  width: calc(100% + 40px);
+  height: 44px;
+  background: #000;
+  margin: 0 -20px 16px;
+}
+.card-3d-cvv-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: auto;
+}
+.card-3d-cvv-box {
+  background: rgba(255,255,255,0.95);
+  color: #111;
+  font-family: monospace;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 6px;
+  letter-spacing: 0.15em;
+}
+.card-3d-back-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
 .card-number-display {
   font-family: 'DM Sans', monospace;
   font-size: 18px; font-weight: 700; color: white;
@@ -1813,7 +1878,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA346</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA347</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1915,7 +1980,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA346</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA347</div>
         </div>
       </div>
     </div>
@@ -2021,7 +2086,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA346</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA347</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3004,7 +3069,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA346',
+  version: 'BETA347',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5303,35 +5368,77 @@ function cardsRender() {
   _cards.filter(c=>!c.deleted).forEach(card => {
     const num = card.number ? card.number.replace(/\d(?=\d{4})/g,'•') : '•••• •••• •••• ••••';
     const expiring = cardIsExpiring(card.exp);
-    const tile = document.createElement('div');
-    tile.className = 'card-tile';
-    tile.style.background = card.color;
-    tile.onclick = () => cardsShowDetail(card.id);
-    tile.innerHTML = `
-      <div class="card-tile-ring" style="width:160px;height:160px;top:-40px;right:-40px;"></div>
-      <div class="card-tile-ring" style="width:120px;height:120px;bottom:-40px;left:-20px;"></div>
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
-        <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.08em;">${card.label}</div>
-        <div style="font-size:22px;">${cardCircuit(card.number)}</div>
-      </div>
-      <div style="position:relative;">
-        <div class="card-number-display">${cardFormatDisplay(num)}</div>
-        <div style="display:flex;gap:20px;align-items:flex-end;">
-          <div>
-            <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
-            <div style="font-size:14px;font-weight:700;color:${expiring?'#fbbf24':'white'};">${card.exp||'—'}${expiring?' ⚠️':''}</div>
+    const circuit = cardCircuit(card.number);
+    const numDisplay = cardFormatDisplay(num);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'card-3d-container';
+    wrap.onclick = () => {
+      const inner = document.getElementById('card-inner-' + card.id);
+      if (inner) inner.classList.toggle('flipped');
+    };
+
+    wrap.innerHTML = `
+      <div id="card-inner-${card.id}" class="card-3d-inner">
+
+        <!-- FRONTE -->
+        <div class="card-3d-front card-tile" style="background:${card.color};height:200px;">
+          <div class="card-tile-ring" style="width:160px;height:160px;top:-40px;right:-40px;"></div>
+          <div class="card-tile-ring" style="width:120px;height:120px;bottom:-40px;left:-20px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
+            <div style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.08em;">${card.label}</div>
+            <div style="font-size:22px;">${circuit}</div>
           </div>
-          ${card.holder ? `<div>
-            <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
-            <div style="font-size:13px;font-weight:700;color:white;">${card.holder.toUpperCase()}</div>
-          </div>` : ''}
-          <div style="margin-left:auto;display:flex;gap:6px;align-items:center;">
-            <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Numero</button>
-            <button onclick="event.stopPropagation();cardsDelete('${card.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.15);color:#ef4444;font-size:13px;cursor:pointer;" title="Elimina carta">🗑</button>
+          <div style="position:relative;margin-top:auto;">
+            <div class="card-number-display">${numDisplay}</div>
+            <div style="display:flex;gap:20px;align-items:flex-end;">
+              <div>
+                <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Scadenza</div>
+                <div style="font-size:14px;font-weight:700;color:${expiring?'#fbbf24':'white'};">${card.exp||'—'}${expiring?' ⚠️':''}</div>
+              </div>
+              ${card.holder ? `<div>
+                <div style="font-size:9px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;">Intestatario</div>
+                <div style="font-size:13px;font-weight:700;color:white;">${card.holder.toUpperCase()}</div>
+              </div>` : ''}
+              <div style="margin-left:auto;">
+                <div style="font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:4px;">🔄 Gira</div>
+              </div>
+            </div>
           </div>
         </div>
+
+        <!-- RETRO -->
+        <div class="card-3d-back">
+          <div class="card-3d-stripe"></div>
+          <div class="card-3d-cvv-row">
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-right:4px;">CVV</div>
+            <div class="card-3d-cvv-box" id="cvv-box-${card.id}">${card.cvv ? '•••' : '—'}</div>
+            ${card.cvv ? `<button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.cvv}')"
+              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">
+              👁 Mostra</button>` : ''}
+          </div>
+          ${card.pin ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;">PIN</div>
+            <div class="card-3d-cvv-box" id="pin-box-${card.id}">••••</div>
+            <button onclick="event.stopPropagation();toggleCVV('${card.id}','${card.pin}','pin-box-${card.id}')"
+              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;">
+              👁</button>
+          </div>` : ''}
+          <div class="card-3d-back-actions">
+            <button onclick="event.stopPropagation();cardsCopyNumber('${card.id}')"
+              style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.8);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
+              📋 Numero</button>
+            <button onclick="event.stopPropagation();cardsShowDetail('${card.id}')"
+              style="background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
+              ✏️ Dettaglio</button>
+            <button onclick="event.stopPropagation();cardsDelete('${card.id}')"
+              style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">
+              🗑</button>
+          </div>
+        </div>
+
       </div>`;
-    list.appendChild(tile);
+    list.appendChild(wrap);
   });
 }
 
@@ -5391,9 +5498,10 @@ function cardsShowDetail(id) {
   document.body.appendChild(overlay);
 }
 
-function toggleCVV(id, cvv) {
-  const el = document.getElementById('detail-cvv-' + id);
-  if (el) el.textContent = el.textContent === '•••' ? cvv : '•••';
+function toggleCVV(id, cvv, elId) {
+  // elId opzionale: se non passato usa detail-cvv-{id}
+  const el = document.getElementById(elId || 'detail-cvv-' + id);
+  if (el) el.textContent = (el.textContent === '•••' || el.textContent === '••••') ? cvv : (cvv.length <= 3 ? '•••' : '••••');
 }
 async function copyCVV(id, cvv) {
   try { await navigator.clipboard.writeText(cvv); showToast('📋 CVV copiato'); }
@@ -8525,7 +8633,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;">
             <div style="width:64px;height:64px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;">🏠</div>
             <div style="font-size:18px;font-weight:800;margin-bottom:4px;">HomeBull</div>
-            <div style="font-size:13px;color:var(--text3);">BETA346</div>
+            <div style="font-size:13px;color:var(--text3);">BETA347</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:10px;">✅ Funzionalità attive</div>
