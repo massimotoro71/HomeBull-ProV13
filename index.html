@@ -1776,7 +1776,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA380</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA381</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1878,7 +1878,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA380</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA381</div>
         </div>
       </div>
     </div>
@@ -1892,6 +1892,7 @@ function cardsSearch(q) {
       <div class="sidebar-item" data-tab="cards" onclick="switchTab('cards')">
         <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         <span class="sidebar-item-label">Portafoglio</span>
+        <span id="sb-badge-cards" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
 
 
@@ -1903,23 +1904,26 @@ function cardsSearch(q) {
       <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <span class="sidebar-item-label">Note</span>
+        <span id="sb-badge-notes" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
 
       <div class="sidebar-item" data-tab="otp" onclick="switchTab('otp')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         <span class="sidebar-item-label">OTP / 2FA</span>
+        <span id="sb-badge-otp" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
 
 
       <div class="sidebar-item" data-tab="passwords" onclick="switchTab('passwords')">
         <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         <span class="sidebar-item-label">Password</span>
-
+        <span id="sb-badge-passwords" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
 
       <div class="sidebar-item" data-tab="server" onclick="switchTab('server')">
         <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
         <span class="sidebar-item-label">Rete & IT</span>
+        <span id="sb-badge-server" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
       <div class="sidebar-item" data-tab="wifi-REMOVED" style="display:none" onclick="switchTab('wifi')">
         <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
@@ -1981,7 +1985,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA380</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA381</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2965,7 +2969,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA380',
+  version: 'BETA381',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3372,6 +3376,8 @@ function unlockApp() {
   // Inizializza cache cifrata PRIMA di tutto
   initLocalCache().then(() => {
     updateHomeStats();
+    updateSidebarBadges();
+    updateSidebarBadges();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
     setTimeout(driveStartAutoTimer, 2000);
@@ -5268,7 +5274,7 @@ let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
 function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
 }
-function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); _setLocalTs(CARDS_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
+function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); _setLocalTs(CARDS_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
 let _walletCurrent = 'cards';
 function walletTab(which) {
@@ -5661,7 +5667,7 @@ let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 function financeLoad() {
   try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
 }
-function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); _setLocalTs(FINANCE_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
+function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); _setLocalTs(FINANCE_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -5899,7 +5905,7 @@ let _wifiSec  = 'WPA';
 function wifiLoad() {
   try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
 }
-function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); _setLocalTs(WIFI_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
+function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); _setLocalTs(WIFI_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -6136,7 +6142,7 @@ let _otpIcon     = '🔐';
 function otpLoad() {
   try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
 }
-function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
+function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
 function otpOpen() {
   otpLoad();
@@ -7339,7 +7345,7 @@ function serverSave() {
   serverShowList();
 }
 
-function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); _setLocalTs(SERVER_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } }
+function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); _setLocalTs(SERVER_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
 function serverShowAdd() {
   document.getElementById('server-view-list').style.display = 'none';
@@ -8655,6 +8661,28 @@ function amCardSelectColor(el, color) {
   el.style.border = '3px solid white';
   el.style.boxShadow = '0 0 0 2px #6366f1';
 }
+
+// ── Contatori sidebar ──────────────────────────────────────
+function updateSidebarBadges() {
+  const set = (id, n) => {
+    const el = document.getElementById('sb-badge-' + id);
+    if (!el) return;
+    el.textContent = n > 0 ? n : '';
+    el.style.display = n > 0 ? 'flex' : 'none';
+  };
+  set('passwords', (_pwItems||[]).filter(i=>!i.deleted).length);
+  set('notes',     (_notes||[]).filter(n=>!n.deleted).length);
+  set('otp',       (_otpAccounts||[]).filter(a=>!a.deleted).length);
+  set('cards',     [
+    ...(_cards||[]).filter(c=>!c.deleted),
+    ...(_financeAccounts||[]).filter(a=>!a.deleted)
+  ].length);
+  set('server',    [
+    ...(_serverItems||[]).filter(s=>!s.deleted),
+    ...(_wifiNets||[]).filter(w=>!w.deleted)
+  ].length);
+}
+
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
 function _autoSyncAfterSave() {
   if (_syncInProgress) return;
@@ -8995,7 +9023,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA380</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA381</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
