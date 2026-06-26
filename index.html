@@ -1728,7 +1728,7 @@ button:active {
   opacity: 0.85;
 }
 
-/* Modal — solo add-modal slide up */
+/* Modal — slide up */
 #add-modal > div {
   transition: transform 0.25s cubic-bezier(0.32,0.72,0,1);
 }
@@ -1819,7 +1819,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA393</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA394</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1921,7 +1921,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA393</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA394</div>
         </div>
       </div>
     </div>
@@ -2022,7 +2022,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA393</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA394</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3010,7 +3010,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA393',
+  version: 'BETA394',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6666,45 +6666,38 @@ async function pinBioAuth() {
 
 
 function earlyBackHandler() {
-  const BUFFER = 80;
+  // Strategia: pushState continuo + intercetta popstate
+  const BUFFER = 80; // voci buffer
 
   function fillBuffer() {
     try {
       for (let i = 0; i < BUFFER; i++) {
-        history.pushState({ hb: 'app' }, '', '#app');
+        history.pushState({ hb: 'app', i }, '');
       }
     } catch(e) {}
   }
 
-  // Imposta hash iniziale
-  try {
-    if (!location.hash) location.replace('#app');
-    history.replaceState({ hb: 'root' }, '', '#app');
-    fillBuffer();
-  } catch(e) {}
+  // Riempimento iniziale
+  try { history.replaceState({ hb: 'root' }, ''); } catch(e) {}
+  fillBuffer();
 
-  // Intercetta popstate
+  // Intercetta OGNI popstate e reindirizza all'app
   window.addEventListener('popstate', function(e) {
-    // Riempi subito il buffer
+    // Riempi subito il buffer — sincrono per bloccare l'uscita
     try { fillBuffer(); } catch(e) {}
-    // Rimetti l'hash
-    try { if (!location.hash || location.hash === '#') location.replace('#app'); } catch(e) {}
-    // Gestisci back nell'app
+    // Gestisci la navigazione nell'app
     if (typeof handleBackPress === 'function') handleBackPress();
   });
 
-  // Intercetta hashchange (fallback per alcuni browser)
-  window.addEventListener('hashchange', function() {
-    try { fillBuffer(); } catch(e) {}
-    if (typeof handleBackPress === 'function') handleBackPress();
-  });
-
+  // Mantieni il buffer pieno in ogni scenario
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') fillBuffer();
   });
-  window.addEventListener('pageshow', () => { fillBuffer(); });
+  window.addEventListener('pageshow', fillBuffer);
   window.addEventListener('focus', fillBuffer);
+  window.addEventListener('resume', fillBuffer);
 
+  // Rinnovo automatico ogni 3 secondi
   setInterval(fillBuffer, 3000);
 }
 
@@ -9123,7 +9116,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA393</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA394</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
