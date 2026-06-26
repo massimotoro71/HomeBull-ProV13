@@ -664,18 +664,6 @@ html, body {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── Tile home v12 (stile v11) ─────────────────────────── */
-.h12-tile {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 5px; padding: 12px 6px;
-  border-radius: 18px; cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  transition: all 0.18s; user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  aspect-ratio: 1;
-  min-width: 0;
-}
 .h12-tile:active { transform: scale(0.93); }
 
 /* ── Scheda Password ───────────────────────────────────── */
@@ -1308,9 +1296,9 @@ html, body {
 @media screen and (max-width: 899px) {
   #sidebar,
   #sidebar * { visibility: hidden !important; }
-  #sidebar { 
-    display: none !important; 
-    width: 0 !important; 
+  #sidebar {
+    display: none !important;
+    width: 0 !important;
     opacity: 0 !important;
     pointer-events: none !important;
   }
@@ -1646,15 +1634,6 @@ html, body {
 }
 
 
-/* ── Lista spesa attiva — tile grandi ──────────────────── */
-@media (max-width: 899px) {  .shop-list-item-icon {
-    font-size: 28px !important;
-  }
-  .shop-list-item-name {
-    font-size: 11px !important;
-  }
-}
-
 /* Tab interne Rete & IT */
 .netit-tab {
   flex: 1;
@@ -1770,67 +1749,6 @@ html, body {
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
-function wifiShowAdd() {
-  document.getElementById('wifi-view-list').style.display = 'none';
-  document.getElementById('wifi-view-add').style.display  = 'flex';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuova Rete';
-  document.getElementById('wifi-add-ssid').value = '';
-  document.getElementById('wifi-add-pw').value = '';
-  const notesEl = document.getElementById('wifi-add-notes');
-  if (notesEl) notesEl.value = '';
-  _wifiSec = 'WPA';
-  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.sec === 'WPA');
-  });
-}
-function wifiDelete(id) {
-  const net = _wifiNets.find(n => n.id === id);
-  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
-  _wifiNets = _wifiNets.filter(n => n.id !== id);
-  wifiSaveAll(); wifiRender();
-  showToast('Rete rimossa');
-}
-function otpShowAdd() {
-  document.getElementById('otp-view-list').style.display = 'none';
-  document.getElementById('otp-view-add').style.display  = 'flex';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuovo Account';
-  if (_otpTimer) clearInterval(_otpTimer);
-  // Reset form
-  document.getElementById('otp-add-name').value = '';
-  document.getElementById('otp-add-user').value = '';
-  document.getElementById('otp-add-secret').value = '';
-  _otpIcon = '🔐';
-  document.querySelectorAll('.otp-icon-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.icon === '🔐');
-  });
-}
-function otpShowList(q='') {
-  document.getElementById('otp-view-list').style.display = 'flex';
-  document.getElementById('otp-view-add').style.display  = 'none';
-  document.getElementById('topbar-back').classList.remove('visible');
-  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
-  otpRenderList(q);
-  otpStartUpdater();
-}
-function otpCopy(id) {
-  const acc = _otpAccounts.find(a => a.id === id);
-  if (!acc) return;
-  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
-  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
-  catch(e) { showToast('Copia non disponibile'); }
-}
-function otpScanQR() {
-  qrScannerOpen('Scansiona QR 2FA', (data) => {
-    const parsed = qrParseOTP(data);
-    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
-    document.getElementById('otp-add-name').value   = parsed.name;
-    document.getElementById('otp-add-user').value   = parsed.user;
-    document.getElementById('otp-add-secret').value = parsed.secret;
-    showToast('✅ QR letto — verifica i dati e salva');
-  });
-}
 
 function cardsSearch(q) {
   const list = document.getElementById('cards-list');
@@ -1876,7 +1794,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA403</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA408</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1978,7 +1896,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA403</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA408</div>
         </div>
       </div>
     </div>
@@ -2085,7 +2003,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA403</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA408</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2529,10 +2447,10 @@ Aggiungi nuovo dato
     </div>
     </div>
 
-    
+
 
     <!-- FINANZE -->
-    
+
 
     <!-- SERVER / IT -->
     <div class="tab-panel" id="panel-server">
@@ -2686,10 +2604,7 @@ Aggiungi nuovo dato
         <div class="drawer-item-icon">💳</div>
         <div class="drawer-item-label">Portafoglio</div>
       </div>
-      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
-        <div class="drawer-item-icon">📄</div>
-        <div class="drawer-item-label">Documenti</div>
-      </div>
+
       <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
         <div class="drawer-item-icon">📝</div>
         <div class="drawer-item-label">Note</div>
@@ -2697,9 +2612,9 @@ Aggiungi nuovo dato
       <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
         <div class="drawer-item-icon">📡</div>
         <div class="drawer-item-label">Rete & IT</div>
-  </div>
       </div>
     </div>
+  </div>
     <div style="display:flex;gap:10px;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
       <button onclick="openSettings();closeMoreDrawer()" style="flex:1;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
         ⚙️ Impostazioni
@@ -2711,24 +2626,6 @@ Aggiungi nuovo dato
   </div>
 </div>
 
-<!-- Modal specifica prodotto (lista spesa) -->
-<div id="shop-detail-modal" style="display:none;position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;" onclick="if(event.target===this)shopCloseDetail()">
-  <div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:20px 16px calc(20px + env(safe-area-inset-bottom, 0px));">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-      <div style="font-size:36px;" id="shop-detail-icon">🧴</div>
-      <div style="flex:1;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:4px;">Aggiungi alla lista</div>
-        <input id="shop-detail-name" type="text" style="width:100%;background:none;border:none;outline:none;font-size:17px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif;">
-      </div>
-    </div>
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:8px;">Varianti rapide</div>
-    <div id="shop-detail-variants" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
-    <div style="display:flex;gap:10px;">
-      <button onclick="shopCloseDetail()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Annulla</button>
-      <button onclick="shopConfirmDetail()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">+ Aggiungi</button>
-    </div>
-  </div>
-</div>
 
 <!-- QR Code Modal (Wi-Fi) -->
 <div id="wifi-qr-modal" onclick="wifiCloseQR()">
@@ -3116,7 +3013,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA403',
+  version: 'BETA408',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3233,7 +3130,7 @@ function showInstallBanner() {
   // Non mostrare se già mostrata in questa sessione
   if (sessionStorage.getItem('hb_install_shown')) return;
   sessionStorage.setItem('hb_install_shown', '1');
-  
+
   const banner = document.createElement('div');
   banner.id = 'install-banner';
   banner.style.cssText = `
@@ -3979,7 +3876,6 @@ function updateHomeStats() {
   if (!alertBox) return;
   const alerts = [];
 
-  // 1. Documenti in scadenza (entro 90 giorni)
   const now = new Date();
 
   // 2. Carte in scadenza
@@ -4287,24 +4183,24 @@ function pwRenameCategory(catId, currentName) {
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
   const box = document.createElement('div');
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);';
-  
+
   const inp = document.createElement('input');
   inp.type = 'text';
   inp.value = currentName;
   inp.style.cssText = 'width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:15px;font-weight:700;font-family:inherit;box-sizing:border-box;margin:16px 0;';
-  
+
   box.innerHTML = '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">✏️ Rinomina categoria</div>'
     + '<div style="font-size:12px;color:var(--text3);">Inserisci il nuovo nome</div>';
   box.appendChild(inp);
-  
+
   const btns = document.createElement('div');
   btns.style.cssText = 'display:flex;gap:10px;';
-  
+
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Annulla';
   cancelBtn.style.cssText = 'flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
   cancelBtn.onclick = () => ov.remove();
-  
+
   const okBtn = document.createElement('button');
   okBtn.textContent = 'Rinomina';
   okBtn.style.cssText = 'flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;';
@@ -4321,7 +4217,7 @@ function pwRenameCategory(catId, currentName) {
       showToast('✅ Categoria rinominata');
     }
   };
-  
+
   btns.appendChild(cancelBtn);
   btns.appendChild(okBtn);
   box.appendChild(btns);
@@ -6630,13 +6526,6 @@ function otpDeleteConfirm(id) {
 
 // ── Fine OTP ──────────────────────────────────────────────
 
-// ═══════════════════════════════════════════════════════════
-//  CONDIVISIONE SELETTIVA — Lista Spesa e Calendario
-// ═══════════════════════════════════════════════════════════
-
-let _myShares      = {}; // condivisioni create da me
-let _receivedShares = {}; // condivisioni ricevute
-let _sharedShopData = {}; // { shareId: { fromEmail, items[] } } dati lista spesa ricevuta
 
 // ── Carica condivisioni da Firebase ──────────────────────
 async function loadShares() {
@@ -6656,62 +6545,7 @@ async function loadShares() {
   } catch(e) { console.warn('loadShares:', e); }
 }
 
-// ── Crea condivisione ─────────────────────────────────────
-async function createShare(section, withEmail, permission) {
-  const myEmail = _emailOtpAddr;
-  if (!myEmail) { showToast('⚠️ Email non trovata'); return; }
-  if (withEmail.toLowerCase() === myEmail.toLowerCase()) { showToast('⚠️ Non puoi condividere con te stesso'); return; }
 
-  showToast('📤 Condivisione in corso...');
-  try {
-    const shareId  = 'sh_' + Date.now();
-    const myKey    = _getSyncKey();
-    const withKey  = btoa(withEmail.toLowerCase()).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-    const rawData  = localStorage.getItem(SHAREABLE[section]?.key);
-    const data     = rawData ? JSON.parse(rawData) : (section === 'shopping' ? {} : []);
-
-    // Salva in Firebase
-    await fbDb.ref('shared/' + shareId).set({
-      id: shareId, section, fromEmail: myEmail, fromKey: myKey,
-      withEmail: withEmail.toLowerCase(), withKey, permission,
-      createdAt: new Date().toISOString(), data
-    });
-    await fbDb.ref('userShares/' + myKey  + '/created/'  + shareId).set({ shareId, section, withEmail: withEmail.toLowerCase(), permission });
-    await fbDb.ref('userShares/' + withKey + '/received/' + shareId).set({ shareId, section, fromEmail: myEmail, permission });
-
-    _myShares[shareId] = { shareId, section, withEmail: withEmail.toLowerCase(), permission };
-    showToast('✅ Condiviso con ' + withEmail);
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-// ── Rimuovi condivisione ──────────────────────────────────
-async function removeShare(shareId) {
-  const myKey = _getSyncKey();
-  const share = _myShares[shareId];
-  try {
-    await fbDb.ref('shared/' + shareId).remove();
-    await fbDb.ref('userShares/' + myKey + '/created/' + shareId).remove();
-    if (share?.withEmail) {
-      const withKey = btoa(share.withEmail).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
-      await fbDb.ref('userShares/' + withKey + '/received/' + shareId).remove();
-    }
-    delete _myShares[shareId];
-    showToast('✅ Condivisione rimossa');
-    document.getElementById('_share_modal')?.remove();
-  } catch(e) { showToast('⚠️ Errore: ' + (e.message||e)); }
-}
-
-// ── Rimuovi tutte le condivisioni (cleanup) ───────────────
-// ── Listener realtime lista spesa condivisa ───────────────
-
-// ── Render tab lista spesa condivisa ─────────────────────
-
-// ── Modal condivisione ────────────────────────────────────
-
-
-// ── Apri lista spesa condivisa come tab ──────────────────
-
-// ── Sincronizza lista spesa verso Firebase (dopo ogni save) ─
 
 
 // ── Indicatore ultimo sync ────────────────────────────────
@@ -9254,7 +9088,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA403</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA408</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
