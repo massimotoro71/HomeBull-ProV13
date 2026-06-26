@@ -1,7 +1,7 @@
 {
   "name": "HomeBull Pro",
   "short_name": "HomeBull",
-  "description": "Encrypted personal vault",
+  "description": "Il tuo vault personale — password, documenti, note e altro",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
