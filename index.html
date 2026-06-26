@@ -1681,70 +1681,97 @@ html, body {
   }
 }
 
+/* ══ TRANSIZIONI E OMBRE ════════════════════════════════════ */
+
+/* Cambio tab — fade + slide */
+.tab-panel {
+  animation: none;
+}
+.tab-panel.active {
+  animation: tabFadeIn 0.22s ease-out;
+}
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Card generiche — ombra e hover */
+.note-card,
+.pw-item-card,
+.wifi-card,
+.finance-card,
+.pw-cat-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.note-card:hover,
+.pw-item-card:hover,
+.wifi-card:hover,
+.finance-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+/* Sidebar items */
+.sidebar-item {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Bottoni */
+button {
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+button:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+/* Modal — slide up */
+#add-modal > div,
+#settings-overlay > div {
+  transition: transform 0.25s cubic-bezier(0.32,0.72,0,1);
+}
+
+/* Carte 3D — già hanno transition, raffiniamo */
+.card-3d-inner {
+  transition: transform 0.55s cubic-bezier(0.4,0.2,0.2,1) !important;
+}
+
+/* OTP card */
+#otp-list > div {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#otp-list > div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+
+/* Categorie password */
+#pw-cats-grid > div {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
+}
+#pw-cats-grid > div:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Input focus */
+input:focus, textarea:focus, select:focus {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+/* FAB mobile */
+#mob-fabs button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+#mob-fabs button:active {
+  transform: scale(0.92) !important;
+}
+
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
-function wifiShowAdd() {
-  document.getElementById('wifi-view-list').style.display = 'none';
-  document.getElementById('wifi-view-add').style.display  = 'flex';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuova Rete';
-  document.getElementById('wifi-add-ssid').value = '';
-  document.getElementById('wifi-add-pw').value = '';
-  const notesEl = document.getElementById('wifi-add-notes');
-  if (notesEl) notesEl.value = '';
-  _wifiSec = 'WPA';
-  document.querySelectorAll('.wifi-sec-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.sec === 'WPA');
-  });
-}
-function wifiDelete(id) {
-  const net = _wifiNets.find(n => n.id === id);
-  if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
-  _wifiNets = _wifiNets.filter(n => n.id !== id);
-  wifiSaveAll(); wifiRender();
-  showToast('Rete rimossa');
-}
-function otpShowAdd() {
-  document.getElementById('otp-view-list').style.display = 'none';
-  document.getElementById('otp-view-add').style.display  = 'flex';
-  document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = 'Nuovo Account';
-  if (_otpTimer) clearInterval(_otpTimer);
-  // Reset form
-  document.getElementById('otp-add-name').value = '';
-  document.getElementById('otp-add-user').value = '';
-  document.getElementById('otp-add-secret').value = '';
-  _otpIcon = '🔐';
-  document.querySelectorAll('.otp-icon-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.icon === '🔐');
-  });
-}
-function otpShowList(q='') {
-  document.getElementById('otp-view-list').style.display = 'flex';
-  document.getElementById('otp-view-add').style.display  = 'none';
-  document.getElementById('topbar-back').classList.remove('visible');
-  document.getElementById('topbar-title').textContent = 'OTP / 2FA';
-  otpRenderList(q);
-  otpStartUpdater();
-}
-function otpCopy(id) {
-  const acc = _otpAccounts.find(a => a.id === id);
-  if (!acc) return;
-  const code = String(otpGenerate(acc.secret)).padStart(6,'0');
-  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
-  catch(e) { showToast('Copia non disponibile'); }
-}
-function otpScanQR() {
-  qrScannerOpen('Scansiona QR 2FA', (data) => {
-    const parsed = qrParseOTP(data);
-    if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
-    document.getElementById('otp-add-name').value   = parsed.name;
-    document.getElementById('otp-add-user').value   = parsed.user;
-    document.getElementById('otp-add-secret').value = parsed.secret;
-    showToast('✅ QR letto — verifica i dati e salva');
-  });
-}
 
 function cardsSearch(q) {
   const list = document.getElementById('cards-list');
@@ -1790,7 +1817,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA390</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA392</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1892,7 +1919,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA390</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA392</div>
         </div>
       </div>
     </div>
@@ -1910,10 +1937,7 @@ function cardsSearch(q) {
       </div>
 
 
-      <div class="sidebar-item" data-tab="finance-REMOVED" style="display:none" onclick="switchTab('finance')">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span class="sidebar-item-label">Finanze</span>
-      </div>
+
 
       <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
         <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -1939,10 +1963,7 @@ function cardsSearch(q) {
         <span class="sidebar-item-label">Rete & IT</span>
         <span id="sb-badge-server" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
-      <div class="sidebar-item" data-tab="wifi-REMOVED" style="display:none" onclick="switchTab('wifi')">
-        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-        <span class="sidebar-item-label">Wi-Fi</span>
-      </div>
+
 
     </div>
 
@@ -1999,7 +2020,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA390</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA392</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2557,7 +2578,7 @@ function cardsSearch(q) {
         <div class="drawer-item-icon">💳</div>
         <div class="drawer-item-label">Portafoglio</div>
       </div>
-      <div class="drawer-item" data-tab="documents" onclick="switchTabFromDrawer('documents')">
+      <!-- drawer documents rimosso --><!-- <div class="drawer-item" data-tab="documents"ments')">
         <div class="drawer-item-icon">📄</div>
         <div class="drawer-item-label">Documenti</div>
       </div>
@@ -2987,7 +3008,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA390',
+  version: 'BETA392',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -2996,7 +3017,7 @@ const HB = {
   pinMode: 'setup',     // setup | login | confirm
   pinFirst: '',         // for confirm step
   otpCode: '',
-  tabs: ['home','passwords','documents','notes','otp','cards','server']
+  tabs: ['home','passwords','notes','otp','cards','server']
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -3436,7 +3457,6 @@ function logout() {
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: [] },
   passwords: { title: 'Password',    sub: '', actions: [] },
-  documents: { title: 'Documenti',   sub: '', actions: [] },
   notes:     { title: 'Note',        sub: '', actions: [] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
   cards:     { title: 'Portafoglio', sub: 'Carte e conti', actions: [] },
@@ -3476,7 +3496,7 @@ function switchTab(tab) {
 
   // Update accent color per tab
   const accentMap = {
-    home:'#6366f1', passwords:'#10b981', documents:'#f59e0b',
+    home:'#6366f1', passwords:'#10b981',
     notes:'#8b5cf6', otp:'#06b6d4',
     cards:'#f97316',
     server:'#64748b'
@@ -3500,8 +3520,7 @@ function switchTab(tab) {
     notes:     () => typeof noteOpen === 'function' && noteOpen(),
     cards:     () => { walletTab(_walletCurrent || 'cards'); },
     server:    () => { netitTab(_netitCurrent || 'server'); },
-    documents: () => typeof docsOpen === 'function' && docsOpen(),
-    home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+      home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
   };
   moduleOpeners[tab]?.();
 }
@@ -5732,15 +5751,7 @@ function financeRender() {
     </div>`;
     return;
   }
-  if (window.innerWidth >= 700) {
-    list.style.display = 'grid';
-    list.style.gridTemplateColumns = 'repeat(2,1fr)';
-    list.style.gap = '10px';
-  } else {
-    list.style.display = 'flex';
-    list.style.flexDirection = 'column';
-    list.style.gap = '0';
-  }
+  if(window.innerWidth>=700){list.style.display='grid';list.style.gridTemplateColumns='repeat(2,1fr)';list.style.gap='10px';}else{list.style.display='flex';list.style.flexDirection='column';}
   list.innerHTML = '';
   activeAccounts.forEach(acc => {
     const card = document.createElement('div');
@@ -5977,16 +5988,7 @@ function wifiRender() {
     </div>`;
     return;
   }
-  // Layout responsive
-  if (window.innerWidth >= 700) {
-    list.style.display = 'grid';
-    list.style.gridTemplateColumns = 'repeat(2,1fr)';
-    list.style.gap = '10px';
-  } else {
-    list.style.display = 'flex';
-    list.style.flexDirection = 'column';
-    list.style.gap = '0';
-  }
+  if(window.innerWidth>=700){list.style.display='grid';list.style.gridTemplateColumns='repeat(2,1fr)';list.style.gap='10px';}else{list.style.display='flex';list.style.flexDirection='column';}
   list.innerHTML = '';
   _wifiNets.filter(n=>!n.deleted).forEach(net => {
     const card = document.createElement('div');
@@ -7319,7 +7321,6 @@ async function fbSyncLoad(){
       else if(tab === 'finance' && typeof financeRender==='function') financeRender();
       else if(tab === 'otp' && typeof otpRender==='function') otpRender();
       else if(tab === 'cards' && typeof cardsRender==='function') cardsRender();
-      else if(tab === 'calendar' && typeof calRender==='function') calRender();
       else if(tab === 'server' && typeof serverRender==='function') serverRender();
     }
     await fbSyncAll(true);
@@ -7381,15 +7382,7 @@ function serverRender() {
     </div>`;
     return;
   }
-  if (window.innerWidth >= 700) {
-    list.style.display = 'grid';
-    list.style.gridTemplateColumns = 'repeat(2,1fr)';
-    list.style.gap = '10px';
-  } else {
-    list.style.display = 'flex';
-    list.style.flexDirection = 'column';
-    list.style.gap = '0';
-  }
+  if(window.innerWidth>=700){list.style.display='grid';list.style.gridTemplateColumns='repeat(2,1fr)';list.style.gap='10px';}else{list.style.display='flex';list.style.flexDirection='column';}
   list.innerHTML = '';
   _serverItems.forEach(item => {
     const card = document.createElement('div');
@@ -8763,10 +8756,8 @@ function amCardSelectColor(el, color) {
 // ── Contatori sidebar ──────────────────────────────────────
 function updateSidebarBadges() {
   const set = (id, n) => {
-    // Sidebar desktop
     const el = document.getElementById('sb-badge-' + id);
     if (el) { el.textContent = n > 0 ? n : ''; el.style.display = n > 0 ? 'flex' : 'none'; }
-    // Menu mobile
     const mob = document.getElementById('mob-badge-' + id);
     if (mob) { mob.textContent = n > 0 ? n : ''; mob.style.display = n > 0 ? 'flex' : 'none'; }
   };
@@ -9123,7 +9114,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA390</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA392</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
