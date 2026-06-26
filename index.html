@@ -1771,6 +1771,103 @@ input:focus, textarea:focus, select:focus {
 }
 
 
+/* ══ HOME MOBILE LAUNCHER ═══════════════════════════════════ */
+@media (max-width: 899px) {
+  /* Nascondi elementi desktop sulla home */
+  #panel-home .home-section-title,
+  #panel-home .qa-grid,
+  #panel-home #quick-access-grid,
+  #panel-home .home-stats {
+    display: none !important;
+  }
+
+  /* Griglia sezioni mobile */
+  .mob-home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 8px 0 16px;
+  }
+
+  .mob-home-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .mob-home-card:active {
+    transform: scale(0.96);
+    background: var(--bg3);
+  }
+  .mob-home-card-icon {
+    font-size: 32px;
+    line-height: 1;
+  }
+  .mob-home-card-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+    text-align: center;
+  }
+  .mob-home-card-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 99px;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+  }
+  .mob-home-card-accent {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  /* Bottoni fondo home mobile */
+  .mob-home-footer {
+    display: flex;
+    gap: 10px;
+    padding: 8px 0 20px;
+  }
+  .mob-home-footer-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+/* Desktop: nascondi elementi solo mobile */
+@media (min-width: 900px) {
+  .mob-home-grid, .mob-home-footer { display: none !important; }
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1819,7 +1916,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA394</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA395</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1921,7 +2018,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA394</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA395</div>
         </div>
       </div>
     </div>
@@ -2022,7 +2119,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA394</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA395</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2032,11 +2129,56 @@ function cardsSearch(q) {
           <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--text3);font-family:inherit;">⌘K</kbd>
         </div>
 
-        <!-- Bottone aggiungi principale -->
+        <!-- Bottone aggiungi principale (desktop) -->
         <button onclick="openAddModal(HB.currentTab||'passwords')" style="width:100%;padding:18px;border-radius:18px;border:none;background:var(--accent);color:white;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;box-shadow:0 4px 20px rgba(99,102,241,0.4);letter-spacing:0.02em;">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Aggiungi nuovo dato
         </button>
+
+        <!-- LAUNCHER MOBILE -->
+        <div class="mob-home-grid">
+          <div class="mob-home-card" onclick="switchTab('passwords')">
+            <div class="mob-home-card-accent" style="background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div>
+            <div class="mob-home-card-icon">🔐</div>
+            <div class="mob-home-card-label">Password</div>
+            <span id="mhb-passwords" class="mob-home-card-badge" style="display:none;"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('notes')">
+            <div class="mob-home-card-accent" style="background:linear-gradient(90deg,#f59e0b,#f97316);"></div>
+            <div class="mob-home-card-icon">📝</div>
+            <div class="mob-home-card-label">Note</div>
+            <span id="mhb-notes" class="mob-home-card-badge" style="display:none;"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('otp')">
+            <div class="mob-home-card-accent" style="background:linear-gradient(90deg,#10b981,#06b6d4);"></div>
+            <div class="mob-home-card-icon">🔑</div>
+            <div class="mob-home-card-label">OTP / 2FA</div>
+            <span id="mhb-otp" class="mob-home-card-badge" style="display:none;"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('cards')">
+            <div class="mob-home-card-accent" style="background:linear-gradient(90deg,#6366f1,#06b6d4);"></div>
+            <div class="mob-home-card-icon">💳</div>
+            <div class="mob-home-card-label">Portafoglio</div>
+            <span id="mhb-cards" class="mob-home-card-badge" style="display:none;"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('server')">
+            <div class="mob-home-card-accent" style="background:linear-gradient(90deg,#0f172a,#1e3a5f);"></div>
+            <div class="mob-home-card-icon">📡</div>
+            <div class="mob-home-card-label">Rete & IT</div>
+            <span id="mhb-server" class="mob-home-card-badge" style="display:none;"></span>
+          </div>
+          <div class="mob-home-card" onclick="openAddModal('passwords')">
+            <div class="mob-home-card-accent" style="background:var(--accent);"></div>
+            <div class="mob-home-card-icon">➕</div>
+            <div class="mob-home-card-label">Aggiungi</div>
+          </div>
+        </div>
+
+        <!-- Footer mobile: Impostazioni + Esci -->
+        <div class="mob-home-footer">
+          <button class="mob-home-footer-btn" onclick="openSettings()">⚙️ Impostazioni</button>
+          <button class="mob-home-footer-btn" style="color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="logout()">🚪 Esci</button>
+        </div>
 
         <!-- Accesso rapido personalizzabile -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -3010,7 +3152,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA394',
+  version: 'BETA395',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8762,6 +8904,8 @@ function updateSidebarBadges() {
     if (el) { el.textContent = n > 0 ? n : ''; el.style.display = n > 0 ? 'flex' : 'none'; }
     const mob = document.getElementById('mob-badge-' + id);
     if (mob) { mob.textContent = n > 0 ? n : ''; mob.style.display = n > 0 ? 'flex' : 'none'; }
+    const mhb = document.getElementById('mhb-' + id);
+    if (mhb) { mhb.textContent = n > 0 ? n : ''; mhb.style.display = n > 0 ? 'flex' : 'none'; }
   };
   set('passwords', (_pwItems||[]).filter(i=>!i.deleted).length);
   set('notes',     (_notes||[]).filter(n=>!n.deleted).length);
@@ -9116,7 +9260,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA394</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA395</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
