@@ -1523,6 +1523,9 @@ html, body {
     padding-bottom: 0 !important;
   }
 }
+@media (max-width: 899px) {
+  #mob-fabs { display: flex !important; }
+}
 @media (min-width: 900px) {
   #mob-fab { display: none !important; }
   #mob-fabs { display: none !important; }
@@ -1681,6 +1684,90 @@ html, body {
   }
 }
 
+/* ══ HOME MOBILE — elementi da nascondere ════════════════════ */
+@media (max-width: 899px) {
+  /* Accesso rapido */
+  #panel-home .home-section-title,
+  #panel-home #quick-access-grid,
+  #panel-home .qa-grid,
+  #panel-home [style*="qa-all-tabs"] { display: none !important; }
+
+  /* Barra cerca globale nella home */
+  #panel-home .home-search-bar,
+  #panel-home #home-search-wrap,
+  #panel-home [onclick*="openGlobalSearch"],
+  #panel-home input[placeholder*="Cerca"] { display: none !important; }
+
+  /* Banner scadenze / avvisi */
+  #panel-home .home-alerts,
+  #panel-home #home-alerts-section,
+  #panel-home [id*="alert"],
+  #panel-home [class*="alert"] { display: none !important; }
+
+  /* Bottone aggiungi desktop */
+  #panel-home .home-add-desktop { display: none !important; }
+
+  /* Stats contatori desktop */
+  #panel-home .home-stats-grid { display: none !important; }
+}
+
+/* ══ HOME MOBILE LAUNCHER ════════════════════════════════════ */
+@media (max-width: 899px) {
+  .mob-home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .mob-home-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px 14px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .mob-home-card:active { transform: scale(0.95); }
+  .mob-home-card-icon { font-size: 36px; line-height: 1; }
+  .mob-home-card-label {
+    font-size: 14px; font-weight: 800;
+    color: var(--text); text-align: center;
+  }
+  .mob-home-card-badge {
+    position: absolute; top: 10px; right: 10px;
+    min-width: 22px; height: 22px; border-radius: 99px;
+    background: var(--accent); color: white;
+    font-size: 11px; font-weight: 800;
+    display: none; align-items: center;
+    justify-content: center; padding: 0 6px;
+  }
+  .mob-home-card-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+  }
+  .mob-home-footer {
+    display: flex; gap: 10px; padding-bottom: 80px;
+  }
+  .mob-home-footer-btn {
+    flex: 1; padding: 15px; border-radius: 16px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); font-size: 14px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    transition: background 0.15s ease;
+  }
+  .mob-home-footer-btn:active { background: var(--bg3); }
+}
+@media (min-width: 900px) {
+  .mob-home-grid, .mob-home-footer { display: none !important; }
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1790,7 +1877,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA390</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA397</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1892,7 +1979,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA390</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA397</div>
         </div>
       </div>
     </div>
@@ -1999,7 +2086,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA390</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA397</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2012,8 +2099,51 @@ function cardsSearch(q) {
         <!-- Bottone aggiungi principale -->
         <button onclick="openAddModal(HB.currentTab||'passwords')" style="width:100%;padding:18px;border-radius:18px;border:none;background:var(--accent);color:white;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;box-shadow:0 4px 20px rgba(99,102,241,0.4);letter-spacing:0.02em;">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Aggiungi nuovo dato
+Aggiungi nuovo dato
         </button>
+
+        <!-- LAUNCHER MOBILE -->
+        <div class="mob-home-grid">
+          <div class="mob-home-card" onclick="switchTab('passwords')">
+            <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div>
+            <div class="mob-home-card-icon">🔐</div>
+            <div class="mob-home-card-label">Password</div>
+            <span id="mhb-passwords" class="mob-home-card-badge"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('notes')">
+            <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#f59e0b,#f97316);"></div>
+            <div class="mob-home-card-icon">📝</div>
+            <div class="mob-home-card-label">Note</div>
+            <span id="mhb-notes" class="mob-home-card-badge"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('otp')">
+            <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#10b981,#06b6d4);"></div>
+            <div class="mob-home-card-icon">🔑</div>
+            <div class="mob-home-card-label">OTP / 2FA</div>
+            <span id="mhb-otp" class="mob-home-card-badge"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('cards')">
+            <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#6366f1,#06b6d4);"></div>
+            <div class="mob-home-card-icon">💳</div>
+            <div class="mob-home-card-label">Portafoglio</div>
+            <span id="mhb-cards" class="mob-home-card-badge"></span>
+          </div>
+          <div class="mob-home-card" onclick="switchTab('server')">
+            <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#0f172a,#3b82f6);"></div>
+            <div class="mob-home-card-icon">📡</div>
+            <div class="mob-home-card-label">Rete & IT</div>
+            <span id="mhb-server" class="mob-home-card-badge"></span>
+          </div>
+          <div class="mob-home-card" onclick="openSettings()">
+            <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#374151,#6b7280);"></div>
+            <div class="mob-home-card-icon">⚙️</div>
+            <div class="mob-home-card-label">Impostazioni</div>
+          </div>
+        </div>
+        <!-- Footer Esci -->
+        <div class="mob-home-footer">
+          <button class="mob-home-footer-btn" style="color:#ef4444;border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.05);" onclick="logout()">🚪 Esci</button>
+        </div>
 
         <!-- Accesso rapido personalizzabile -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
@@ -2987,7 +3117,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA390',
+  version: 'BETA397',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8769,6 +8899,8 @@ function updateSidebarBadges() {
     // Menu mobile
     const mob = document.getElementById('mob-badge-' + id);
     if (mob) { mob.textContent = n > 0 ? n : ''; mob.style.display = n > 0 ? 'flex' : 'none'; }
+    const mhb = document.getElementById('mhb-' + id);
+    if (mhb) { mhb.textContent = n > 0 ? n : ''; mhb.style.display = n > 0 ? 'flex' : 'none'; }
   };
   set('passwords', (_pwItems||[]).filter(i=>!i.deleted).length);
   set('notes',     (_notes||[]).filter(n=>!n.deleted).length);
@@ -9123,7 +9255,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA390</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA397</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
