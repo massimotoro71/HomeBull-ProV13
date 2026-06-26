@@ -1711,6 +1711,61 @@ html, body {
   .mob-home-grid, .mob-home-footer { display: none !important; }
 }
 
+/* ══ HOME MOBILE LAUNCHER ════════════════════════════════════ */
+@media (max-width: 899px) {
+  #mob-fabs { display: flex !important; }
+
+  .mob-home-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .mob-home-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 10px 12px;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .mob-home-card:active { transform: scale(0.95); }
+  .mob-home-card-icon { font-size: 28px; line-height: 1; }
+  .mob-home-card-label {
+    font-size: 12px; font-weight: 800;
+    color: var(--text); text-align: center;
+  }
+  .mob-home-card-badge {
+    position: absolute; top: 8px; right: 8px;
+    min-width: 20px; height: 20px; border-radius: 99px;
+    background: var(--accent); color: white;
+    font-size: 10px; font-weight: 800;
+    display: none; align-items: center;
+    justify-content: center; padding: 0 5px;
+  }
+  .mob-home-card-bar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  }
+  .mob-home-footer {
+    display: flex !important; gap: 10px; padding-bottom: 80px;
+  }
+  .mob-home-footer-btn {
+    flex: 1; padding: 14px; border-radius: 14px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); font-size: 13px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+  }
+  .mob-home-footer-btn:active { background: var(--bg3); }
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1820,7 +1875,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA401</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA402</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1922,7 +1977,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA401</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA402</div>
         </div>
       </div>
     </div>
@@ -2029,7 +2084,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA401</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA402</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3060,7 +3115,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA401',
+  version: 'BETA402',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9198,7 +9253,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA401</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA402</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
