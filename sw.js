@@ -1,4 +1,4 @@
-const CACHE = 'hb13-beta395';
+const CACHE = 'hb13-beta396';
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./index.html','./manifest.json'])));
   self.skipWaiting();
