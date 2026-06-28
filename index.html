@@ -53,7 +53,6 @@
   /* Layout */
   --topbar-h:    54px;
   --bottombar-h: 70px;
-  --sidebar-w:   220px;
   --radius:      16px;
   --radius-sm:   10px;
   --radius-lg:   24px;
@@ -312,7 +311,6 @@ html, body {
   .qa-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
 }
 
-/* On desktop: sidebar replaces bottombar */
 @media (min-width: 900px) {
   #sidebar {
     display: flex !important;
@@ -1831,7 +1829,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA418</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA419</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1933,7 +1931,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA418</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA419</div>
         </div>
       </div>
     </div>
@@ -2041,7 +2039,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA418</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA419</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3061,7 +3059,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA418',
+  version: 'BETA419',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3476,13 +3474,6 @@ function unlockApp() {
     // Carica condivisioni dopo sync
     setTimeout(() => {
       loadShares().then(() => {
-        // Avvia listener per condivisioni shopping ricevute
-        Object.entries(_receivedShares)
-          .filter(([k,s]) => s.section === 'shopping')
-          .forEach(([k,s]) => startShopShareListener(s.shareId || k));
-        // Notifica condivisioni presenti
-        const cnt = Object.keys(_receivedShares).length;
-        if (cnt > 0) updateHomeStats();
       });
     }, 3000);
     setTimeout(checkExpiryNotifications, 3000);
@@ -3566,7 +3557,7 @@ function switchTab(tab) {
     notes:     () => typeof noteOpen === 'function' && noteOpen(),
     cards:     () => { walletTab(_walletCurrent || 'cards'); },
     server:    () => { netitTab(_netitCurrent || 'server'); },
-      home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); if (typeof renderQuickAccess === 'function') renderQuickAccess(); }
+      home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); }
   };
   moduleOpeners[tab]?.();
 }
@@ -3650,12 +3641,7 @@ function renderTopbarActions(actions) {
     btn.title = 'Aggiungi';
     btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
     btn.onclick = () => {
-      if (HB.currentTab === 'documents') {
-    const addView = document.getElementById('docs-view-add');
-    const overlay = document.getElementById('docs-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'server') {
+      if (HB.currentTab === 'server') {
     const addView = document.getElementById('server-view-add');
     if (addView && addView.style.display !== 'none') { serverShowList(); return; }
     const overlay = document.getElementById('server-detail-overlay');
@@ -6853,7 +6839,6 @@ function saveHomeCustom() {
     alerts: document.getElementById('hc-alerts').checked,
   };
   saveHomePrefs(prefs);
-  if (qaSelected.length > 0) localStorage.setItem(QA_KEY, JSON.stringify(qaSelected));
   applyHomePrefs();
   closeHomeCustom();
   showToast('✅ Home personalizzata');
@@ -6934,9 +6919,6 @@ function handleBackPress() {
     // Chiudi qualsiasi modal/overlay aperto
     if (document.getElementById('settings-overlay')?.style.display === 'flex') {
       closeSettings(); return;
-    }
-    if (document.getElementById('mob-overlay')?.style.display === 'block') {
-       return;
     }
     if (document.getElementById('search-overlay')?.classList.contains('open')) {
       closeGlobalSearch(); return;
@@ -9041,7 +9023,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA418</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA419</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
