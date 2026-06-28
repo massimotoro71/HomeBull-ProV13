@@ -1666,11 +1666,7 @@ html, body {
   .qa-card,
   #panel-home [onclick*="editQuickAccess"] { display: none !important; }
 
-  /* Banner scadenze */
-  #panel-home .home-alerts,
-  #panel-home #home-alerts-section,
-  #panel-home [id*="alert"],
-  #panel-home [class*="alert"] { display: none !important; }
+
 
   /* Stats desktop */
   #panel-home .home-stats-grid { display: none !important; }
@@ -1766,6 +1762,68 @@ html, body {
   .topbar { background: rgba(10,10,26,0.7) !important; backdrop-filter: blur(12px); }
 }
 
+/* ══ LAYOUT UNIFICATO — Sidebar rimossa ═════════════════════ */
+
+/* Nascondi sidebar ovunque */
+.sidebar, nav.sidebar, #sidebar { display: none !important; }
+
+/* Rimuovi offset sidebar dall'app */
+.app-layout, #app, .app-main {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Topbar — stile unificato */
+#topbar {
+  background: rgba(10,10,26,0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+/* Contenuto centrato su PC */
+@media (min-width: 900px) {
+  .tab-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+}
+
+/* Sfondo mesh su tutta l'app */
+body {
+  background: #0a0a1a !important;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 55% at 15% 15%, rgba(99,102,241,0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 65% at 85% 5%,  rgba(139,92,246,0.35) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 45% at 55% 85%, rgba(59,130,246,0.25) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 55% at 5%  75%, rgba(76,29,149,0.3)  0%, transparent 65%);
+  animation: meshPulseAll 7s ease-in-out infinite alternate;
+}
+@keyframes meshPulseAll {
+  0%   { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Pannelli trasparenti per vedere sfondo */
+#app, .app-layout, .app-main,
+.tab-panel, .tab-inner,
+#tab-container { background: transparent !important; }
+
+/* FAB mobile — teniamo solo il + */
+#mob-fabs { gap: 0 !important; }
+#mob-fabs button:first-child {
+  width: 56px !important;
+  height: 56px !important;
+}
+
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1814,7 +1872,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA412</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA414</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1916,7 +1974,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA412</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA414</div>
         </div>
       </div>
     </div>
@@ -1989,7 +2047,8 @@ function cardsSearch(q) {
         <polyline points="15 18 9 12 15 6"/>
       </svg>
     </div>
-    <div class="topbar-title">
+    <div class="topbar-title" style="display:flex;align-items:center;gap:10px;">
+      <span onclick="switchTab('home')" style="cursor:pointer;font-size:18px;opacity:0.9;" title="Torna alla Home">🏠</span>
       <h1 id="topbar-title">Home</h1>
       <span id="topbar-sub"></span>
     </div>
@@ -2023,7 +2082,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA412</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA414</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3043,7 +3102,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA412',
+  version: 'BETA414',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9038,7 +9097,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA412</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA414</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
