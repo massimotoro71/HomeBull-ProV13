@@ -1057,7 +1057,7 @@ html, body {
   /* ── Root override mobile ─────────────────────────────── */
   :root {
     --topbar-h:    56px;
-    --bottombar-h: calc(64px + env(safe-area-inset-bottom, 0px));
+    --bottombar-h: calc(1px + env(safe-area-inset-bottom, 0px));
     --radius:      14px;
   }
 
@@ -1832,7 +1832,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA431</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA433</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1934,7 +1934,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA431</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA433</div>
         </div>
       </div>
     </div>
@@ -2039,7 +2039,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA431</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA433</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3060,7 +3060,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA431',
+  version: 'BETA433',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6560,22 +6560,7 @@ function otpDeleteConfirm(id) {
 
 
 // ── Carica condivisioni da Firebase ──────────────────────
-async function loadShares() {
-  if (!fbReady || !fbDb) return;
-  const emailKey = _getSyncKey();
-  if (!emailKey) return;
-  try {
-    console.log('loadShares — emailKey:', emailKey);
-    const mySnap  = await fbDb.ref('userShares/' + emailKey + '/created').get();
-    _myShares     = mySnap.exists()  ? mySnap.val()  : {};
-    const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
-    _receivedShares = recSnap.exists() ? recSnap.val() : {};
-    console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
-    // Debug: mostra cosa c'è su Firebase
-    const allSnap = await fbDb.ref('userShares/' + emailKey).get();
-    console.log('userShares raw:', JSON.stringify(allSnap.val()));
-  } catch(e) { console.warn('loadShares:', e); }
-}
+async function loadShares() { return; } // rimosso — UI condivisione dismessa
 
 
 // ── Indicatore ultimo sync ────────────────────────────────
@@ -6655,45 +6640,29 @@ async function pinBioAuth() {
 
 
 function earlyBackHandler() {
-  // Strategia: pushState continuo + intercetta popstate
-  const BUFFER = 80; // voci buffer
-
   function fillBuffer() {
     try {
-      for (let i = 0; i < BUFFER; i++) {
-        history.pushState({ hb: 'app', i }, '');
+      if (history.length < 5) {
+        for (let i = 0; i < 5; i++) history.pushState({ hb: 'app' }, '');
       }
     } catch(e) {}
   }
-
-  // Riempimento iniziale
-  try { history.replaceState({ hb: 'root' }, ''); } catch(e) {}
-  fillBuffer();
-
-  // Intercetta OGNI popstate e reindirizza all'app
-  window.addEventListener('popstate', function(e) {
-    // Riempi subito il buffer — sincrono per bloccare l'uscita
-    try { fillBuffer(); } catch(e) {}
-    // Gestisci la navigazione nell'app
+  try {
+    history.replaceState({ hb: 'root' }, '');
+    for (let i = 0; i < 5; i++) history.pushState({ hb: 'app' }, '');
+  } catch(e) {}
+  window.addEventListener('popstate', function() {
+    try { if (history.length < 3) { history.pushState({ hb: 'app' }, ''); history.pushState({ hb: 'app' }, ''); } } catch(e) {}
     if (typeof handleBackPress === 'function') handleBackPress();
   });
-
-  // Mantieni il buffer pieno in ogni scenario
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') fillBuffer();
-  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') fillBuffer(); });
   window.addEventListener('pageshow', fillBuffer);
-  window.addEventListener('focus', fillBuffer);
-  window.addEventListener('resume', fillBuffer);
-
-  // Rinnovo automatico ogni 3 secondi
-  setInterval(fillBuffer, 3000);
 }
 
 // Alias globale
 function ensureBuffer() {
   try {
-    if (history.length < 5) for (let i = 0; i < 30; i++) history.pushState({ hb: 'app' }, '');
+    if (history.length < 3) history.pushState({ hb: 'app' }, '');
   } catch(e) {}
 }
 
@@ -9025,7 +8994,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA431</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA433</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
