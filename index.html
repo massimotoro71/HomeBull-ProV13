@@ -1784,6 +1784,38 @@ body::before {
   }
 }
 
+/* ══ SFONDI PER SEZIONE ═════════════════════════════════════ */
+@media (max-width: 899px) {
+  #panel-passwords { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%) !important; }
+  #panel-notes     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 70%) !important; }
+  #panel-otp       { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(16,185,129,0.12) 0%, transparent 70%) !important; }
+  #panel-cards     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 70%) !important; }
+  #panel-server    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(148,163,184,0.08) 0%, transparent 70%) !important; }
+}
+
+/* ══ ANIMAZIONE CARD HOME ═══════════════════════════════════ */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mob-home-card {
+  animation: cardIn 0.35s ease both;
+}
+.mob-home-card:nth-child(1) { animation-delay: 0.05s; }
+.mob-home-card:nth-child(2) { animation-delay: 0.10s; }
+.mob-home-card:nth-child(3) { animation-delay: 0.15s; }
+.mob-home-card:nth-child(4) { animation-delay: 0.20s; }
+.mob-home-card:nth-child(5) { animation-delay: 0.25s; }
+.mob-home-card:nth-child(6) { animation-delay: 0.30s; }
+
+/* ══ COPIA CON FEEDBACK ═════════════════════════════════════ */
+@keyframes copyPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(99,102,241,0); }
+  100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+}
+.copy-pulse { animation: copyPulse 0.6s ease; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1832,7 +1864,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA433</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA435</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1934,7 +1966,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA433</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA435</div>
         </div>
       </div>
     </div>
@@ -2039,7 +2071,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA433</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA435</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3060,7 +3092,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA433',
+  version: 'BETA435',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3468,6 +3500,7 @@ function unlockApp() {
   initLocalCache().then(() => {
     updateHomeStats();
     updateSidebarBadges();
+    initAutoLock();
     updateSidebarBadges();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
@@ -3958,6 +3991,19 @@ function updateHomeStats() {
       ${a.tab ? `<div style="font-size:14px;color:var(--text3);flex-shrink:0;">›</div>` : ''}
     </div>
   `).join('');
+
+  // Stats line
+  const statsEl = document.getElementById('home-stats-line');
+  if (statsEl) {
+    const pwCount   = (_pwItems||[]).filter(i=>!i.deleted).length;
+    const noteCount = (_notes||[]).filter(n=>!n.deleted).length;
+    const otpCount  = (_otpAccounts||[]).filter(a=>!a.deleted).length;
+    const total = pwCount + noteCount + otpCount +
+                  (_cards||[]).filter(c=>!c.deleted).length +
+                  (_wifiNets||[]).filter(w=>!w.deleted).length +
+                  (_serverItems||[]).filter(s=>!s.deleted).length;
+    statsEl.textContent = total > 0 ? `${total} elementi salvati · ${pwCount} password · ${otpCount} OTP` : '';
+  }
 }
 
 let toastTimer;
@@ -8334,7 +8380,10 @@ function addModalAdapt() {
 
   const pwToggle = (id) =>
     `<div style="margin-bottom:12px;">
-      <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="pw-field-label">Password</div>
+        <button onclick="genPassword('am-${id}')" style="background:none;border:none;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:6px;font-family:inherit;">⚡ Genera</button>
+      </div>
       <div style="position:relative;">
         <input id="am-${id}" type="password" placeholder="Password"
           style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
@@ -8652,6 +8701,76 @@ function updateSidebarBadges() {
     ...(_serverItems||[]).filter(s=>!s.deleted),
     ...(_wifiNets||[]).filter(w=>!w.deleted)
   ].length);
+}
+
+
+// ── Generatore password ────────────────────────────────────
+function genPassword(inputId) {
+  const len = 16;
+  const chars = {
+    upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    lower: 'abcdefghijklmnopqrstuvwxyz',
+    digits: '0123456789',
+    symbols: '!@#$%^&*()-_=+[]{}|;:,.<>?'
+  };
+  const all = chars.upper + chars.lower + chars.digits + chars.symbols;
+
+  // Garantisce almeno 1 di ogni tipo
+  let pw = [
+    chars.upper[Math.floor(Math.random() * chars.upper.length)],
+    chars.lower[Math.floor(Math.random() * chars.lower.length)],
+    chars.digits[Math.floor(Math.random() * chars.digits.length)],
+    chars.symbols[Math.floor(Math.random() * chars.symbols.length)],
+  ];
+  for (let i = pw.length; i < len; i++) {
+    pw.push(all[Math.floor(Math.random() * all.length)]);
+  }
+  // Mescola
+  pw = pw.sort(() => Math.random() - 0.5).join('');
+
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.value = pw;
+  input.type = 'text'; // mostra la password generata
+  // Feedback visivo
+  input.style.borderColor = 'var(--accent)';
+  setTimeout(() => { input.style.borderColor = ''; }, 1500);
+  showToast('⚡ Password generata — modifica se vuoi');
+}
+
+
+// ── Copia con feedback visivo ──────────────────────────────
+function copyWithFeedback(text, el) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Copiato!', 1200);
+    if (el) {
+      el.classList.add('copy-pulse');
+      setTimeout(() => el.classList.remove('copy-pulse'), 700);
+    }
+  }).catch(() => showToast('❌ Copia non riuscita'));
+}
+
+
+// ── Blocco automatico per inattività ──────────────────────
+let _autoLockTimer = null;
+const AUTO_LOCK_MS = 5 * 60 * 1000; // 5 minuti
+
+function resetAutoLock() {
+  clearTimeout(_autoLockTimer);
+  _autoLockTimer = setTimeout(() => {
+    if (HB.user && HB.locked !== true) {
+      HB.locked = true;
+      logout();
+      showToast('🔒 Sessione scaduta per inattività');
+    }
+  }, AUTO_LOCK_MS);
+}
+
+function initAutoLock() {
+  ['click','touchstart','keydown','scroll'].forEach(ev =>
+    document.addEventListener(ev, resetAutoLock, { passive: true })
+  );
+  resetAutoLock();
 }
 
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
@@ -8994,7 +9113,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA433</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA435</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
