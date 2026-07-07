@@ -637,7 +637,6 @@ html, body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Tile home v12 (stile v11) ─────────────────────────── */
 .h12-tile:active { transform: scale(0.93); }
 
 /* ── Scheda Password ───────────────────────────────────── */
@@ -1864,7 +1863,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.2</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.3</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1966,7 +1965,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.2</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.3</div>
         </div>
       </div>
     </div>
@@ -2050,7 +2049,6 @@ function cardsSearch(q) {
   <div id="tab-container">
 
     <!-- HOME -->
-    <!-- HOME — layout tile v11-style 3 colonne -->
     <!-- HOME -->
     <div class="tab-panel active" id="panel-home">
       <div class="tab-inner">
@@ -2071,7 +2069,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2231,8 +2229,7 @@ Aggiungi nuovo dato
         <div style="text-align:center;padding:32px 24px;max-width:320px;">
           <div style="font-size:48px;margin-bottom:16px;">🔐</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
-          <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
-          <button onclick="pwImportCSV()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📥 Importa da Chrome / Firefox / 1Password</button>
+          
           <button onclick="pwImportBackup()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
           <button onclick="pwScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📷 Scansiona QR condiviso</button>
           <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
@@ -3092,7 +3089,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.2',
+  version: 'v13.1.3',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3271,23 +3268,8 @@ window.addEventListener('load', () => {
 });
 
 // Pulizia dati v11 incompatibili al primo avvio v13
-function migrateFromV11() {
-  if (localStorage.getItem('hb_v13_migrated')) return;
-  // Verifica se ci sono password v11 (avevano campo 'site' invece di 'title')
-  try {
-    const pws = JSON.parse(localStorage.getItem('hb13_passwords') || '[]');
-    if (pws.length > 0 && pws[0].site && !pws[0].categoryId) {
-      // Sono dati v11 — rimuovi
-      localStorage.removeItem('hb13_passwords');
-      localStorage.removeItem('hb13_pw_cats');
-      console.log('ℹ️ Dati password v11 rimossi');
-    }
-  } catch(e) {}
-  localStorage.setItem('hb_v13_migrated', '1');
-}
 
 function checkAuthStatus() {
-  migrateFromV11();
   const savedUser = localStorage.getItem('hb_last_user');
   const hasPIN = !!localStorage.getItem('hb12_pin_hash');
   if (savedUser && hasPIN) {
@@ -4815,9 +4797,6 @@ function pwDoImportCSV(items) {
 }
 
 // Import backup v11
-function pwImportBackup() {
-  document.getElementById('pw-import-input').click();
-}
 
 async function pwHandleImport(event) {
   const file = event.target.files[0];
@@ -9138,7 +9117,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.2</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.3</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
