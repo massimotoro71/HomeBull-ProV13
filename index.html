@@ -1863,7 +1863,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.5</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.6</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1965,7 +1965,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.5</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.6</div>
         </div>
       </div>
     </div>
@@ -2069,7 +2069,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.5</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.6</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2131,27 +2131,32 @@ Aggiungi nuovo dato
         <!-- Navigazione sezioni — card fisse -->
         <div class="home-section-title" style="margin-bottom:12px;">🗂 Sezioni</div>
         <div id="home-nav-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
-          <div class="qa-card" onclick="switchTab('passwords')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('passwords')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-passwords" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">🔐</div>
             <div class="qa-card-label">Password</div>
           </div>
-          <div class="qa-card" onclick="switchTab('notes')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('notes')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-notes" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">📝</div>
             <div class="qa-card-label">Note</div>
           </div>
-          <div class="qa-card" onclick="switchTab('otp')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('otp')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-otp" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">🔑</div>
             <div class="qa-card-label">OTP / 2FA</div>
           </div>
-          <div class="qa-card" onclick="switchTab('cards')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('cards')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-cards" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">💳</div>
             <div class="qa-card-label">Portafoglio</div>
           </div>
-          <div class="qa-card" onclick="switchTab('server')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('server')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-server" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">📡</div>
             <div class="qa-card-label">Rete & IT</div>
           </div>
-          <div class="qa-card" onclick="openSettings()" style="cursor:pointer;">
+          <div class="qa-card" onclick="openSettings()" style="cursor:pointer;position:relative;">
             <div class="qa-card-icon">⚙️</div>
             <div class="qa-card-label">Impostazioni</div>
           </div>
@@ -3088,7 +3093,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.5',
+  version: 'v13.1.6',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8678,6 +8683,9 @@ function updateSidebarBadges() {
     if (mob) { mob.textContent = n > 0 ? n : ''; mob.style.display = n > 0 ? 'flex' : 'none'; }
     const mhb = document.getElementById('mhb-' + id);
     if (mhb) { mhb.textContent = n > 0 ? n : ''; mhb.style.display = n > 0 ? 'flex' : 'none'; }
+    // Card desktop
+    const pc = document.getElementById('pc-badge-' + id);
+    if (pc) { pc.textContent = n > 0 ? n : ''; pc.style.display = n > 0 ? 'flex' : 'none'; }
   };
   set('passwords', (_pwItems||[]).filter(i=>!i.deleted).length);
   set('notes',     (_notes||[]).filter(n=>!n.deleted).length);
@@ -9102,7 +9110,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.5</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.6</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
