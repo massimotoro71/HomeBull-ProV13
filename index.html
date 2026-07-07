@@ -7222,6 +7222,12 @@ async function fbSyncLoad(){
         if(typeof value === 'string' && !value.startsWith('hb13enc:')) {
           try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
         }
+        // Protezione: non sovrascrivere se il cloud ha meno dati del locale
+        const localVal = localStorage.getItem(k);
+        if(localVal && value && localVal.length > 10 && value.length < localVal.length * 0.5) {
+          console.warn('⚠️ Cloud ha meno dati del locale — skip:', k, 'cloud:', value.length, 'locale:', localVal.length);
+          continue;
+        }
         _syncInProgress = true;
         localStorage.setItem(k, value);
         _syncInProgress = false;
@@ -7279,7 +7285,9 @@ function fbStartRealtime(){
     HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true; });
     if(needLoad){
       console.log('\ud83d\udd04 Aggiornamento cloud rilevato');
-      setTimeout(fbSyncLoad, 1000);
+      // Debounce: aspetta 3s per evitare sync multipli al riavvio pagina
+      clearTimeout(window._syncDebounce);
+      window._syncDebounce = setTimeout(fbSyncLoad, 3000);
     }
   });
   document.removeEventListener('visibilitychange', _onVisibilityChange);
@@ -7748,7 +7756,11 @@ function _getSyncKey(){
 function _tsKey(k){ return 'hb_ts_' + k; }
 
 function _onVisibilityChange(){
-  if(document.visibilityState === 'visible' && fbReady && HB.user) fbStartRealtime();
+  if(document.visibilityState === 'visible' && fbReady && HB.user) {
+    // Aspetta 2s prima di riavviare il realtime — evita sync su ricarica pagina
+    clearTimeout(window._visibilityDebounce);
+    window._visibilityDebounce = setTimeout(fbStartRealtime, 2000);
+  }
 }
 
 function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
