@@ -1887,7 +1887,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.17</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.18</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1989,7 +1989,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.17</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.18</div>
         </div>
       </div>
     </div>
@@ -2093,7 +2093,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.17</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.18</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3130,7 +3130,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.17',
+  version: 'v13.1.18',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8885,6 +8885,84 @@ async function migrateToUid() {
   }
 }
 
+
+// ── Backup/Ripristino per sezione ─────────────────────────
+const SECTION_KEYS = {
+  'passwords': ['hb13_passwords','hb13_pw_cats'],
+  'notes':     ['hb13_notes'],
+  'otp':       ['hb13_otp_accounts'],
+  'cards':     ['hb13_cards','hb13_finance'],
+  'server':    ['hb13_server','hb13_wifi'],
+};
+const SECTION_LABELS = {
+  'passwords': '🔐 Password',
+  'notes':     '📝 Note',
+  'otp':       '🔑 OTP / 2FA',
+  'cards':     '💳 Portafoglio',
+  'server':    '📡 Rete & IT',
+};
+
+function sectionExport(section) {
+  const keys = SECTION_KEYS[section];
+  if (!keys) return;
+  const data = {};
+  keys.forEach(k => {
+    const v = localStorage.getItem(k);
+    if (v) try { data[k] = JSON.parse(v); } catch(e) { data[k] = v; }
+  });
+  const payload = JSON.stringify({
+    version: '13.0.0',
+    section,
+    exportedAt: new Date().toISOString(),
+    data
+  }, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `HomeBull-${section}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Export ' + SECTION_LABELS[section] + ' completato');
+}
+
+function sectionImport(section) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (!parsed.data) throw new Error('Formato non valido');
+      // Importa solo le chiavi della sezione
+      const allowedKeys = SECTION_KEYS[section] || [];
+      let imported = 0;
+      Object.entries(parsed.data).forEach(([k, v]) => {
+        if (allowedKeys.includes(k)) {
+          localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+          _setLocalTs(k);
+          imported++;
+        }
+      });
+      if (imported === 0) throw new Error('Nessun dato trovato per questa sezione');
+      // Ricarica la sezione
+      if (section === 'passwords') { pwLoad(); pwRenderCats(); }
+      if (section === 'notes') { noteLoad(); noteRenderList(); }
+      if (section === 'otp') { otpLoad(); otpRenderList(); }
+      if (section === 'cards') { cardsLoad(); cardsRender(); financeLoad(); financeRender(); }
+      if (section === 'server') { serverLoad(); serverRender(); wifiLoad(); wifiRender(); }
+      updateSidebarBadges();
+      showToast('✅ Importati dati ' + SECTION_LABELS[section]);
+    } catch(err) {
+      showToast('❌ Import fallito: ' + err.message);
+    }
+  };
+  input.click();
+}
+
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
 function _autoSyncAfterSave() {
   if (_syncInProgress) return;
@@ -9152,6 +9230,24 @@ document.addEventListener('keydown', (e) => {
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
           </div>
+
+          <!-- Backup per sezione -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:12px;">📦 Esporta / Importa per sezione</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              ${['passwords','notes','otp','cards','server'].map(s => {
+                const labels = {passwords:'🔐 Password',notes:'📝 Note',otp:'🔑 OTP / 2FA',cards:'💳 Portafoglio',server:'📡 Rete & IT'};
+                return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);gap:8px;">
+                  <span style="font-size:13px;font-weight:600;">${labels[s]}</span>
+                  <div style="display:flex;gap:6px;">
+                    <button onclick="sectionExport('${s}')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
+                    <button onclick="sectionImport('${s}')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                  </div>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+
           <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
             <span style="font-size:28px;">🔄</span>
             <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
@@ -9225,7 +9321,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.17</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.18</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
