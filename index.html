@@ -1887,7 +1887,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.15</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.13</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1989,7 +1989,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.15</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.13</div>
         </div>
       </div>
     </div>
@@ -2093,7 +2093,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.15</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.13</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3130,7 +3130,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.15',
+  version: 'v13.1.13',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4968,8 +4968,30 @@ function pwNewItem() {
   };
 }
 
-// ── Icon lookup per categorie (statico) ─────────────────────
-async function aiGetCatIcon(catName) { return '📁'; }
+// ── AI icon lookup per categorie ────────────────────────────
+const _iconCache = {};
+
+async function aiGetCatIcon(catName) {
+  if (_iconCache[catName]) return _iconCache[catName];
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 10,
+        messages: [{
+          role: 'user',
+          content: `Rispondi SOLO con un singolo emoji che rappresenta meglio la categoria password chiamata "${catName}". Solo l'emoji, nient'altro.`
+        }]
+      })
+    });
+    const data = await res.json();
+    const emoji = data.content?.[0]?.text?.trim() || '📁';
+    _iconCache[catName] = emoji;
+    return emoji;
+  } catch(e) { return '📁'; }
+}
 
 async function pwEnrichIcons() {
   if (!navigator.onLine) return;
@@ -7025,7 +7047,7 @@ function runSearch(q) {
           icon: '📁', title: cat.name,
           sub: count + ' password',
           badge: '📂 Categoria',
-          action: () => { switchTab('passwords'); setTimeout(() => { try { pwLoad(); pwShowItems(cat.id, cat.name); } catch(e){} }, 300); }
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowItems(cat.id, cat.name), 300); }
         });
       }
     });
@@ -7041,7 +7063,7 @@ function runSearch(q) {
           icon: cat?.icon || '🔐', title: item.title,
           sub: item.username || item.url || 'Password',
           badge: '🔐 Password',
-          action: () => { switchTab('passwords'); setTimeout(() => { try { pwLoad(); pwShowDetail(item.id); } catch(e){} }, 300); }
+          action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
         });
       }
     });
@@ -7055,7 +7077,7 @@ function runSearch(q) {
           icon: '📝', title: note.title || 'Nota senza titolo',
           sub: (note.content || '').slice(0, 60),
           badge: '📝 Note',
-          action: () => { switchTab('notes'); setTimeout(() => { try { noteLoad(); noteEdit(note.id); } catch(e){} }, 300); }
+          action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
         });
       }
     });
@@ -7150,7 +7172,7 @@ function runSearch(q) {
         '<div class="search-result-sub">' + r.sub + '</div>' +
       '</div>' +
       '<div class="search-result-tab">' + r.badge + '</div>';
-    el.onclick = () => { closeGlobalSearch(); setTimeout(() => r.action(), 150); };
+    el.onclick = () => { closeGlobalSearch(); r.action(); };
     container.appendChild(el);
   });
 }
@@ -7250,10 +7272,6 @@ async function fbSyncLoad(){
     }
     await fbSyncAll(true);
     console.log('\u2713 Sync load completato');
-    // Ricarica cache locale dopo sync per evitare 0 chiavi
-    if(HB.sessionKey) try { await initLocalCache(); } catch(e){}
-    updateSidebarBadges();
-    updateHomeStats();
   }catch(e){console.warn('SyncLoad:',e);}
   finally { _syncInProgress = false; }
 }
@@ -7745,6 +7763,7 @@ function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(loca
 function _getSyncKey(){
   // USA SEMPRE UID Firebase
   const uid = HB.user?.uid || fbAuth?.currentUser?.uid;
+  console.log('🔑 SyncKey uid:', uid, '| user:', HB.user?.email);
   if(uid) return uid;
   return null;
 }
@@ -8864,7 +8883,29 @@ function getCardCircuitLogo(label) {
 
 
 // ── Migrazione emailKey → UID ──────────────────────────────
-async function migrateToUid() { /* migrazione completata */ }
+async function migrateToUid() {
+  try {
+    const uid = HB.user?.uid;
+    if (!uid) return;
+    // Calcola il vecchio emailKey
+    let emailAddr = HB.user?.email || '';
+    if (!emailAddr) return;
+    const oldKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+    if (oldKey === uid) return; // già aggiornato
+    // Controlla se esistono dati al vecchio percorso
+    const oldSnap = await fbDb.ref('hb13/' + oldKey).get();
+    if (!oldSnap.exists()) return;
+    // Controlla se il nuovo percorso è vuoto
+    const newSnap = await fbDb.ref('hb13/' + uid).get();
+    if (newSnap.exists()) return; // nuovo già ha dati
+    // Copia dal vecchio al nuovo
+    await fbDb.ref('hb13/' + uid).set(oldSnap.val());
+    console.log('✅ Migrazione emailKey → UID completata');
+    showToast('✅ Dati migrati al nuovo formato sicuro');
+  } catch(e) {
+    console.warn('Migrazione fallita:', e);
+  }
+}
 
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
 function _autoSyncAfterSave() {
@@ -9206,7 +9247,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.15</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.13</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
