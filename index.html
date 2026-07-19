@@ -1887,7 +1887,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.19</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.20</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1931,12 +1931,17 @@ function cardsSearch(q) {
     <div class="auth-step" id="step-pin">
       <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center;" id="pin-sub">8 cifre — usato per sbloccare l'app</div>
-      <div class="pin-row" id="pin-dots">
-        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
-        <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
-        <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div class="pin-row" id="pin-dots">
+          <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+          <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
+          <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
+        </div>
+        <button onclick="togglePinVisibility()" id="pin-eye-btn"
+          style="position:absolute;right:-32px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;">👁</button>
       </div>
+      <div id="pin-reveal" style="display:none;font-size:22px;font-family:monospace;font-weight:800;letter-spacing:6px;color:var(--accent);text-align:center;margin-top:4px;min-height:28px;"></div>
       <div class="pin-numpad" id="pin-numpad">
         <button class="pin-key" onclick="pinPress('1')">1</button>
         <button class="pin-key" onclick="pinPress('2')">2</button>
@@ -1989,7 +1994,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.19</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.20</div>
         </div>
       </div>
     </div>
@@ -2093,7 +2098,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.19</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.20</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3130,7 +3135,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.19',
+  version: 'v13.1.20',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3382,6 +3387,11 @@ function updatePinDots() {
   for (let i = 0; i < 8; i++) {
     const dot = document.getElementById('pd' + i);
     if (dot) dot.classList.toggle('filled', i < HB.pinBuffer.length);
+  }
+  // Aggiorna reveal se visibile
+  if (_pinVisible) {
+    const reveal = document.getElementById('pin-reveal');
+    if (reveal) reveal.textContent = HB.pinBuffer || '';
   }
 }
 
@@ -4227,7 +4237,13 @@ function pwRenderCats(q='') {
 
   const cats = _pwCats
     .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
-    .sort((a, b) => a.name.localeCompare(b.name, 'it'));
+    .sort((a, b) => {
+      // Ordine manuale se presente, altrimenti alfabetico
+      const oa = a.order ?? 9999;
+      const ob = b.order ?? 9999;
+      if (oa !== ob) return oa - ob;
+      return a.name.localeCompare(b.name, 'it');
+    });
 
   if (!cats.length) {
     grid.style.display = 'block';
@@ -4262,6 +4278,27 @@ function pwRenderCats(q='') {
     div.onmouseenter = () => { div.style.background='var(--surface2,var(--bg3))'; div.style.transform='translateY(-1px)'; };
     div.onmouseleave = () => { div.style.background='var(--surface)'; div.style.transform=''; };
     div.onclick = () => pwShowItems(cat.id, cat.name);
+    div.ondragstart = (e) => { e.dataTransfer.setData('text/plain', cat.id); div.style.opacity='0.5'; };
+    div.ondragend = () => { div.style.opacity='1'; };
+    div.ondragover = (e) => { e.preventDefault(); div.style.background='var(--bg3)'; };
+    div.ondragleave = () => { div.style.background='var(--surface)'; };
+    div.ondrop = (e) => {
+      e.preventDefault(); div.style.background='var(--surface)';
+      const fromId = e.dataTransfer.getData('text/plain');
+      if (fromId === cat.id) return;
+      // Riordina
+      const sorted = [...cats];
+      const fromIdx = sorted.findIndex(c => c.id === fromId);
+      const toIdx = sorted.findIndex(c => c.id === cat.id);
+      const [moved] = sorted.splice(fromIdx, 1);
+      sorted.splice(toIdx, 0, moved);
+      sorted.forEach((c, i) => {
+        const item = _pwCats.find(x => x.id === c.id);
+        if (item) item.order = i;
+      });
+      pwSaveAll(); pwRenderCats();
+    };
+    div.setAttribute('draggable', 'true');
 
     div.innerHTML = `
       <!-- Icona colorata -->
@@ -4380,6 +4417,7 @@ function pwRenderItems(q='') {
         <div style="flex:1;min-width:0;">
           <div class="pw-item-title">${item.title||'—'}</div>
           <div class="pw-item-user">${item.username||''}</div>
+          ${item.updatedAt ? `<div style="font-size:10px;color:var(--text3);margin-top:1px;">${timeAgo(item.updatedAt)}</div>` : ''}
         </div>
       </div>
       <div class="pw-item-footer">
@@ -4431,6 +4469,7 @@ function pwShowDetail(itemId) {
     ${item.pin ? pwPinField(item.id) : ''}
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
+    ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map(h=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span style="font-family:monospace;color:var(--text2);">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);">'+timeAgo(h.changedAt)+'</span></div>').join('')}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
       <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
       <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
@@ -8104,6 +8143,13 @@ function pwEditItem(itemId) {
     if (!title) { showToast('Inserisci il titolo'); return; }
     const idx = _pwItems.findIndex(i => i.id === itemId);
     if (idx > -1) {
+      // Salva cronologia password se cambiata
+      const oldPass = item.password;
+      const history = item.pwHistory || [];
+      if (pass && oldPass && pass !== oldPass) {
+        history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
+        if (history.length > 5) history.length = 5; // max 5 voci
+      }
       _pwItems[idx] = {
         ...item,
         title,
@@ -8113,6 +8159,7 @@ function pwEditItem(itemId) {
         pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
         notes:    document.getElementById('_pwe_note')?.value.trim() || '',
         categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
+        pwHistory: history,
         updatedAt: new Date().toISOString()
       };
       pwSave();
@@ -8404,9 +8451,16 @@ function addModalAdapt() {
       </div>
       <div style="position:relative;">
         <input id="am-${id}" type="password" placeholder="Password"
+          oninput="pwStrengthUpdate('am-${id}','str-${id}')"
           style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
         <button onclick="const e=document.getElementById('am-${id}');e.type=e.type==='password'?'text':'password'"
           style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+      </div>
+      <div id="str-${id}" style="display:none;align-items:center;gap:8px;margin-top:6px;">
+        <div style="flex:1;height:4px;border-radius:4px;background:var(--border);overflow:hidden;">
+          <div class="pw-str-fill" style="height:100%;border-radius:4px;transition:width 0.3s,background 0.3s;width:0%;"></div>
+        </div>
+        <span class="pw-str-label" style="font-size:11px;font-weight:700;min-width:48px;text-align:right;"></span>
       </div>
     </div>`;
 
@@ -8763,6 +8817,9 @@ function genPassword(inputId) {
   // Feedback visivo
   input.style.borderColor = 'var(--accent)';
   setTimeout(() => { input.style.borderColor = ''; }, 1500);
+  // Aggiorna barra forza
+  const barId = inputId.replace('am-', 'str-');
+  pwStrengthUpdate(inputId, barId);
   showToast('⚡ Password generata — modifica se vuoi');
 }
 
@@ -8781,7 +8838,10 @@ function copyWithFeedback(text, el) {
 
 // ── Blocco automatico per inattività ──────────────────────
 let _autoLockTimer = null;
-const AUTO_LOCK_MS = 5 * 60 * 1000; // 5 minuti
+function getAutoLockMs() {
+  const saved = parseInt(localStorage.getItem('hb_autolock_min') || '5');
+  return saved * 60 * 1000;
+}
 
 function resetAutoLock() {
   clearTimeout(_autoLockTimer);
@@ -8791,7 +8851,7 @@ function resetAutoLock() {
       logout();
       showToast('🔒 Sessione scaduta per inattività');
     }
-  }, AUTO_LOCK_MS);
+  }, getAutoLockMs());
 }
 
 function initAutoLock() {
@@ -8961,6 +9021,72 @@ function sectionImport(section) {
     }
   };
   input.click();
+}
+
+
+// ── Forza password ─────────────────────────────────────────
+function pwStrength(pw) {
+  if (!pw) return { score: 0, label: '', color: '' };
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (pw.length >= 16) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  if (score <= 2) return { score, pct: 25,  label: 'Debole',    color: '#ef4444' };
+  if (score <= 4) return { score, pct: 50,  label: 'Discreta',  color: '#f97316' };
+  if (score <= 5) return { score, pct: 75,  label: 'Buona',     color: '#eab308' };
+  return              { score, pct: 100, label: 'Ottima',     color: '#22c55e' };
+}
+
+function pwStrengthUpdate(inputId, barId) {
+  const pw = document.getElementById(inputId)?.value || '';
+  const bar = document.getElementById(barId);
+  if (!bar) return;
+  const s = pwStrength(pw);
+  if (!pw) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.querySelector('.pw-str-fill').style.width = s.pct + '%';
+  bar.querySelector('.pw-str-fill').style.background = s.color;
+  bar.querySelector('.pw-str-label').textContent = s.label;
+  bar.querySelector('.pw-str-label').style.color = s.color;
+}
+
+
+// ── Tempo relativo ──────────────────────────────────────────
+function timeAgo(isoDate) {
+  if (!isoDate) return '';
+  const diff = Date.now() - new Date(isoDate).getTime();
+  const min  = Math.floor(diff / 60000);
+  const h    = Math.floor(diff / 3600000);
+  const d    = Math.floor(diff / 86400000);
+  if (min < 1)  return 'adesso';
+  if (min < 60) return `${min} min fa`;
+  if (h < 24)   return `${h} ore fa`;
+  if (d === 1)  return 'ieri';
+  if (d < 30)   return `${d} giorni fa`;
+  if (d < 365)  return `${Math.floor(d/30)} mesi fa`;
+  return `${Math.floor(d/365)} anni fa`;
+}
+
+
+// ── Mostra/nascondi PIN inserito ───────────────────────────
+let _pinVisible = false;
+function togglePinVisibility() {
+  _pinVisible = !_pinVisible;
+  const reveal = document.getElementById('pin-reveal');
+  const btn = document.getElementById('pin-eye-btn');
+  if (!reveal) return;
+  if (_pinVisible) {
+    reveal.style.display = 'block';
+    reveal.textContent = HB.pinBuffer || '';
+    btn.style.color = 'var(--accent)';
+  } else {
+    reveal.style.display = 'none';
+    btn.style.color = 'var(--text3)';
+  }
 }
 
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
@@ -9305,6 +9431,18 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Cambia il tuo PIN Master</div>
             <button onclick="settingsChangePin()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cambia PIN</button>
           </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏱ Blocco automatico</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Blocca dopo inattività</div>
+            <select id="autolock-select" onchange="localStorage.setItem('hb_autolock_min',this.value);showToast('✅ Timeout aggiornato')"
+              style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;">
+              <option value="2">2 minuti</option>
+              <option value="5" selected>5 minuti</option>
+              <option value="10">10 minuti</option>
+              <option value="30">30 minuti</option>
+              <option value="60">1 ora</option>
+            </select>
+          </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
@@ -9346,7 +9484,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.19</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.20</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
