@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 const CACHE = 'hb13-v13-1-21';
-=======
-const CACHE = 'hb13-v13-1-20';
->>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
 
 self.addEventListener('install', e => {
   e.waitUntil(

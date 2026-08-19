@@ -8205,7 +8205,6 @@ function pwEditItem(itemId) {
       // Salva cronologia password se cambiata
       const oldPass = item.password;
       const history = item.pwHistory || [];
-<<<<<<< HEAD
       const passChanged = pass && oldPass && pass !== oldPass;
       if (passChanged) {
         history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
@@ -8217,12 +8216,6 @@ function pwEditItem(itemId) {
       const expiryDate = (expChanged || (passChanged && expDays !== 'none'))
         ? pwComputeExpiryDate(expDays)
         : (expDays === 'none' ? '' : item.expiryDate);
-=======
-      if (pass && oldPass && pass !== oldPass) {
-        history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
-        if (history.length > 5) history.length = 5; // max 5 voci
-      }
->>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
       _pwItems[idx] = {
         ...item,
         title,
@@ -8232,11 +8225,8 @@ function pwEditItem(itemId) {
         pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
         notes:    document.getElementById('_pwe_note')?.value.trim() || '',
         categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
-<<<<<<< HEAD
         expiryDays: expDays,
         expiryDate: expiryDate,
-=======
->>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
         pwHistory: history,
         updatedAt: new Date().toISOString()
       };
@@ -8845,7 +8835,6 @@ function updateSidebarBadges() {
   };
   try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
   set('passwords', (_pwItems||[]).filter(i=>!i.deleted).length);
-<<<<<<< HEAD
   // Avviso password vecchie (>180 giorni) o in scadenza/scadute
   const oldPw = (_pwItems||[]).filter(i => !i.deleted && i.updatedAt &&
     (Date.now() - new Date(i.updatedAt).getTime()) > 180 * 24 * 60 * 60 * 1000).length;
@@ -8862,13 +8851,6 @@ function updateSidebarBadges() {
     pwWarn.textContent = msgs.join(' · ');
     pwWarn.style.display = msgs.length ? 'block' : 'none';
   }
-=======
-  // Avviso password vecchie (>180 giorni)
-  const oldPw = (_pwItems||[]).filter(i => !i.deleted && i.updatedAt &&
-    (Date.now() - new Date(i.updatedAt).getTime()) > 180 * 24 * 60 * 60 * 1000).length;
-  const pwWarn = document.getElementById('home-pw-warn');
-  if (pwWarn) { pwWarn.textContent = oldPw > 0 ? `⚠️ ${oldPw} password non aggiornate da 6+ mesi` : ''; pwWarn.style.display = oldPw > 0 ? 'block' : 'none'; }
->>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
   try { if(typeof noteLoad==='function') noteLoad(); } catch(e){}
   set('notes',     (_notes||[]).filter(n=>!n.deleted).length);
   set('otp',       (_otpAccounts||[]).filter(a=>!a.deleted).length);
