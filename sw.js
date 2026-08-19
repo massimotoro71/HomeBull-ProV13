@@ -1,4 +1,8 @@
-const CACHE = 'hb13-v1';
+<<<<<<< HEAD
+const CACHE = 'hb13-v13-1-21';
+=======
+const CACHE = 'hb13-v13-1-20';
+>>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
 
 self.addEventListener('install', e => {
   e.waitUntil(
@@ -21,7 +25,6 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // Icone PNG
   if (url.pathname.endsWith('icon-192.png') || url.pathname.endsWith('icon-512.png')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
@@ -29,12 +32,10 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // API esterne — sempre network, mai cache
   if (!url.origin.includes('github.io') && !url.pathname.startsWith('/HomeBull')) {
     return;
   }
 
-  // Network-first per index.html — aggiornamenti immediati
   if (url.pathname.endsWith('index.html') || url.pathname.endsWith('/')) {
     e.respondWith(
       fetch(e.request).then(response => {
@@ -48,7 +49,6 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Cache-first per altri assets statici
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;

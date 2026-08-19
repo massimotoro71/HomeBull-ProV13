@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#0a0a1a">
 <title>HomeBull Pro</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -637,7 +637,6 @@ html, body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Tile home v12 (stile v11) ─────────────────────────── */
 .h12-tile:active { transform: scale(0.93); }
 
 /* ── Scheda Password ───────────────────────────────────── */
@@ -798,7 +797,7 @@ html, body {
   .cards-grid .card-3d-container { margin-bottom: 0; }
 }
 @media (min-width: 1100px) {
-  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+  .cards-grid { grid-template-columns: repeat(3, 1fr); max-width:900px; margin:0 auto; }
 }
 .card-3d-inner {
   position: relative;
@@ -989,6 +988,7 @@ html, body {
 
 /* Quick access card */
 .qa-card {
+  position: relative;
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 14px; padding: 16px 8px;
   cursor: pointer; text-align: center;
@@ -1057,7 +1057,7 @@ html, body {
   /* ── Root override mobile ─────────────────────────────── */
   :root {
     --topbar-h:    56px;
-    --bottombar-h: calc(64px + env(safe-area-inset-bottom, 0px));
+    --bottombar-h: calc(1px + env(safe-area-inset-bottom, 0px));
     --radius:      14px;
   }
 
@@ -1775,6 +1775,70 @@ body::before {
   }
 }
 
+/* ══ SAFE AREA — colora come sfondo ════════════════════════ */
+@media (max-width: 899px) {
+  html, body {
+    background: #0a0a1a !important;
+    /* Estendi sfondo nella safe area */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* ══ SFONDI PER SEZIONE ═════════════════════════════════════ */
+@media (max-width: 899px) {
+  #panel-passwords { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%) !important; }
+  #panel-notes     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 70%) !important; }
+  #panel-otp       { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(16,185,129,0.12) 0%, transparent 70%) !important; }
+  #panel-cards     { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 70%) !important; }
+  #panel-server    { background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(148,163,184,0.08) 0%, transparent 70%) !important; }
+}
+
+/* ══ ANIMAZIONE CARD HOME ═══════════════════════════════════ */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mob-home-card {
+  animation: cardIn 0.35s ease both;
+}
+.mob-home-card:nth-child(1) { animation-delay: 0.05s; }
+.mob-home-card:nth-child(2) { animation-delay: 0.10s; }
+.mob-home-card:nth-child(3) { animation-delay: 0.15s; }
+.mob-home-card:nth-child(4) { animation-delay: 0.20s; }
+.mob-home-card:nth-child(5) { animation-delay: 0.25s; }
+.mob-home-card:nth-child(6) { animation-delay: 0.30s; }
+
+/* ══ COPIA CON FEEDBACK ═════════════════════════════════════ */
+@keyframes copyPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(99,102,241,0); }
+  100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); }
+}
+.copy-pulse { animation: copyPulse 0.6s ease; }
+
+/* ══ ANIMAZIONE INGRESSO SEZIONI ════════════════════════════ */
+.tab-panel.active .pw-item-card,
+.tab-panel.active .note-card,
+.tab-panel.active .otp-item,
+.tab-panel.active .card-3d-container,
+.tab-panel.active .pw-cat-card,
+.tab-panel.active .wifi-card,
+.tab-panel.active .finance-card {
+  animation: itemFadeIn 0.3s ease both;
+}
+@keyframes itemFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.tab-panel.active .pw-item-card:nth-child(1)  { animation-delay: 0.03s; }
+.tab-panel.active .pw-item-card:nth-child(2)  { animation-delay: 0.06s; }
+.tab-panel.active .pw-item-card:nth-child(3)  { animation-delay: 0.09s; }
+.tab-panel.active .pw-item-card:nth-child(4)  { animation-delay: 0.12s; }
+.tab-panel.active .pw-item-card:nth-child(5)  { animation-delay: 0.15s; }
+.tab-panel.active .note-card:nth-child(1)     { animation-delay: 0.03s; }
+.tab-panel.active .note-card:nth-child(2)     { animation-delay: 0.06s; }
+.tab-panel.active .note-card:nth-child(3)     { animation-delay: 0.09s; }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1823,7 +1887,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">BETA429</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.20</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -1867,12 +1931,17 @@ function cardsSearch(q) {
     <div class="auth-step" id="step-pin">
       <div class="auth-label" id="pin-label">Scegli il tuo PIN Master</div>
       <div style="font-size:12px;color:var(--text3);margin-bottom:8px;text-align:center;" id="pin-sub">8 cifre — usato per sbloccare l'app</div>
-      <div class="pin-row" id="pin-dots">
-        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
-        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
-        <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
-        <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+        <div class="pin-row" id="pin-dots">
+          <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+          <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+          <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
+          <div class="pin-dot" id="pd6"></div><div class="pin-dot" id="pd7"></div>
+        </div>
+        <button onclick="togglePinVisibility()" id="pin-eye-btn"
+          style="position:absolute;right:-32px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px;">👁</button>
       </div>
+      <div id="pin-reveal" style="display:none;font-size:22px;font-family:monospace;font-weight:800;letter-spacing:6px;color:var(--accent);text-align:center;margin-top:4px;min-height:28px;"></div>
       <div class="pin-numpad" id="pin-numpad">
         <button class="pin-key" onclick="pinPress('1')">1</button>
         <button class="pin-key" onclick="pinPress('2')">2</button>
@@ -1925,7 +1994,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">BETA429</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.20</div>
         </div>
       </div>
     </div>
@@ -2009,7 +2078,6 @@ function cardsSearch(q) {
   <div id="tab-container">
 
     <!-- HOME -->
-    <!-- HOME — layout tile v11-style 3 colonne -->
     <!-- HOME -->
     <div class="tab-panel active" id="panel-home">
       <div class="tab-inner">
@@ -2030,10 +2098,11 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">BETA429</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.20</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
+        <div id="home-pw-warn" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;color:#f59e0b;margin-bottom:12px;cursor:pointer;" onclick="switchTab('passwords')"></div>
         <div id="home-search-bar" onclick="openGlobalSearch()" style="display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 16px;margin-bottom:20px;cursor:pointer;transition:border-color 0.2s;">
           <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <span style="color:var(--text3);font-size:14px;font-weight:500;flex:1;">Cerca in tutto HomeBull...</span>
@@ -2092,27 +2161,32 @@ Aggiungi nuovo dato
         <!-- Navigazione sezioni — card fisse -->
         <div class="home-section-title" style="margin-bottom:12px;">🗂 Sezioni</div>
         <div id="home-nav-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
-          <div class="qa-card" onclick="switchTab('passwords')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('passwords')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-passwords" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">🔐</div>
             <div class="qa-card-label">Password</div>
           </div>
-          <div class="qa-card" onclick="switchTab('notes')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('notes')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-notes" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">📝</div>
             <div class="qa-card-label">Note</div>
           </div>
-          <div class="qa-card" onclick="switchTab('otp')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('otp')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-otp" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">🔑</div>
             <div class="qa-card-label">OTP / 2FA</div>
           </div>
-          <div class="qa-card" onclick="switchTab('cards')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('cards')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-cards" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">💳</div>
             <div class="qa-card-label">Portafoglio</div>
           </div>
-          <div class="qa-card" onclick="switchTab('server')" style="cursor:pointer;">
+          <div class="qa-card" onclick="switchTab('server')" style="cursor:pointer;position:relative;">
+            <span id="pc-badge-server" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
             <div class="qa-card-icon">📡</div>
             <div class="qa-card-label">Rete & IT</div>
           </div>
-          <div class="qa-card" onclick="openSettings()" style="cursor:pointer;">
+          <div class="qa-card" onclick="openSettings()" style="cursor:pointer;position:relative;">
             <div class="qa-card-icon">⚙️</div>
             <div class="qa-card-label">Impostazioni</div>
           </div>
@@ -2190,11 +2264,9 @@ Aggiungi nuovo dato
         <div style="text-align:center;padding:32px 24px;max-width:320px;">
           <div style="font-size:48px;margin-bottom:16px;">🔐</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;">Nessuna password</div>
-          <div style="color:var(--text3);font-size:13px;margin-bottom:24px;line-height:1.6;">Importa il tuo backup dalla v11<br>oppure aggiungi la prima password</div>
-          <button onclick="pwImportCSV()" style="width:100%;padding:14px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:10px;">📥 Importa da Chrome / Firefox / 1Password</button>
-          <button onclick="pwImportBackup()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📦 Importa backup v11</button>
-          <button onclick="pwScanQR()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">📷 Scansiona QR condiviso</button>
-          <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">+ Nuova password</button>
+          <div style="color:var(--text3);font-size:13px;margin-bottom:20px;">Aggiungi la prima password o ripristina dal backup</div>
+          <button onclick="driveRestoreNow()" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;margin-bottom:10px;">☁️ Importa da Drive</button>
+          <button onclick="pwNewItem()" style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">+ Nuova password</button>
           <input type="file" id="pw-import-input" accept=".hbb,.json" style="display:none;" onchange="pwHandleImport(event)">
           <input type="file" id="pw-csv-input" accept=".csv" style="display:none;" onchange="pwHandleCSV(event)">
         </div>
@@ -2231,6 +2303,13 @@ Aggiungi nuovo dato
           <div style="padding:6px 14px;flex-shrink:0;">
             <span id="note-editor-date" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
           </div>
+          <!-- Barra formattazione note -->
+          <div style="padding:4px 14px;display:flex;gap:6px;flex-shrink:0;">
+            <button onclick="noteFormat('bold')" title="Grassetto" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">B</button>
+            <button onclick="noteFormat('italic')" title="Corsivo" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-style:italic;font-family:inherit;">I</button>
+            <button onclick="noteFormat('list')" title="Elenco" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">• —</button>
+            <button onclick="noteFormat('line')" title="Separatore" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">—</button>
+          </div>
           <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..."
             style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
         </div>
@@ -2246,7 +2325,12 @@ Aggiungi nuovo dato
           <div style="padding:12px 14px 8px;flex-shrink:0;">
 
           </div>
-          <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;display:grid;grid-template-columns:1fr;gap:12px;align-content:start;"></div>
+          <div style="padding:4px 14px 0;flex-shrink:0;">
+            <input id="otp-search-inp" type="text" placeholder="🔍 Cerca OTP..."
+              oninput="otpSearch(this.value)"
+              style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">
+          </div>
+          <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 24px;display:grid;grid-template-columns:1fr;gap:12px;align-content:start;"></div>
         </div>
 
         <!-- Vista aggiungi account -->
@@ -2316,7 +2400,7 @@ Aggiungi nuovo dato
           <div style="padding:12px 14px 8px;flex-shrink:0;">
 
           </div>
-          <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;max-width:1200px;"></div>
+          <div id="cards-list" class="cards-grid" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 24px;max-width:900px;margin:0 auto;width:100%;"></div>
         </div>
 
         <!-- Aggiungi carta -->
@@ -2394,16 +2478,16 @@ Aggiungi nuovo dato
             <div style="margin-bottom:20px;">
               <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <div class="card-color-btn active" data-color="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#6366f1,#8b5cf6)')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="cardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e3a5f)')" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#065f46,#10b981)" onclick="cardSelectColor(this,'linear-gradient(135deg,#065f46,#10b981)')" style="background:linear-gradient(135deg,#065f46,#10b981);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#7c2d12,#f97316)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7c2d12,#f97316)')" style="background:linear-gradient(135deg,#7c2d12,#f97316);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#1a1a1a,#374151)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1a1a1a,#374151)')" style="background:linear-gradient(135deg,#1a1a1a,#374151);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#92400e,#d97706)" onclick="cardSelectColor(this,'linear-gradient(135deg,#92400e,#d97706)')" style="background:linear-gradient(135deg,#92400e,#d97706);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#831843,#ec4899)" onclick="cardSelectColor(this,'linear-gradient(135deg,#831843,#ec4899)')" style="background:linear-gradient(135deg,#831843,#ec4899);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#1e3a8a,#3b82f6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1e3a8a,#3b82f6)')" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#7f1d1d,#ef4444)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7f1d1d,#ef4444)')" style="background:linear-gradient(135deg,#7f1d1d,#ef4444);"></div>
-                <div class="card-color-btn" data-color="linear-gradient(135deg,#134e4a,#06b6d4)" onclick="cardSelectColor(this,'linear-gradient(135deg,#134e4a,#06b6d4)')" style="background:linear-gradient(135deg,#134e4a,#06b6d4);"></div>
+                <div class="card-color-btn active" data-color="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="cardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e40af,#3b82f6)')" style="background:linear-gradient(135deg,#0f172a,#1e3a5f);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#065f46,#10b981)" onclick="cardSelectColor(this,'linear-gradient(135deg,#064e3b,#059669,#34d399)')" style="background:linear-gradient(135deg,#065f46,#10b981);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#7c2d12,#f97316)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7c2d12,#ea580c,#fb923c)')" style="background:linear-gradient(135deg,#7c2d12,#f97316);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#1a1a1a,#374151)" onclick="cardSelectColor(this,'linear-gradient(135deg,#111827,#374151,#6b7280)')" style="background:linear-gradient(135deg,#1a1a1a,#374151);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#92400e,#d97706)" onclick="cardSelectColor(this,'linear-gradient(135deg,#78350f,#b45309,#fbbf24)')" style="background:linear-gradient(135deg,#92400e,#d97706);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#831843,#ec4899)" onclick="cardSelectColor(this,'linear-gradient(135deg,#831843,#db2777,#f9a8d4)')" style="background:linear-gradient(135deg,#831843,#ec4899);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#1e3a8a,#3b82f6)" onclick="cardSelectColor(this,'linear-gradient(135deg,#1e3a8a,#2563eb,#60a5fa)')" style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#7f1d1d,#ef4444)" onclick="cardSelectColor(this,'linear-gradient(135deg,#7f1d1d,#dc2626,#f87171)')" style="background:linear-gradient(135deg,#7f1d1d,#ef4444);"></div>
+                <div class="card-color-btn" data-color="linear-gradient(135deg,#134e4a,#06b6d4)" onclick="cardSelectColor(this,'linear-gradient(135deg,#134e4a,#0891b2,#67e8f9)')" style="background:linear-gradient(135deg,#134e4a,#06b6d4);"></div>
               </div>
             </div>
             <button onclick="cardSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Carta</button>
@@ -3051,7 +3135,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'BETA429',
+  version: 'v13.1.20',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3230,23 +3314,8 @@ window.addEventListener('load', () => {
 });
 
 // Pulizia dati v11 incompatibili al primo avvio v13
-function migrateFromV11() {
-  if (localStorage.getItem('hb_v13_migrated')) return;
-  // Verifica se ci sono password v11 (avevano campo 'site' invece di 'title')
-  try {
-    const pws = JSON.parse(localStorage.getItem('hb13_passwords') || '[]');
-    if (pws.length > 0 && pws[0].site && !pws[0].categoryId) {
-      // Sono dati v11 — rimuovi
-      localStorage.removeItem('hb13_passwords');
-      localStorage.removeItem('hb13_pw_cats');
-      console.log('ℹ️ Dati password v11 rimossi');
-    }
-  } catch(e) {}
-  localStorage.setItem('hb_v13_migrated', '1');
-}
 
 function checkAuthStatus() {
-  migrateFromV11();
   const savedUser = localStorage.getItem('hb_last_user');
   const hasPIN = !!localStorage.getItem('hb12_pin_hash');
   if (savedUser && hasPIN) {
@@ -3318,6 +3387,11 @@ function updatePinDots() {
   for (let i = 0; i < 8; i++) {
     const dot = document.getElementById('pd' + i);
     if (dot) dot.classList.toggle('filled', i < HB.pinBuffer.length);
+  }
+  // Aggiorna reveal se visibile
+  if (_pinVisible) {
+    const reveal = document.getElementById('pin-reveal');
+    if (reveal) reveal.textContent = HB.pinBuffer || '';
   }
 }
 
@@ -3459,6 +3533,10 @@ function unlockApp() {
   initLocalCache().then(() => {
     updateHomeStats();
     updateSidebarBadges();
+    initAutoLock();
+    // migrazione completata
+    // Scarica sempre da Firebase al login — garantisce dati aggiornati
+    setTimeout(() => fbSyncLoad().catch(()=>{}), 1500);
     updateSidebarBadges();
     fbSyncLoad().catch(()=>{});
     fbStartRealtime();
@@ -3949,6 +4027,19 @@ function updateHomeStats() {
       ${a.tab ? `<div style="font-size:14px;color:var(--text3);flex-shrink:0;">›</div>` : ''}
     </div>
   `).join('');
+
+  // Stats line
+  const statsEl = document.getElementById('home-stats-line');
+  if (statsEl) {
+    const pwCount   = (_pwItems||[]).filter(i=>!i.deleted).length;
+    const noteCount = (_notes||[]).filter(n=>!n.deleted).length;
+    const otpCount  = (_otpAccounts||[]).filter(a=>!a.deleted).length;
+    const total = pwCount + noteCount + otpCount +
+                  (_cards||[]).filter(c=>!c.deleted).length +
+                  (_wifiNets||[]).filter(w=>!w.deleted).length +
+                  (_serverItems||[]).filter(s=>!s.deleted).length;
+    statsEl.textContent = total > 0 ? `${total} elementi salvati · ${pwCount} password · ${otpCount} OTP` : '';
+  }
 }
 
 let toastTimer;
@@ -4146,7 +4237,13 @@ function pwRenderCats(q='') {
 
   const cats = _pwCats
     .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
-    .sort((a, b) => a.name.localeCompare(b.name, 'it'));
+    .sort((a, b) => {
+      // Ordine manuale se presente, altrimenti alfabetico
+      const oa = a.order ?? 9999;
+      const ob = b.order ?? 9999;
+      if (oa !== ob) return oa - ob;
+      return a.name.localeCompare(b.name, 'it');
+    });
 
   if (!cats.length) {
     grid.style.display = 'block';
@@ -4181,6 +4278,27 @@ function pwRenderCats(q='') {
     div.onmouseenter = () => { div.style.background='var(--surface2,var(--bg3))'; div.style.transform='translateY(-1px)'; };
     div.onmouseleave = () => { div.style.background='var(--surface)'; div.style.transform=''; };
     div.onclick = () => pwShowItems(cat.id, cat.name);
+    div.ondragstart = (e) => { e.dataTransfer.setData('text/plain', cat.id); div.style.opacity='0.5'; };
+    div.ondragend = () => { div.style.opacity='1'; };
+    div.ondragover = (e) => { e.preventDefault(); div.style.background='var(--bg3)'; };
+    div.ondragleave = () => { div.style.background='var(--surface)'; };
+    div.ondrop = (e) => {
+      e.preventDefault(); div.style.background='var(--surface)';
+      const fromId = e.dataTransfer.getData('text/plain');
+      if (fromId === cat.id) return;
+      // Riordina
+      const sorted = [...cats];
+      const fromIdx = sorted.findIndex(c => c.id === fromId);
+      const toIdx = sorted.findIndex(c => c.id === cat.id);
+      const [moved] = sorted.splice(fromIdx, 1);
+      sorted.splice(toIdx, 0, moved);
+      sorted.forEach((c, i) => {
+        const item = _pwCats.find(x => x.id === c.id);
+        if (item) item.order = i;
+      });
+      pwSaveAll(); pwRenderCats();
+    };
+    div.setAttribute('draggable', 'true');
 
     div.innerHTML = `
       <!-- Icona colorata -->
@@ -4288,6 +4406,7 @@ function pwRenderItems(q='') {
   list.innerHTML = '';
   items.forEach(item => {
     const strength = getStrength(item.password);
+    const expInfo = pwExpiryInfo(item);
     const cat = _pwCats.find(c => c.id === item.categoryId);
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
     const card = document.createElement('div');
@@ -4299,10 +4418,12 @@ function pwRenderItems(q='') {
         <div style="flex:1;min-width:0;">
           <div class="pw-item-title">${item.title||'—'}</div>
           <div class="pw-item-user">${item.username||''}</div>
+          ${item.updatedAt ? `<div style="font-size:10px;color:var(--text3);margin-top:1px;">${timeAgo(item.updatedAt)}</div>` : ''}
         </div>
       </div>
       <div class="pw-item-footer">
         <span class="pw-strength-badge" style="background:${strength.bg};color:${strength.col};">${strength.label}</span>
+        ${expInfo && (expInfo.status==='expired'||expInfo.status==='today'||expInfo.status==='soon') ? `<span style="background:${expInfo.bg};color:${expInfo.col};font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">⏰ ${expInfo.badge}</span>` : ''}
         ${item.pin ? '<span style="background:rgba(234,179,8,0.15);color:#eab308;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">PIN</span>' : ''}
         <button class="pw-copy-btn" onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -4348,8 +4469,10 @@ function pwShowDetail(itemId) {
       </div>
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
+    ${(() => { const e = pwExpiryInfo(item); return e ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${e.col};font-weight:700;">${e.text}</div></div>` : ''; })()}
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
+    ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map(h=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span style="font-family:monospace;color:var(--text2);">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);">'+timeAgo(h.changedAt)+'</span></div>').join('')}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
       <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
       <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
@@ -4442,6 +4565,48 @@ function getStrength(pw) {
   return              { label:'Debole', bg:'rgba(239,68,68,0.15)',   col:'#ef4444' };
 }
 
+// ── Scadenza password ────────────────────────────────────
+const PW_EXP_OPTS = [
+  { value:'none', label:'Nessuna scadenza', days:0 },
+  { value:'30',   label:'30 giorni',        days:30 },
+  { value:'60',   label:'60 giorni',        days:60 },
+  { value:'90',   label:'90 giorni',        days:90 },
+  { value:'180',  label:'6 mesi',           days:180 },
+  { value:'365',  label:'1 anno',           days:365 }
+];
+
+function pwExpOptionsHtml(selected) {
+  return PW_EXP_OPTS.map(o =>
+    '<option value="'+o.value+'"'+((selected||'none')===o.value?' selected':'')+'>'+o.label+'</option>'
+  ).join('');
+}
+
+// Calcola la data di scadenza (ISO) a partire da oggi + n giorni
+function pwComputeExpiryDate(expiryDays) {
+  if (!expiryDays || expiryDays === 'none') return '';
+  const d = new Date();
+  d.setDate(d.getDate() + parseInt(expiryDays, 10));
+  return d.toISOString();
+}
+
+// Stato scadenza di un item: null se nessuna scadenza impostata
+function pwExpiryInfo(item) {
+  if (!item || !item.expiryDate) return null;
+  const diffMs = new Date(item.expiryDate).getTime() - Date.now();
+  const diffDays = Math.ceil(diffMs / 86400000);
+  const dateLabel = new Date(item.expiryDate).toLocaleDateString('it-IT', { day:'2-digit', month:'short', year:'numeric' });
+  if (diffDays < 0) {
+    return { status:'expired', text:'⏰ Scaduta il '+dateLabel, badge:'Scaduta', bg:'rgba(239,68,68,0.15)', col:'#ef4444' };
+  }
+  if (diffDays === 0) {
+    return { status:'today', text:'⏰ Scade oggi', badge:'Scade oggi', bg:'rgba(239,68,68,0.15)', col:'#ef4444' };
+  }
+  if (diffDays <= 14) {
+    return { status:'soon', text:'⏰ Scade tra '+diffDays+' giorni ('+dateLabel+')', badge:'Tra '+diffDays+'gg', bg:'rgba(249,115,22,0.15)', col:'#f97316' };
+  }
+  return { status:'ok', text:'📅 Scade il '+dateLabel, badge:dateLabel, bg:'rgba(100,116,139,0.15)', col:'#64748b' };
+}
+
 
 // ═══════════════════════════════════════════════════════════
 //  STATISTICHE PASSWORD
@@ -4449,7 +4614,7 @@ function getStrength(pw) {
 function pwShowStats() {
   if (!_pwItems.length) { showToast('Nessuna password salvata'); return; }
 
-  let weak=0, medium=0, strong=0, dupes=0, old=0;
+  let weak=0, medium=0, strong=0, dupes=0, old=0, expiring=0;
   const seen = {};
   const now  = Date.now();
   const ninetyDays = 90 * 24 * 60 * 60 * 1000;
@@ -4467,6 +4632,10 @@ function pwShowStats() {
 
     // Vecchie (non aggiornate da 90gg)
     if (item.updatedAt && (now - new Date(item.updatedAt).getTime()) > ninetyDays) old++;
+
+    // In scadenza o scadute
+    const e = pwExpiryInfo(item);
+    if (e && (e.status === 'expired' || e.status === 'today' || e.status === 'soon')) expiring++;
   });
 
   const total = _pwItems.length;
@@ -4510,6 +4679,7 @@ function pwShowStats() {
       </div>
     </div>
 
+    ${expiring > 0 ? `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;">⏰ Hai ${expiring} password in scadenza o già scadute</div>` : ''}
     ${old > 0 ? `<div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#f97316;">⏰ ${old} password non aggiornate da più di 90 giorni</div>` : ''}
     ${dupes > 0 ? `<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;">⚠️ Hai ${dupes} password duplicate — cambia quelle riusate</div>` : ''}
     ${weak === 0 && dupes === 0 ? `<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#10b981;">✅ Ottimo! Nessuna password debole o duplicata</div>` : ''}
@@ -4527,20 +4697,6 @@ function pwShowStats() {
 // ═══════════════════════════════════════════════════════════
 //  IMPORT PASSWORD via QR — scansiona QR condiviso da altro dispositivo
 // ═══════════════════════════════════════════════════════════
-function pwScanQR() {
-  qrScannerOpen('Scansiona QR password', (data) => {
-    let parsed;
-    try { parsed = JSON.parse(data); } catch(e) {
-      showToast('⚠️ QR non valido o non leggibile');
-      return;
-    }
-    if (parsed.app !== 'HomeBull' || !parsed.password) {
-      showToast('⚠️ QR non riconosciuto — non è una password HomeBull');
-      return;
-    }
-    pwShowQRImportPreview(parsed);
-  });
-}
 
 function pwShowQRImportPreview(data) {
   const ov = document.createElement('div');
@@ -4577,6 +4733,7 @@ function pwShowQRImportPreview(data) {
       password: data.password || '',
       url: data.url || '',
       createdAt: new Date().toISOString(),
+      color:  window._ceColor || card.color,
       updatedAt: new Date().toISOString(),
     });
     pwSave();
@@ -4759,9 +4916,6 @@ function pwDoImportCSV(items) {
 }
 
 // Import backup v11
-function pwImportBackup() {
-  document.getElementById('pw-import-input').click();
-}
 
 async function pwHandleImport(event) {
   const file = event.target.files[0];
@@ -4856,6 +5010,8 @@ function pwNewItem() {
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
     '<div style="display:flex;gap:8px;"><input id="_pwn_pin" type="password" placeholder="PIN numerico..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
     '<button id="_pwn_pin_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button></div></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">⏰ Scadenza password</div>',
+    '<select id="_pwn_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+pwExpOptionsHtml('none')+'</select></div>',
     '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
     '<textarea id="_pwn_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea></div>',
     '<div style="display:flex;gap:10px;">',
@@ -4885,6 +5041,7 @@ function pwNewItem() {
     const title = document.getElementById('_pwn_title')?.value.trim();
     const pass  = document.getElementById('_pwn_pass')?.value;
     if (!title || !pass) { showToast('Inserisci titolo e password'); return; }
+    const expDays = document.getElementById('_pwn_exp')?.value || 'none';
     _pwItems.push({
       id: 'pw_' + Date.now(),
       title,
@@ -4894,6 +5051,8 @@ function pwNewItem() {
       pin:       document.getElementById('_pwn_pin')?.value.trim() || '',
       notes:     document.getElementById('_pwn_note')?.value.trim() || '',
       categoryId: document.getElementById('_pwn_cat')?.value,
+      expiryDays: expDays,
+      expiryDate: pwComputeExpiryDate(expDays),
       createdAt: new Date().toISOString()
     });
     pwSave();
@@ -4903,30 +5062,9 @@ function pwNewItem() {
   };
 }
 
-// ── AI icon lookup per categorie ────────────────────────────
-const _iconCache = {};
-
-async function aiGetCatIcon(catName) {
-  if (_iconCache[catName]) return _iconCache[catName];
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 10,
-        messages: [{
-          role: 'user',
-          content: `Rispondi SOLO con un singolo emoji che rappresenta meglio la categoria password chiamata "${catName}". Solo l'emoji, nient'altro.`
-        }]
-      })
-    });
-    const data = await res.json();
-    const emoji = data.content?.[0]?.text?.trim() || '📁';
-    _iconCache[catName] = emoji;
-    return emoji;
-  } catch(e) { return '📁'; }
-}
+// ── Icon lookup per categorie ────────────────────────────────
+const _iconCache = {}; // cache icone categorie
+async function aiGetCatIcon(catName) { return '📁'; }
 
 async function pwEnrichIcons() {
   if (!navigator.onLine) return;
@@ -5352,7 +5490,7 @@ function noteImportFromBackup(notesArr) {
 // ═══════════════════════════════════════════════════════════
 const CARDS_KEY = 'hb13_cards';
 let _cards = [];
-let _cardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+let _cardColor = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
 
 function cardsLoad() {
   try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
@@ -5412,7 +5550,7 @@ function cardsRender() {
     const num = card.number ? card.number.replace(/\s/g,'').replace(/(.{4})/g,'$1 ').trim() : '•••• •••• •••• ••••';
     const numMasked = card.number ? card.number.replace(/\d(?=\d{4})/g,'•').replace(/\s/g,'').replace(/(.{4})/g,'$1 ').trim() : '•••• •••• •••• ••••';
     const expiring = cardIsExpiring(card.exp);
-    const circuit = cardCircuit(card.number);
+    const circuit = cardCircuit(card.number, card.label);
 
     const wrap = document.createElement('div');
     wrap.className = 'card-3d-container';
@@ -5428,7 +5566,7 @@ function cardsRender() {
           <!-- Top: label + circuito -->
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:0.1em;">${card.label}</span>
-            <span style="font-size:16px;font-weight:900;font-style:italic;color:white;">${circuit}</span>
+            <span style="display:flex;align-items:center;">${circuit}</span>
           </div>
           <!-- Chip + numero -->
           <div>
@@ -5598,12 +5736,23 @@ function cardsEdit(id) {
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">Intestatario</div>
     <input id="_ce_holder" value="${card.holder||''}" placeholder="NOME COGNOME" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:20px;font-family:monospace;text-transform:uppercase;outline:none;">
 
-    <div style="display:flex;gap:10px;">
+<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:8px;">Colore carta</div><div id="_ce_palette" style="display:flex;flex-wrap:wrap;gap:8px;"><div title="Viola" data-grad="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="window._ceColor='linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Navy" data-grad="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="window._ceColor='linear-gradient(135deg,#0f172a,#1e40af,#3b82f6)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#1e3a5f);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Verde" data-grad="linear-gradient(135deg,#065f46,#10b981)" onclick="window._ceColor='linear-gradient(135deg,#064e3b,#059669,#34d399)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#065f46,#10b981);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Arancio" data-grad="linear-gradient(135deg,#7c2d12,#f97316)" onclick="window._ceColor='linear-gradient(135deg,#7c2d12,#ea580c,#fb923c)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c2d12,#f97316);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Nero" data-grad="linear-gradient(135deg,#1a1a1a,#374151)" onclick="window._ceColor='linear-gradient(135deg,#111827,#374151,#6b7280)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#1a1a1a,#374151);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Oro" data-grad="linear-gradient(135deg,#92400e,#d97706)" onclick="window._ceColor='linear-gradient(135deg,#78350f,#b45309,#fbbf24)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Rosa" data-grad="linear-gradient(135deg,#831843,#ec4899)" onclick="window._ceColor='linear-gradient(135deg,#831843,#db2777,#f9a8d4)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#831843,#ec4899);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Blu" data-grad="linear-gradient(135deg,#1e3a8a,#3b82f6)" onclick="window._ceColor='linear-gradient(135deg,#1e3a8a,#2563eb,#60a5fa)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Rosso" data-grad="linear-gradient(135deg,#7f1d1d,#ef4444)" onclick="window._ceColor='linear-gradient(135deg,#7f1d1d,#dc2626,#f87171)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7f1d1d,#ef4444);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Teal" data-grad="linear-gradient(135deg,#134e4a,#06b6d4)" onclick="window._ceColor='linear-gradient(135deg,#134e4a,#0891b2,#67e8f9)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#134e4a,#06b6d4);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div></div></div>    <div style="display:flex;gap:10px;">
       <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_ce_save" style="flex:2;padding:13px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
+  window._ceColor = card.color || 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
+  // Evidenzia il colore attuale nella palette
+  setTimeout(() => {
+    const btns = document.querySelectorAll('#_ce_palette div');
+    btns.forEach(b => {
+      b.style.outline = '2px solid transparent';
+      if (b.getAttribute('data-grad') === window._ceColor) {
+        b.style.outline = '3px solid white';
+      }
+    });
+  }, 50);
   ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
   document.getElementById('_ce_save').onclick = () => {
     const label = document.getElementById('_ce_label').value.trim();
@@ -5616,6 +5765,7 @@ function cardsEdit(id) {
       cvv:    document.getElementById('_ce_cvv').value.trim(),
       pin:    document.getElementById('_ce_pin').value.trim(),
       holder: document.getElementById('_ce_holder').value.trim().toUpperCase(),
+      color:  window._ceColor || card.color || 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)',
       updatedAt: new Date().toISOString()
     }; }
     cardsSaveAll(); cardsRender(); ov.remove();
@@ -5650,14 +5800,18 @@ function cardsDelete(id) {
 }
 
 // ── Riconoscimento circuito ───────────────────────────────
-function cardCircuit(number) {
-  if (!number) return '💳';
+function cardCircuit(number, label) {
+  // Prima cerca per label (più affidabile)
+  const logo = getCardCircuitLogo(label || '');
+  if (logo) return logo;
+  // Poi per numero
+  if (!number) return '';
   const n = number.replace(/\s/g,'');
-  if (/^4/.test(n)) return '💳'; // Visa — idealmente SVG Visa
-  if (/^5[1-5]/.test(n) || /^2[2-7]/.test(n)) return '💳'; // Mastercard
-  if (/^3[47]/.test(n)) return '💳'; // Amex
-  if (/^36|^38|^30[0-5]/.test(n)) return '💳'; // Diners
-  return '💳';
+  if (/^4/.test(n)) return getCardCircuitLogo('visa');
+  if (/^5[1-5]/.test(n) || /^2[2-7]/.test(n)) return getCardCircuitLogo('mastercard');
+  if (/^3[47]/.test(n)) return getCardCircuitLogo('amex');
+  if (/^6[37]/.test(n)) return getCardCircuitLogo('maestro');
+  return '';
 }
 
 function cardIsExpiring(exp) {
@@ -5683,7 +5837,7 @@ function cardFormatDisplay(num) {
   return num.replace(/(.{4})/g,'$1 ').trim();
 }
 
-let _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+let _cardColorSelected = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
 function cardSelectColor(el, color) {
   _cardColorSelected = color;
   document.querySelectorAll('.card-color-btn').forEach(b => b.classList.remove('active'));
@@ -5716,7 +5870,7 @@ function cardsShowAdd() {
   ['card-add-label','card-add-number','card-add-exp','card-add-cvv','card-add-holder','card-add-pin'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value='';
   });
-  _cardColorSelected = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+  _cardColorSelected = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
   const preview = document.getElementById('card-preview');
   if (preview) preview.style.background = _cardColorSelected;
   cardUpdatePreview();
@@ -6551,22 +6705,7 @@ function otpDeleteConfirm(id) {
 
 
 // ── Carica condivisioni da Firebase ──────────────────────
-async function loadShares() {
-  if (!fbReady || !fbDb) return;
-  const emailKey = _getSyncKey();
-  if (!emailKey) return;
-  try {
-    console.log('loadShares — emailKey:', emailKey);
-    const mySnap  = await fbDb.ref('userShares/' + emailKey + '/created').get();
-    _myShares     = mySnap.exists()  ? mySnap.val()  : {};
-    const recSnap = await fbDb.ref('userShares/' + emailKey + '/received').get();
-    _receivedShares = recSnap.exists() ? recSnap.val() : {};
-    console.log('Shares — creati:', Object.keys(_myShares).length, '/ ricevuti:', Object.keys(_receivedShares).length);
-    // Debug: mostra cosa c'è su Firebase
-    const allSnap = await fbDb.ref('userShares/' + emailKey).get();
-    console.log('userShares raw:', JSON.stringify(allSnap.val()));
-  } catch(e) { console.warn('loadShares:', e); }
-}
+async function loadShares() { return; } // rimosso — UI condivisione dismessa
 
 
 // ── Indicatore ultimo sync ────────────────────────────────
@@ -6646,45 +6785,29 @@ async function pinBioAuth() {
 
 
 function earlyBackHandler() {
-  // Strategia: pushState continuo + intercetta popstate
-  const BUFFER = 80; // voci buffer
-
   function fillBuffer() {
     try {
-      for (let i = 0; i < BUFFER; i++) {
-        history.pushState({ hb: 'app', i }, '');
+      if (history.length < 5) {
+        for (let i = 0; i < 5; i++) history.pushState({ hb: 'app' }, '');
       }
     } catch(e) {}
   }
-
-  // Riempimento iniziale
-  try { history.replaceState({ hb: 'root' }, ''); } catch(e) {}
-  fillBuffer();
-
-  // Intercetta OGNI popstate e reindirizza all'app
-  window.addEventListener('popstate', function(e) {
-    // Riempi subito il buffer — sincrono per bloccare l'uscita
-    try { fillBuffer(); } catch(e) {}
-    // Gestisci la navigazione nell'app
+  try {
+    history.replaceState({ hb: 'root' }, '');
+    for (let i = 0; i < 5; i++) history.pushState({ hb: 'app' }, '');
+  } catch(e) {}
+  window.addEventListener('popstate', function() {
+    try { if (history.length < 3) { history.pushState({ hb: 'app' }, ''); history.pushState({ hb: 'app' }, ''); } } catch(e) {}
     if (typeof handleBackPress === 'function') handleBackPress();
   });
-
-  // Mantieni il buffer pieno in ogni scenario
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') fillBuffer();
-  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') fillBuffer(); });
   window.addEventListener('pageshow', fillBuffer);
-  window.addEventListener('focus', fillBuffer);
-  window.addEventListener('resume', fillBuffer);
-
-  // Rinnovo automatico ogni 3 secondi
-  setInterval(fillBuffer, 3000);
 }
 
 // Alias globale
 function ensureBuffer() {
   try {
-    if (history.length < 5) for (let i = 0; i < 30; i++) history.pushState({ hb: 'app' }, '');
+    if (history.length < 3) history.pushState({ hb: 'app' }, '');
   } catch(e) {}
 }
 
@@ -7122,7 +7245,7 @@ function runSearch(q) {
         '<div class="search-result-sub">' + r.sub + '</div>' +
       '</div>' +
       '<div class="search-result-tab">' + r.badge + '</div>';
-    el.onclick = () => { closeGlobalSearch(); r.action(); };
+    el.onclick = () => { closeGlobalSearch(); setTimeout(() => r.action(), 150); };
     container.appendChild(el);
   });
 }
@@ -7160,11 +7283,12 @@ async function fbSyncLoad(){
   try{
     const snap = await fbDb.ref('hb13/' + emailKey).get();
     if(!snap.exists()){
-      // Cloud vuoto: carica i dati locali sul cloud (non sovrascrivere il locale)
+      // Cloud vuoto: carica i dati locali sul cloud
       console.log('Cloud vuoto — upload dati locali');
       await fbSyncAll(true);
       return;
     }
+    // Cloud ha dati — scarica sempre (priorità cloud dopo riavvio)
     const cloudSnap = snap.val() || {};
     // Protezione: se il cloud non ha nessuna chiave dati reale, non sovrascrivere il locale
     const cloudHasData = HB_SYNC_KEYS.some(k => cloudSnap[k] && cloudSnap[k] !== 'null');
@@ -7184,6 +7308,12 @@ async function fbSyncLoad(){
         if(typeof value === 'string' && value.startsWith('hb12:')) { console.warn('Skip legacy:', k); continue; }
         if(typeof value === 'string' && !value.startsWith('hb13enc:')) {
           try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
+        }
+        // Protezione: non sovrascrivere se il cloud ha meno dati del locale
+        const localVal = localStorage.getItem(k);
+        if(localVal && value && localVal.length > 10 && value.length < localVal.length * 0.5) {
+          console.warn('⚠️ Cloud ha meno dati del locale — skip:', k, 'cloud:', value.length, 'locale:', localVal.length);
+          continue;
         }
         _syncInProgress = true;
         localStorage.setItem(k, value);
@@ -7242,7 +7372,9 @@ function fbStartRealtime(){
     HB_SYNC_KEYS.forEach(k => { if((cloudTs[k]||0) > _getLocalTs(k)) needLoad = true; });
     if(needLoad){
       console.log('\ud83d\udd04 Aggiornamento cloud rilevato');
-      setTimeout(fbSyncLoad, 1000);
+      // Debounce: aspetta 3s per evitare sync multipli al riavvio pagina
+      clearTimeout(window._syncDebounce);
+      window._syncDebounce = setTimeout(fbSyncLoad, 3000);
     }
   });
   document.removeEventListener('visibilitychange', _onVisibilityChange);
@@ -7702,16 +7834,20 @@ function _getLocalTs(k){ return parseInt(localStorage.getItem(_tsKey(k))||'0'); 
 function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(localStorage,_tsKey(k),t||Date.now()); }
 
 function _getSyncKey(){
-  let emailAddr = _emailOtpAddr || HB.user?.email || '';
-  if(!emailAddr){ try { emailAddr = JSON.parse(localStorage.getItem('hb_last_user')||'{}').email||''; } catch(e){} }
-  if(!emailAddr) return null;
-  return btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+  // USA SEMPRE UID Firebase
+  const uid = HB.user?.uid || fbAuth?.currentUser?.uid;
+  if(uid) return uid;
+  return null;
 }
 
 function _tsKey(k){ return 'hb_ts_' + k; }
 
 function _onVisibilityChange(){
-  if(document.visibilityState === 'visible' && fbReady && HB.user) fbStartRealtime();
+  if(document.visibilityState === 'visible' && fbReady && HB.user) {
+    // Aspetta 2s prima di riavviare il realtime — evita sync su ricarica pagina
+    clearTimeout(window._visibilityDebounce);
+    window._visibilityDebounce = setTimeout(fbStartRealtime, 2000);
+  }
 }
 
 function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
@@ -8035,6 +8171,10 @@ function pwEditItem(itemId) {
     '<button id="_pwe_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div>',
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
     '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
+    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">⏰ Scadenza password</div>',
+    '<select id="_pwe_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+pwExpOptionsHtml(item.expiryDays)+'</select>',
+    item.expiryDate ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;">'+(pwExpiryInfo(item)?.text||'')+'</div>' : '',
+    '</div>',
     '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
     '<textarea id="_pwe_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;">'+(item.notes||'')+'</textarea></div>',
     '<div style="display:flex;gap:10px;">',
@@ -8062,6 +8202,27 @@ function pwEditItem(itemId) {
     if (!title) { showToast('Inserisci il titolo'); return; }
     const idx = _pwItems.findIndex(i => i.id === itemId);
     if (idx > -1) {
+      // Salva cronologia password se cambiata
+      const oldPass = item.password;
+      const history = item.pwHistory || [];
+<<<<<<< HEAD
+      const passChanged = pass && oldPass && pass !== oldPass;
+      if (passChanged) {
+        history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
+        if (history.length > 5) history.length = 5; // max 5 voci
+      }
+      // Ricalcola la data di scadenza se è cambiata l'opzione scelta o se la password è stata rinnovata
+      const expDays = document.getElementById('_pwe_exp')?.value || 'none';
+      const expChanged = expDays !== (item.expiryDays || 'none');
+      const expiryDate = (expChanged || (passChanged && expDays !== 'none'))
+        ? pwComputeExpiryDate(expDays)
+        : (expDays === 'none' ? '' : item.expiryDate);
+=======
+      if (pass && oldPass && pass !== oldPass) {
+        history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
+        if (history.length > 5) history.length = 5; // max 5 voci
+      }
+>>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
       _pwItems[idx] = {
         ...item,
         title,
@@ -8071,6 +8232,12 @@ function pwEditItem(itemId) {
         pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
         notes:    document.getElementById('_pwe_note')?.value.trim() || '',
         categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
+<<<<<<< HEAD
+        expiryDays: expDays,
+        expiryDate: expiryDate,
+=======
+>>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
+        pwHistory: history,
         updatedAt: new Date().toISOString()
       };
       pwSave();
@@ -8329,7 +8496,7 @@ function openAddModal(section) {
   }
   addModalAdapt();
   // Reset colore carta
-  window._amCardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+  window._amCardColor = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
   // Focus primo campo dopo animazione
   setTimeout(() => {
     const first = document.querySelector('#add-modal-fields input, #add-modal-fields textarea');
@@ -8356,12 +8523,22 @@ function addModalAdapt() {
 
   const pwToggle = (id) =>
     `<div style="margin-bottom:12px;">
-      <div class="pw-field-label" style="margin-bottom:6px;">Password</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="pw-field-label">Password</div>
+        <button onclick="genPassword('am-${id}')" style="background:none;border:none;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;padding:2px 6px;border-radius:6px;font-family:inherit;">⚡ Genera</button>
+      </div>
       <div style="position:relative;">
         <input id="am-${id}" type="password" placeholder="Password"
+          oninput="pwStrengthUpdate('am-${id}','str-${id}')"
           style="width:100%;padding:13px 44px 13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:monospace;outline:none;box-sizing:border-box;">
         <button onclick="const e=document.getElementById('am-${id}');e.type=e.type==='password'?'text':'password'"
           style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁</button>
+      </div>
+      <div id="str-${id}" style="display:none;align-items:center;gap:8px;margin-top:6px;">
+        <div style="flex:1;height:4px;border-radius:4px;background:var(--border);overflow:hidden;">
+          <div class="pw-str-fill" style="height:100%;border-radius:4px;transition:width 0.3s,background 0.3s;width:0%;"></div>
+        </div>
+        <span class="pw-str-label" style="font-size:11px;font-weight:700;min-width:48px;text-align:right;"></span>
       </div>
     </div>`;
 
@@ -8401,16 +8578,16 @@ function addModalAdapt() {
       <div style="margin-bottom:12px;">
         <div class="pw-field-label" style="margin-bottom:6px;">Colore carta</div>
         <div id="am-card-palette" style="display:flex;flex-wrap:wrap;gap:8px;">
-          <div onclick="amCardSelectColor(this,'linear-gradient(135deg,#6366f1,#8b5cf6)')" title="Viola" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);cursor:pointer;border:2px solid transparent; border:3px solid white;box-shadow:0 0 0 2px #6366f1;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e3a5f)')" title="Navy" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#1e3a5f);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#065f46,#10b981)')" title="Verde" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#065f46,#10b981);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#7c2d12,#f97316)')" title="Arancio" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c2d12,#f97316);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#1a1a1a,#374151)')" title="Nero" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a1a1a,#374151);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#92400e,#d97706)')" title="Oro" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#831843,#ec4899)')" title="Rosa" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#831843,#ec4899);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#1e3a8a,#3b82f6)')" title="Blu" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#7f1d1d,#ef4444)')" title="Rosso" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7f1d1d,#ef4444);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
-<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#134e4a,#06b6d4)')" title="Teal" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#134e4a,#06b6d4);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+          <div onclick="amCardSelectColor(this,'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)')" title="Viola" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);cursor:pointer;border:2px solid transparent; border:3px solid white;box-shadow:0 0 0 2px #6366f1;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#0f172a,#1e40af,#3b82f6)')" title="Navy" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#1e3a5f);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#064e3b,#059669,#34d399)')" title="Verde" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#065f46,#10b981);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#7c2d12,#ea580c,#fb923c)')" title="Arancio" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7c2d12,#f97316);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#111827,#374151,#6b7280)')" title="Nero" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a1a1a,#374151);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#78350f,#b45309,#fbbf24)')" title="Oro" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#831843,#db2777,#f9a8d4)')" title="Rosa" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#831843,#ec4899);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#1e3a8a,#2563eb,#60a5fa)')" title="Blu" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#7f1d1d,#dc2626,#f87171)')" title="Rosso" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#7f1d1d,#ef4444);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
+<div onclick="amCardSelectColor(this,'linear-gradient(135deg,#134e4a,#0891b2,#67e8f9)')" title="Teal" style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#134e4a,#06b6d4);cursor:pointer;border:2px solid transparent;transition:transform 0.15s,border-color 0.15s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div>
         </div>
       </div>
     `,
@@ -8524,7 +8701,7 @@ function addModalSave() {
     if (!label) { showToast('Inserisci il nome carta'); return; }
     if (!number) { showToast('Inserisci il numero'); return; }
     if (!exp) { showToast('Inserisci la scadenza'); return; }
-    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), pin:document.getElementById('am-card-pin')?.value||'', color:window._amCardColor||'linear-gradient(135deg,#6366f1,#8b5cf6)' });
+    _cards.push({ id:'card_'+Date.now(), label, number, exp, cvv:g('card-cvv'), holder:g('card-holder'), pin:document.getElementById('am-card-pin')?.value||'', color:window._amCardColor||'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)' });
     cardsSaveAll(); showToast('✅ Carta salvata');
     if (typeof cardsRender === 'function') cardsRender();
 
@@ -8640,7 +8817,7 @@ function financeTogglePinCard(id, pin) {
 }
 
 // Selezione colore carta nel modal
-let _amCardColor = 'linear-gradient(135deg,#6366f1,#8b5cf6)';
+let _amCardColor = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
 function amCardSelectColor(el, color) {
   _amCardColor = color;
   document.querySelectorAll('#am-card-palette > div').forEach(b => {
@@ -8662,8 +8839,37 @@ function updateSidebarBadges() {
     if (mob) { mob.textContent = n > 0 ? n : ''; mob.style.display = n > 0 ? 'flex' : 'none'; }
     const mhb = document.getElementById('mhb-' + id);
     if (mhb) { mhb.textContent = n > 0 ? n : ''; mhb.style.display = n > 0 ? 'flex' : 'none'; }
+    // Card desktop
+    const pc = document.getElementById('pc-badge-' + id);
+    if (pc) { pc.textContent = n > 0 ? n : ''; pc.style.display = n > 0 ? 'flex' : 'none'; }
   };
+  try { if(typeof pwLoad==='function') pwLoad(); } catch(e){}
   set('passwords', (_pwItems||[]).filter(i=>!i.deleted).length);
+<<<<<<< HEAD
+  // Avviso password vecchie (>180 giorni) o in scadenza/scadute
+  const oldPw = (_pwItems||[]).filter(i => !i.deleted && i.updatedAt &&
+    (Date.now() - new Date(i.updatedAt).getTime()) > 180 * 24 * 60 * 60 * 1000).length;
+  const expPw = (_pwItems||[]).filter(i => {
+    if (i.deleted) return false;
+    const e = pwExpiryInfo(i);
+    return e && (e.status === 'expired' || e.status === 'today' || e.status === 'soon');
+  }).length;
+  const pwWarn = document.getElementById('home-pw-warn');
+  if (pwWarn) {
+    const msgs = [];
+    if (expPw > 0) msgs.push(`⏰ ${expPw} password in scadenza o scadute`);
+    if (oldPw > 0) msgs.push(`⚠️ ${oldPw} password non aggiornate da 6+ mesi`);
+    pwWarn.textContent = msgs.join(' · ');
+    pwWarn.style.display = msgs.length ? 'block' : 'none';
+  }
+=======
+  // Avviso password vecchie (>180 giorni)
+  const oldPw = (_pwItems||[]).filter(i => !i.deleted && i.updatedAt &&
+    (Date.now() - new Date(i.updatedAt).getTime()) > 180 * 24 * 60 * 60 * 1000).length;
+  const pwWarn = document.getElementById('home-pw-warn');
+  if (pwWarn) { pwWarn.textContent = oldPw > 0 ? `⚠️ ${oldPw} password non aggiornate da 6+ mesi` : ''; pwWarn.style.display = oldPw > 0 ? 'block' : 'none'; }
+>>>>>>> 1fdc76582a318383f05f34870aef4b6afe2ef6f6
+  try { if(typeof noteLoad==='function') noteLoad(); } catch(e){}
   set('notes',     (_notes||[]).filter(n=>!n.deleted).length);
   set('otp',       (_otpAccounts||[]).filter(a=>!a.deleted).length);
   set('cards',     [
@@ -8674,6 +8880,310 @@ function updateSidebarBadges() {
     ...(_serverItems||[]).filter(s=>!s.deleted),
     ...(_wifiNets||[]).filter(w=>!w.deleted)
   ].length);
+}
+
+
+// ── Generatore password ────────────────────────────────────
+function genPassword(inputId) {
+  const len = 16;
+  const chars = {
+    upper: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    lower: 'abcdefghijklmnopqrstuvwxyz',
+    digits: '0123456789',
+    symbols: '!@#$%^&*()-_=+[]{}|;:,.<>?'
+  };
+  const all = chars.upper + chars.lower + chars.digits + chars.symbols;
+
+  // Garantisce almeno 1 di ogni tipo
+  let pw = [
+    chars.upper[Math.floor(Math.random() * chars.upper.length)],
+    chars.lower[Math.floor(Math.random() * chars.lower.length)],
+    chars.digits[Math.floor(Math.random() * chars.digits.length)],
+    chars.symbols[Math.floor(Math.random() * chars.symbols.length)],
+  ];
+  for (let i = pw.length; i < len; i++) {
+    pw.push(all[Math.floor(Math.random() * all.length)]);
+  }
+  // Mescola
+  pw = pw.sort(() => Math.random() - 0.5).join('');
+
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.value = pw;
+  input.type = 'text'; // mostra la password generata
+  // Feedback visivo
+  input.style.borderColor = 'var(--accent)';
+  setTimeout(() => { input.style.borderColor = ''; }, 1500);
+  // Aggiorna barra forza
+  const barId = inputId.replace('am-', 'str-');
+  pwStrengthUpdate(inputId, barId);
+  showToast('⚡ Password generata — modifica se vuoi');
+}
+
+
+// ── Copia con feedback visivo ──────────────────────────────
+function copyWithFeedback(text, el) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('📋 Copiato!', 1200);
+    if (el) {
+      el.classList.add('copy-pulse');
+      setTimeout(() => el.classList.remove('copy-pulse'), 700);
+    }
+  }).catch(() => showToast('❌ Copia non riuscita'));
+}
+
+
+// ── Blocco automatico per inattività ──────────────────────
+let _autoLockTimer = null;
+function getAutoLockMs() {
+  const saved = parseInt(localStorage.getItem('hb_autolock_min') || '5');
+  return saved * 60 * 1000;
+}
+
+function resetAutoLock() {
+  clearTimeout(_autoLockTimer);
+  _autoLockTimer = setTimeout(() => {
+    if (HB.user && HB.locked !== true) {
+      HB.locked = true;
+      logout();
+      showToast('🔒 Sessione scaduta per inattività');
+    }
+  }, getAutoLockMs());
+}
+
+function initAutoLock() {
+  ['click','touchstart','keydown','scroll'].forEach(ev =>
+    document.addEventListener(ev, resetAutoLock, { passive: true })
+  );
+  resetAutoLock();
+}
+
+
+// ── Formattazione note ─────────────────────────────────────
+function noteFormat(type) {
+  const ta = document.getElementById('note-content-inp');
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const sel = ta.value.substring(start, end);
+  const before = ta.value.substring(0, start);
+  const after = ta.value.substring(end);
+
+  let insert = '';
+  if (type === 'bold')   insert = sel ? `**${sel}**` : '**testo**';
+  if (type === 'italic') insert = sel ? `_${sel}_` : '_testo_';
+  if (type === 'list')   insert = `\n• ${sel || 'elemento'}`;
+  if (type === 'line')   insert = '\n---\n';
+
+  ta.value = before + insert + after;
+  ta.selectionStart = ta.selectionEnd = start + insert.length;
+  ta.focus();
+}
+
+
+// ── Logo circuito carta ────────────────────────────────────
+function getCardCircuitLogo(label) {
+  const l = (label || '').toLowerCase();
+  if (l.includes('visa') && !l.includes('mastercard')) {
+    return `<svg width="52" height="18" viewBox="0 0 52 18" style="flex-shrink:0;">
+      <text x="0" y="15" font-family="Arial" font-size="18" font-weight="900"
+        font-style="italic" fill="white" opacity="0.9">VISA</text></svg>`;
+  }
+  if (l.includes('mastercard') || l.includes('master card') || l.includes('master')) {
+    return `<svg width="44" height="26" viewBox="0 0 44 26" style="flex-shrink:0;">
+      <circle cx="14" cy="13" r="13" fill="#eb001b" opacity="0.9"/>
+      <circle cx="30" cy="13" r="13" fill="#f79e1b" opacity="0.9"/>
+      <path d="M22 2.5 a13 13 0 0 1 0 21 13 13 0 0 1 0-21z" fill="#ff5f00" opacity="0.85"/></svg>`;
+  }
+  if (l.includes('amex') || l.includes('american express')) {
+    return `<svg width="50" height="22" viewBox="0 0 50 22" style="flex-shrink:0;">
+      <text x="0" y="10" font-family="Arial" font-size="8" font-weight="900"
+        fill="white" opacity="0.85" letter-spacing="1">AMERICAN</text>
+      <text x="0" y="21" font-family="Arial" font-size="8" font-weight="900"
+        fill="white" opacity="0.85" letter-spacing="1">EXPRESS</text></svg>`;
+  }
+  if (l.includes('maestro')) {
+    return `<svg width="44" height="26" viewBox="0 0 44 26" style="flex-shrink:0;">
+      <circle cx="14" cy="13" r="13" fill="#eb001b" opacity="0.85"/>
+      <circle cx="30" cy="13" r="13" fill="#0099df" opacity="0.85"/>
+      <path d="M22 2.5 a13 13 0 0 1 0 21 13 13 0 0 1 0-21z" fill="#6c2d91" opacity="0.8"/></svg>`;
+  }
+  if (l.includes('postepay') || l.includes('poste')) {
+    return `<svg width="48" height="18" viewBox="0 0 48 18" style="flex-shrink:0;">
+      <text x="0" y="14" font-family="Arial" font-size="11" font-weight="900"
+        fill="#ffd700" opacity="0.95" letter-spacing="0.5">POSTEPAY</text></svg>`;
+  }
+  return '';
+}
+
+
+// ── Migrazione emailKey → UID ──────────────────────────────
+async function migrateToUid() {
+  try {
+    const uid = HB.user?.uid;
+    if (!uid) return;
+    // Calcola il vecchio emailKey
+    let emailAddr = HB.user?.email || '';
+    if (!emailAddr) return;
+    const oldKey = btoa(emailAddr).replace(/[^a-zA-Z0-9]/g,'').slice(0,28);
+    if (oldKey === uid) return; // già aggiornato
+    // Controlla se esistono dati al vecchio percorso
+    const oldSnap = await fbDb.ref('hb13/' + oldKey).get();
+    if (!oldSnap.exists()) return;
+    // Controlla se il nuovo percorso è vuoto
+    const newSnap = await fbDb.ref('hb13/' + uid).get();
+    if (newSnap.exists()) return; // nuovo già ha dati
+    // Copia dal vecchio al nuovo
+    await fbDb.ref('hb13/' + uid).set(oldSnap.val());
+    console.log('✅ Migrazione emailKey → UID completata');
+    showToast('✅ Dati migrati al nuovo formato sicuro');
+  } catch(e) {
+    console.warn('Migrazione fallita:', e);
+  }
+}
+
+
+// ── Backup/Ripristino per sezione ─────────────────────────
+const SECTION_KEYS = {
+  'passwords': ['hb13_passwords','hb13_pw_cats'],
+  'notes':     ['hb13_notes'],
+  'otp':       ['hb13_otp_accounts'],
+  'cards':     ['hb13_cards','hb13_finance'],
+  'server':    ['hb13_server','hb13_wifi'],
+};
+const SECTION_LABELS = {
+  'passwords': '🔐 Password',
+  'notes':     '📝 Note',
+  'otp':       '🔑 OTP / 2FA',
+  'cards':     '💳 Portafoglio',
+  'server':    '📡 Rete & IT',
+};
+
+function sectionExport(section) {
+  const keys = SECTION_KEYS[section];
+  if (!keys) return;
+  const data = {};
+  keys.forEach(k => {
+    const v = localStorage.getItem(k);
+    if (v) try { data[k] = JSON.parse(v); } catch(e) { data[k] = v; }
+  });
+  const payload = JSON.stringify({
+    version: '13.0.0',
+    section,
+    exportedAt: new Date().toISOString(),
+    data
+  }, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `HomeBull-${section}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Export ' + SECTION_LABELS[section] + ' completato');
+}
+
+function sectionImport(section) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (!parsed.data) throw new Error('Formato non valido');
+      // Importa solo le chiavi della sezione
+      const allowedKeys = SECTION_KEYS[section] || [];
+      let imported = 0;
+      Object.entries(parsed.data).forEach(([k, v]) => {
+        if (allowedKeys.includes(k)) {
+          localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+          _setLocalTs(k);
+          imported++;
+        }
+      });
+      if (imported === 0) throw new Error('Nessun dato trovato per questa sezione');
+      // Ricarica la sezione
+      if (section === 'passwords') { pwLoad(); pwRenderCats(); }
+      if (section === 'notes') { noteLoad(); noteRenderList(); }
+      if (section === 'otp') { otpLoad(); otpRenderList(); }
+      if (section === 'cards') { cardsLoad(); cardsRender(); financeLoad(); financeRender(); }
+      if (section === 'server') { serverLoad(); serverRender(); wifiLoad(); wifiRender(); }
+      updateSidebarBadges();
+      showToast('✅ Importati dati ' + SECTION_LABELS[section]);
+    } catch(err) {
+      showToast('❌ Import fallito: ' + err.message);
+    }
+  };
+  input.click();
+}
+
+
+// ── Forza password ─────────────────────────────────────────
+function pwStrength(pw) {
+  if (!pw) return { score: 0, label: '', color: '' };
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (pw.length >= 16) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  if (score <= 2) return { score, pct: 25,  label: 'Debole',    color: '#ef4444' };
+  if (score <= 4) return { score, pct: 50,  label: 'Discreta',  color: '#f97316' };
+  if (score <= 5) return { score, pct: 75,  label: 'Buona',     color: '#eab308' };
+  return              { score, pct: 100, label: 'Ottima',     color: '#22c55e' };
+}
+
+function pwStrengthUpdate(inputId, barId) {
+  const pw = document.getElementById(inputId)?.value || '';
+  const bar = document.getElementById(barId);
+  if (!bar) return;
+  const s = pwStrength(pw);
+  if (!pw) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.querySelector('.pw-str-fill').style.width = s.pct + '%';
+  bar.querySelector('.pw-str-fill').style.background = s.color;
+  bar.querySelector('.pw-str-label').textContent = s.label;
+  bar.querySelector('.pw-str-label').style.color = s.color;
+}
+
+
+// ── Tempo relativo ──────────────────────────────────────────
+function timeAgo(isoDate) {
+  if (!isoDate) return '';
+  const diff = Date.now() - new Date(isoDate).getTime();
+  const min  = Math.floor(diff / 60000);
+  const h    = Math.floor(diff / 3600000);
+  const d    = Math.floor(diff / 86400000);
+  if (min < 1)  return 'adesso';
+  if (min < 60) return `${min} min fa`;
+  if (h < 24)   return `${h} ore fa`;
+  if (d === 1)  return 'ieri';
+  if (d < 30)   return `${d} giorni fa`;
+  if (d < 365)  return `${Math.floor(d/30)} mesi fa`;
+  return `${Math.floor(d/365)} anni fa`;
+}
+
+
+// ── Mostra/nascondi PIN inserito ───────────────────────────
+let _pinVisible = false;
+function togglePinVisibility() {
+  _pinVisible = !_pinVisible;
+  const reveal = document.getElementById('pin-reveal');
+  const btn = document.getElementById('pin-eye-btn');
+  if (!reveal) return;
+  if (_pinVisible) {
+    reveal.style.display = 'block';
+    reveal.textContent = HB.pinBuffer || '';
+    btn.style.color = 'var(--accent)';
+  } else {
+    reveal.style.display = 'none';
+    btn.style.color = 'var(--text3)';
+  }
 }
 
 // ── Auto-sync Firebase dopo salvataggio ───────────────────
@@ -8943,6 +9453,49 @@ document.addEventListener('keydown', (e) => {
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
           </div>
+
+          <!-- Backup per sezione -->
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:12px;">📦 Esporta / Importa per sezione</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);">
+                <span style="font-size:13px;font-weight:600;">🔐 Password</span>
+                <div style="display:flex;gap:6px;">
+                  <button onclick="sectionExport('passwords')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
+                  <button onclick="sectionImport('passwords')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);">
+                <span style="font-size:13px;font-weight:600;">📝 Note</span>
+                <div style="display:flex;gap:6px;">
+                  <button onclick="sectionExport('notes')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
+                  <button onclick="sectionImport('notes')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);">
+                <span style="font-size:13px;font-weight:600;">🔑 OTP / 2FA</span>
+                <div style="display:flex;gap:6px;">
+                  <button onclick="sectionExport('otp')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
+                  <button onclick="sectionImport('otp')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);">
+                <span style="font-size:13px;font-weight:600;">💳 Portafoglio</span>
+                <div style="display:flex;gap:6px;">
+                  <button onclick="sectionExport('cards')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
+                  <button onclick="sectionImport('cards')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);">
+                <span style="font-size:13px;font-weight:600;">📡 Rete & IT</span>
+                <div style="display:flex;gap:6px;">
+                  <button onclick="sectionExport('server')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
+                  <button onclick="sectionImport('server')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
             <span style="font-size:28px;">🔄</span>
             <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
@@ -8974,6 +9527,18 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🔑 PIN di accesso</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Cambia il tuo PIN Master</div>
             <button onclick="settingsChangePin()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cambia PIN</button>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏱ Blocco automatico</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Blocca dopo inattività</div>
+            <select id="autolock-select" onchange="localStorage.setItem('hb_autolock_min',this.value);showToast('✅ Timeout aggiornato')"
+              style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;">
+              <option value="2">2 minuti</option>
+              <option value="5" selected>5 minuti</option>
+              <option value="10">10 minuti</option>
+              <option value="30">30 minuti</option>
+              <option value="60">1 ora</option>
+            </select>
           </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
@@ -9016,7 +9581,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">BETA429</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.20</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
