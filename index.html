@@ -4240,9 +4240,8 @@ function pwRenderCats(q='') {
       const oa = a.order ?? 9999;
       const ob = b.order ?? 9999;
       if (oa !== ob) return oa - ob;
-      return a.name.localeCompare(b.name, 'it');
+      return a.name.localeCompare(b.name, 'it', { numeric: true, sensitivity: 'base' });
     });
-
   if (!cats.length) {
     grid.style.display = 'block';
     grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna categoria — usa + Categoria per crearne una</div>';
@@ -4391,8 +4390,8 @@ function pwRenderItems(q='') {
 
   // Ordinamento
   const sort = localStorage.getItem('hb_pw_sort') || 'az';
-  if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it'));
-  else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it'));
+  if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it', { numeric: true, sensitivity: 'base' }));
+  else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it', { numeric: true, sensitivity: 'base' }));
   else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
   else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
   const count = _pwItems.filter(i => i.categoryId === _pwCurCat).length;
@@ -5355,7 +5354,7 @@ function noteRenderList(q='') {
   const sortSel = document.getElementById('note-sort-sel');
   if (sortSel) sortSel.value = noteSort;
   let notes = [..._notes].filter(n=>!n.deleted).sort((a,b) => {
-    if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'','it');
+    if (noteSort === 'title') return (a.title||'').localeCompare(b.title||'','it', { numeric: true, sensitivity: 'base' });
     if (noteSort === 'created') return new Date(b.createdAt||0)-new Date(a.createdAt||0);
     return new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0);
   });
@@ -8344,7 +8343,7 @@ function pwDeleteCategory(catId, catName, count) {
 
 function pwPickCategoryToDelete() {
   if (!_pwCats.length) { showToast('Nessuna categoria da eliminare'); return; }
-  const sorted = [..._pwCats].sort((a,b) => a.name.localeCompare(b.name,'it'));
+  const sorted = [..._pwCats].sort((a,b) => a.name.localeCompare(b.name,'it', { numeric: true, sensitivity: 'base' }));
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
   const box = document.createElement('div');
