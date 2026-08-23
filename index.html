@@ -3533,7 +3533,6 @@ function unlockApp() {
   initLocalCache().then(() => {
     updateHomeStats();
     updateSidebarBadges();
-    initAutoLock();
     // migrazione completata
     // Scarica sempre da Firebase al login — garantisce dati aggiornati
     setTimeout(() => fbSyncLoad().catch(()=>{}), 1500);
@@ -3570,11 +3569,11 @@ function logout() {
 // ── Router ─────────────────────────────────────────────────
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: [] },
-  passwords: { title: 'Password',    sub: '', actions: [] },
-  notes:     { title: 'Note',        sub: '', actions: [] },
-  otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: [] },
-  cards:     { title: 'Portafoglio', sub: 'Carte e conti', actions: [] },
-  server:    { title: 'Rete & IT',   sub: 'Server, credenziali e Wi-Fi', actions: [] },
+  passwords: { title: 'Password',    sub: '', actions: ['search'] },
+  notes:     { title: 'Note',        sub: '', actions: ['add'] },
+  otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: ['add'] },
+  cards:     { title: 'Portafoglio', sub: 'Carte e conti', actions: ['add'] },
+  server:    { title: 'Rete & IT',   sub: 'Server, credenziali e Wi-Fi', actions: ['add'] },
   family:    { title: 'Famiglia',    sub: 'Vault condiviso', actions: [] },
 };
 
@@ -3719,30 +3718,29 @@ function renderTopbarActions(actions) {
     btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
     btn.onclick = () => {
       if (HB.currentTab === 'server') {
+    if (_netitCurrent === 'wifi') {
+      const addView = document.getElementById('wifi-view-add');
+      if (addView && addView.style.display !== 'none') { wifiShowList(); return; }
+      wifiShowAdd(); return;
+    }
     const addView = document.getElementById('server-view-add');
     if (addView && addView.style.display !== 'none') { serverShowList(); return; }
-    const overlay = document.getElementById('server-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'finance') {
-    const addView = document.getElementById('finance-view-add');
-    if (addView && addView.style.display !== 'none') { financeShowList(); return; }
-    const overlay = document.getElementById('finance-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
+    serverShowAdd(); return;
   }
   if (HB.currentTab === 'cards') {
+    if (_walletCurrent === 'finance') {
+      const addView = document.getElementById('finance-view-add');
+      if (addView && addView.style.display !== 'none') { financeShowList(); return; }
+      financeShowAdd(); return;
+    }
     const addView = document.getElementById('cards-view-add');
     if (addView && addView.style.display !== 'none') { cardsShowList(); return; }
-    const overlay = document.getElementById('card-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
-  if (HB.currentTab === 'wifi') {
-    const addView = document.getElementById('wifi-view-add');
-    if (addView && addView.style.display !== 'none') { wifiShowList(); return; }
+    cardsShowAdd(); return;
   }
   if (HB.currentTab === 'otp') {
     const addView = document.getElementById('otp-view-add');
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
+    otpShowAdd(); return;
   }
   if (HB.currentTab === 'notes') { noteNew(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
@@ -6844,9 +6842,9 @@ function patchLocalStorage(){
 // ══ FUNZIONI RIPRISTINATE DA BETA333 ══════════════════════
 
 
-function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock')||'0';},500);applyCustomColors();}
+function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock_min')||'0';},500);applyCustomColors();}
 
-function settingsAutolock(min){localStorage.setItem('hb_autolock',min);showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
+function settingsAutolock(min){localStorage.setItem('hb_autolock_min',min);autolockReset();showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 
 function settingsBack() { settingsPage('main'); }
 
@@ -7035,7 +7033,7 @@ function autolockStop() {
 }
 
 function autolockReset() {
-  const min = parseInt(localStorage.getItem('hb_autolock') || '0');
+  const min = parseInt(localStorage.getItem('hb_autolock_min') || '0');
   if (!min) return;
   clearTimeout(_autolockTimer);
   _autolockTimer = setTimeout(() => {
@@ -8937,32 +8935,6 @@ function copyWithFeedback(text, el) {
 }
 
 
-// ── Blocco automatico per inattività ──────────────────────
-let _autoLockTimer = null;
-function getAutoLockMs() {
-  const saved = parseInt(localStorage.getItem('hb_autolock_min') || '5');
-  return saved * 60 * 1000;
-}
-
-function resetAutoLock() {
-  clearTimeout(_autoLockTimer);
-  _autoLockTimer = setTimeout(() => {
-    if (HB.user && HB.locked !== true) {
-      HB.locked = true;
-      logout();
-      showToast('🔒 Sessione scaduta per inattività');
-    }
-  }, getAutoLockMs());
-}
-
-function initAutoLock() {
-  ['click','touchstart','keydown','scroll'].forEach(ev =>
-    document.addEventListener(ev, resetAutoLock, { passive: true })
-  );
-  resetAutoLock();
-}
-
-
 // ── Formattazione note ─────────────────────────────────────
 function noteFormat(type) {
   const ta = document.getElementById('note-content-inp');
@@ -9533,19 +9505,6 @@ document.addEventListener('keydown', (e) => {
             <button onclick="settingsChangePin()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cambia PIN</button>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏱ Blocco automatico</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Blocca dopo inattività</div>
-            <select id="autolock-select" onchange="localStorage.setItem('hb_autolock_min',this.value);showToast('✅ Timeout aggiornato')"
-              style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;">
-              <option value="2">2 minuti</option>
-              <option value="5" selected>5 minuti</option>
-              <option value="10">10 minuti</option>
-              <option value="30">30 minuti</option>
-              <option value="60">1 ora</option>
-            </select>
-          </div>
-
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
               <div style="font-size:13px;font-weight:800;">👆 Biometria</div>
               <div id="bio-status" style="font-size:11px;font-weight:700;color:var(--text3);">Verifica...</div>
@@ -9568,9 +9527,12 @@ document.addEventListener('keydown', (e) => {
             <select id="autolock-sel" onchange="settingsAutolock(this.value)" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
               <option value="0">Mai</option>
               <option value="1">1 minuto</option>
+              <option value="2">2 minuti</option>
               <option value="5">5 minuti</option>
+              <option value="10">10 minuti</option>
               <option value="15">15 minuti</option>
               <option value="30">30 minuti</option>
+              <option value="60">1 ora</option>
             </select>
           </div>
 
