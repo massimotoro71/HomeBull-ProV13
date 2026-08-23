@@ -4581,12 +4581,21 @@ function pwExpOptionsHtml(selected) {
   ).join('');
 }
 
-// Calcola la data di scadenza (ISO) a partire da oggi + n giorni
-function pwComputeExpiryDate(expiryDays) {
+// Calcola la data di scadenza (ISO) a partire da una data di inizio (o da oggi) + n giorni
+function pwComputeExpiryDate(expiryDays, startDateStr) {
   if (!expiryDays || expiryDays === 'none') return '';
-  const d = new Date();
+  let d = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date();
+  if (isNaN(d.getTime())) d = new Date();
   d.setDate(d.getDate() + parseInt(expiryDays, 10));
   return d.toISOString();
+}
+
+// Data odierna in formato YYYY-MM-DD per gli input date
+function pwTodayISO() {
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return d.getFullYear()+'-'+mm+'-'+dd;
 }
 
 // Stato scadenza di un item: null se nessuna scadenza impostata
@@ -5011,7 +5020,12 @@ function pwNewItem() {
     '<div style="display:flex;gap:8px;"><input id="_pwn_pin" type="password" placeholder="PIN numerico..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
     '<button id="_pwn_pin_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button></div></div>',
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">⏰ Scadenza password</div>',
-    '<select id="_pwn_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+pwExpOptionsHtml('none')+'</select></div>',
+    '<div style="display:flex;gap:8px;">',
+    '<select id="_pwn_exp" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+pwExpOptionsHtml('none')+'</select>',
+    '<input id="_pwn_exp_start" type="date" value="'+pwTodayISO()+'" title="Data di inizio da cui calcolare la scadenza" style="padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;font-family:inherit;">',
+    '</div>',
+    '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data (di default oggi — cambiala se la password esiste già da un po\')</div>',
+    '</div>',
     '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
     '<textarea id="_pwn_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea></div>',
     '<div style="display:flex;gap:10px;">',
@@ -5041,7 +5055,8 @@ function pwNewItem() {
     const title = document.getElementById('_pwn_title')?.value.trim();
     const pass  = document.getElementById('_pwn_pass')?.value;
     if (!title || !pass) { showToast('Inserisci titolo e password'); return; }
-    const expDays = document.getElementById('_pwn_exp')?.value || 'none';
+    const expDays  = document.getElementById('_pwn_exp')?.value || 'none';
+    const expStart = document.getElementById('_pwn_exp_start')?.value || pwTodayISO();
     _pwItems.push({
       id: 'pw_' + Date.now(),
       title,
@@ -5052,7 +5067,8 @@ function pwNewItem() {
       notes:     document.getElementById('_pwn_note')?.value.trim() || '',
       categoryId: document.getElementById('_pwn_cat')?.value,
       expiryDays: expDays,
-      expiryDate: pwComputeExpiryDate(expDays),
+      expiryStartDate: expStart,
+      expiryDate: pwComputeExpiryDate(expDays, expStart),
       createdAt: new Date().toISOString()
     });
     pwSave();
@@ -8172,7 +8188,11 @@ function pwEditItem(itemId) {
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
     '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">⏰ Scadenza password</div>',
-    '<select id="_pwe_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+pwExpOptionsHtml(item.expiryDays)+'</select>',
+    '<div style="display:flex;gap:8px;">',
+    '<select id="_pwe_exp" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+pwExpOptionsHtml(item.expiryDays)+'</select>',
+    '<input id="_pwe_exp_start" type="date" value="'+(item.expiryStartDate || (item.createdAt ? item.createdAt.slice(0,10) : pwTodayISO()))+'" title="Data di inizio da cui calcolare la scadenza" style="padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;font-family:inherit;">',
+    '</div>',
+    '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data — correggila se la password esisteva già da prima</div>',
     item.expiryDate ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;">'+(pwExpiryInfo(item)?.text||'')+'</div>' : '',
     '</div>',
     '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
@@ -8210,11 +8230,12 @@ function pwEditItem(itemId) {
         history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
         if (history.length > 5) history.length = 5; // max 5 voci
       }
-      // Ricalcola la data di scadenza se è cambiata l'opzione scelta o se la password è stata rinnovata
-      const expDays = document.getElementById('_pwe_exp')?.value || 'none';
-      const expChanged = expDays !== (item.expiryDays || 'none');
+      // Ricalcola la data di scadenza se è cambiata l'opzione scelta, la data di inizio, o se la password è stata rinnovata
+      const expDays  = document.getElementById('_pwe_exp')?.value || 'none';
+      const expStart = document.getElementById('_pwe_exp_start')?.value || pwTodayISO();
+      const expChanged = expDays !== (item.expiryDays || 'none') || expStart !== (item.expiryStartDate || '');
       const expiryDate = (expChanged || (passChanged && expDays !== 'none'))
-        ? pwComputeExpiryDate(expDays)
+        ? pwComputeExpiryDate(expDays, expStart)
         : (expDays === 'none' ? '' : item.expiryDate);
       _pwItems[idx] = {
         ...item,
@@ -8226,6 +8247,7 @@ function pwEditItem(itemId) {
         notes:    document.getElementById('_pwe_note')?.value.trim() || '',
         categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
         expiryDays: expDays,
+        expiryStartDate: expStart,
         expiryDate: expiryDate,
         pwHistory: history,
         updatedAt: new Date().toISOString()
