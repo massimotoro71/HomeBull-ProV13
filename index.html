@@ -4140,11 +4140,25 @@ function getCatIcon(catId, catName, catIconField) {
 }
 
 // Carica da localStorage
+// Parsing "sicuro" del vault: se il dato è ancora cifrato (sessione non pronta)
+// o non è JSON valido, NON azzerare i dati in memoria — altrimenti un salvataggio
+// successivo scriverebbe un vault vuoto sopra quello vero (perdita dati).
+function _vaultParse(raw, prevValue) {
+  if (!raw) return prevValue !== undefined ? prevValue : [];
+  if (typeof raw === 'string' && raw.startsWith('hb13enc:')) {
+    console.warn('⚠️ Dato ancora cifrato (sessione non pronta) — mantengo i dati già in memoria');
+    return prevValue !== undefined ? prevValue : [];
+  }
+  try { return JSON.parse(raw); }
+  catch(e) {
+    console.warn('⚠️ Parsing vault fallito — mantengo i dati già in memoria', e);
+    return prevValue !== undefined ? prevValue : [];
+  }
+}
+
 function pwLoad() {
-  try {
-    _pwCats  = JSON.parse(localStorage.getItem(PW_CATS)  || '[]');
-    _pwItems = JSON.parse(localStorage.getItem(PW_KEY)   || '[]');
-  } catch(e) { _pwCats=[]; _pwItems=[]; }
+  _pwCats  = _vaultParse(localStorage.getItem(PW_CATS), _pwCats);
+  _pwItems = _vaultParse(localStorage.getItem(PW_KEY), _pwItems);
 }
 
 // Salva
@@ -5309,7 +5323,7 @@ let _notes = [];
 let _noteEditId = null; // null = nuova nota
 
 function noteLoad() {
-  try { _notes = JSON.parse(localStorage.getItem(NOTE_KEY) || '[]'); } catch(e) { _notes=[]; }
+  _notes = _vaultParse(localStorage.getItem(NOTE_KEY), _notes);
 }
 function noteSaveAll() {
   localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
@@ -5506,7 +5520,7 @@ let _cards = [];
 let _cardColor = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
 
 function cardsLoad() {
-  try { _cards = JSON.parse(localStorage.getItem(CARDS_KEY)||'[]'); } catch(e) { _cards=[]; }
+  _cards = _vaultParse(localStorage.getItem(CARDS_KEY), _cards);
 }
 function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); _setLocalTs(CARDS_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
@@ -5915,7 +5929,7 @@ let _financeAccounts = [];
 let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 
 function financeLoad() {
-  try { _financeAccounts = JSON.parse(localStorage.getItem(FINANCE_KEY)||'[]'); } catch(e) { _financeAccounts=[]; }
+  _financeAccounts = _vaultParse(localStorage.getItem(FINANCE_KEY), _financeAccounts);
 }
 function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); _setLocalTs(FINANCE_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
@@ -6162,7 +6176,7 @@ let _wifiNets = [];
 let _wifiSec  = 'WPA';
 
 function wifiLoad() {
-  try { _wifiNets = JSON.parse(localStorage.getItem(WIFI_KEY)||'[]'); } catch(e) { _wifiNets=[]; }
+  _wifiNets = _vaultParse(localStorage.getItem(WIFI_KEY), _wifiNets);
 }
 function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); _setLocalTs(WIFI_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
@@ -6435,7 +6449,7 @@ let _otpTimer    = null;
 let _otpIcon     = '🔐';
 
 function otpLoad() {
-  try { _otpAccounts = JSON.parse(localStorage.getItem(OTP_KEY)||'[]'); } catch(e) { _otpAccounts=[]; }
+  _otpAccounts = _vaultParse(localStorage.getItem(OTP_KEY), _otpAccounts);
 }
 function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); } updateSidebarBadges(); }
 
@@ -7403,7 +7417,7 @@ function serverOpen() {
 }
 
 function serverLoad() {
-  try { _serverItems = JSON.parse(localStorage.getItem(SERVER_KEY)||'[]'); } catch(e) { _serverItems=[]; }
+  _serverItems = _vaultParse(localStorage.getItem(SERVER_KEY), _serverItems);
 }
 
 function serverRender() {
@@ -7782,9 +7796,12 @@ async function tryBiometric() {
         }
       } catch(e2) { console.warn('[Bio decrypt]', e2); }
     }
-    // Fallback: biometria verificata → sblocca direttamente
-    showToast('👆 Accesso biometrico');
-    unlockApp();
+    // La biometria del sistema operativo è passata, ma non siamo riusciti a
+    // ricavare/verificare il PIN necessario per derivare la chiave di cifratura.
+    // NON sbloccare senza una sessionKey valida: farlo mostrerebbe il vault
+    // cifrato come vuoto e un salvataggio successivo lo sovrascriverebbe per
+    // sempre. Chiediamo il PIN manualmente.
+    showPinError('Verifica biometrica incompleta — inserisci il PIN');
   } catch(e) {
     console.warn('[Bio auth]', e);
     if (e.name === 'NotAllowedError') {
