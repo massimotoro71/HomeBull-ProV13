@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.27</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.29</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.27</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.29</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.27</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.29</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2250,6 +2250,7 @@ Aggiungi nuovo dato
             </div>
 
             <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📊</button>
+            <button onclick="pwExportCategoryMenu()" title="Esporta categoria" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📤</button>
             <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📷</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
@@ -2326,7 +2327,10 @@ Aggiungi nuovo dato
             <button onclick="noteFormat('italic')" title="Corsivo" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-style:italic;font-family:inherit;">I</button>
             <button onclick="noteFormat('list')" title="Elenco" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">• —</button>
             <button onclick="noteFormat('line')" title="Separatore" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">—</button>
+            <button onclick="noteAttPick()" title="Allega file" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">📎</button>
+            <input id="note-att-input" type="file" accept="image/*,.pdf" multiple style="display:none;" onchange="noteAttHandleFiles(this.files)">
           </div>
+          <div id="note-att-list" style="display:none;gap:10px;padding:0 14px 10px;overflow-x:auto;flex-shrink:0;"></div>
           <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..."
             style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
         </div>
@@ -2962,7 +2966,7 @@ const FB_CFG = {
 
 const HB_SYNC_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi',
   'hb13_finance','hb13_server',
-  'hb13_pw_cats'];
+  'hb13_pw_cats','hb13_note_att'];
 
 // ── Costanti biometria e autolock ──────────────────────────
 const HB_BIO_KEY     = 'hb12_bio_credId';
@@ -3153,7 +3157,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.27',
+  version: 'v13.1.29',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4888,6 +4892,91 @@ function pwShowFilteredList(type) {
   showExpiringListModal(title, rows, 'Nessuna voce trovata');
 }
 
+// ── Esportazione categoria (testo / PDF) ──────────────────
+function pwExportCategoryMenu() {
+  const cat = _pwCats.find(c => c.id === _pwCurCat);
+  const items = _pwItems.filter(i => i.categoryId === _pwCurCat && !i.deleted);
+  if (!items.length) { showToast('Nessuna password da esportare in questa categoria'); return; }
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';
+  box.innerHTML = `
+    <div style="font-size:28px;margin-bottom:10px;">⚠️</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Esportare "${cat?.name||'categoria'}"?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Il file conterrà ${items.length} password <strong>in chiaro, non cifrate</strong>. Conservalo con cura e cancellalo quando non ti serve più.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button id="_pwexp_txt" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📄 Scarica come testo (.txt)</button>
+      <button id="_pwexp_pdf" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🖨️ Stampa / Salva come PDF</button>
+      <button id="_pwexp_cancel" style="padding:12px;border-radius:12px;border:none;background:none;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+    </div>`;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_pwexp_cancel').onclick = () => overlay.remove();
+  document.getElementById('_pwexp_txt').onclick = () => { overlay.remove(); pwExportCategoryText(cat, items); };
+  document.getElementById('_pwexp_pdf').onclick = () => { overlay.remove(); pwExportCategoryPrint(cat, items); };
+}
+
+function pwExportCategoryText(cat, items) {
+  const now = new Date().toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric' });
+  let txt = `HOMEBULL PRO — Esportazione categoria "${cat?.name||''}"\nGenerato il ${now}\n`;
+  txt += '='.repeat(50) + '\n\n';
+  items.forEach((item, i) => {
+    txt += `${i+1}. ${item.title || 'Senza titolo'}\n`;
+    if (item.username) txt += `   Utente:   ${item.username}\n`;
+    txt += `   Password: ${item.password || '—'}\n`;
+    if (item.url)   txt += `   Sito:     ${item.url}\n`;
+    if (item.pin)   txt += `   PIN:      ${item.pin}\n`;
+    if (item.notes) txt += `   Note:     ${item.notes}\n`;
+    txt += '\n';
+  });
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `HomeBull-${(cat?.name||'categoria').replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ File di testo scaricato');
+}
+
+function pwExportCategoryPrint(cat, items) {
+  const now = new Date().toLocaleDateString('it-IT', { day:'2-digit', month:'long', year:'numeric' });
+  const rows = items.map((item, i) => `
+    <tr>
+      <td style="padding:8px;border:1px solid #ccc;">${i+1}</td>
+      <td style="padding:8px;border:1px solid #ccc;font-weight:700;">${(item.title||'—').replace(/</g,'&lt;')}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${(item.username||'—').replace(/</g,'&lt;')}</td>
+      <td style="padding:8px;border:1px solid #ccc;font-family:monospace;">${(item.password||'—').replace(/</g,'&lt;')}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${(item.url||'—').replace(/</g,'&lt;')}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${(item.notes||'—').replace(/</g,'&lt;')}</td>
+    </tr>`).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>HomeBull - ${cat?.name||''}</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:24px;color:#111;}
+      h1{font-size:18px;margin-bottom:2px;}
+      .sub{font-size:12px;color:#666;margin-bottom:18px;}
+      table{border-collapse:collapse;width:100%;font-size:12px;}
+      th{background:#6366f1;color:white;padding:8px;text-align:left;border:1px solid #ccc;}
+      .warn{margin-top:20px;font-size:11px;color:#999;}
+      @media print { body{padding:0;} }
+    </style></head><body>
+    <h1>🔐 HomeBull Pro — ${(cat?.name||'Categoria').replace(/</g,'&lt;')}</h1>
+    <div class="sub">Esportato il ${now} — ${items.length} password</div>
+    <table>
+      <tr><th>#</th><th>Titolo</th><th>Utente</th><th>Password</th><th>Sito</th><th>Note</th></tr>
+      ${rows}
+    </table>
+    <div class="warn">Documento generato da HomeBull Pro — contiene dati sensibili in chiaro, conservare con cura.</div>
+    <script>window.onload=()=>{setTimeout(()=>window.print(),300);}<\/script>
+    </body></html>`;
+  const win = window.open('', '_blank');
+  if (!win) { showToast('⚠️ Consenti i popup per stampare/salvare come PDF'); return; }
+  win.document.write(html);
+  win.document.close();
+}
+
 
 
 // ═══════════════════════════════════════════════════════════
@@ -5499,11 +5588,25 @@ function wifiScanQR(fromModal) {
 //  SCHEDA NOTE
 // ═══════════════════════════════════════════════════════════
 const NOTE_KEY = 'hb13_notes';
+const NOTE_ATT_KEY = 'hb13_note_att';
 let _notes = [];
 let _noteEditId = null; // null = nuova nota
+let _noteAttStore = {};        // { noteId: [ {id,name,type,size,dataUrl} ] }
+let _noteCurrentAtts = [];     // allegati della nota attualmente in modifica
+const NOTE_ATT_MAX_COUNT = 4;
+const NOTE_ATT_MAX_BYTES = 1.5 * 1024 * 1024; // 1.5MB dopo compressione/per file non immagine
 
 function noteLoad() {
   _notes = _vaultParse(localStorage.getItem(NOTE_KEY), _notes);
+}
+function noteAttLoad() {
+  const parsed = _vaultParse(localStorage.getItem(NOTE_ATT_KEY), _noteAttStore);
+  _noteAttStore = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+}
+function noteAttSaveAll() {
+  localStorage.setItem(NOTE_ATT_KEY, JSON.stringify(_noteAttStore));
+  _setLocalTs(NOTE_ATT_KEY);
+  if(!_syncInProgress) { driveAutoBackupOnSave(); _autoSyncAfterSave(); }
 }
 function noteSaveAll() {
   localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
@@ -5513,8 +5616,134 @@ function noteSaveAll() {
   if (el) el.textContent = _notes.length || '—';
 }
 
+// Ridimensiona/comprime un'immagine lato client prima di salvarla (evita di
+// appesantire lo storage locale e la sincronizzazione con file enormi)
+function noteCompressImage(file, maxDim, quality) {
+  maxDim = maxDim || 1280; quality = quality || 0.72;
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) { height = Math.round(height * maxDim / width); width = maxDim; }
+          else { width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('Immagine non valida'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error('Lettura file fallita'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function noteAttFormatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return Math.round(bytes/1024) + ' KB';
+  return (bytes/1024/1024).toFixed(1) + ' MB';
+}
+
+function noteAttIcon(type) {
+  if (type && type.startsWith('image/')) return '🖼️';
+  if (type === 'application/pdf') return '📄';
+  return '📎';
+}
+
+// Gestisce la selezione file dall'input nascosto
+function noteAttPick() {
+  if (_noteCurrentAtts.length >= NOTE_ATT_MAX_COUNT) {
+    showToast('Massimo ' + NOTE_ATT_MAX_COUNT + ' allegati per nota'); return;
+  }
+  document.getElementById('note-att-input').click();
+}
+
+async function noteAttHandleFiles(fileList) {
+  const files = Array.from(fileList || []);
+  for (const file of files) {
+    if (_noteCurrentAtts.length >= NOTE_ATT_MAX_COUNT) {
+      showToast('Massimo ' + NOTE_ATT_MAX_COUNT + ' allegati per nota'); break;
+    }
+    try {
+      let dataUrl, size, type = file.type || 'application/octet-stream';
+      if (type.startsWith('image/')) {
+        dataUrl = await noteCompressImage(file);
+        size = Math.round(dataUrl.length * 0.75); // stima byte da base64
+      } else {
+        if (file.size > NOTE_ATT_MAX_BYTES) {
+          showToast('⚠️ "'+file.name+'" supera '+noteAttFormatSize(NOTE_ATT_MAX_BYTES)+' — non allegato');
+          continue;
+        }
+        dataUrl = await new Promise((res, rej) => {
+          const r = new FileReader();
+          r.onload = e => res(e.target.result);
+          r.onerror = () => rej(new Error('Lettura fallita'));
+          r.readAsDataURL(file);
+        });
+        size = file.size;
+      }
+      if (size > NOTE_ATT_MAX_BYTES) {
+        showToast('⚠️ "'+file.name+'" ancora troppo grande dopo la compressione — non allegato');
+        continue;
+      }
+      _noteCurrentAtts.push({ id:'att_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:file.name, type, size, dataUrl });
+    } catch(e) {
+      showToast('⚠️ Impossibile allegare "'+file.name+'"');
+    }
+  }
+  noteRenderAttachments();
+  document.getElementById('note-att-input').value = '';
+}
+
+function noteRenderAttachments() {
+  const box = document.getElementById('note-att-list');
+  if (!box) return;
+  if (!_noteCurrentAtts.length) { box.innerHTML = ''; box.style.display = 'none'; return; }
+  box.style.display = 'flex';
+  box.innerHTML = _noteCurrentAtts.map(a => {
+    const thumb = a.type.startsWith('image/')
+      ? `<img src="${a.dataUrl}" style="width:100%;height:100%;object-fit:cover;">`
+      : `<div style="font-size:22px;">${noteAttIcon(a.type)}</div>`;
+    return `<div style="position:relative;width:64px;flex-shrink:0;">
+      <div onclick="noteAttPreview('${a.id}')" style="width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">${thumb}</div>
+      <div style="font-size:9px;color:var(--text3);margin-top:3px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${noteAttFormatSize(a.size)}</div>
+      <button onclick="noteAttRemove('${a.id}')" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:white;border:2px solid var(--bg2);font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function noteAttRemove(id) {
+  _noteCurrentAtts = _noteCurrentAtts.filter(a => a.id !== id);
+  noteRenderAttachments();
+}
+
+function noteAttPreview(id) {
+  const a = _noteCurrentAtts.find(x => x.id === id);
+  if (!a) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.onclick = () => overlay.remove();
+  if (a.type.startsWith('image/')) {
+    overlay.innerHTML = `<img src="${a.dataUrl}" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">`;
+  } else {
+    overlay.innerHTML = `<div style="background:var(--bg2);border-radius:16px;padding:28px;text-align:center;max-width:280px;">
+      <div style="font-size:40px;margin-bottom:10px;">${noteAttIcon(a.type)}</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px;word-break:break-word;">${a.name}</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">${noteAttFormatSize(a.size)}</div>
+      <a href="${a.dataUrl}" download="${a.name}" onclick="event.stopPropagation()" style="display:inline-block;padding:10px 18px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-size:13px;font-weight:700;">⬇️ Scarica</a>
+    </div>`;
+  }
+  document.body.appendChild(overlay);
+}
+
 function noteOpen() {
   noteLoad();
+  noteAttLoad();
   noteShowList();
   document.getElementById('topbar-title').textContent = 'Note';
   document.getElementById('topbar-sub').textContent = _notes.length + ' note';
@@ -5586,7 +5815,7 @@ function noteRenderList(q='') {
       <div class="note-card-title">${note.title || 'Senza titolo'}</div>
       ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
       <div class="note-card-footer">
-        <span class="note-card-date">🕐 ${dateStr}</span>
+        <span class="note-card-date">🕐 ${dateStr}${(_noteAttStore[note.id]||[]).length ? ' · 📎 '+_noteAttStore[note.id].length : ''}</span>
         <div style="display:flex;gap:6px;">
           <button onclick="event.stopPropagation();noteEdit('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
           <button onclick="event.stopPropagation();noteDelete('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑</button>
@@ -5600,10 +5829,12 @@ function noteSearch(q) { noteRenderList(q); }
 
 // ── Editor ───────────────────────────────────────────────
 function noteNew() {
-  _noteEditId = null;
+  _noteEditId = 'note_' + Date.now();
+  _noteCurrentAtts = [];
   document.getElementById('note-title-inp').value = '';
   document.getElementById('note-content-inp').value = '';
   document.getElementById('note-editor-date').textContent = 'Nuova nota';
+  noteRenderAttachments();
   noteShowEditor();
   setTimeout(() => document.getElementById('note-title-inp').focus(), 200);
 }
@@ -5612,11 +5843,13 @@ function noteEdit(id) {
   const note = _notes.find(n => n.id === id);
   if (!note) return;
   _noteEditId = id;
+  _noteCurrentAtts = (_noteAttStore[id] || []).slice();
   document.getElementById('note-title-inp').value = note.title || '';
   document.getElementById('note-content-inp').value = note.content || '';
   const d = new Date(note.updatedAt);
   document.getElementById('note-editor-date').textContent =
     'Modificata: ' + d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  noteRenderAttachments();
   noteShowEditor();
 }
 
@@ -5631,14 +5864,17 @@ function noteShowEditor() {
 function noteSave() {
   const title   = document.getElementById('note-title-inp').value.trim();
   const content = document.getElementById('note-content-inp').value.trim();
-  if (!title && !content) { showToast('Scrivi qualcosa prima di salvare'); return; }
+  if (!title && !content && !_noteCurrentAtts.length) { showToast('Scrivi qualcosa prima di salvare'); return; }
   const now = new Date().toISOString();
-  if (_noteEditId) {
-    const note = _notes.find(n => n.id === _noteEditId);
-    if (note) { note.title = title; note.content = content; note.updatedAt = now; }
+  let note = _notes.find(n => n.id === _noteEditId);
+  if (note) {
+    note.title = title; note.content = content; note.updatedAt = now;
   } else {
-    _notes.push({ id:'note_'+Date.now(), title, content, createdAt:now, updatedAt:now });
+    _notes.push({ id:_noteEditId, title, content, createdAt:now, updatedAt:now });
   }
+  if (_noteCurrentAtts.length) _noteAttStore[_noteEditId] = _noteCurrentAtts;
+  else delete _noteAttStore[_noteEditId];
+  noteAttSaveAll();
   noteSaveAll();
   showToast('✅ Nota salvata');
   noteCloseEditor();
@@ -5667,6 +5903,7 @@ function noteDelete(id) {
   document.getElementById('_nd_ok').onclick = () => {
     overlay.remove();
     _notes = markDeleted(_notes, id);
+    if (_noteAttStore[id]) { delete _noteAttStore[id]; noteAttSaveAll(); }
     noteSaveAll();
     noteRenderList('');
     showToast('Nota eliminata');
@@ -9823,7 +10060,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.27</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.29</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
