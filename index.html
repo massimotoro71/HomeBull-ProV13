@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.29</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.30</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.29</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.30</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.29</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.30</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2322,17 +2322,22 @@ Aggiungi nuovo dato
             <span id="note-editor-date" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
           </div>
           <!-- Barra formattazione note -->
-          <div style="padding:4px 14px;display:flex;gap:6px;flex-shrink:0;">
-            <button onclick="noteFormat('bold')" title="Grassetto" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">B</button>
-            <button onclick="noteFormat('italic')" title="Corsivo" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-style:italic;font-family:inherit;">I</button>
-            <button onclick="noteFormat('list')" title="Elenco" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">• —</button>
-            <button onclick="noteFormat('line')" title="Separatore" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">—</button>
-            <button onclick="noteAttPick()" title="Allega file" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;">📎</button>
+          <div style="padding:4px 14px;display:flex;gap:6px;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;">
+            <button onclick="noteFormat('bold')" title="Grassetto" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">B</button>
+            <button onclick="noteFormat('italic')" title="Corsivo" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-style:italic;font-family:inherit;flex-shrink:0;">I</button>
+            <button onclick="noteFormat('heading')" title="Titolo" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;flex-shrink:0;">H</button>
+            <button onclick="noteFormat('list')" title="Elenco" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">• —</button>
+            <button onclick="noteFormat('check')" title="Casella da spuntare" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">☑</button>
+            <button onclick="noteFormat('quote')" title="Citazione" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">"</button>
+            <button onclick="noteFormat('line')" title="Separatore" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">—</button>
+            <button onclick="noteAttPick()" title="Allega file" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;">📎</button>
+            <button id="note-preview-btn" onclick="noteTogglePreview()" title="Anteprima formattata" style="padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0;margin-left:auto;">👁 Anteprima</button>
             <input id="note-att-input" type="file" accept="image/*,.pdf" multiple style="display:none;" onchange="noteAttHandleFiles(this.files)">
           </div>
           <div id="note-att-list" style="display:none;gap:10px;padding:0 14px 10px;overflow-x:auto;flex-shrink:0;"></div>
-          <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..."
+          <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..." oninput="if(_noteInPreview)noteRenderPreview()"
             style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
+          <div id="note-preview-box" style="display:none;flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;line-height:1.7;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
         </div>
 
       </div>
@@ -3157,7 +3162,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.29',
+  version: 'v13.1.30',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3655,7 +3660,7 @@ function switchTab(tab) {
     notes:     () => typeof noteOpen === 'function' && noteOpen(),
     cards:     () => { walletTab(_walletCurrent || 'cards'); },
     server:    () => { netitTab(_netitCurrent || 'server'); },
-      home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); }
+      home:      () => { if (typeof updateHomeDate === 'function') updateHomeDate(); updateSyncBadge(); }
   };
   moduleOpeners[tab]?.();
 }
@@ -3781,11 +3786,6 @@ function renderTopbarActions(actions) {
 }
 
 function topbarBack() {
-  if (HB.currentTab === 'documents') {
-    const addView = document.getElementById('docs-view-add');
-    const overlay = document.getElementById('docs-detail-overlay');
-    if (overlay) { overlay.remove(); return; }
-  }
   if (HB.currentTab === 'server') {
     const addView = document.getElementById('server-view-add');
     if (addView && addView.style.display !== 'none') { serverShowList(); return; }
@@ -3921,8 +3921,6 @@ function checkExpiryNotifications() {
   if (shown.date === today) return; // già notificato oggi
 
   const toNotify = [];
-
-  // Documenti
 
   // Carte
   (_cards || []).forEach(card => {
@@ -5859,6 +5857,9 @@ function noteShowEditor() {
   document.getElementById('topbar-back').classList.add('visible');
   document.getElementById('topbar-title').textContent = _noteEditId ? 'Modifica nota' : 'Nuova nota';
   document.getElementById('topbar-sub').textContent = '';
+  // Riparti sempre in modalità modifica, non anteprima
+  _noteInPreview = true; // forza il toggle a "spegnere" l'anteprima ripristinando lo stato editor
+  noteTogglePreview();
 }
 
 function noteSave() {
@@ -7199,7 +7200,11 @@ async function loadShares() { return; } // rimosso — UI condivisione dismessa
 // ── Indicatore ultimo sync ────────────────────────────────
 function updateSyncBadge() {
   const el = document.getElementById('sync-time-badge');
-  if (!el || !_lastSyncTime) return;
+  if (!el) return;
+  if (!_lastSyncTime) {
+    el.textContent = (navigator.onLine && fbReady && HB.user) ? '⏳ sync in corso...' : '';
+    return;
+  }
   const diff = Math.round((Date.now() - new Date(_lastSyncTime).getTime()) / 1000);
   let label;
   if (diff < 60) label = '✅ sync ' + diff + 's fa';
@@ -7780,6 +7785,7 @@ async function fbSyncAll(silent=false){
     await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
+    updateSyncBadge();
     driveAutoBackup();
     driveAutoBackupOnSave();
   }catch(e){
@@ -9437,6 +9443,8 @@ function copyWithFeedback(text, el) {
 
 
 // ── Formattazione note ─────────────────────────────────────
+let _noteInPreview = false;
+
 function noteFormat(type) {
   const ta = document.getElementById('note-content-inp');
   if (!ta) return;
@@ -9447,14 +9455,71 @@ function noteFormat(type) {
   const after = ta.value.substring(end);
 
   let insert = '';
-  if (type === 'bold')   insert = sel ? `**${sel}**` : '**testo**';
-  if (type === 'italic') insert = sel ? `_${sel}_` : '_testo_';
-  if (type === 'list')   insert = `\n• ${sel || 'elemento'}`;
-  if (type === 'line')   insert = '\n---\n';
+  if (type === 'bold')    insert = sel ? `**${sel}**` : '**testo**';
+  if (type === 'italic')  insert = sel ? `_${sel}_` : '_testo_';
+  if (type === 'heading') insert = `\n## ${sel || 'Titolo'}\n`;
+  if (type === 'list')    insert = `\n• ${sel || 'elemento'}`;
+  if (type === 'check')   insert = `\n☐ ${sel || 'da fare'}`;
+  if (type === 'quote')   insert = `\n> ${sel || 'citazione'}`;
+  if (type === 'line')    insert = '\n---\n';
 
   ta.value = before + insert + after;
   ta.selectionStart = ta.selectionEnd = start + insert.length;
   ta.focus();
+  if (_noteInPreview) noteRenderPreview();
+}
+
+// Converte la sintassi markdown-lite usata nelle note in HTML formattato
+function noteMarkdownToHtml(text) {
+  if (!text) return '<span style="color:var(--text3);">Niente da mostrare — scrivi qualcosa nell\'editor.</span>';
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = esc(text).split('\n');
+  let html = '', inList = false;
+  const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
+  lines.forEach(line => {
+    let l = line;
+    // Toggle rapido: cliccando su una checkbox nell'anteprima si spunta/de-spunta nel testo originale
+    if (/^☑ /.test(l)) { closeList(); html += `<div style="text-decoration:line-through;color:var(--text3);margin:2px 0;">☑ ${l.slice(2)}</div>`; return; }
+    if (/^☐ /.test(l)) { closeList(); html += `<div style="margin:2px 0;">☐ ${l.slice(2)}</div>`; return; }
+    if (/^## /.test(l)) { closeList(); html += `<div style="font-size:17px;font-weight:800;margin:10px 0 4px;">${l.slice(3)}</div>`; return; }
+    if (/^> /.test(l))  { closeList(); html += `<div style="border-left:3px solid var(--accent);padding-left:10px;color:var(--text2);font-style:italic;margin:4px 0;">${l.slice(2)}</div>`; return; }
+    if (/^---$/.test(l.trim())) { closeList(); html += '<hr style="border:none;border-top:1px solid var(--border);margin:10px 0;">'; return; }
+    if (/^• /.test(l))  { if (!inList) { html += '<ul style="margin:4px 0;padding-left:20px;">'; inList = true; } html += `<li>${l.slice(2)}</li>`; return; }
+    closeList();
+    if (!l.trim()) { html += '<br>'; return; }
+    l = l.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/_(.+?)_/g, '<em>$1</em>');
+    html += `<div style="margin:2px 0;">${l}</div>`;
+  });
+  closeList();
+  return html;
+}
+
+function noteRenderPreview() {
+  const box = document.getElementById('note-preview-box');
+  const ta = document.getElementById('note-content-inp');
+  if (box && ta) box.innerHTML = noteMarkdownToHtml(ta.value);
+}
+
+function noteTogglePreview() {
+  _noteInPreview = !_noteInPreview;
+  const ta = document.getElementById('note-content-inp');
+  const box = document.getElementById('note-preview-box');
+  const btn = document.getElementById('note-preview-btn');
+  if (_noteInPreview) {
+    noteRenderPreview();
+    ta.style.display = 'none';
+    box.style.display = 'block';
+    btn.textContent = '✏️ Modifica';
+    btn.style.background = 'var(--accent)';
+    btn.style.color = 'white';
+  } else {
+    ta.style.display = 'block';
+    box.style.display = 'none';
+    btn.textContent = '👁 Anteprima';
+    btn.style.background = 'var(--surface)';
+    btn.style.color = 'var(--text)';
+    ta.focus();
+  }
 }
 
 
@@ -10060,7 +10125,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.29</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.30</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
