@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.30</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.31</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.30</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.31</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.30</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.31</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2210,6 +2210,12 @@ Aggiungi nuovo dato
         <!-- Esci desktop -->
         <button onclick="logout()" class="home-esci-desktop" style="width:100%;padding:14px;border-radius:14px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.05);color:#ef4444;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-bottom:16px;">🚪 Esci</button>
 
+        <!-- Preferiti -->
+        <div id="home-favorites-section" style="margin-bottom:24px;display:none;">
+          <div class="home-section-title" style="margin-bottom:10px;">⭐ Preferiti</div>
+          <div id="home-favorites" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
         <!-- Alert reali -->
         <div id="home-alerts-section" style="margin-bottom:24px;">
           <div class="home-section-title" style="margin-bottom:10px;">🔔 Alert</div>
@@ -2273,6 +2279,7 @@ Aggiungi nuovo dato
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div id="pw-detail-title" style="flex:1;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+          <button id="pw-detail-fav" title="Preferiti" style="background:none;border:none;cursor:pointer;font-size:22px;padding:4px;flex-shrink:0;line-height:1;">☆</button>
         </div>
         <div id="pw-detail-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;"></div>
       </div>
@@ -3162,7 +3169,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.30',
+  version: 'v13.1.31',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3962,8 +3969,9 @@ function updateHomeStats() {
 
   // ── Ricarica sempre da localStorage (importante dopo sync) ──
   try { pwLoad(); } catch(e) {}
-  try { notesLoad(); } catch(e) {}
+  try { noteLoad(); } catch(e) {}
   try { otpLoad(); } catch(e) {}
+  updateHomeFavorites();
 
   const pw   = document.getElementById('stat-passwords');
   const nt   = document.getElementById('stat-notes');
@@ -4482,6 +4490,7 @@ function pwRenderItems(q='') {
           <div class="pw-item-user">${item.username||''}</div>
           ${item.updatedAt ? `<div style="font-size:10px;color:var(--text3);margin-top:1px;">${timeAgo(item.updatedAt)}</div>` : ''}
         </div>
+        <button onclick="event.stopPropagation();pwToggleFavorite('${item.id}')" title="${item.favorite?'Rimuovi dai preferiti':'Aggiungi ai preferiti'}" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px;flex-shrink:0;line-height:1;">${item.favorite ? '⭐' : '☆'}</button>
       </div>
       <div class="pw-item-footer">
         <span class="pw-strength-badge" style="background:${strength.bg};color:${strength.col};">${strength.label}</span>
@@ -4498,6 +4507,52 @@ function pwRenderItems(q='') {
 }
 
 function pwFilterItems(q) { pwRenderItems(q); }
+
+function pwToggleFavorite(id) {
+  const item = _pwItems.find(i => i.id === id);
+  if (!item) return;
+  item.favorite = !item.favorite;
+  pwSave();
+  pwRenderItems(document.getElementById('pw-item-search')?.value || '');
+  updateHomeFavorites();
+  showToast(item.favorite ? '⭐ Aggiunta ai preferiti' : 'Rimossa dai preferiti');
+}
+
+// Sezione "Preferiti" in Home — accesso rapido con copia password in un tocco
+function updateHomeFavorites() {
+  const section = document.getElementById('home-favorites-section');
+  const box = document.getElementById('home-favorites');
+  if (!section || !box) return;
+  const favs = (_pwItems || []).filter(i => i.favorite && !i.deleted);
+  if (!favs.length) { section.style.display = 'none'; box.innerHTML = ''; return; }
+  section.style.display = 'block';
+  box.innerHTML = favs.slice(0, 6).map(item => {
+    const cat = _pwCats.find(c => c.id === item.categoryId);
+    const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
+    return `<div onclick="pwOpenDirect('${item.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;">
+      <div style="width:38px;height:38px;border-radius:11px;background:${cat?.color||'rgba(99,102,241,0.1)'}20;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.title||'—'}</div>
+        <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.username||''}</div>
+      </div>
+      <button onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+// Apre direttamente il dettaglio di una password da qualsiasi punto dell'app (es. dai Preferiti in Home)
+function pwOpenDirect(id) {
+  const item = _pwItems.find(i => i.id === id);
+  if (!item) { showToast('Password non trovata'); return; }
+  const cat = _pwCats.find(c => c.id === item.categoryId);
+  switchTab('passwords');
+  setTimeout(() => {
+    pwShowItems(item.categoryId, cat?.name || 'Password');
+    setTimeout(() => pwShowDetail(id), 150);
+  }, 200);
+}
 
 function pwToggleSearch() {
   const wrap = document.getElementById('pw-item-search-wrap');
@@ -4517,6 +4572,9 @@ function pwShowDetail(itemId) {
   document.getElementById('pw-view-detail').style.display = 'flex';
   document.getElementById('pw-detail-title').textContent = item.title || '—';
   document.getElementById('topbar-title').textContent = item.title || '—';
+
+  const favBtn = document.getElementById('pw-detail-fav');
+  if (favBtn) { favBtn.textContent = item.favorite ? '⭐' : '☆'; favBtn.onclick = () => { pwToggleFavorite(item.id); pwShowDetail(item.id); }; }
 
   const pw = item.password ? '••••••••' : '—';
   const content = document.getElementById('pw-detail-content');
@@ -10125,7 +10183,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.30</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.31</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
