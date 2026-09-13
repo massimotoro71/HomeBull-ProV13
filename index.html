@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.32</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.33</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.32</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.33</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.32</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.33</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3171,7 +3171,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.32',
+  version: 'v13.1.33',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3247,6 +3247,7 @@ async function _encryptAndStore(key, jsonStr) {
   const origGet = proto.getItem.bind(localStorage);
   const origSet = proto.setItem.bind(localStorage);
   proto.__origSet = proto.setItem;
+  proto.__origGet = proto.getItem;
 
   proto.getItem = function(key) {
     if (_lsCacheReady && _SENSITIVE_KEYS.includes(key)) {
@@ -4506,6 +4507,53 @@ function pwRenderItems(q='') {
       </div>`;
     list.appendChild(card);
   });
+}
+
+// ── Diagnostica dati locali (per capire se un vault "vuoto" è dati persi o un bug di visualizzazione) ──
+function hbDiagnose() {
+  const rawKeys = Object.keys(localStorage);
+  const check = (label, key) => {
+    const cached = _lsCache[key]; // valore decifrato già in memoria, se la sessione è pronta
+    if (cached === undefined) {
+      const rawExists = Object.getPrototypeOf(localStorage).__origGet
+        ? Object.getPrototypeOf(localStorage).__origGet.call(localStorage, key)
+        : null;
+      return label + ': NON in cache decifrata' + (rawExists ? ' (ma un valore grezzo esiste, ' + rawExists.length + ' byte)' : ' (assente anche sul disco)');
+    }
+    let count = '';
+    try { const parsed = JSON.parse(cached); if (Array.isArray(parsed)) count = ' — ' + parsed.length + ' elementi'; } catch(e) { count = ' — non è JSON valido!'; }
+    return label + ': presente, ' + cached.length + ' byte' + count;
+  };
+  const lines = [
+    '📦 Chiavi totali in localStorage: ' + rawKeys.length,
+    '🔑 sessionKey attiva: ' + (HB.sessionKey ? 'sì' : 'NO'),
+    '🗄️ Cache pronta (_lsCacheReady): ' + (_lsCacheReady ? 'sì' : 'NO'),
+    '',
+    check('Password (hb13_passwords)', 'hb13_passwords'),
+    check('Categorie password (hb13_pw_cats)', 'hb13_pw_cats'),
+    check('Note (hb13_notes)', 'hb13_notes'),
+    check('Carte (hb13_cards)', 'hb13_cards'),
+    '',
+    '📲 In memoria ora: _pwItems=' + (_pwItems?.length ?? '?') + ', _notes=' + (_notes?.length ?? '?'),
+    '☁️ Ultimo sync riuscito: ' + (_lastSyncTime ? new Date(_lastSyncTime).toLocaleString('it-IT') : 'mai in questa sessione'),
+    '⚠️ Ultimo errore sync: ' + (_lastSyncError || 'nessuno'),
+  ];
+  const text = lines.join('\n');
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:22px;max-width:400px;width:100%;border:1px solid var(--border);';
+  box.innerHTML = '<div style="font-size:15px;font-weight:800;margin-bottom:12px;">🔍 Diagnostica</div>' +
+    '<pre style="white-space:pre-wrap;font-size:12px;font-family:monospace;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;max-height:50vh;overflow-y:auto;color:var(--text2);">' + text.replace(/</g,'&lt;') + '</pre>' +
+    '<div style="display:flex;gap:8px;margin-top:14px;">' +
+    '<button id="_diag-copy" style="flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button>' +
+    '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="flex:1;padding:11px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>' +
+    '</div>';
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  document.getElementById('_diag-copy').onclick = () => {
+    navigator.clipboard?.writeText(text).then(() => showToast('✅ Copiato negli appunti')).catch(() => showToast('Copia manualmente il testo sopra'));
+  };
 }
 
 function pwFilterItems(q) { pwRenderItems(q); }
@@ -10197,7 +10245,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.32</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.33</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
@@ -10216,6 +10264,7 @@ document.addEventListener('keydown', (e) => {
               <div style="display:flex;align-items:center;gap:10px;">🎨 <span style="color:var(--text2);">Tema chiaro / scuro</span></div>
             </div>
           </div>
+          <button onclick="hbDiagnose()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 Diagnostica dati locali</button>
         </div>
       </div>
 
