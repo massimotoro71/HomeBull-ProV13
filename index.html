@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.33</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.34</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.33</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.34</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.33</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.34</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3171,7 +3171,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.33',
+  version: 'v13.1.34',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3240,6 +3240,21 @@ async function _encryptAndStore(key, jsonStr) {
     );
   } catch(e) {}
 }
+
+// "Scatola nera": registra le ultime attività di sync/localStorage per diagnosticare problemi futuri
+window._hbLogBuffer = [];
+(function() {
+  const origLog = console.log.bind(console);
+  const origWarn = console.warn.bind(console);
+  const push = (level, args) => {
+    try {
+      window._hbLogBuffer.push('[' + new Date().toLocaleTimeString('it-IT') + '] ' + level + ': ' + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '));
+      if (window._hbLogBuffer.length > 60) window._hbLogBuffer.shift();
+    } catch(e) {}
+  };
+  console.log = function(...args) { push('LOG', args); origLog(...args); };
+  console.warn = function(...args) { push('WARN', args); origWarn(...args); };
+})();
 
 // Patch trasparente localStorage — getItem legge dalla cache, setItem cifra in background
 (function() {
@@ -4511,7 +4526,7 @@ function pwRenderItems(q='') {
 
 // ── Diagnostica dati locali (per capire se un vault "vuoto" è dati persi o un bug di visualizzazione) ──
 function hbDiagnose() {
-  const rawKeys = Object.keys(localStorage);
+  const rawKeys = Object.keys(localStorage).sort();
   const check = (label, key) => {
     const cached = _lsCache[key]; // valore decifrato già in memoria, se la sessione è pronta
     if (cached === undefined) {
@@ -4524,8 +4539,14 @@ function hbDiagnose() {
     try { const parsed = JSON.parse(cached); if (Array.isArray(parsed)) count = ' — ' + parsed.length + ' elementi'; } catch(e) { count = ' — non è JSON valido!'; }
     return label + ': presente, ' + cached.length + ' byte' + count;
   };
+  const allKeysList = rawKeys.map(k => {
+    const raw = Object.getPrototypeOf(localStorage).__origGet ? Object.getPrototypeOf(localStorage).__origGet.call(localStorage, k) : localStorage.getItem(k);
+    return '  • ' + k + ' — ' + (raw ? raw.length + ' byte' : 'vuota');
+  }).join('\n');
   const lines = [
     '📦 Chiavi totali in localStorage: ' + rawKeys.length,
+    allKeysList,
+    '',
     '🔑 sessionKey attiva: ' + (HB.sessionKey ? 'sì' : 'NO'),
     '🗄️ Cache pronta (_lsCacheReady): ' + (_lsCacheReady ? 'sì' : 'NO'),
     '',
@@ -4533,10 +4554,17 @@ function hbDiagnose() {
     check('Categorie password (hb13_pw_cats)', 'hb13_pw_cats'),
     check('Note (hb13_notes)', 'hb13_notes'),
     check('Carte (hb13_cards)', 'hb13_cards'),
+    check('OTP (hb13_otp)', 'hb13_otp'),
+    check('WiFi (hb13_wifi)', 'hb13_wifi'),
+    check('Server (hb13_server)', 'hb13_server'),
+    check('Finanze (hb13_finance)', 'hb13_finance'),
     '',
     '📲 In memoria ora: _pwItems=' + (_pwItems?.length ?? '?') + ', _notes=' + (_notes?.length ?? '?'),
     '☁️ Ultimo sync riuscito: ' + (_lastSyncTime ? new Date(_lastSyncTime).toLocaleString('it-IT') : 'mai in questa sessione'),
     '⚠️ Ultimo errore sync: ' + (_lastSyncError || 'nessuno'),
+    '',
+    '📋 Ultime attività registrate:',
+    (window._hbLogBuffer && window._hbLogBuffer.length ? window._hbLogBuffer.slice(-25).join('\n') : '(nessuna — riapri l\'app e riprova tra qualche secondo)'),
   ];
   const text = lines.join('\n');
   const overlay = document.createElement('div');
@@ -10245,7 +10273,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.33</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.34</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
