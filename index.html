@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.38</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.39</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.38</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.39</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.38</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.39</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.38',
+  version: 'v13.1.39',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7974,17 +7974,24 @@ async function fbSyncAll(silent=false){
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
     const rawGet = Object.getPrototypeOf(localStorage).__origGet;
-    const data = {}; const tsMap = {};
+    const updates = {};
     HB_SYNC_KEYS.forEach(k=>{
       // Per le chiavi sensibili leggiamo il valore FISICO su disco (cifrato,
       // hb13enc:...) e non tramite il getItem "smart" che restituirebbe il
       // testo in chiaro dalla cache — altrimenti il cloud riceverebbe i dati
       // in chiaro.
       const v = _SENSITIVE_KEYS.includes(k) ? rawGet.call(localStorage, k) : localStorage.getItem(k);
-      if(v && v !== 'null'){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
+      if(v && v !== 'null'){
+        updates[k] = v;
+        // Path multiplo "_ts/<chiave>": Firebase lo fonde con i figli
+        // esistenti di _ts invece di sostituire l'intero nodo — così un
+        // upload parziale (device con solo alcune chiavi locali) non
+        // cancella più i timestamp delle chiavi che quel device non ha.
+        updates['_ts/' + k] = _getLocalTs(k) || Date.now();
+      }
     });
-    if(Object.keys(data).length === 0){ console.log('Nessun dato locale da sincronizzare'); return; }
-    await fbDb.ref('hb13/' + emailKey).update({ ...data, _ts: tsMap });
+    if(Object.keys(updates).length === 0){ console.log('Nessun dato locale da sincronizzare'); return; }
+    await fbDb.ref('hb13/' + emailKey).update(updates);
     if(!silent) showToast('\u2601\ufe0f Dati sincronizzati');
     console.log('\u2713 Sync upload completato'); _lastSyncTime = new Date();
     _lastSyncError = null;
@@ -8052,7 +8059,14 @@ async function fbSyncLoad(){
     for(const k of HB_SYNC_KEYS) {
       const localTs = _getLocalTs(k);
       const remoteTs = cloudTs[k] || 0;
-      if(remoteTs > localTs && cloud[k]){
+      const localRawExists = !!(_SENSITIVE_KEYS.includes(k)
+        ? Object.getPrototypeOf(localStorage).__origGet.call(localStorage, k)
+        : localStorage.getItem(k));
+      // Scarica se: il cloud è più recente, OPPURE in locale non c'è
+      // fisicamente nulla per questa chiave (es. dopo una reinstallazione, o
+      // se un _ts cloud era stato azzerato da un bug precedente) e sul cloud
+      // c'è un valore reale — altrimenti resterebbe bloccato per sempre.
+      if((remoteTs > localTs || !localRawExists) && cloud[k]){
         let value = cloud[k];
         if(typeof value === 'string' && value.startsWith('hb12:')) { console.warn('Skip legacy:', k); continue; }
         if(typeof value === 'string' && !value.startsWith('hb13enc:')) {
@@ -10394,7 +10408,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.38</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.39</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
