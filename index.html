@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.35</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.36</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.35</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.36</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.35</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.36</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.35',
+  version: 'v13.1.36',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3515,8 +3515,36 @@ function showPinError(msg) {
   setTimeout(() => { document.getElementById('pin-error').textContent = ''; }, 3000);
 }
 
+async function _fetchCloudSalt() {
+  try {
+    if (!fbReady || !fbDb || !HB.user) return null;
+    const uid = _getSyncKey();
+    if (!uid) return null;
+    const snap = await fbDb.ref('hb13/' + uid + '/_salt').get();
+    if (!snap.exists()) return null;
+    const b64 = snap.val();
+    return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  } catch(e) { console.warn('[_fetchCloudSalt]', e); return null; }
+}
+
+async function _pushCloudSalt(saltBytes) {
+  try {
+    if (!fbReady || !fbDb || !HB.user) return;
+    const uid = _getSyncKey();
+    if (!uid) return;
+    const b64 = btoa(String.fromCharCode(...saltBytes));
+    await fbDb.ref('hb13/' + uid + '/_salt').set(b64);
+  } catch(e) { console.warn('[_pushCloudSalt]', e); }
+}
+
 async function setupPIN(pin) {
-  const salt = crypto.getRandomValues(new Uint8Array(16));
+  // Riusa il salt condiviso su Firebase se esiste già (altro device),
+  // così tutti i device con lo stesso PIN derivano la stessa chiave AES.
+  let salt = await _fetchCloudSalt();
+  if (!salt) {
+    salt = crypto.getRandomValues(new Uint8Array(16));
+    _pushCloudSalt(salt).catch(()=>{});
+  }
   localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
   HB.sessionKey = await deriveKey(pin, salt);
   // Save PIN hash (PBKDF2 output — not the PIN itself)
@@ -7934,9 +7962,14 @@ async function fbSyncAll(silent=false){
   const emailKey = _getSyncKey();
   if(!emailKey){console.warn('SyncAll: no email key');return;}
   try{
+    const rawGet = Object.getPrototypeOf(localStorage).__origGet;
     const data = {}; const tsMap = {};
     HB_SYNC_KEYS.forEach(k=>{
-      const v=localStorage.getItem(k);
+      // Per le chiavi sensibili leggiamo il valore FISICO su disco (cifrato,
+      // hb13enc:...) e non tramite il getItem "smart" che restituirebbe il
+      // testo in chiaro dalla cache — altrimenti il cloud riceverebbe i dati
+      // in chiaro.
+      const v = _SENSITIVE_KEYS.includes(k) ? rawGet.call(localStorage, k) : localStorage.getItem(k);
       if(v && v !== 'null'){ data[k]=v; tsMap[k]=_getLocalTs(k)||Date.now(); }
     });
     if(Object.keys(data).length === 0){ console.log('Nessun dato locale da sincronizzare'); return; }
@@ -7954,6 +7987,30 @@ async function fbSyncAll(silent=false){
     updateSyncBadge();
     if(!silent) showToast('\u26a0\ufe0f Sync fallito: ' + e.message);
   }
+}
+
+async function _applySyncedValue(key, cloudRaw) {
+  const origSet = Object.getPrototypeOf(localStorage).__origSet;
+  if (!_SENSITIVE_KEYS.includes(key)) {
+    origSet.call(localStorage, key, cloudRaw);
+    return;
+  }
+  let plain = cloudRaw;
+  if (typeof cloudRaw === 'string' && cloudRaw.startsWith('hb13enc:')) {
+    if (!HB.sessionKey) { console.warn('Nessuna sessionKey — skip applicazione', key); return; }
+    try {
+      const bytes = Uint8Array.from(atob(cloudRaw.slice(8)), ch => ch.charCodeAt(0));
+      const dec = await crypto.subtle.decrypt(
+        { name:'AES-GCM', iv: bytes.slice(0,12) }, HB.sessionKey, bytes.slice(12)
+      );
+      plain = new TextDecoder().decode(dec);
+    } catch(e) {
+      console.warn('Impossibile decifrare valore dal cloud per', key, e);
+      return; // non sovrascrivere con dati inutilizzabili/PIN diverso
+    }
+  }
+  _lsCache[key] = plain;
+  origSet.call(localStorage, key, cloudRaw);
 }
 
 async function fbSyncLoad(){
@@ -7990,13 +8047,16 @@ async function fbSyncLoad(){
           try { JSON.parse(value); } catch(e2) { console.warn('Skip non-JSON:', k); continue; }
         }
         // Protezione: non sovrascrivere se il cloud ha meno dati del locale
-        const localVal = localStorage.getItem(k);
+        // (confronto sempre a parità di formato: raw-vs-raw per le chiavi cifrate)
+        const localVal = _SENSITIVE_KEYS.includes(k)
+          ? Object.getPrototypeOf(localStorage).__origGet.call(localStorage, k)
+          : localStorage.getItem(k);
         if(localVal && value && localVal.length > 10 && value.length < localVal.length * 0.5) {
           console.warn('⚠️ Cloud ha meno dati del locale — skip:', k, 'cloud:', value.length, 'locale:', localVal.length);
           continue;
         }
         _syncInProgress = true;
-        localStorage.setItem(k, value);
+        await _applySyncedValue(k, value);
         _syncInProgress = false;
         _setLocalTs(k, remoteTs);
         updated = true;
@@ -8495,7 +8555,10 @@ async function tryBiometric() {
 
 async function setupBioAndEnter() {
   const ok = await registerBiometric();
-  if (ok) showToast('✅ Biometria abilitata!');
+  if (ok) {
+    localStorage.setItem('hb_bio','1');
+    showToast('✅ Biometria abilitata!');
+  }
   unlockApp();
 }
 
@@ -10315,7 +10378,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.35</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.36</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
