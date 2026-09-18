@@ -7567,7 +7567,7 @@ async function pinCheckBio() {
   if (!bioBtn || !bioGhost) return;
   const credId  = localStorage.getItem(HB_BIO_KEY);  
   const enabled   = localStorage.getItem('hb_bio') === '1';
-  if (supported && enabled) {
+  if (window.PublicKeyCredential && credId && enabled) {
     bioBtn.style.display = 'flex';
     bioGhost.style.display = 'none';
   } else {
@@ -7585,7 +7585,6 @@ async function pinBioAuth() {
   }
   await tryBiometric();
 }
-
 
 function earlyBackHandler() {
   function fillBuffer() {
