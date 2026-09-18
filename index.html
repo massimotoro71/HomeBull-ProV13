@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.39</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.42</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.39</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.42</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.39</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.42</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.39',
+  version: 'v13.1.42',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3235,6 +3235,18 @@ async function initLocalCache() {
   autolockStart();
 }
 
+function _bytesToBase64(bytes) {
+  // Evita lo spread su array grandi (String.fromCharCode(...bytes)) che su
+  // payload grandi (es. hb13_passwords, 100KB+) può superare il limite di
+  // argomenti di funzione del motore JS. Procede a blocchi.
+  let binary = '';
+  const CHUNK = 8192;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(binary);
+}
+
 async function _encryptAndStore(key, jsonStr) {
   try {
     if (!HB.sessionKey) return;
@@ -3247,9 +3259,9 @@ async function _encryptAndStore(key, jsonStr) {
     buf.set(iv,0); buf.set(new Uint8Array(enc),12);
     // Usa il metodo originale per non ciclare
     Object.getPrototypeOf(localStorage).__origSet.call(
-      localStorage, key, 'hb13enc:' + btoa(String.fromCharCode(...buf))
+      localStorage, key, 'hb13enc:' + _bytesToBase64(buf)
     );
-  } catch(e) {}
+  } catch(e) { console.warn('Errore cifratura locale per', key, '-', (e&&e.name)||'', (e&&e.message)||String(e)); }
 }
 
 // "Scatola nera": registra le ultime attività di sync/localStorage per diagnosticare problemi futuri
@@ -3542,8 +3554,11 @@ async function setupPIN(pin) {
   // così tutti i device con lo stesso PIN derivano la stessa chiave AES.
   let salt = await _fetchCloudSalt();
   if (!salt) {
+    console.warn('🧂 Nessun salt condiviso sul cloud — ne genero uno nuovo su questo device');
     salt = crypto.getRandomValues(new Uint8Array(16));
     _pushCloudSalt(salt).catch(()=>{});
+  } else {
+    console.log('🧂 Salt condiviso trovato sul cloud, riuso:', btoa(String.fromCharCode(...salt)));
   }
   localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
   HB.sessionKey = await deriveKey(pin, salt);
@@ -3580,7 +3595,10 @@ async function _ensureCloudSaltPublished(saltBytes) {
   // ripristinato/reinstallato di riusare la stessa chiave inserendo lo stesso PIN.
   try {
     const existing = await _fetchCloudSalt();
-    if (!existing) await _pushCloudSalt(saltBytes);
+    if (!existing) {
+      await _pushCloudSalt(saltBytes);
+      console.log('🧂 Salt locale pubblicato sul cloud:', btoa(String.fromCharCode(...saltBytes)));
+    }
   } catch(e) {}
 }
 
@@ -4612,6 +4630,10 @@ function hbDiagnose() {
     '📲 In memoria ora: _pwItems=' + (_pwItems?.length ?? '?') + ', _notes=' + (_notes?.length ?? '?'),
     '☁️ Ultimo sync riuscito: ' + (_lastSyncTime ? new Date(_lastSyncTime).toLocaleString('it-IT') : 'mai in questa sessione'),
     '⚠️ Ultimo errore sync: ' + (_lastSyncError || 'nessuno'),
+    '',
+    '🧂 Salt locale attuale: ' + (Object.getPrototypeOf(localStorage).__origGet.call(localStorage,'hb12_salt') || '(assente)'),
+    '🧂 Log salt (setup PIN):',
+    (window._hbLogBuffer ? window._hbLogBuffer.filter(l => l.includes('🧂')).join('\n') || '(nessuno in questa sessione)' : '(nessuno)'),
     '',
     '📋 Ultime attività registrate:',
     (window._hbLogBuffer && window._hbLogBuffer.length ? window._hbLogBuffer.slice(-25).join('\n') : '(nessuna — riapri l\'app e riprova tra qualche secondo)'),
@@ -8023,7 +8045,7 @@ async function _applySyncedValue(key, cloudRaw) {
       );
       plain = new TextDecoder().decode(dec);
     } catch(e) {
-      console.warn('Impossibile decifrare valore dal cloud per', key, e);
+      console.warn('Impossibile decifrare valore dal cloud per', key, '-', (e && e.name) || 'errore', ':', (e && e.message) || String(e), '- lunghezza cloudRaw:', (cloudRaw ? cloudRaw.length : 0));
       return false; // non sovrascrivere con dati inutilizzabili/PIN diverso
     }
   }
@@ -10408,7 +10430,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.39</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.42</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
