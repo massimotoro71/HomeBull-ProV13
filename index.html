@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.47</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.48</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.47</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.48</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.47</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.48</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.47',
+  version: 'v13.1.48',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3406,13 +3406,12 @@ function checkAuthStatus() {
       if (sub) sub.textContent = '';
       const fp = document.getElementById('forgot-pin-btn');
       if (fp) fp.style.display = 'block';
-      // Avvia biometria automatica su mobile
+      // Mostra il pulsante impronta (l'avvio è sempre manuale, un tocco
+      // dell'utente — un avvio automatico qui può restare "in sospeso" e
+      // bloccare in silenzio ogni tocco manuale successivo tramite _bioBusy).
       setTimeout(() => {
         checkBiometricAvailable();
         pinCheckBio();
-        if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
-          setTimeout(tryBiometric, 600);
-        }
       }, 300);
       return;
     } catch(e) {}
@@ -4724,7 +4723,7 @@ function hbDiagnose() {
     (window._hbLogBuffer ? window._hbLogBuffer.filter(l => l.includes('🧂')).join('\n') || '(nessuno in questa sessione)' : '(nessuno)'),
     '',
     '👆 Log pulsante impronta:',
-    (window._hbLogBuffer ? window._hbLogBuffer.filter(l => l.includes('👆 pinCheckBio')).join('\n') || '(nessuno in questa sessione — apri la schermata PIN e riprova)' : '(nessuno)'),
+    (window._hbLogBuffer ? window._hbLogBuffer.filter(l => l.includes('👆')).join('\n') || '(nessuno in questa sessione — apri la schermata PIN e riprova)' : '(nessuno)'),
     '',
     '📋 Ultime attività registrate:',
     (window._hbLogBuffer && window._hbLogBuffer.length ? window._hbLogBuffer.slice(-25).join('\n') : '(nessuna — riapri l\'app e riprova tra qualche secondo)'),
@@ -7575,6 +7574,15 @@ async function pinCheckBio() {
   if (show) {
     bioBtn.style.display = 'flex';
     bioGhost.style.display = 'none';
+    // Collegamento di sicurezza oltre all'onclick inline nell'HTML, nel raro
+    // caso in cui quest'ultimo non si attivi in certi contesti PWA.
+    if (!bioBtn._hbListenerAttached) {
+      bioBtn.addEventListener('click', () => {
+        console.log('👆 pinBioAuth: click via addEventListener');
+        pinBioAuth();
+      });
+      bioBtn._hbListenerAttached = true;
+    }
   } else {
     bioBtn.style.display = 'none';
     bioGhost.style.display = 'flex';
@@ -7582,6 +7590,7 @@ async function pinCheckBio() {
 }
 
 async function pinBioAuth() {
+  console.log('👆 pinBioAuth: CLICK RICEVUTO — credId presente:', !!localStorage.getItem(HB_BIO_KEY));
   // Usa tryBiometric() che ha il credId salvato e decifra il PIN
   const credId = localStorage.getItem(HB_BIO_KEY);
   if (!credId) {
@@ -7816,9 +7825,6 @@ function lockApp() {
   setTimeout(() => {
     checkBiometricAvailable();
     pinCheckBio();
-    if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
-      setTimeout(tryBiometric, 600);
-    }
   }, 300);
 }
 
@@ -8659,8 +8665,9 @@ async function tryBiometric() {
     showToast('⚠️ Nessuna impronta registrata'); return;
   }
   if (_bioBusy) {
-    // Un'altra richiesta biometrica (auto-trigger o tap manuale) è già in
-    // corso: la lasciamo proseguire invece di farle collidere.
+    // Un'altra richiesta biometrica è già in corso.
+    console.warn('👆 tryBiometric: richiesta già in corso (_bioBusy), tocco ignorato');
+    showToast('⏳ Richiesta impronta già in corso, un attimo...');
     return;
   }
   // Annulla qualsiasi richiesta WebAuthn precedente ancora in volo prima di
@@ -10536,7 +10543,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.47</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.48</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
