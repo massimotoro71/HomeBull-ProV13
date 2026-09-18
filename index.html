@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.43</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.44</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.43</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.44</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.43</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.44</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.43',
+  version: 'v13.1.44',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3555,16 +3555,40 @@ async function _pushCloudSalt(saltBytes) {
   } catch(e) { console.warn('[_pushCloudSalt]', e); }
 }
 
+async function _establishSharedSalt() {
+  // Stabilisce il salt condiviso in modo atomico e restituisce SEMPRE il
+  // valore vincitore sul cloud (che sia quello già esistente o quello
+  // appena generato da questo device) — mai un valore locale "orfano" nel
+  // caso in cui la scrittura del proprio salt venga rifiutata perché un
+  // altro device ne ha già pubblicato uno.
+  try {
+    if (!fbReady || !fbDb || !HB.user) return null;
+    const uid = _getSyncKey();
+    if (!uid) return null;
+    const candidateBytes = crypto.getRandomValues(new Uint8Array(16));
+    const candidateB64 = btoa(String.fromCharCode(...candidateBytes));
+    const result = await fbDb.ref('hb13/' + uid + '/_salt').transaction(current => {
+      if (current === null || current === undefined) return candidateB64;
+      return; // già presente — non toccare
+    });
+    const committedB64 = result && result.snapshot ? result.snapshot.val() : null;
+    if (!committedB64) return null;
+    return { bytes: Uint8Array.from(atob(committedB64), c => c.charCodeAt(0)), b64: committedB64 };
+  } catch(e) { console.warn('[_establishSharedSalt]', e); return null; }
+}
+
 async function setupPIN(pin) {
-  // Riusa il salt condiviso su Firebase se esiste già (altro device),
-  // così tutti i device con lo stesso PIN derivano la stessa chiave AES.
-  let salt = await _fetchCloudSalt();
-  if (!salt) {
-    console.warn('🧂 Nessun salt condiviso sul cloud — ne genero uno nuovo su questo device');
-    salt = crypto.getRandomValues(new Uint8Array(16));
-    _pushCloudSalt(salt).catch(()=>{});
+  // Stabilisce/riusa il salt condiviso su Firebase in modo atomico, così
+  // tutti i device con lo stesso PIN derivano sempre la stessa chiave AES —
+  // adotta comunque il valore vincitore sul cloud, mai uno locale orfano.
+  const established = await _establishSharedSalt();
+  let salt;
+  if (established) {
+    salt = established.bytes;
+    console.log('🧂 Salt condiviso (cloud):', established.b64);
   } else {
-    console.log('🧂 Salt condiviso trovato sul cloud, riuso:', btoa(String.fromCharCode(...salt)));
+    console.warn('🧂 Impossibile raggiungere il cloud per il salt condiviso — uso locale (verificare connessione)');
+    salt = crypto.getRandomValues(new Uint8Array(16));
   }
   localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
   HB.sessionKey = await deriveKey(pin, salt);
@@ -10436,7 +10460,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.43</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.44</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
