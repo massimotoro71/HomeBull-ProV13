@@ -7563,10 +7563,9 @@ async function pinCheckBio() {
   // fosse disponibile, sarà tryBiometric() a segnalarlo con un messaggio.
   const bioBtn   = document.getElementById('pin-bio-btn');
   const bioGhost = document.getElementById('pin-bio-ghost');
-  const supported = window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().catch(()=>false);
   if (!bioBtn || !bioGhost) return;
-  const credId  = localStorage.getItem(HB_BIO_KEY);  
-  const enabled   = localStorage.getItem('hb_bio') === '1';
+  const credId  = localStorage.getItem(HB_BIO_KEY);
+  const enabled = localStorage.getItem('hb_bio') === '1';
   if (window.PublicKeyCredential && credId && enabled) {
     bioBtn.style.display = 'flex';
     bioGhost.style.display = 'none';
@@ -7585,6 +7584,7 @@ async function pinBioAuth() {
   }
   await tryBiometric();
 }
+
 
 function earlyBackHandler() {
   function fillBuffer() {
