@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.44</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.45</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.44</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.45</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.44</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.45</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.44',
+  version: 'v13.1.45',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3612,11 +3612,68 @@ async function verifyPIN(pin) {
     hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
     if (h === localStorage.getItem('hb12_pin_hash')) {
       HB.sessionKey = key;
-      _ensureCloudSaltPublished(salt).catch(()=>{});
+      _reconcileSharedSalt(pin, salt).catch(e => console.warn('[_reconcileSharedSalt]', e));
       return true;
     }
     return false;
   } catch(e) { return false; }
+}
+
+async function _reconcileSharedSalt(pin, localSaltBytes) {
+  // Se il cloud non ha ancora un salt condiviso, pubblica quello di QUESTO
+  // device (comportamento invariato). Se invece il cloud ha GIÀ un salt
+  // condiviso DIVERSO da quello usato finora da questo device, migra tutta
+  // la cifratura locale al salt condiviso — altrimenti questo device
+  // continuerebbe a cifrare i propri salvataggi con una chiave diversa da
+  // quella degli altri device, rendendoli reciprocamente indecifrabili.
+  const cloudSalt = await _fetchCloudSalt();
+  if (!cloudSalt) {
+    await _pushCloudSalt(localSaltBytes);
+    console.log('🧂 Salt locale pubblicato sul cloud:', btoa(String.fromCharCode(...localSaltBytes)));
+    return;
+  }
+  const localB64 = btoa(String.fromCharCode(...localSaltBytes));
+  const cloudB64 = btoa(String.fromCharCode(...cloudSalt));
+  if (localB64 === cloudB64) return; // già allineato, nulla da fare
+
+  console.warn('🧂 Salt locale diverso da quello condiviso sul cloud — migro la cifratura locale (', localB64, '→', cloudB64, ')');
+  const oldKey = HB.sessionKey;
+  const newKey = await deriveKey(pin, cloudSalt);
+  const origGet = Object.getPrototypeOf(localStorage).__origGet;
+  const origSet = Object.getPrototypeOf(localStorage).__origSet;
+
+  for (const key of _SENSITIVE_KEYS) {
+    const raw = origGet.call(localStorage, key);
+    if (!raw) continue;
+    let plain = raw;
+    if (raw.startsWith('hb13enc:')) {
+      try {
+        const bytes = Uint8Array.from(atob(raw.slice(8)), ch => ch.charCodeAt(0));
+        const dec = await crypto.subtle.decrypt({ name:'AES-GCM', iv: bytes.slice(0,12) }, oldKey, bytes.slice(12));
+        plain = new TextDecoder().decode(dec);
+      } catch(e) {
+        console.warn('🧂 Migrazione: impossibile decifrare', key, 'con la vecchia chiave locale — salto (verrà ripreso dal cloud)');
+        continue;
+      }
+    }
+    try {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const enc = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, newKey, new TextEncoder().encode(plain));
+      const buf = new Uint8Array(12 + enc.byteLength);
+      buf.set(iv,0); buf.set(new Uint8Array(enc),12);
+      origSet.call(localStorage, key, 'hb13enc:' + _bytesToBase64(buf));
+      _lsCache[key] = plain;
+    } catch(e) { console.warn('🧂 Migrazione: impossibile ricifrare', key, e); }
+  }
+
+  localStorage.setItem('hb12_salt', cloudB64);
+  HB.sessionKey = newKey;
+  const hashBuf2 = await crypto.subtle.exportKey('raw', newKey);
+  const hashArr2 = new Uint8Array(hashBuf2).slice(0, 16);
+  let h2 = '';
+  hashArr2.forEach(b => h2 += b.toString(16).padStart(2, '0'));
+  localStorage.setItem('hb12_pin_hash', h2);
+  console.log('🧂 Migrazione al salt condiviso completata');
 }
 
 async function _ensureCloudSaltPublished(saltBytes) {
@@ -10460,7 +10517,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.44</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.45</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
