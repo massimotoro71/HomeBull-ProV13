@@ -1903,7 +1903,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.41</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.47</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2010,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.41</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.47</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2114,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.41</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.47</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -3182,7 +3182,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.41',
+  version: 'v13.1.47',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3235,6 +3235,18 @@ async function initLocalCache() {
   autolockStart();
 }
 
+function _bytesToBase64(bytes) {
+  // Evita lo spread su array grandi (String.fromCharCode(...bytes)) che su
+  // payload grandi (es. hb13_passwords, 100KB+) può superare il limite di
+  // argomenti di funzione del motore JS. Procede a blocchi.
+  let binary = '';
+  const CHUNK = 8192;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(binary);
+}
+
 async function _encryptAndStore(key, jsonStr) {
   try {
     if (!HB.sessionKey) return;
@@ -3247,9 +3259,9 @@ async function _encryptAndStore(key, jsonStr) {
     buf.set(iv,0); buf.set(new Uint8Array(enc),12);
     // Usa il metodo originale per non ciclare
     Object.getPrototypeOf(localStorage).__origSet.call(
-      localStorage, key, 'hb13enc:' + btoa(String.fromCharCode(...buf))
+      localStorage, key, 'hb13enc:' + _bytesToBase64(buf)
     );
-  } catch(e) {}
+  } catch(e) { console.warn('Errore cifratura locale per', key, '-', (e&&e.name)||'', (e&&e.message)||String(e)); }
 }
 
 // "Scatola nera": registra le ultime attività di sync/localStorage per diagnosticare problemi futuri
@@ -3397,6 +3409,7 @@ function checkAuthStatus() {
       // Avvia biometria automatica su mobile
       setTimeout(() => {
         checkBiometricAvailable();
+        pinCheckBio();
         if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
           setTimeout(tryBiometric, 600);
         }
@@ -3533,20 +3546,50 @@ async function _pushCloudSalt(saltBytes) {
     const uid = _getSyncKey();
     if (!uid) return;
     const b64 = btoa(String.fromCharCode(...saltBytes));
-    await fbDb.ref('hb13/' + uid + '/_salt').set(b64);
+    // Transazione atomica: scrive SOLO se il nodo è ancora vuoto in quel
+    // preciso istante, per evitare che un falso negativo del controllo
+    // precedente sovrascriva un salt già pubblicato da un altro device.
+    await fbDb.ref('hb13/' + uid + '/_salt').transaction(current => {
+      if (current === null || current === undefined) return b64;
+      return; // undefined = annulla la scrittura, mantiene il valore esistente
+    });
   } catch(e) { console.warn('[_pushCloudSalt]', e); }
 }
 
+async function _establishSharedSalt() {
+  // Stabilisce il salt condiviso in modo atomico e restituisce SEMPRE il
+  // valore vincitore sul cloud (che sia quello già esistente o quello
+  // appena generato da questo device) — mai un valore locale "orfano" nel
+  // caso in cui la scrittura del proprio salt venga rifiutata perché un
+  // altro device ne ha già pubblicato uno.
+  try {
+    if (!fbReady || !fbDb || !HB.user) return null;
+    const uid = _getSyncKey();
+    if (!uid) return null;
+    const candidateBytes = crypto.getRandomValues(new Uint8Array(16));
+    const candidateB64 = btoa(String.fromCharCode(...candidateBytes));
+    const result = await fbDb.ref('hb13/' + uid + '/_salt').transaction(current => {
+      if (current === null || current === undefined) return candidateB64;
+      return; // già presente — non toccare
+    });
+    const committedB64 = result && result.snapshot ? result.snapshot.val() : null;
+    if (!committedB64) return null;
+    return { bytes: Uint8Array.from(atob(committedB64), c => c.charCodeAt(0)), b64: committedB64 };
+  } catch(e) { console.warn('[_establishSharedSalt]', e); return null; }
+}
+
 async function setupPIN(pin) {
-  // Riusa il salt condiviso su Firebase se esiste già (altro device),
-  // così tutti i device con lo stesso PIN derivano la stessa chiave AES.
-  let salt = await _fetchCloudSalt();
-  if (!salt) {
-    console.warn('🧂 Nessun salt condiviso sul cloud — ne genero uno nuovo su questo device');
-    salt = crypto.getRandomValues(new Uint8Array(16));
-    _pushCloudSalt(salt).catch(()=>{});
+  // Stabilisce/riusa il salt condiviso su Firebase in modo atomico, così
+  // tutti i device con lo stesso PIN derivano sempre la stessa chiave AES —
+  // adotta comunque il valore vincitore sul cloud, mai uno locale orfano.
+  const established = await _establishSharedSalt();
+  let salt;
+  if (established) {
+    salt = established.bytes;
+    console.log('🧂 Salt condiviso (cloud):', established.b64);
   } else {
-    console.log('🧂 Salt condiviso trovato sul cloud, riuso:', btoa(String.fromCharCode(...salt)));
+    console.warn('🧂 Impossibile raggiungere il cloud per il salt condiviso — uso locale (verificare connessione)');
+    salt = crypto.getRandomValues(new Uint8Array(16));
   }
   localStorage.setItem('hb12_salt', btoa(String.fromCharCode(...salt)));
   HB.sessionKey = await deriveKey(pin, salt);
@@ -3570,11 +3613,68 @@ async function verifyPIN(pin) {
     hashArr.forEach(b => h += b.toString(16).padStart(2, '0'));
     if (h === localStorage.getItem('hb12_pin_hash')) {
       HB.sessionKey = key;
-      _ensureCloudSaltPublished(salt).catch(()=>{});
+      _reconcileSharedSalt(pin, salt).catch(e => console.warn('[_reconcileSharedSalt]', e));
       return true;
     }
     return false;
   } catch(e) { return false; }
+}
+
+async function _reconcileSharedSalt(pin, localSaltBytes) {
+  // Se il cloud non ha ancora un salt condiviso, pubblica quello di QUESTO
+  // device (comportamento invariato). Se invece il cloud ha GIÀ un salt
+  // condiviso DIVERSO da quello usato finora da questo device, migra tutta
+  // la cifratura locale al salt condiviso — altrimenti questo device
+  // continuerebbe a cifrare i propri salvataggi con una chiave diversa da
+  // quella degli altri device, rendendoli reciprocamente indecifrabili.
+  const cloudSalt = await _fetchCloudSalt();
+  if (!cloudSalt) {
+    await _pushCloudSalt(localSaltBytes);
+    console.log('🧂 Salt locale pubblicato sul cloud:', btoa(String.fromCharCode(...localSaltBytes)));
+    return;
+  }
+  const localB64 = btoa(String.fromCharCode(...localSaltBytes));
+  const cloudB64 = btoa(String.fromCharCode(...cloudSalt));
+  if (localB64 === cloudB64) return; // già allineato, nulla da fare
+
+  console.warn('🧂 Salt locale diverso da quello condiviso sul cloud — migro la cifratura locale (', localB64, '→', cloudB64, ')');
+  const oldKey = HB.sessionKey;
+  const newKey = await deriveKey(pin, cloudSalt);
+  const origGet = Object.getPrototypeOf(localStorage).__origGet;
+  const origSet = Object.getPrototypeOf(localStorage).__origSet;
+
+  for (const key of _SENSITIVE_KEYS) {
+    const raw = origGet.call(localStorage, key);
+    if (!raw) continue;
+    let plain = raw;
+    if (raw.startsWith('hb13enc:')) {
+      try {
+        const bytes = Uint8Array.from(atob(raw.slice(8)), ch => ch.charCodeAt(0));
+        const dec = await crypto.subtle.decrypt({ name:'AES-GCM', iv: bytes.slice(0,12) }, oldKey, bytes.slice(12));
+        plain = new TextDecoder().decode(dec);
+      } catch(e) {
+        console.warn('🧂 Migrazione: impossibile decifrare', key, 'con la vecchia chiave locale — salto (verrà ripreso dal cloud)');
+        continue;
+      }
+    }
+    try {
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const enc = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, newKey, new TextEncoder().encode(plain));
+      const buf = new Uint8Array(12 + enc.byteLength);
+      buf.set(iv,0); buf.set(new Uint8Array(enc),12);
+      origSet.call(localStorage, key, 'hb13enc:' + _bytesToBase64(buf));
+      _lsCache[key] = plain;
+    } catch(e) { console.warn('🧂 Migrazione: impossibile ricifrare', key, e); }
+  }
+
+  localStorage.setItem('hb12_salt', cloudB64);
+  HB.sessionKey = newKey;
+  const hashBuf2 = await crypto.subtle.exportKey('raw', newKey);
+  const hashArr2 = new Uint8Array(hashBuf2).slice(0, 16);
+  let h2 = '';
+  hashArr2.forEach(b => h2 += b.toString(16).padStart(2, '0'));
+  localStorage.setItem('hb12_pin_hash', h2);
+  console.log('🧂 Migrazione al salt condiviso completata');
 }
 
 async function _ensureCloudSaltPublished(saltBytes) {
@@ -4622,6 +4722,9 @@ function hbDiagnose() {
     '🧂 Salt locale attuale: ' + (Object.getPrototypeOf(localStorage).__origGet.call(localStorage,'hb12_salt') || '(assente)'),
     '🧂 Log salt (setup PIN):',
     (window._hbLogBuffer ? window._hbLogBuffer.filter(l => l.includes('🧂')).join('\n') || '(nessuno in questa sessione)' : '(nessuno)'),
+    '',
+    '👆 Log pulsante impronta:',
+    (window._hbLogBuffer ? window._hbLogBuffer.filter(l => l.includes('👆 pinCheckBio')).join('\n') || '(nessuno in questa sessione — apri la schermata PIN e riprova)' : '(nessuno)'),
     '',
     '📋 Ultime attività registrate:',
     (window._hbLogBuffer && window._hbLogBuffer.length ? window._hbLogBuffer.slice(-25).join('\n') : '(nessuna — riapri l\'app e riprova tra qualche secondo)'),
@@ -7455,13 +7558,21 @@ function cloudToggleAutoSync(){
 
 // ── Biometria PIN ──────────────────────────────────────────
 async function pinCheckBio() {
-  // Mostra tasto biometrico se supportato e abilitato
+  // Mostra tasto biometrico se una credenziale è registrata ed è abilitata.
+  // NOTA: isUserVerifyingPlatformAuthenticatorAvailable() può restituire
+  // false in modo inconsistente su alcuni browser/PWA Android anche quando
+  // la credenziale esiste ed è perfettamente funzionante — non la usiamo più
+  // per decidere se mostrare il pulsante (altrimenti compare un segnaposto
+  // "fantasma" senza alcuna funzione collegata). Se il sensore davvero non
+  // fosse disponibile, sarà tryBiometric() a segnalarlo con un messaggio.
   const bioBtn   = document.getElementById('pin-bio-btn');
   const bioGhost = document.getElementById('pin-bio-ghost');
   if (!bioBtn || !bioGhost) return;
-  const supported = window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().catch(()=>false);
-  const enabled   = localStorage.getItem('hb_bio') === '1';
-  if (supported && enabled) {
+  const credId  = localStorage.getItem(HB_BIO_KEY);
+  const enabled = localStorage.getItem('hb_bio') === '1';
+  const show = !!(window.PublicKeyCredential && credId && enabled);
+  console.log('👆 pinCheckBio:', show ? 'mostro pulsante vero' : 'mostro segnaposto', '- PublicKeyCredential:', !!window.PublicKeyCredential, '- credId:', !!credId, '- hb_bio:', enabled);
+  if (show) {
     bioBtn.style.display = 'flex';
     bioGhost.style.display = 'none';
   } else {
@@ -7702,6 +7813,13 @@ function lockApp() {
   if (sub) sub.textContent = '';
   const fp = document.getElementById('forgot-pin-btn');
   if (fp) fp.style.display = 'block';
+  setTimeout(() => {
+    checkBiometricAvailable();
+    pinCheckBio();
+    if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
+      setTimeout(tryBiometric, 600);
+    }
+  }, 300);
 }
 
 function autolockStart() {
@@ -8033,7 +8151,7 @@ async function _applySyncedValue(key, cloudRaw) {
       );
       plain = new TextDecoder().decode(dec);
     } catch(e) {
-      console.warn('Impossibile decifrare valore dal cloud per', key, e);
+      console.warn('Impossibile decifrare valore dal cloud per', key, '-', (e && e.name) || 'errore', ':', (e && e.message) || String(e), '- lunghezza cloudRaw:', (cloudRaw ? cloudRaw.length : 0));
       return false; // non sovrascrivere con dati inutilizzabili/PIN diverso
     }
   }
@@ -10418,7 +10536,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.41</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.47</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
