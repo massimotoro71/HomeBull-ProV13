@@ -7561,12 +7561,9 @@ async function pinCheckBio() {
   // per decidere se mostrare il pulsante (altrimenti compare un segnaposto
   // "fantasma" senza alcuna funzione collegata). Se il sensore davvero non
   // fosse disponibile, sarà tryBiometric() a segnalarlo con un messaggio.
-  const bioBtn   = document.getElementById('pin-bio-btn');
-  const bioGhost = document.getElementById('pin-bio-ghost');
-  if (!bioBtn || !bioGhost) return;
-  const credId  = localStorage.getItem(HB_BIO_KEY);
-  const enabled = localStorage.getItem('hb_bio') === '1';
-  if (window.PublicKeyCredential && credId && enabled) {
+  const supported = window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().catch(()=>false);
+  const enabled   = localStorage.getItem('hb_bio') === '1';
+  if (supported && enabled) {
     bioBtn.style.display = 'flex';
     bioGhost.style.display = 'none';
   } else {
@@ -7574,6 +7571,7 @@ async function pinCheckBio() {
     bioGhost.style.display = 'flex';
   }
 }
+
 
 async function pinBioAuth() {
   // Usa tryBiometric() che ha il credId salvato e decifra il PIN
