@@ -25,7 +25,7 @@
   --bg:          #0a0a0f;
   --bg2:         #111118;
   --bg3:         #1a1a26;
-  --surface:     #1e1e2e;
+  --surface:     rgba(30,30,46,0.62);
   --surface2:    #252538;
   --border:      rgba(255,255,255,0.08);
   --border2:     rgba(255,255,255,0.14);
@@ -59,7 +59,7 @@
   --bg:       #f4f4f8;
   --bg2:      #ffffff;
   --bg3:      #eeeef6;
-  --surface:  #ffffff;
+  --surface:  rgba(255,255,255,0.68);
   --surface2: #f0f0f8;
   --border:   rgba(0,0,0,0.08);
   --border2:  rgba(0,0,0,0.14);
@@ -240,7 +240,7 @@ html, body {
 
 .topbar-back {
   width: 36px; height: 36px; border-radius: 10px;
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex-shrink: 0;
   transition: background 0.15s;
@@ -268,7 +268,7 @@ html, body {
 }
 .topbar-btn {
   width: 36px; height: 36px; border-radius: 10px;
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; transition: background 0.15s;
   color: var(--text2);
@@ -507,7 +507,7 @@ html, body {
 .qa-btn {
   display: flex; align-items: center; gap: 8px;
   padding: 10px 16px; border-radius: var(--radius-sm);
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   color: var(--text); font-size: 13px; font-weight: 600;
   cursor: pointer; white-space: nowrap;
   transition: background 0.15s;
@@ -569,7 +569,7 @@ html, body {
 .drawer-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   padding: 16px 8px; border-radius: var(--radius-sm);
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   cursor: pointer; transition: background 0.15s;
 }
 .drawer-item:active { background: var(--surface2); }
@@ -642,13 +642,13 @@ html, body {
 /* ── Scheda Password ───────────────────────────────────── */
 .pw-search-bar {
   display: flex; align-items: center; gap: 10px;
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 12px; padding: 10px 14px;
 }
 .pw-cat-tile {
   display: flex; align-items: center; gap: 14px;
   padding: 14px 16px; border-radius: 16px;
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   cursor: pointer; transition: all 0.15s; margin-bottom: 8px;
   -webkit-tap-highlight-color: transparent;
 }
@@ -663,7 +663,7 @@ html, body {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .pw-item-card {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 16px; padding: 14px 16px; margin-bottom: 8px;
   cursor: pointer; transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -692,7 +692,7 @@ html, body {
 .pw-copy-btn:active { background: var(--accent-bg); }
 /* Dettaglio */
 .pw-field-row {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
 }
 .pw-field-label { font-size: 10px; font-weight: 700; text-transform: uppercase;
@@ -707,7 +707,7 @@ html, body {
 
 /* ── Note ──────────────────────────────────────────────── */
 .note-card {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 16px; padding: 14px 16px; margin-bottom: 8px;
   cursor: pointer; transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -726,7 +726,7 @@ html, body {
 
 /* ── Finanze ───────────────────────────────────────────── */
 .finance-card {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 18px; padding: 16px; margin-bottom: 10px;
   cursor: pointer; transition: all 0.15s;
 }
@@ -835,7 +835,7 @@ html, body {
 
 /* ── Wi-Fi ─────────────────────────────────────────────── */
 .wifi-card {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 18px; padding: 16px; margin-bottom: 10px;
 }
 .wifi-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
@@ -886,7 +886,7 @@ html, body {
 
 /* ── OTP / 2FA ─────────────────────────────────────────── */
 .otp-card {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 18px; padding: 16px; margin-bottom: 10px;
   cursor: pointer; transition: all 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -957,7 +957,7 @@ html, body {
 }
 #search-input::placeholder { color: var(--text3); }
 .search-close-btn {
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 8px; padding: 4px 10px; cursor: pointer;
   color: var(--text3); font-size: 12px; font-weight: 700;
   font-family: inherit; transition: background 0.15s, transform 0.1s;
@@ -1005,7 +1005,7 @@ html, body {
 /* Quick access card */
 .qa-card {
   position: relative;
-  background: var(--surface); border: 1px solid var(--border);
+  background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
   border-radius: 14px; padding: 16px 8px;
   cursor: pointer; text-align: center;
   transition: border-color 0.2s, transform 0.15s;
@@ -1854,6 +1854,13 @@ body::before {
 .tab-panel.active .note-card:nth-child(1)     { animation-delay: 0.03s; }
 .tab-panel.active .note-card:nth-child(2)     { animation-delay: 0.06s; }
 .tab-panel.active .note-card:nth-child(3)     { animation-delay: 0.09s; }
+@keyframes hbCopyPulse { 0%{transform:scale(1);} 40%{transform:scale(1.28);filter:brightness(1.4);} 100%{transform:scale(1);} }
+.hb-copy-pulse { animation: hbCopyPulse 0.45s ease; color: #22c55e !important; }
+/* Sfondo mesh: tonalità diversa a seconda dell'ora del giorno */
+body.tod-morning::before { filter: hue-rotate(-15deg) brightness(1.08) saturate(1.05); }
+body.tod-day::before     { filter: hue-rotate(0deg) brightness(1) saturate(1); }
+body.tod-evening::before { filter: hue-rotate(22deg) saturate(1.15) brightness(0.95); }
+body.tod-night::before   { filter: hue-rotate(-8deg) brightness(0.72) saturate(0.85); }
 
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
@@ -1903,7 +1910,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.1.53</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.2.0</div>
   <div class="auth-card">
 
     <!-- STEP 1: EMAIL -->
@@ -2010,7 +2017,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.1.53</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.2.0</div>
         </div>
       </div>
     </div>
@@ -2114,7 +2121,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.1.53</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.2.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2215,6 +2222,8 @@ Aggiungi nuovo dato
           <div class="home-section-title" style="margin-bottom:10px;">⭐ Preferiti</div>
           <div id="home-favorites" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
+
+        <div id="home-insight" style="display:none;margin-bottom:20px;padding:12px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--border);font-size:13px;color:var(--text2);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3);"></div>
 
         <!-- Alert reali -->
         <div id="home-alerts-section" style="margin-bottom:24px;">
@@ -3182,7 +3191,7 @@ async function resendOTP() {
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.1.53',
+  version: 'v13.2.0',
   currentTab: 'home',
   authState: 'email',   // email | otp | pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3619,6 +3628,13 @@ async function verifyPIN(pin) {
   } catch(e) { return false; }
 }
 
+function updateTimeOfDayTint() {
+  const h = new Date().getHours();
+  const cls = h >= 6 && h < 10 ? 'tod-morning' : h >= 10 && h < 18 ? 'tod-day' : h >= 18 && h < 22 ? 'tod-evening' : 'tod-night';
+  document.body.classList.remove('tod-morning','tod-day','tod-evening','tod-night');
+  document.body.classList.add(cls);
+}
+
 async function _reconcileSharedSalt(pin, localSaltBytes) {
   // Se il cloud non ha ancora un salt condiviso, pubblica quello di QUESTO
   // device (comportamento invariato). Se invece il cloud ha GIÀ un salt
@@ -3721,12 +3737,15 @@ function loadUser()  { try { return JSON.parse(localStorage.getItem('hb12_user')
 function unlockApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
+  updateTimeOfDayTint();
+  if (!window._todInterval) window._todInterval = setInterval(updateTimeOfDayTint, 30*60*1000);
   // Inizializza buffer history per tasto indietro
   try { earlyBackHandler(); } catch(e) {}
   // Inizializza cache cifrata PRIMA di tutto
   initLocalCache().then(() => {
     updateHomeStats();
     updateSidebarBadges();
+    checkMonthlyDigest();
     // migrazione completata
     // Scarica sempre da Firebase al login — garantisce dati aggiornati
     setTimeout(() => { _syncStartedAt = Date.now(); fbSyncLoad().catch(()=>{}); }, 1500);
@@ -4132,6 +4151,7 @@ function updateHomeStats() {
   try { noteLoad(); } catch(e) {}
   try { otpLoad(); } catch(e) {}
   updateHomeFavorites();
+  updateHomeInsight();
 
   const pw   = document.getElementById('stat-passwords');
   const nt   = document.getElementById('stat-notes');
@@ -4813,6 +4833,7 @@ function pwShowDetail(itemId) {
       <div class="pw-field-actions">
         <button class="pw-field-btn" onclick="pdTogglePw('${item.id}')">👁 Mostra</button>
         <button class="pw-field-btn" onclick="pwCopy('${item.id}','password')">📋 Copia</button>
+        <button class="pw-field-btn" id="breach-btn-${item.id}" onclick="checkPasswordBreach('${item.id}')">🔍 Verifica breach</button>
       </div>
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
@@ -4878,14 +4899,57 @@ function pwDeleteConfirm(itemId) {
 }
 
 // Copia
+async function checkPasswordBreach(itemId) {
+  const item = _pwItems.find(i => i.id === itemId);
+  if (!item || !item.password) { showToast('Nessuna password da verificare'); return; }
+  const btn = document.getElementById('breach-btn-' + itemId);
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.innerHTML = '⏳ Verifica in corso…'; btn.disabled = true; }
+  try {
+    const enc = new TextEncoder().encode(item.password);
+    const hashBuf = await crypto.subtle.digest('SHA-1', enc);
+    const hashArr = Array.from(new Uint8Array(hashBuf));
+    const hashHex = hashArr.map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+    const prefix = hashHex.slice(0,5), suffix = hashHex.slice(5);
+    const res = await fetch('https://api.pwnedpasswords.com/range/' + prefix);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const line = text.split('\n').find(l => l.split(':')[0].trim() === suffix);
+    const count = line ? parseInt(line.split(':')[1].trim(), 10) : 0;
+    if (count > 0) {
+      showToast('⚠️ Trovata in ' + count.toLocaleString('it-IT') + ' fughe di dati note — cambiala!');
+    } else {
+      showToast('✅ Non risulta in fughe di dati note');
+    }
+  } catch(e) {
+    console.warn('[checkPasswordBreach]', e);
+    showToast('⚠️ Verifica non riuscita — controlla la connessione');
+  } finally {
+    if (btn) { btn.innerHTML = originalHtml; btn.disabled = false; }
+  }
+}
+
 async function pwCopy(itemId, field) {
   const item = _pwItems.find(i => i.id === itemId);
   if (!item) return;
   const val = item[field] || '';
   try {
     await navigator.clipboard.writeText(val);
+    _copyFeedback();
     showToast('📋 Copiato!');
   } catch(e) { showToast('Copia non disponibile'); }
+}
+
+function _copyFeedback() {
+  // Piccola animazione di conferma sul pulsante appena premuto, in aggiunta
+  // al toast — un pulse verde rapido invece del solo messaggio testuale.
+  try {
+    const el = window.event?.target?.closest('button, [onclick]');
+    if (el) {
+      el.classList.add('hb-copy-pulse');
+      setTimeout(() => el.classList.remove('hb-copy-pulse'), 450);
+    }
+  } catch(e) {}
 }
 
 // Navigazione back
@@ -5060,6 +5124,101 @@ function pwShowExpiringList() {
   showExpiringListModal('⏰ Password scadute o in scadenza', rows, 'Nessuna password in scadenza 🎉');
 }
 
+
+function _homeInsight() {
+  try {
+    if (!_pwItems || !_pwItems.length) return null;
+    let weak=0, dupes=0, old=0;
+    const seen = {};
+    const now  = Date.now();
+    const ninetyDays = 90 * 24 * 60 * 60 * 1000;
+    let oldestDate = null, oldestTitle = '';
+    _pwItems.forEach(item => {
+      const pw = item.password || '';
+      const s  = getStrength(pw);
+      if (s.score <= 1) weak++;
+      if (pw && seen[pw]) dupes++;
+      if (pw) seen[pw] = true;
+      if (item.updatedAt) {
+        const t = new Date(item.updatedAt).getTime();
+        if (t && (now - t) > ninetyDays) old++;
+        if (!oldestDate || t < oldestDate) { oldestDate = t; oldestTitle = item.title || ''; }
+      }
+    });
+    const total = _pwItems.length;
+    const favCount = (_pwItems||[]).filter(i=>i.favorite).length;
+    const candidates = [];
+    if (weak > 0) candidates.push(`⚠️ Hai ${weak} password ${weak===1?'debole':'deboli'} — vale la pena rinforzarl${weak===1?'a':'e'}`);
+    if (dupes > 0) candidates.push(`👀 ${dupes} password ${dupes===1?'è riusata':'sono riusate'} su più account`);
+    if (old > 0) candidates.push(`⏰ ${old} password non ${old===1?'è stata aggiornata':'sono state aggiornate'} da oltre 90 giorni`);
+    if (oldestDate) {
+      const years = (now - oldestDate) / (365*24*60*60*1000);
+      if (years >= 1) candidates.push(`📅 La tua password più datata ha più di ${Math.floor(years)} ${Math.floor(years)===1?'anno':'anni'}`);
+    }
+    if (favCount > 0) candidates.push(`⭐ Hai ${favCount} preferiti a portata di tocco in Home`);
+    if (weak === 0 && dupes === 0) candidates.push(`✅ Nessuna password debole o duplicata — vault in ottima forma`);
+    candidates.push(`🔒 Stai proteggendo ${total} password con HomeBull`);
+    if (!candidates.length) return null;
+    // Cambia una volta al giorno, non a ogni apertura — indice stabile per la giornata
+    const dayIndex = Math.floor(now / 86400000);
+    return candidates[dayIndex % candidates.length];
+  } catch(e) { return null; }
+}
+
+function updateHomeInsight() {
+  const el = document.getElementById('home-insight');
+  if (!el) return;
+  const text = _homeInsight();
+  if (text) { el.textContent = text; el.style.display = 'block'; }
+  else { el.style.display = 'none'; }
+}
+
+function checkMonthlyDigest() {
+  try {
+    const now = new Date();
+    const monthKey = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+    const last = localStorage.getItem('hb_last_digest_month');
+    if (last === monthKey) return;
+    localStorage.setItem('hb_last_digest_month', monthKey);
+    if (!last) return; // primo avvio in assoluto: non mostrare, solo inizializza il mese di riferimento
+    if (!_pwItems || !_pwItems.length) return;
+    setTimeout(showMonthlyDigest, 1200);
+  } catch(e) {}
+}
+
+function showMonthlyDigest() {
+  let weak=0, dupes=0, strong=0;
+  const seen = {};
+  _pwItems.forEach(item => {
+    const pw = item.password || '';
+    const s = getStrength(pw);
+    if (s.score <= 1) weak++; else if (s.score >= 4) strong++;
+    if (pw && seen[pw]) dupes++;
+    if (pw) seen[pw] = true;
+  });
+  const total = _pwItems.length;
+  const notesCount = (_notes||[]).filter(i=>!i.deleted).length;
+  const cardsCount = (_cards||[]).filter(i=>!i.deleted).length;
+  const monthName = new Date().toLocaleDateString('it-IT', { month:'long', year:'numeric' });
+
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;border:1px solid var(--border);width:100%;max-width:420px;padding:24px 20px;text-align:center;">
+    <div style="font-size:32px;margin-bottom:8px;">🎖️</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">Il tuo vault a ${monthName}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Certificato di salute mensile</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;text-align:center;">
+      <div style="background:var(--surface);border-radius:12px;padding:12px;"><div style="font-size:20px;font-weight:900;">${total}</div><div style="font-size:11px;color:var(--text3);">Password</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:12px;"><div style="font-size:20px;font-weight:900;">${notesCount}</div><div style="font-size:11px;color:var(--text3);">Note</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:12px;"><div style="font-size:20px;font-weight:900;color:${strong>0?'#10b981':'inherit'};">${strong}</div><div style="font-size:11px;color:var(--text3);">Forti</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:12px;"><div style="font-size:20px;font-weight:900;color:${(weak+dupes)>0?'#ef4444':'#10b981'};">${weak+dupes}</div><div style="font-size:11px;color:var(--text3);">Da controllare</div></div>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:18px;">${weak+dupes===0 ? '✅ Nessuna password debole o duplicata questo mese — ottimo lavoro!' : `⚠️ ${weak+dupes} password da rivedere (deboli o duplicate)`}</div>
+    <button onclick="this.closest('[style*=fixed]').remove();pwShowStats();" style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-weight:700;font-size:14px;margin-bottom:8px;cursor:pointer;">Vedi dettagli</button>
+    <button onclick="this.closest('[style*=fixed]').remove();" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:14px;cursor:pointer;">Chiudi</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
 
 function pwShowStats() {
   if (!_pwItems.length) { showToast('Nessuna password salvata'); return; }
@@ -6804,7 +6963,7 @@ async function financeCopy(id, field) {
   const acc = _financeAccounts.find(a => a.id === id);
   if (!acc) return;
   const val = acc[field] || '';
-  try { await navigator.clipboard.writeText(val); showToast('📋 Copiato!'); }
+  try { await navigator.clipboard.writeText(val); _copyFeedback(); showToast('📋 Copiato!'); }
   catch(e) { showToast('Copia non disponibile'); }
 }
 
@@ -7080,7 +7239,7 @@ function wifiSave() {
 async function wifiCopyPw(id) {
   const net = _wifiNets.find(n => n.id === id);
   if (!net?.pw) { showToast('Rete aperta — nessuna password'); return; }
-  try { await navigator.clipboard.writeText(net.pw); showToast('📋 Password copiata'); }
+  try { await navigator.clipboard.writeText(net.pw); _copyFeedback(); showToast('📋 Password copiata'); }
   catch(e) { showToast('Copia non disponibile'); }
 }
 
@@ -7431,7 +7590,7 @@ async function otpCopy(id) {
   const acc = _otpAccounts.find(a => a.id === id);
   if (!acc) return;
   const code = String(otpGenerate(acc.secret)).padStart(6,'0');
-  try { await navigator.clipboard.writeText(code); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
+  try { await navigator.clipboard.writeText(code); _copyFeedback(); showToast('📋 Codice copiato: ' + otpFormat(code.split('').map(Number).reduce((a,n)=>a*10+n,0))); }
   catch(e) { showToast('Copia non disponibile'); }
 }
 
@@ -8441,7 +8600,7 @@ function serverDelete(id) {
 async function serverCopy(id, field) {
   const item = _serverItems.find(i => i.id === id);
   if (!item) return;
-  try { await navigator.clipboard.writeText(item[field]||''); showToast('📋 Copiato!'); }
+  try { await navigator.clipboard.writeText(item[field]||''); _copyFeedback(); showToast('📋 Copiato!'); }
   catch(e) { showToast('Copia non disponibile'); }
 }
 
@@ -10530,7 +10689,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.1.53</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.2.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
