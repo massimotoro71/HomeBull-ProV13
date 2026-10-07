@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.3.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.4.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.3.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.4.0</div>
         </div>
       </div>
     </div>
@@ -2072,7 +2072,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.3.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.4.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2917,7 +2917,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.3.0',
+  version: 'v13.4.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3330,6 +3330,8 @@ function unlockApp() {
     if (typeof updateSyncBadge === 'function') updateSyncBadge();
     setTimeout(driveStartAutoTimer, 2000);
     setTimeout(checkExpiryNotifications, 3000);
+    // Controllo periodico password compromesse (Have I Been Pwned) — ricontrolla quelle scadute/non ancora verificate
+    setTimeout(() => { try { pwLoad(); } catch(e) {} if (typeof pwRunBreachCheck === 'function') pwRunBreachCheck(); }, 4000);
   });
   initBackHandler();
   applyHomePrefs();
@@ -3806,6 +3808,12 @@ function updateHomeStats() {
     alerts.push({ icon:'🔐', color:'#f97316', text: pwSoon.length + ' password in scadenza', time: '', tab: 'passwords' });
   }
 
+  // 2c. Password compromesse (violazioni note, via Have I Been Pwned) — massima priorità
+  const pwPwned = (_pwItems||[]).filter(i => !i.deleted && i.pwnedCount > 0);
+  if (pwPwned.length > 0) {
+    alerts.unshift({ icon:'🚨', color:'#ef4444', text: pwPwned.length + ' password compromess' + (pwPwned.length===1?'a':'e') + ' — cambiale subito', time: '', tab: 'passwords' });
+  }
+
   // 3. OTP attivi
   const _otpAlerts = JSON.parse(localStorage.getItem('hb13_otp')||'[]');
   if (_otpAlerts.length > 0) {
@@ -3977,6 +3985,10 @@ function pwSave() {
 
   const statEl = document.getElementById('stat-passwords');
   if (statEl) statEl.textContent = _pwItems.length || '—';
+
+  // Controllo password compromesse per quelle nuove/modificate (debounced)
+  clearTimeout(window._pwBreachDebounce);
+  window._pwBreachDebounce = setTimeout(() => { if (typeof pwRunBreachCheck === 'function') pwRunBreachCheck(); }, 2000);
 }
 
 // Apri scheda Password
@@ -4386,6 +4398,7 @@ function pwShowDetail(itemId) {
   const pw = item.password ? '••••••••' : '—';
   const content = document.getElementById('pw-detail-content');
   content.innerHTML = `
+    ${item.pwnedCount > 0 ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;font-weight:600;">🚨 Questa password è comparsa in ${item.pwnedCount} violazion${item.pwnedCount===1?'e':'i'} di dati nota — cambiala appena possibile.</div>` : ''}
     ${item.username ? `<div class="pw-field-row"><div class="pw-field-label">Email / Username</div><div class="pw-field-value">${item.username}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
     <div class="pw-field-row">
       <div class="pw-field-label">Password</div>
@@ -4514,6 +4527,73 @@ function getStrength(pw) {
   if (s >= 10)      return { score:4, label:'Buona', bg:'rgba(99,102,241,0.15)', col:'#6366f1' };
   if (s >= 6)       return { score:2, label:'Media', bg:'rgba(234,179,8,0.15)',   col:'#eab308' };
   return              { score:0, label:'Debole', bg:'rgba(239,68,68,0.15)',   col:'#ef4444' };
+}
+
+// ── Password compromesse (Have I Been Pwned, k-anonymity) ─────────────────
+// La password NON viene mai inviata in rete: si calcola localmente il suo hash
+// SHA-1, si invia online solo il prefisso di 5 caratteri, e il confronto con la
+// riga di risposta corretta avviene tutto in locale. HIBP non può mai sapere
+// quale password stiamo controllando.
+async function sha1Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+async function pwnedCheckPassword(password) {
+  if (!password) return 0;
+  try {
+    const hash = await sha1Hex(password);
+    const prefix = hash.slice(0,5), suffix = hash.slice(5);
+    const resp = await fetch('https://api.pwnedpasswords.com/range/' + prefix, {
+      headers: { 'Add-Padding': 'true' }
+    });
+    if (!resp.ok) return null; // null = controllo non riuscito, non significa "sicura"
+    const text = await resp.text();
+    const line = text.split('\n').find(l => l.toUpperCase().startsWith(suffix));
+    return line ? parseInt(line.split(':')[1], 10) || 0 : 0;
+  } catch(e) {
+    console.warn('Controllo password compromesse fallito:', e);
+    return null;
+  }
+}
+
+let _pwBreachRunning = false;
+const PW_BREACH_RECHECK_MS = 30 * 24 * 60 * 60 * 1000; // ri-controlla ogni 30 giorni
+
+async function pwRunBreachCheck(force = false) {
+  if (_pwBreachRunning) return;
+  _pwBreachRunning = true;
+  if (force) showToast('🔍 Verifica password compromesse in corso...');
+  try {
+    const now = Date.now();
+    const toCheck = _pwItems.filter(i => !i.deleted && i.password &&
+      (force || !i.pwnedCheckedAt || (now - new Date(i.pwnedCheckedAt).getTime()) > PW_BREACH_RECHECK_MS));
+    if (!toCheck.length) { if (force) showToast('✅ Nessuna password da controllare'); return; }
+    let changed = false, failed = 0;
+    for (const item of toCheck) {
+      const count = await pwnedCheckPassword(item.password);
+      if (count !== null) {
+        item.pwnedCount = count;
+        item.pwnedCheckedAt = new Date().toISOString();
+        changed = true;
+      } else failed++;
+      await new Promise(r => setTimeout(r, 300)); // non martellare l'API pubblica
+    }
+    if (changed) {
+      localStorage.setItem(PW_KEY, JSON.stringify(_pwItems));
+      _setLocalTs(PW_KEY);
+      driveAutoBackupOnSave();
+      updateHomeStats();
+    }
+    if (force) {
+      const pwnedNow = _pwItems.filter(i => !i.deleted && i.pwnedCount > 0).length;
+      showToast(pwnedNow > 0
+        ? '⚠️ ' + pwnedNow + ' password compromess' + (pwnedNow===1?'a':'e') + ' trovat' + (pwnedNow===1?'a':'e')
+        : '✅ Nessuna password compromessa trovata');
+    }
+  } finally {
+    _pwBreachRunning = false;
+  }
 }
 
 // ── Scadenza password ────────────────────────────────────
@@ -4668,7 +4748,7 @@ function pwShowExpiringList() {
 function pwShowStats() {
   if (!_pwItems.length) { showToast('Nessuna password salvata'); return; }
 
-  let weak=0, medium=0, strong=0, dupes=0, old=0, expiring=0;
+  let weak=0, medium=0, strong=0, dupes=0, old=0, expiring=0, pwned=0;
   const seen = {};
   const now  = Date.now();
   const ninetyDays = 90 * 24 * 60 * 60 * 1000;
@@ -4690,6 +4770,9 @@ function pwShowStats() {
     // In scadenza o scadute
     const e = pwExpiryInfo(item);
     if (e && (e.status === 'expired' || e.status === 'today' || e.status === 'soon')) expiring++;
+
+    // Compromesse (violazioni note, via Have I Been Pwned)
+    if (item.pwnedCount > 0) pwned++;
   });
 
   const total = _pwItems.length;
@@ -4733,10 +4816,11 @@ function pwShowStats() {
       </div>
     </div>
 
+    ${pwned > 0 ? `<div onclick="pwShowFilteredList('pwned')" style="cursor:pointer;background:rgba(239,68,68,0.14);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;font-weight:700;display:flex;align-items:center;justify-content:space-between;">🚨 ${pwned} password compromess${pwned===1?'a':'e'} in violazioni note <span>›</span></div>` : ''}
     ${expiring > 0 ? `<div onclick="this.closest('[style*=fixed]').remove();pwShowExpiringList()" style="cursor:pointer;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;display:flex;align-items:center;justify-content:space-between;">⏰ Hai ${expiring} password in scadenza o già scadute <span>›</span></div>` : ''}
     ${old > 0 ? `<div onclick="pwShowFilteredList('old')" style="cursor:pointer;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#f97316;display:flex;align-items:center;justify-content:space-between;">⏰ ${old} password non aggiornate da più di 90 giorni <span>›</span></div>` : ''}
     ${dupes > 0 ? `<div onclick="pwShowFilteredList('dupes')" style="cursor:pointer;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#ef4444;display:flex;align-items:center;justify-content:space-between;">⚠️ Hai ${dupes} password duplicate — cambia quelle riusate <span>›</span></div>` : ''}
-    ${weak === 0 && dupes === 0 ? `<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#10b981;">✅ Ottimo! Nessuna password debole o duplicata</div>` : ''}
+    ${weak === 0 && dupes === 0 && pwned === 0 ? `<div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#10b981;">✅ Ottimo! Nessuna password debole, duplicata o compromessa</div>` : ''}
 
     <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
   </div>`;
@@ -4761,6 +4845,9 @@ function pwShowFilteredList(type) {
   } else if (type === 'old') {
     filtered = _pwItems.filter(i => i.updatedAt && (now - new Date(i.updatedAt).getTime()) > ninetyDays);
     title = '⏰ Password non aggiornate da 90+ giorni';
+  } else if (type === 'pwned') {
+    filtered = _pwItems.filter(i => i.pwnedCount > 0);
+    title = '🚨 Password compromesse';
   }
 
   const rows = filtered.map(item => {
@@ -4769,6 +4856,7 @@ function pwShowFilteredList(type) {
     if (type === 'weak') sub = getStrength(item.password||'').label || 'Debole';
     else if (type === 'dupes') sub = 'Riusata in ' + pwCount[item.password] + ' voci';
     else if (type === 'old') sub = 'Ultima modifica: ' + (item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('it-IT') : '—');
+    else if (type === 'pwned') sub = 'Trovata in ' + item.pwnedCount + ' violazion' + (item.pwnedCount===1?'e':'i') + ' di dati';
     return {
       icon: getCatIcon(cat?.id, cat?.name, cat?.icon),
       bg: 'rgba(239,68,68,0.15)', col: '#ef4444', text: sub,
@@ -8565,6 +8653,9 @@ function pwEditItem(itemId) {
         expiryStartDate: expStart,
         expiryDate: expiryDate,
         pwHistory: history,
+        // Se la password è cambiata, il vecchio controllo "compromessa" non è più valido — forza un nuovo controllo
+        pwnedCount: passChanged ? undefined : item.pwnedCount,
+        pwnedCheckedAt: passChanged ? undefined : item.pwnedCheckedAt,
         updatedAt: new Date().toISOString()
       };
       pwSave();
@@ -9794,6 +9885,12 @@ document.addEventListener('keydown', (e) => {
             <button id="bio-btn" onclick="settingsToggleBio()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Attiva biometria</button>
           </div>
 
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🛡️ Password compromesse</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" id="pwned-status-txt">Controlla se le tue password sono apparse in violazioni di dati note (Have I Been Pwned). La password non viene mai inviata online — solo un'impronta parziale e irreversibile.</div>
+            <button onclick="pwRunBreachCheck(true)" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 Verifica ora tutte le password</button>
+          </div>
+
           <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
               <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
@@ -9840,7 +9937,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.3.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.4.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
