@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.6.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.6.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.6.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.6.1</div>
         </div>
       </div>
     </div>
@@ -2070,9 +2070,21 @@ function cardsSearch(q) {
           <div style="width:4px;height:4px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
           <div id="home-time" style="font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;"></div>
         </div>
-        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
-          <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.6.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+        <div style="position:relative;margin:10px 0 18px;">
+          <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.6.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
+          </div>
+          <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="sync-dd-saved">📦 Ultimo salvataggio: —</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="sync-dd-backup">☁️ Ultimo backup: —</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:12px;" id="sync-dd-restore">⬇️ Ultimo ripristino: —</div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="homeBackupNow()" style="flex:1;padding:9px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Backup ora</button>
+              <button onclick="document.getElementById('sync-dropdown').style.display='none';driveRestoreNow()" style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Ripristina</button>
+            </div>
+          </div>
         </div>
 
         <!-- Ricerca globale -->
@@ -2180,17 +2192,6 @@ Aggiungi nuovo dato
           <div id="home-alerts"></div>
         </div>
 
-        <!-- Backup su Drive -->
-        <div id="home-backup-section" style="margin-bottom:24px;">
-          <div class="home-section-title" style="margin-bottom:10px;">☁️ Backup su Drive</div>
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
-            <div id="home-backup-status" style="font-size:12px;color:var(--text3);margin-bottom:12px;">Nessun backup effettuato</div>
-            <div style="display:flex;gap:10px;">
-              <button onclick="homeBackupNow()" style="flex:1;padding:11px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☁️ Backup ora</button>
-              <button onclick="driveRestoreNow()" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇️ Ripristina</button>
-            </div>
-          </div>
-        </div>
 
       </div>
     </div>
@@ -2929,7 +2930,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.6.0',
+  version: 'v13.6.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8506,6 +8507,7 @@ async function driveDoRestore(fileId, dateLabel, btn) {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
       localStorage.setItem('hb_drive_backup_ts', new Date().toISOString());
+      localStorage.setItem('hb_drive_restore_ts', new Date().toISOString());
       window._driveRemoteNewerDetected = false;
       showToast('✅ Ripristino completato — ricarico...');
       setTimeout(() => location.reload(), 1500);
@@ -8632,6 +8634,43 @@ async function homeBackupNow() {
   driveUpdateBackupUI();
 }
 
+function toggleSyncDropdown() {
+  const dd = document.getElementById('sync-dropdown');
+  if (!dd) return;
+  const show = dd.style.display === 'none';
+  if (show) { updateSyncDropdown(); dd.style.display = 'block'; }
+  else dd.style.display = 'none';
+}
+// Chiude il menu a tendina se si clicca altrove
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('sync-dropdown');
+  if (!dd || dd.style.display === 'none') return;
+  if (!dd.parentElement.contains(e.target)) dd.style.display = 'none';
+});
+
+function _fmtSyncTime(iso) {
+  if (!iso) return 'mai';
+  const d = new Date(typeof iso === 'number' ? iso : iso);
+  return d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'2-digit'}) + ' alle ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+}
+
+// L'ultimo salvataggio locale = il più recente tra tutte le sezioni dati, utile per confrontare tra dispositivi
+function getLastLocalSaveTs() {
+  const keys = [PW_KEY, PW_CATS, NOTE_KEY, NOTE_ATT_KEY, OTP_KEY, CARDS_KEY, WIFI_KEY, FINANCE_KEY, SERVER_KEY];
+  let max = 0;
+  keys.forEach(k => { const t = _getLocalTs(k); if (t > max) max = t; });
+  return max || null;
+}
+
+function updateSyncDropdown() {
+  const savedEl   = document.getElementById('sync-dd-saved');
+  const backupEl  = document.getElementById('sync-dd-backup');
+  const restoreEl = document.getElementById('sync-dd-restore');
+  if (savedEl)   savedEl.textContent   = '📦 Ultimo salvataggio: ' + _fmtSyncTime(getLastLocalSaveTs());
+  if (backupEl)  backupEl.textContent  = '☁️ Ultimo backup: ' + _fmtSyncTime(localStorage.getItem('hb_drive_backup_ts'));
+  if (restoreEl) restoreEl.textContent = '⬇️ Ultimo ripristino: ' + _fmtSyncTime(localStorage.getItem('hb_drive_restore_ts'));
+}
+
 function driveUpdateBackupUI() {
   const ts = localStorage.getItem('hb_drive_backup_ts');
   const el = document.getElementById('drive-backup-ts');
@@ -8643,16 +8682,7 @@ function driveUpdateBackupUI() {
       el.textContent = 'Nessun backup effettuato';
     }
   }
-  // Stessa informazione, mostrata anche nella card Backup in Home
-  const homeEl = document.getElementById('home-backup-status');
-  if (homeEl) {
-    if (ts) {
-      const d = new Date(ts);
-      homeEl.textContent = '✅ Ultimo backup: ' + d.toLocaleDateString('it-IT') + ' alle ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-    } else {
-      homeEl.textContent = 'Nessun backup effettuato ancora';
-    }
-  }
+  updateSyncDropdown();
   const accEl = document.getElementById('drive-account-email');
   if (accEl) accEl.textContent = localStorage.getItem('hb_drive_account_email') || '—';
   // Aggiorna toggle auto
@@ -10070,7 +10100,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.6.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.6.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
