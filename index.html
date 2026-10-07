@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.2.2</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.3.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.2.2</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.3.0</div>
         </div>
       </div>
     </div>
@@ -2072,7 +2072,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.2.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.3.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2283,8 +2283,9 @@ Aggiungi nuovo dato
               style="flex:1;background:none;border:none;outline:none;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);">
             <button onclick="noteSave()" style="padding:8px 16px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">Salva</button>
           </div>
-          <div style="padding:6px 14px;flex-shrink:0;">
+          <div style="padding:6px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
             <span id="note-editor-date" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
+            <span id="note-history-link" onclick="noteShowHistory()" style="display:none;font-size:11px;color:var(--accent);font-weight:700;cursor:pointer;">🕐 Cronologia</span>
           </div>
           <!-- Barra formattazione note -->
           <div style="padding:4px 14px;display:flex;gap:6px;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;">
@@ -2862,7 +2863,7 @@ Aggiungi nuovo dato
 //  HOMEBULL PRO v12 — Core JS
 // ═══════════════════════════════════════════════════════════
 
-// ── Auth: niente più Firebase/email OTP in v13.2.2 — solo PIN + biometria locale ──
+// ── Auth: niente più Firebase/email OTP in v13.3.0 — solo PIN + biometria locale ──
 
 // ── Auth OTP globals ────────────────────────────────────────
 
@@ -2916,7 +2917,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.2.2',
+  version: 'v13.3.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4398,12 +4399,18 @@ function pwShowDetail(itemId) {
     ${(() => { const e = pwExpiryInfo(item); return e ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${e.col};font-weight:700;">${e.text}</div></div>` : ''; })()}
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
-    ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map(h=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);"><span style="font-family:monospace;color:var(--text2);">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);">'+timeAgo(h.changedAt)+'</span></div>').join('')}</div></div>` : ''}
+    ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map((h,hi)=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);"><span id="pd-pwh-'+item.id+'-'+hi+'" style="font-family:monospace;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);flex-shrink:0;">'+timeAgo(h.changedAt)+'</span><button class="pw-field-btn pwh-toggle" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">👁</button><button class="pw-field-btn pwh-copy" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">📋</button></div>').join('')}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
       <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
       <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
       <button onclick="pwDeleteConfirm('${item.id}')" style="padding:13px 18px;border-radius:12px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🗑</button>
     </div>`;
+  content.querySelectorAll('.pwh-toggle').forEach(btn => {
+    btn.onclick = () => pdTogglePwHistory(btn.dataset.itemid, parseInt(btn.dataset.idx));
+  });
+  content.querySelectorAll('.pwh-copy').forEach(btn => {
+    btn.onclick = () => pwCopyHistory(btn.dataset.itemid, parseInt(btn.dataset.idx));
+  });
 }
 
 function pdTogglePw(itemId) {
@@ -4464,6 +4471,24 @@ async function pwCopy(itemId, field) {
   try {
     await navigator.clipboard.writeText(val);
     showToast('📋 Copiato!');
+  } catch(e) { showToast('Copia non disponibile'); }
+}
+
+function pdTogglePwHistory(itemId, idx) {
+  const item = _pwItems.find(i => i.id === itemId);
+  const h = item?.pwHistory?.[idx];
+  const el = document.getElementById('pd-pwh-' + itemId + '-' + idx);
+  if (!el || !h) return;
+  el.textContent = el.textContent.includes('•') ? (h.password || '—') : '•'.repeat(Math.min(h.password?.length || 0, 12));
+}
+
+async function pwCopyHistory(itemId, idx) {
+  const item = _pwItems.find(i => i.id === itemId);
+  const h = item?.pwHistory?.[idx];
+  if (!h) return;
+  try {
+    await navigator.clipboard.writeText(h.password || '');
+    showToast('📋 Vecchia password copiata!');
   } catch(e) { showToast('Copia non disponibile'); }
 }
 
@@ -5696,6 +5721,8 @@ function noteNew() {
   document.getElementById('note-title-inp').value = '';
   document.getElementById('note-content-inp').value = '';
   document.getElementById('note-editor-date').textContent = 'Nuova nota';
+  const histLink = document.getElementById('note-history-link');
+  if (histLink) histLink.style.display = 'none';
   noteRenderAttachments();
   noteShowEditor();
   setTimeout(() => document.getElementById('note-title-inp').focus(), 200);
@@ -5711,8 +5738,55 @@ function noteEdit(id) {
   const d = new Date(note.updatedAt);
   document.getElementById('note-editor-date').textContent =
     'Modificata: ' + d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  const histLink = document.getElementById('note-history-link');
+  if (histLink) {
+    const n = (note.history || []).length;
+    histLink.style.display = n ? 'block' : 'none';
+    histLink.textContent = '🕐 Cronologia (' + n + ')';
+  }
   noteRenderAttachments();
   noteShowEditor();
+}
+
+// ── Cronologia nota: mostra le versioni precedenti, con possibilità di ripristinarle ──
+function noteShowHistory() {
+  const note = _notes.find(n => n.id === _noteEditId);
+  if (!note || !note.history?.length) return;
+  const ov = document.createElement('div');
+  ov.id = '_nh_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:flex-end;justify-content:center;';
+  const rows = note.history.map((h, i) => {
+    const d = new Date(h.changedAt);
+    const label = d.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'}) +
+                  ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    const preview = (h.content || '(vuoto)').slice(0, 80).replace(/</g,'&lt;');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:3px;">${label}</div>
+        <div style="font-size:13px;font-weight:700;">${h.title ? h.title.replace(/</g,'&lt;') : '(senza titolo)'}</div>
+        <div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${preview}</div>
+      </div>
+      <button onclick="noteRestoreHistory(${i})" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;">Ripristina</button>
+    </div>`;
+  }).join('');
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;padding:20px 16px calc(20px + env(safe-area-inset-bottom));max-height:80vh;overflow-y:auto;">
+    <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;"></div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">🕐 Cronologia nota</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Versioni precedenti di questa nota — tocca "Ripristina" per riportarla a quella versione.</div>
+    ${rows}
+    <button onclick="document.getElementById('_nh_ov').remove()" style="width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:12px;">Chiudi</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+function noteRestoreHistory(index) {
+  const note = _notes.find(n => n.id === _noteEditId);
+  if (!note || !note.history?.[index]) return;
+  const h = note.history[index];
+  document.getElementById('_nh_ov')?.remove();
+  document.getElementById('note-title-inp').value = h.title || '';
+  document.getElementById('note-content-inp').value = h.content || '';
+  showToast('↩️ Versione ripristinata nell\'editor — premi Salva per confermare');
 }
 
 function noteShowEditor() {
@@ -5733,6 +5807,14 @@ function noteSave() {
   const now = new Date().toISOString();
   let note = _notes.find(n => n.id === _noteEditId);
   if (note) {
+    // Salva cronologia se titolo o contenuto sono cambiati
+    const changed = note.title !== title || note.content !== content;
+    if (changed) {
+      const history = note.history || [];
+      history.unshift({ title: note.title, content: note.content, changedAt: note.updatedAt || now });
+      if (history.length > 5) history.length = 5; // max 5 versioni precedenti
+      note.history = history;
+    }
     note.title = title; note.content = content; note.updatedAt = now;
   } else {
     _notes.push({ id:_noteEditId, title, content, createdAt:now, updatedAt:now });
@@ -7618,7 +7700,7 @@ function handleSearchOverlayClick(e) {
   if (e.target === document.getElementById('search-overlay')) closeGlobalSearch();
 }
 
-// ── Sync Firebase rimosso in v13.2.2: ora il backup/restore avviene solo su Google Drive (vedi driveBackupNow/driveRestoreNow) ──
+// ── Sync Firebase rimosso in v13.3.0: ora il backup/restore avviene solo su Google Drive (vedi driveBackupNow/driveRestoreNow) ──
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -9385,7 +9467,7 @@ function togglePinVisibility() {
   }
 }
 
-// ── Backup su Drive: ad ogni modifica, attivo di default (v13.2.2) ──
+// ── Backup su Drive: ad ogni modifica, attivo di default (v13.3.0) ──
 if (localStorage.getItem('hb_drive_auto') === null) {
   localStorage.setItem('hb_drive_auto', '1');
   localStorage.setItem('hb_drive_auto_mode', 'save');
@@ -9758,7 +9840,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.2.2</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.3.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
