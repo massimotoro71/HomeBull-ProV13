@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.4.3</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.6.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.4.3</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.6.0</div>
         </div>
       </div>
     </div>
@@ -2072,7 +2072,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.4.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.6.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2178,6 +2178,18 @@ Aggiungi nuovo dato
         <div id="home-alerts-section" style="margin-bottom:24px;">
           <div class="home-section-title" style="margin-bottom:10px;">🔔 Alert</div>
           <div id="home-alerts"></div>
+        </div>
+
+        <!-- Backup su Drive -->
+        <div id="home-backup-section" style="margin-bottom:24px;">
+          <div class="home-section-title" style="margin-bottom:10px;">☁️ Backup su Drive</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
+            <div id="home-backup-status" style="font-size:12px;color:var(--text3);margin-bottom:12px;">Nessun backup effettuato</div>
+            <div style="display:flex;gap:10px;">
+              <button onclick="homeBackupNow()" style="flex:1;padding:11px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☁️ Backup ora</button>
+              <button onclick="driveRestoreNow()" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇️ Ripristina</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -2917,7 +2929,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.4.3',
+  version: 'v13.6.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3332,6 +3344,10 @@ function unlockApp() {
     setTimeout(checkExpiryNotifications, 3000);
     // Controllo periodico password compromesse (Have I Been Pwned) — ricontrolla quelle scadute/non ancora verificate
     setTimeout(() => { try { pwLoad(); } catch(e) {} if (typeof pwRunBreachCheck === 'function') pwRunBreachCheck(); }, 4000);
+    // Controllo silenzioso: c'è un backup più recente su Drive fatto da un altro dispositivo? Nessun popup, solo avviso in Home se trovato
+    setTimeout(() => { if (typeof driveCheckRemoteNewer === 'function') driveCheckRemoteNewer(); }, 5500);
+    // Mostra subito lo stato dell'ultimo backup nella card Home
+    try { if (typeof driveUpdateBackupUI === 'function') driveUpdateBackupUI(); } catch(e) {}
   });
   initBackHandler();
   applyHomePrefs();
@@ -3808,8 +3824,13 @@ function updateHomeStats() {
     alerts.push({ icon:'🔐', color:'#f97316', text: pwSoon.length + ' password in scadenza', time: '', tab: 'passwords' });
   }
 
+  // 1b. Backup più recente trovato su Drive (fatto da un altro dispositivo) — rilevato in background, nessun ripristino automatico
+  if (window._driveRemoteNewerDetected) {
+    alerts.unshift({ icon:'☁️', color:'#6366f1', text: 'Trovato un backup più recente su Drive — probabilmente da un altro dispositivo', time: '', action: "driveRestoreNow()" });
+  }
+
   // 2c. Password compromesse (violazioni note, via Have I Been Pwned) — massima priorità
-  const pwPwned = (_pwItems||[]).filter(i => !i.deleted && i.pwnedCount > 0);
+  const pwPwned = (_pwItems||[]).filter(i => !i.deleted && i.pwnedCount > 0 && !i.pwnedIgnored);
   if (pwPwned.length > 0) {
     alerts.unshift({ icon:'🚨', color:'#ef4444', text: pwPwned.length + ' password compromess' + (pwPwned.length===1?'a':'e') + ' — cambiale subito', time: '', tab: 'passwords', action: "switchTab('passwords');setTimeout(()=>pwShowFilteredList('pwned'),150)" });
   }
@@ -4337,6 +4358,17 @@ function pwToggleFavorite(id) {
   showToast(item.favorite ? '⭐ Aggiunta ai preferiti' : 'Rimossa dai preferiti');
 }
 
+// Smette di avvisare per una password compromessa che l'utente ha scelto di tenere comunque (es. deve restare sempre quella)
+function pwIgnoreBreach(id, ignore = true) {
+  const item = _pwItems.find(i => i.id === id);
+  if (!item) return;
+  item.pwnedIgnored = ignore;
+  pwSave();
+  updateHomeStats();
+  pwShowDetail(id);
+  showToast(ignore ? '🔕 Non ti avviserò più per questa password' : '🔔 Avviso riattivato per questa password');
+}
+
 // Sezione "Preferiti" in Home — accesso rapido con copia password in un tocco
 function updateHomeFavorites() {
   const section = document.getElementById('home-favorites-section');
@@ -4398,7 +4430,14 @@ function pwShowDetail(itemId) {
   const pw = item.password ? '••••••••' : '—';
   const content = document.getElementById('pw-detail-content');
   content.innerHTML = `
-    ${item.pwnedCount > 0 ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;font-weight:600;">🚨 Questa password è comparsa in ${item.pwnedCount} violazion${item.pwnedCount===1?'e':'i'} di dati nota — cambiala appena possibile.</div>` : ''}
+    ${item.pwnedCount > 0 && !item.pwnedIgnored ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;">
+      <div style="font-weight:600;margin-bottom:8px;">🚨 Questa password è comparsa in ${item.pwnedCount} violazion${item.pwnedCount===1?'e':'i'} di dati nota — cambiala appena possibile.</div>
+      <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
+    </div>` : ''}
+    ${item.pwnedCount > 0 && item.pwnedIgnored ? `<div style="background:rgba(107,114,128,0.1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:var(--text3);">
+      ✅ Avviso disattivato per questa password (resta comunque compromessa).
+      <button onclick="pwIgnoreBreach('${item.id}', false)" style="margin-left:6px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">Riattiva avviso</button>
+    </div>` : ''}
     ${item.username ? `<div class="pw-field-row"><div class="pw-field-label">Email / Username</div><div class="pw-field-value">${item.username}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
     <div class="pw-field-row">
       <div class="pw-field-label">Password</div>
@@ -4569,7 +4608,7 @@ function pwLastBreachCheckSummary() {
   const checked = (_pwItems||[]).filter(i => !i.deleted && i.pwnedCheckedAt);
   if (!checked.length) return 'Controlla se le tue password sono apparse in violazioni di dati note (Have I Been Pwned). La password non viene mai inviata online — solo un\'impronta parziale e irreversibile.';
   const lastTs = checked.reduce((max, i) => Math.max(max, new Date(i.pwnedCheckedAt).getTime()), 0);
-  const pwnedNow = checked.filter(i => i.pwnedCount > 0).length;
+  const pwnedNow = checked.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored).length;
   const when = new Date(lastTs).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
   return '🕐 Ultimo controllo: ' + when + ' — ' + (pwnedNow > 0 ? pwnedNow + ' compromess' + (pwnedNow===1?'a':'e') : 'nessuna compromessa') + ' (' + checked.length + '/' + (_pwItems||[]).filter(i=>!i.deleted).length + ' password controllate)';
 }
@@ -4583,7 +4622,7 @@ async function pwRunBreachCheck(force = false) {
   if (force) { showToast('🔍 Verifica password compromesse in corso...'); pwUpdateBreachStatusUI('🔍 Verifica in corso...'); }
   try {
     const now = Date.now();
-    const toCheck = _pwItems.filter(i => !i.deleted && i.password &&
+    const toCheck = _pwItems.filter(i => !i.deleted && i.password && !i.pwnedIgnored &&
       (force || !i.pwnedCheckedAt || (now - new Date(i.pwnedCheckedAt).getTime()) > PW_BREACH_RECHECK_MS));
     if (!toCheck.length) {
       if (force) showToast('✅ Nessuna password da controllare');
@@ -4607,7 +4646,7 @@ async function pwRunBreachCheck(force = false) {
       updateHomeStats();
     }
     if (force) {
-      const pwnedNow = _pwItems.filter(i => !i.deleted && i.pwnedCount > 0).length;
+      const pwnedNow = _pwItems.filter(i => !i.deleted && i.pwnedCount > 0 && !i.pwnedIgnored).length;
       showToast(pwnedNow > 0
         ? '⚠️ ' + pwnedNow + ' password compromess' + (pwnedNow===1?'a':'e') + ' trovat' + (pwnedNow===1?'a':'e')
         : '✅ Nessuna password compromessa trovata');
@@ -4794,8 +4833,8 @@ function pwShowStats() {
     const e = pwExpiryInfo(item);
     if (e && (e.status === 'expired' || e.status === 'today' || e.status === 'soon')) expiring++;
 
-    // Compromesse (violazioni note, via Have I Been Pwned)
-    if (item.pwnedCount > 0) pwned++;
+    // Compromesse (violazioni note, via Have I Been Pwned) — non conta quelle "ignorate" di proposito
+    if (item.pwnedCount > 0 && !item.pwnedIgnored) pwned++;
   });
 
   const total = _pwItems.length;
@@ -4869,7 +4908,7 @@ function pwShowFilteredList(type) {
     filtered = _pwItems.filter(i => i.updatedAt && (now - new Date(i.updatedAt).getTime()) > ninetyDays);
     title = '⏰ Password non aggiornate da 90+ giorni';
   } else if (type === 'pwned') {
-    filtered = _pwItems.filter(i => i.pwnedCount > 0);
+    filtered = _pwItems.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored);
     title = '🚨 Password compromesse';
   }
 
@@ -8466,6 +8505,8 @@ async function driveDoRestore(fileId, dateLabel, btn) {
       Object.entries(bk.data).forEach(([k, v]) => {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
+      localStorage.setItem('hb_drive_backup_ts', new Date().toISOString());
+      window._driveRemoteNewerDetected = false;
       showToast('✅ Ripristino completato — ricarico...');
       setTimeout(() => location.reload(), 1500);
     } catch(e) { showToast('⚠️ Ripristino fallito: ' + (e.message || e)); }
@@ -8512,6 +8553,52 @@ async function driveGetBackupToken(forceAccountPicker = false) {
   return token;
 }
 
+// ── Controllo silenzioso all'apertura: c'è un backup più recente su Drive fatto da un altro dispositivo? ──
+// Non mostra MAI popup di login: se Google non può rispondere in silenzio, rinuncia senza disturbare.
+async function driveGetTokenSilent() {
+  return new Promise((resolve) => {
+    try {
+      if (!window.google?.accounts) { resolve(null); return; }
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: GDRIVE_CLIENT_ID,
+        scope: GDRIVE_BACKUP_SCOPE,
+        prompt: 'none', // silenzioso: nessuna finestra, fallisce pulito se non già autorizzato in questa sessione browser
+        callback: (resp) => {
+          if (resp.error) { resolve(null); return; }
+          _driveBackupToken = resp.access_token;
+          resolve(resp.access_token);
+        },
+        error_callback: () => resolve(null)
+      });
+      client.requestAccessToken({ prompt: 'none' });
+      setTimeout(() => resolve(null), 4000); // non aspettare all'infinito
+    } catch(e) { resolve(null); }
+  });
+}
+
+async function driveCheckRemoteNewer() {
+  try {
+    const token = _driveBackupToken || await driveGetTokenSilent();
+    if (!token) return; // nessuna sessione Google disponibile in silenzio — niente avviso, niente popup
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&pageSize=1`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    if (!search.ok) return;
+    const result = await search.json();
+    const latest = result.files?.[0];
+    if (!latest) return;
+    const remoteTime = new Date(latest.modifiedTime).getTime();
+    const localTs = localStorage.getItem('hb_drive_backup_ts');
+    const localTime = localTs ? new Date(localTs).getTime() : 0;
+    // Margine di 2 minuti per evitare falsi positivi da piccoli sfasamenti d'orario
+    if (remoteTime - localTime > 2*60*1000) {
+      window._driveRemoteNewerDetected = true;
+      updateHomeStats();
+    }
+  } catch(e) { /* controllo best-effort: nessun avviso in caso di errore di rete */ }
+}
+
 async function drivePruneOldBackups(token) {
   try {
     // Cerca tutti i backup HomeBull ordinati per data
@@ -8540,6 +8627,11 @@ function driveStartAutoTimer() {
   console.log('⏱ Drive auto-backup ogni 30min attivo');
 }
 
+async function homeBackupNow() {
+  await driveBackupNow(false);
+  driveUpdateBackupUI();
+}
+
 function driveUpdateBackupUI() {
   const ts = localStorage.getItem('hb_drive_backup_ts');
   const el = document.getElementById('drive-backup-ts');
@@ -8549,6 +8641,16 @@ function driveUpdateBackupUI() {
       el.textContent = 'Ultimo: ' + d.toLocaleDateString('it-IT') + ' ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
     } else {
       el.textContent = 'Nessun backup effettuato';
+    }
+  }
+  // Stessa informazione, mostrata anche nella card Backup in Home
+  const homeEl = document.getElementById('home-backup-status');
+  if (homeEl) {
+    if (ts) {
+      const d = new Date(ts);
+      homeEl.textContent = '✅ Ultimo backup: ' + d.toLocaleDateString('it-IT') + ' alle ' + d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+    } else {
+      homeEl.textContent = 'Nessun backup effettuato ancora';
     }
   }
   const accEl = document.getElementById('drive-account-email');
@@ -9968,7 +10070,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.4.3</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.6.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
