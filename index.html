@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.2.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.2.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.2.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.2.1</div>
         </div>
       </div>
     </div>
@@ -2072,7 +2072,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.2.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.2.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2862,7 +2862,7 @@ Aggiungi nuovo dato
 //  HOMEBULL PRO v12 — Core JS
 // ═══════════════════════════════════════════════════════════
 
-// ── Auth: niente più Firebase/email OTP in v13.2.0 — solo PIN + biometria locale ──
+// ── Auth: niente più Firebase/email OTP in v13.2.1 — solo PIN + biometria locale ──
 
 // ── Auth OTP globals ────────────────────────────────────────
 
@@ -2916,7 +2916,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.2.0',
+  version: 'v13.2.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3165,6 +3165,27 @@ function updatePinDots() {
   }
 }
 
+// ── Offre il ripristino da Drive subito dopo aver impostato un nuovo PIN ──
+// (va chiamata solo DOPO setupPIN(), quando HB.sessionKey esiste già —
+//  altrimenti i dati ripristinati resterebbero solo in cache e si perderebbero al reload)
+function offerDriveRestore(onSkip) {
+  const ov = document.createElement('div');
+  ov.id = '_dro_offer';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:32px;margin-bottom:12px;">☁️</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:8px;">Hai già un backup su Google Drive?</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Se hai già usato HomeBull su un altro dispositivo, puoi ripristinare subito i tuoi dati con il PIN che hai appena scelto.</div>
+    <div style="display:flex;gap:10px;">
+      <button id="_dro_skip" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">No, inizia da zero</button>
+      <button id="_dro_yes" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">☁️ Ripristina</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_dro_skip').onclick = () => { ov.remove(); onSkip(); };
+  document.getElementById('_dro_yes').onclick = () => { ov.remove(); driveRestoreNow(); };
+}
+
 async function pinConfirm() {
   if (HB.pinBuffer.length < 8) {
     showPinError('Minimo 6 cifre');
@@ -3195,12 +3216,15 @@ async function pinConfirm() {
       }
       HB._lastPin = HB.pinBuffer; // salva per registrazione biometrica
       await setupPIN(HB.pinBuffer);
-      // Offri biometria se disponibile e non già configurata
-      if (window.PublicKeyCredential && !localStorage.getItem(HB_BIO_KEY)) {
-        goToStep('bio-setup');
-      } else {
-        unlockApp();
-      }
+      // Prima chiede se ripristinare un backup Drive esistente, poi prosegue
+      offerDriveRestore(() => {
+        // Offri biometria se disponibile e non già configurata
+        if (window.PublicKeyCredential && !localStorage.getItem(HB_BIO_KEY)) {
+          goToStep('bio-setup');
+        } else {
+          unlockApp();
+        }
+      });
     }
   }
 
@@ -7594,7 +7618,7 @@ function handleSearchOverlayClick(e) {
   if (e.target === document.getElementById('search-overlay')) closeGlobalSearch();
 }
 
-// ── Sync Firebase rimosso in v13.2.0: ora il backup/restore avviene solo su Google Drive (vedi driveBackupNow/driveRestoreNow) ──
+// ── Sync Firebase rimosso in v13.2.1: ora il backup/restore avviene solo su Google Drive (vedi driveBackupNow/driveRestoreNow) ──
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -9338,7 +9362,7 @@ function togglePinVisibility() {
   }
 }
 
-// ── Backup su Drive: ad ogni modifica, attivo di default (v13.2.0) ──
+// ── Backup su Drive: ad ogni modifica, attivo di default (v13.2.1) ──
 if (localStorage.getItem('hb_drive_auto') === null) {
   localStorage.setItem('hb_drive_auto', '1');
   localStorage.setItem('hb_drive_auto_mode', 'save');
@@ -9710,7 +9734,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.2.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.2.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
