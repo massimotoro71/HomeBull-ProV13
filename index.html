@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.2.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.2.2</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.2.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.2.2</div>
         </div>
       </div>
     </div>
@@ -2072,7 +2072,7 @@ function cardsSearch(q) {
         </div>
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin:10px 0 18px;">
           <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.2.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.2.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
         </div>
 
         <!-- Ricerca globale -->
@@ -2862,7 +2862,7 @@ Aggiungi nuovo dato
 //  HOMEBULL PRO v12 — Core JS
 // ═══════════════════════════════════════════════════════════
 
-// ── Auth: niente più Firebase/email OTP in v13.2.1 — solo PIN + biometria locale ──
+// ── Auth: niente più Firebase/email OTP in v13.2.2 — solo PIN + biometria locale ──
 
 // ── Auth OTP globals ────────────────────────────────────────
 
@@ -2916,7 +2916,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.2.1',
+  version: 'v13.2.2',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7618,7 +7618,7 @@ function handleSearchOverlayClick(e) {
   if (e.target === document.getElementById('search-overlay')) closeGlobalSearch();
 }
 
-// ── Sync Firebase rimosso in v13.2.1: ora il backup/restore avviene solo su Google Drive (vedi driveBackupNow/driveRestoreNow) ──
+// ── Sync Firebase rimosso in v13.2.2: ora il backup/restore avviene solo su Google Drive (vedi driveBackupNow/driveRestoreNow) ──
 
 function serverOpen() {
   serverLoad(); serverShowList();
@@ -8166,7 +8166,11 @@ async function driveRestoreNow() {
     );
     const result = await search.json();
     const files = result.files || [];
-    if (!files.length) { showToast('⚠️ Nessun backup trovato su Drive'); return; }
+    if (!files.length) {
+      const acc = localStorage.getItem('hb_drive_account_email');
+      showToast('⚠️ Nessun backup trovato' + (acc ? ' per ' + acc : '') + ' — controlla di aver scelto l\'account giusto');
+      return;
+    }
 
     // Mostra lista backup da scegliere
     const ov = document.createElement('div');
@@ -8271,7 +8275,7 @@ async function driveDoRestore(fileId, dateLabel, btn) {
   };
 }
 
-async function driveGetBackupToken() {
+async function driveGetBackupToken(forceAccountPicker = false) {
   await new Promise((resolve, reject) => {
     if (!window.google?.accounts) {
       const s = document.createElement('script');
@@ -8280,7 +8284,7 @@ async function driveGetBackupToken() {
       document.head.appendChild(s);
     } else resolve();
   });
-  return new Promise((resolve, reject) => {
+  const token = await new Promise((resolve, reject) => {
     const client = google.accounts.oauth2.initTokenClient({
       client_id: GDRIVE_CLIENT_ID,
       scope: GDRIVE_BACKUP_SCOPE,
@@ -8290,8 +8294,25 @@ async function driveGetBackupToken() {
         resolve(resp.access_token);
       }
     });
-    client.requestAccessToken();
+    // Forza sempre la scelta dell'account Google — altrimenti Google può
+    // selezionarne uno automaticamente (es. l'account già attivo nel browser)
+    // senza chiedere, con il rischio di collegarsi a un account diverso da
+    // quello usato per il backup originale.
+    client.requestAccessToken({ prompt: 'select_account' });
   });
+  // Mostra quale account Google è stato effettivamente usato, per poterlo verificare a colpo d'occhio
+  try {
+    const info = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: 'Bearer ' + token }
+    }).then(r => r.json());
+    if (info && info.email) {
+      localStorage.setItem('hb_drive_account_email', info.email);
+      showToast('☁️ Account Drive: ' + info.email);
+      const el = document.getElementById('drive-account-email');
+      if (el) el.textContent = info.email;
+    }
+  } catch(e) { /* non blocca il backup/restore se fallisce solo questo controllo */ }
+  return token;
 }
 
 async function drivePruneOldBackups(token) {
@@ -8333,6 +8354,8 @@ function driveUpdateBackupUI() {
       el.textContent = 'Nessun backup effettuato';
     }
   }
+  const accEl = document.getElementById('drive-account-email');
+  if (accEl) accEl.textContent = localStorage.getItem('hb_drive_account_email') || '—';
   // Aggiorna toggle auto
   const auto = localStorage.getItem('hb_drive_auto') === '1';
   const tog = document.getElementById('drive-auto-toggle');
@@ -9362,7 +9385,7 @@ function togglePinVisibility() {
   }
 }
 
-// ── Backup su Drive: ad ogni modifica, attivo di default (v13.2.1) ──
+// ── Backup su Drive: ad ogni modifica, attivo di default (v13.2.2) ──
 if (localStorage.getItem('hb_drive_auto') === null) {
   localStorage.setItem('hb_drive_auto', '1');
   localStorage.setItem('hb_drive_auto_mode', 'save');
@@ -9563,6 +9586,7 @@ document.addEventListener('keydown', (e) => {
             <div>
               <div style="font-size:13px;font-weight:700;">☁️ Google Drive Backup</div>
               <div style="font-size:11px;color:var(--text3);" id="drive-backup-ts">Nessun backup effettuato</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px;">Account: <span id="drive-account-email" style="color:var(--text2);font-weight:700;">—</span></div>
             </div>
             <div style="display:flex;gap:8px;">
               <button onclick="driveRestoreNow()" style="padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">⬇️ Ripristina</button>
@@ -9734,7 +9758,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.2.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.2.2</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
