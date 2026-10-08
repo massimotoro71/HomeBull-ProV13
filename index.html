@@ -1898,7 +1898,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.6.3</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.7.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,7 +1968,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.6.3</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.7.0</div>
         </div>
       </div>
     </div>
@@ -2073,13 +2073,14 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.6.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.7.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
             <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="sync-dd-saved">📦 Ultimo salvataggio: —</div>
             <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="sync-dd-backup">☁️ Ultimo backup: —</div>
             <div style="font-size:12px;color:var(--text2);margin-bottom:12px;" id="sync-dd-restore">⬇️ Ultimo ripristino: —</div>
+            <button onclick="driveCheckNowManual()" style="width:100%;padding:9px;margin-bottom:8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🔄 Controlla Drive adesso</button>
             <div style="display:flex;gap:8px;">
               <button onclick="homeBackupNow()" style="flex:1;padding:9px;border-radius:10px;border:none;background:var(--accent);color:white;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Backup ora</button>
               <button onclick="document.getElementById('sync-dropdown').style.display='none';driveRestoreNow()" style="flex:1;padding:9px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Ripristina</button>
@@ -2930,7 +2931,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.6.3',
+  version: 'v13.7.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8612,6 +8613,37 @@ async function driveCheckRemoteNewer() {
   } catch(e) { /* controllo best-effort: nessun avviso in caso di errore di rete */ }
 }
 
+// Controllo manuale (avviato dall'utente): se la sessione silenziosa non basta, può aprire il login Google.
+async function driveCheckNowManual() {
+  document.getElementById('sync-dropdown').style.display = 'none';
+  try {
+    showToast('🔄 Controllo Drive in corso...');
+    const token = _driveBackupToken || await driveGetTokenSilent() || await driveGetBackupToken();
+    const search = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&pageSize=1`,
+      { headers: { Authorization: 'Bearer ' + token } }
+    );
+    if (!search.ok) throw new Error('HTTP ' + search.status);
+    const latest = (await search.json()).files?.[0];
+    if (!latest) { showToast('⚠️ Nessun backup trovato su Drive'); return; }
+    const remoteTime = new Date(latest.modifiedTime).getTime();
+    const localTs = localStorage.getItem('hb_drive_backup_ts');
+    const localTime = localTs ? new Date(localTs).getTime() : 0;
+    if (remoteTime - localTime > 2*60*1000) {
+      window._driveRemoteNewerDetected = true;
+      updateHomeStats();
+      showToast('☁️ Su Drive c\'è un backup più recente');
+      driveRestoreNow();
+    } else {
+      window._driveRemoteNewerDetected = false;
+      updateHomeStats();
+      showToast('✅ Sei già aggiornato: nessun backup più recente su Drive');
+    }
+  } catch(e) {
+    showToast('⚠️ Controllo non riuscito: ' + (e.message || e));
+  }
+}
+
 async function drivePruneOldBackups(token) {
   try {
     // Cerca tutti i backup HomeBull ordinati per data
@@ -8990,13 +9022,130 @@ function settingsExport(){
   showToast('✅ Backup esportato!');
 }
 
+// ── Export cifrato (AES-256-GCM, chiave da password scelta al momento) ──
+function _hbAskPassword(title, confirmTwice) {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+    const inp = 'width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:10px;';
+    ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);">' +
+      '<div style="font-size:15px;font-weight:800;margin-bottom:12px;">' + title + '</div>' +
+      '<input id="_hbp1" type="password" placeholder="Password" style="' + inp + '">' +
+      (confirmTwice ? '<input id="_hbp2" type="password" placeholder="Ripeti password" style="' + inp + '"><div style="font-size:11px;color:#f97316;margin-bottom:12px;">Senza questa password il file non è recuperabile. Non viene salvata da nessuna parte.</div>' : '') +
+      '<div style="display:flex;gap:10px;"><button id="_hbpc" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>' +
+      '<button id="_hbpo" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">OK</button></div></div>';
+    document.body.appendChild(ov);
+    document.getElementById('_hbp1').focus();
+    document.getElementById('_hbpc').onclick = () => { ov.remove(); resolve(null); };
+    document.getElementById('_hbpo').onclick = () => {
+      const p1 = document.getElementById('_hbp1').value;
+      if (p1.length < 6) { showToast('Almeno 6 caratteri'); return; }
+      if (confirmTwice && p1 !== document.getElementById('_hbp2').value) { showToast('Le password non coincidono'); return; }
+      ov.remove(); resolve(p1);
+    };
+  });
+}
+function _hbB64(buf) { let s=''; new Uint8Array(buf).forEach(b=>s+=String.fromCharCode(b)); return btoa(s); }
+function _hbUnB64(str) { return Uint8Array.from(atob(str), c => c.charCodeAt(0)); }
+
+async function settingsExportEncrypted() {
+  const pass = await _hbAskPassword('🔒 Password per proteggere il file', true);
+  if (!pass) return;
+  try {
+    const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
+    const data={};
+    keys.forEach(k=>{ const v=localStorage.getItem(k); if(v) try{ data[k]=JSON.parse(v); }catch(e){ data[k]=v; } });
+    const plain = JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data});
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(pass, salt);
+    const ct = await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, new TextEncoder().encode(plain));
+    const out = JSON.stringify({format:'homebull-enc-1', salt:_hbB64(salt), iv:_hbB64(iv), ct:_hbB64(ct)});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([out],{type:'application/json'}));
+    a.download='homebull-cifrato-'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();
+    showToast('✅ Backup cifrato esportato');
+  } catch(e) { showToast('⚠️ Export fallito: ' + (e.message||e)); }
+}
+
+async function hbDecryptBackupFile(bk) {
+  const pass = await _hbAskPassword('🔓 Password del file cifrato', false);
+  if (!pass) return null;
+  try {
+    const key = await deriveKey(pass, _hbUnB64(bk.salt));
+    const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:_hbUnB64(bk.iv)}, key, _hbUnB64(bk.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  } catch(e) { showToast('⚠️ Password errata o file danneggiato'); return null; }
+}
+
+// ── Import password da CSV (Chrome / Edge) ──
+function _hbParseCSV(text) {
+  const rows = []; let row = [], cur = '', q = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; }
+      else cur += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i+1] === '\n') i++; row.push(cur); cur = ''; if (row.some(x => x !== '')) rows.push(row); row = []; }
+    else cur += c;
+  }
+  row.push(cur); if (row.some(x => x !== '')) rows.push(row);
+  return rows;
+}
+
+function importChromeCSV(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const rows = _hbParseCSV(e.target.result);
+      if (rows.length < 2) { showToast('CSV vuoto'); return; }
+      const head = rows[0].map(h => h.trim().toLowerCase());
+      const col = n => head.indexOf(n);
+      const iName = col('name'), iUrl = col('url'), iUser = col('username'), iPass = col('password'), iNote = col('note');
+      if (iPass < 0 || (iName < 0 && iUrl < 0)) { showToast('Formato CSV non riconosciuto'); return; }
+      pwLoad();
+      let cat = _pwCats.find(c => c.name === 'Importate da Chrome');
+      if (!cat) { cat = { id: 'cat_' + Date.now(), name: 'Importate da Chrome', icon: '🌐' }; _pwCats.push(cat); }
+      const seen = new Set(_pwItems.map(i => (i.url||'') + '|' + (i.username||'') + '|' + (i.password||'')));
+      let added = 0, skipped = 0;
+      const stamp = Date.now(), nowIso = new Date().toISOString();
+      rows.slice(1).forEach((r, n) => {
+        const pass = r[iPass] || '';
+        if (!pass) { skipped++; return; }
+        const url = iUrl >= 0 ? (r[iUrl]||'') : '';
+        const user = iUser >= 0 ? (r[iUser]||'') : '';
+        const k = url + '|' + user + '|' + pass;
+        if (seen.has(k)) { skipped++; return; }
+        seen.add(k);
+        let title = iName >= 0 ? (r[iName]||'') : '';
+        if (!title) { try { title = new URL(url).hostname; } catch(_) { title = url || 'Senza titolo'; } }
+        _pwItems.push({ id: 'pw_' + stamp + '_' + n, title, password: pass, username: user, url, pin: '',
+          notes: iNote >= 0 ? (r[iNote]||'') : '', categoryId: cat.id, createdAt: nowIso, updatedAt: nowIso });
+        added++;
+      });
+      pwSave();
+      updateHomeStats();
+      showToast('✅ Importate ' + added + ' password' + (skipped ? ' (' + skipped + ' saltate: duplicate o senza password)' : '') + ' — ora elimina il file CSV dal computer!', 6000);
+    } catch(err) { showToast('⚠️ Import fallito: ' + (err.message||err)); }
+  };
+  reader.readAsText(file);
+}
+
 function settingsImport(event){
   const file=event.target.files[0];
   if(!file) return;
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     try{
-      const bk=JSON.parse(e.target.result);
+      let bk=JSON.parse(e.target.result);
+      if(bk.format==='homebull-enc-1'){ bk = await hbDecryptBackupFile(bk); if(!bk) return; }
       if(!bk.data){ showToast('File non valido'); return; }
       const ov=document.createElement('div');
       ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -9972,9 +10121,18 @@ document.addEventListener('keydown', (e) => {
             <div><div style="margin-bottom:3px;">Importa backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Ripristina da un file JSON</div></div>
             <input type="file" accept=".json,.hbb" style="display:none;" onchange="settingsImport(event)">
           </label>
+          <button onclick="settingsExportEncrypted()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">🔒</span>
+            <div><div style="margin-bottom:3px;">Esporta backup cifrato</div><div style="font-size:12px;color:var(--text3);font-weight:500;">File protetto da una password a tua scelta (AES-256). L'import normale lo riconosce.</div></div>
+          </button>
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
           </div>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🌐</span>
+            <div><div style="margin-bottom:3px;">Importa da Chrome / Edge</div><div style="font-size:12px;color:var(--text3);font-weight:500;">File CSV esportato dal gestore password del browser. Aggiunge, non sovrascrive.</div></div>
+            <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
+          </label>
 
           <!-- Backup per sezione -->
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
@@ -10111,7 +10269,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.6.3</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.7.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
