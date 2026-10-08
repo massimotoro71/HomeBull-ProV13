@@ -1910,7 +1910,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.10.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.11.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1980,7 +1980,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.10.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.11.0</div>
         </div>
       </div>
     </div>
@@ -2085,7 +2085,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.10.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.11.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2942,7 +2942,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.10.0',
+  version: 'v13.11.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4440,6 +4440,47 @@ function pwQuickFix(id) {
   };
 }
 
+
+// Rapporto delle password compromesse SENZA le password (solo titolo, sito, categoria, violazioni, riuso) — sicuro da condividere per fare ordine
+function pwExportBreachReport() {
+  pwLoad();
+  const cnt = {}; _pwItems.forEach(i => { if (!i.deleted && i.password) cnt[i.password] = (cnt[i.password]||0) + 1; });
+  const list = _pwItems.filter(i => !i.deleted && i.pwnedCount > 0)
+    .sort((a, b) => (b.pwnedCount||0) - (a.pwnedCount||0));
+  if (!list.length) { showToast('Nessuna password compromessa da esportare'); return; }
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const host = u => { try { return new URL(/^https?:/i.test(u) ? u : 'https://' + u).hostname; } catch(e) { return u || ''; } };
+  const rows = [['Titolo','Sito','Categoria','Violazioni','Riusata in N voci','Debole','Ignorata','Ultima modifica']];
+  list.forEach(i => {
+    const cat = _pwCats.find(c => c.id === i.categoryId);
+    rows.push([i.title||'', host(i.url), cat?.name||'', i.pwnedCount, cnt[i.password]||1,
+      (typeof getStrength === 'function' && getStrength(i.password||'').score <= 1) ? 'sì' : 'no',
+      i.pwnedIgnored ? 'sì' : 'no', i.updatedAt ? i.updatedAt.slice(0,10) : '']);
+  });
+  const csv = '\ufeff' + rows.map(r => r.map(q).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'homebull-compromesse-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  const reused = list.filter(i => cnt[i.password] > 1).length;
+  showToast('📄 Rapporto esportato: ' + list.length + ' voci (' + reused + ' con password riusata). Nessuna password dentro.', 5000);
+}
+
+
+// Gravità di una password compromessa: dipende da quante volte è comparsa nelle violazioni, +1 livello se è riusata altrove
+const PW_SEV = [
+  { lvl:0, name:'Bassa',   dot:'⚪', col:'#9ca3af', bg:'rgba(156,163,175,0.15)' },
+  { lvl:1, name:'Media',   dot:'🟡', col:'#eab308', bg:'rgba(234,179,8,0.15)' },
+  { lvl:2, name:'Alta',    dot:'🟠', col:'#f97316', bg:'rgba(249,115,22,0.15)' },
+  { lvl:3, name:'Critica', dot:'🔴', col:'#ef4444', bg:'rgba(239,68,68,0.15)' }
+];
+function pwSeverity(item, reusedCount) {
+  const n = item.pwnedCount || 0;
+  let l = n >= 10000 ? 3 : n >= 500 ? 2 : n >= 20 ? 1 : 0;
+  if ((reusedCount || 1) > 1 && l < 3) l++;
+  return PW_SEV[l];
+}
+
 // Smette di avvisare per una password compromessa che l'utente ha scelto di tenere comunque (es. deve restare sempre quella)
 function pwIgnoreBreach(id, ignore = true) {
   const item = _pwItems.find(i => i.id === id);
@@ -4513,7 +4554,7 @@ function pwShowDetail(itemId) {
   const content = document.getElementById('pw-detail-content');
   content.innerHTML = `
     ${item.pwnedCount > 0 && !item.pwnedIgnored ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;">
-      <div style="font-weight:600;margin-bottom:8px;">🚨 Questa password è comparsa in ${item.pwnedCount} violazion${item.pwnedCount===1?'e':'i'} di dati nota — cambiala appena possibile.</div>
+      <div style="font-weight:600;margin-bottom:8px;">${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password).length; const sv = pwSeverity(item, rc); return sv.dot + ' Gravità ' + sv.name.toLowerCase() + ' — '; })()}comparsa in ${item.pwnedCount.toLocaleString('it-IT')} violazion${item.pwnedCount===1?'e':'i'} di dati nota. Cambiala appena possibile.</div>
       <button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>
       <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
     </div>` : ''}
@@ -5000,8 +5041,9 @@ function pwShowFilteredList(type) {
     title = '⏰ Password non aggiornate da 90+ giorni';
   } else if (type === 'pwned') {
     filtered = _pwItems.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored)
-      .sort((a, b) => (b.pwnedCount||0) - (a.pwnedCount||0)); // le più critiche (più violazioni) prima
-    title = '🚨 Password compromesse — dalla più critica';
+      .sort((a, b) => (pwSeverity(b, pwCount[b.password]).lvl - pwSeverity(a, pwCount[a.password]).lvl) || ((b.pwnedCount||0) - (a.pwnedCount||0))); // prima le più gravi
+    const tally = [3,2,1,0].map(l => PW_SEV[l].dot + ' ' + filtered.filter(i => pwSeverity(i, pwCount[i.password]).lvl === l).length).join('  ');
+    title = '🚨 Compromesse · ' + tally;
   }
 
   const rows = filtered.map(item => {
@@ -5010,10 +5052,14 @@ function pwShowFilteredList(type) {
     if (type === 'weak') sub = getStrength(item.password||'').label || 'Debole';
     else if (type === 'dupes') sub = 'Riusata in ' + pwCount[item.password] + ' voci';
     else if (type === 'old') sub = 'Ultima modifica: ' + (item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('it-IT') : '—');
-    else if (type === 'pwned') sub = 'Trovata in ' + item.pwnedCount + ' violazion' + (item.pwnedCount===1?'e':'i') + ' di dati' + (item.password && pwCount[item.password] > 1 ? ' ⚠️ e riusata altrove' : '');
+    let sev = null;
+    if (type === 'pwned') {
+      sev = pwSeverity(item, pwCount[item.password]);
+      sub = sev.dot + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
+    }
     return {
       icon: getCatIcon(cat?.id, cat?.name, cat?.icon),
-      bg: 'rgba(239,68,68,0.15)', col: '#ef4444', text: sub,
+      bg: sev ? sev.bg : 'rgba(239,68,68,0.15)', col: sev ? sev.col : '#ef4444', text: sub,
       name: item.title || '—',
       onclick: "window._pwReturnToFilter='" + type + "';pwShowDetail('" + item.id + "')"
     };
@@ -10451,6 +10497,7 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🛡️ Password compromesse</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" id="pwned-status-txt">Controlla se le tue password sono apparse in violazioni di dati note (Have I Been Pwned). La password non viene mai inviata online — solo un'impronta parziale e irreversibile.</div>
             <button onclick="pwRunBreachCheck(true)" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 Verifica ora tutte le password</button>
+            <button onclick="pwExportBreachReport()" style="width:100%;margin-top:8px;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📄 Esporta rapporto compromesse (senza password)</button>
           </div>
 
           <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
@@ -10499,7 +10546,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.10.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.11.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
