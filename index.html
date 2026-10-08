@@ -1910,7 +1910,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.8.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.10.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1980,7 +1980,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.8.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.10.0</div>
         </div>
       </div>
     </div>
@@ -2085,7 +2085,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.8.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.10.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2942,7 +2942,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.8.0',
+  version: 'v13.10.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4373,6 +4373,73 @@ function pwToggleFavorite(id) {
   showToast(item.favorite ? '⭐ Aggiunta ai preferiti' : 'Rimossa dai preferiti');
 }
 
+
+// ── Correzione guidata di una password compromessa ──
+function pwQfGenerate(len) {
+  const sets = ['abcdefghijkmnopqrstuvwxyz','ABCDEFGHJKLMNPQRSTUVWXYZ','23456789','!@#$%^&*-_+=?'];
+  const all = sets.join('');
+  const rnd = n => { const a = new Uint32Array(1); const lim = Math.floor(4294967296 / n) * n; let v; do { crypto.getRandomValues(a); v = a[0]; } while (v >= lim); return v % n; };
+  const out = sets.map(st => st[rnd(st.length)]);
+  while (out.length < len) out.push(all[rnd(all.length)]);
+  for (let i = out.length - 1; i > 0; i--) { const j = rnd(i + 1); [out[i], out[j]] = [out[j], out[i]]; }
+  return out.join('');
+}
+function pwQuickFix(id) {
+  const item = _pwItems.find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('_pwqf')?.remove();
+  const ov = document.createElement('div');
+  ov.id = '_pwqf';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;justify-content:center;';
+  const esc = t => String(t||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  ov.innerHTML = `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:20px 18px 24px;width:100%;max-width:480px;max-height:90vh;overflow:auto;">
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">🎲 Correggi: ${esc(item.title)}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.45;">1. Copia la nuova password e cambiala sul sito/servizio.<br>2. Quando l'hai cambiata davvero, premi “Ho cambiato, salva”. Finché non confermi non modifico nulla.</div>
+    <div id="_pwqf_pw" style="font-family:monospace;font-size:16px;word-break:break-all;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;user-select:all;"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <button id="_pwqf_copy" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button>
+      <button id="_pwqf_regen" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔄 Rigenera</button>
+      ${item.url ? `<button id="_pwqf_open" style="flex:1;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔗 Apri sito</button>` : ''}
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text2);margin-bottom:14px;">Lunghezza <input id="_pwqf_len" type="range" min="12" max="32" value="20" style="flex:1;accent-color:var(--accent);"><span id="_pwqf_lenv" style="width:22px;text-align:right;">20</span></label>
+    <button id="_pwqf_save" style="width:100%;padding:14px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:8px;">✅ Ho cambiato, salva</button>
+    <button id="_pwqf_cancel" style="width:100%;padding:12px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+  </div>`;
+  document.body.appendChild(ov);
+  let cur = '';
+  const $ = x => document.getElementById(x);
+  const regen = () => { cur = pwQfGenerate(parseInt($('_pwqf_len').value, 10) || 20); $('_pwqf_pw').textContent = cur; };
+  regen();
+  $('_pwqf_regen').onclick = regen;
+  $('_pwqf_len').oninput = () => { $('_pwqf_lenv').textContent = $('_pwqf_len').value; regen(); };
+  $('_pwqf_copy').onclick = async () => { try { await navigator.clipboard.writeText(cur); showToast('📋 Copiata'); } catch(e) { showToast('Selezionala e copiala a mano'); } };
+  if ($('_pwqf_open')) $('_pwqf_open').onclick = () => { const u = /^https?:/i.test(item.url) ? item.url : 'https://' + item.url; window.open(u, '_blank', 'noopener'); };
+  $('_pwqf_cancel').onclick = () => ov.remove();
+  ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  $('_pwqf_save').onclick = () => {
+    const idx = _pwItems.findIndex(i => i.id === id);
+    if (idx < 0) { ov.remove(); return; }
+    const it = _pwItems[idx];
+    const history = it.pwHistory || [];
+    if (it.password) { history.unshift({ password: it.password, changedAt: new Date().toISOString() }); if (history.length > 5) history.length = 5; }
+    const expDays = it.expiryDays || 'none';
+    _pwItems[idx] = {
+      ...it,
+      password: cur,
+      pwHistory: history,
+      pwnedCount: undefined, pwnedCheckedAt: undefined, pwnedIgnored: false,
+      expiryDate: expDays !== 'none' ? pwComputeExpiryDate(expDays, pwTodayISO()) : it.expiryDate,
+      expiryStartDate: expDays !== 'none' ? pwTodayISO() : it.expiryStartDate,
+      updatedAt: new Date().toISOString()
+    };
+    pwSave();
+    try { updateHomeStats(); } catch(e) {}
+    ov.remove();
+    showToast('✅ Password aggiornata — la vecchia è in cronologia');
+    if (window._pwReturnToFilter) pwBackToItems(); else pwShowDetail(id);
+  };
+}
+
 // Smette di avvisare per una password compromessa che l'utente ha scelto di tenere comunque (es. deve restare sempre quella)
 function pwIgnoreBreach(id, ignore = true) {
   const item = _pwItems.find(i => i.id === id);
@@ -4447,6 +4514,7 @@ function pwShowDetail(itemId) {
   content.innerHTML = `
     ${item.pwnedCount > 0 && !item.pwnedIgnored ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;">
       <div style="font-weight:600;margin-bottom:8px;">🚨 Questa password è comparsa in ${item.pwnedCount} violazion${item.pwnedCount===1?'e':'i'} di dati nota — cambiala appena possibile.</div>
+      <button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>
       <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
     </div>` : ''}
     ${item.pwnedCount > 0 && item.pwnedIgnored ? `<div style="background:rgba(107,114,128,0.1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:var(--text3);">
@@ -9239,32 +9307,45 @@ function importChromeCSV(event) {
       const rows = _hbParseCSV(e.target.result);
       if (rows.length < 2) { showToast('CSV vuoto'); return; }
       const head = rows[0].map(h => h.trim().toLowerCase());
-      const col = n => head.indexOf(n);
-      const iName = col('name'), iUrl = col('url'), iUser = col('username'), iPass = col('password'), iNote = col('note');
-      if (iPass < 0 || (iName < 0 && iUrl < 0)) { showToast('Formato CSV non riconosciuto'); return; }
+      const find = (...names) => { for (const n of names) { const k = head.indexOf(n); if (k >= 0) return k; } return -1; };
+      // Formati supportati: Chrome/Edge, Bitwarden (CSV), LastPass
+      let source = 'Chrome', iType = -1, iTotp = -1, iGroup = -1;
+      if (head.includes('login_password')) { source = 'Bitwarden'; iType = find('type'); iTotp = find('login_totp'); iGroup = find('folder'); }
+      else if (head.includes('grouping') || (head.includes('extra') && head.includes('fav'))) { source = 'LastPass'; iTotp = find('totp'); iGroup = find('grouping'); }
+      const iName = find('name'), iUrl = find('url', 'login_uri'), iUser = find('username', 'login_username'),
+            iPass = find('password', 'login_password'), iNote = find('note', 'notes', 'extra');
+      if (iPass < 0 || (iName < 0 && iUrl < 0)) { showToast('Formato CSV non riconosciuto (supporto Chrome/Edge, Bitwarden CSV, LastPass)'); return; }
       pwLoad();
-      let cat = _pwCats.find(c => c.name === 'Importate da Chrome');
-      if (!cat) { cat = { id: 'cat_' + Date.now(), name: 'Importate da Chrome', icon: '🌐' }; _pwCats.push(cat); }
+      const catName = 'Importate da ' + source;
+      let cat = _pwCats.find(c => c.name === catName);
+      if (!cat) { cat = { id: 'cat_' + Date.now(), name: catName, icon: source === 'Chrome' ? '🌐' : '📥' }; _pwCats.push(cat); }
       const seen = new Set(_pwItems.map(i => (i.url||'') + '|' + (i.username||'') + '|' + (i.password||'')));
       let added = 0, skipped = 0;
       const stamp = Date.now(), nowIso = new Date().toISOString();
       rows.slice(1).forEach((r, n) => {
+        if (iType >= 0 && r[iType] && r[iType].toLowerCase() !== 'login') { skipped++; return; } // Bitwarden: note/carte/identità non sono login
         const pass = r[iPass] || '';
         if (!pass) { skipped++; return; }
-        const url = iUrl >= 0 ? (r[iUrl]||'') : '';
+        let url = iUrl >= 0 ? (r[iUrl]||'') : '';
+        if (url === 'http://sn') { skipped++; return; } // LastPass: note sicure
         const user = iUser >= 0 ? (r[iUser]||'') : '';
         const k = url + '|' + user + '|' + pass;
         if (seen.has(k)) { skipped++; return; }
         seen.add(k);
         let title = iName >= 0 ? (r[iName]||'') : '';
         if (!title) { try { title = new URL(url).hostname; } catch(_) { title = url || 'Senza titolo'; } }
+        let notes = iNote >= 0 ? (r[iNote]||'') : '';
+        const totp = iTotp >= 0 ? (r[iTotp]||'') : '';
+        if (totp) notes += (notes ? '\n' : '') + 'TOTP: ' + totp;
+        const grp = iGroup >= 0 ? (r[iGroup]||'') : '';
+        if (grp) notes += (notes ? '\n' : '') + 'Cartella originale: ' + grp;
         _pwItems.push({ id: 'pw_' + stamp + '_' + n, title, password: pass, username: user, url, pin: '',
-          notes: iNote >= 0 ? (r[iNote]||'') : '', categoryId: cat.id, createdAt: nowIso, updatedAt: nowIso });
+          notes, categoryId: cat.id, createdAt: nowIso, updatedAt: nowIso });
         added++;
       });
       pwSave();
       updateHomeStats();
-      showToast('✅ Importate ' + added + ' password' + (skipped ? ' (' + skipped + ' saltate: duplicate o senza password)' : '') + ' — ora elimina il file CSV dal computer!', 6000);
+      showToast('✅ Importate ' + added + ' password da ' + source + (skipped ? ' (' + skipped + ' saltate: duplicate, senza password o non-login)' : '') + ' — ora elimina il file CSV dal computer!', 6000);
     } catch(err) { showToast('⚠️ Import fallito: ' + (err.message||err)); }
   };
   reader.readAsText(file);
@@ -10279,7 +10360,7 @@ document.addEventListener('keydown', (e) => {
           </div>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
             <span style="font-size:28px;">🌐</span>
-            <div><div style="margin-bottom:3px;">Importa da Chrome / Edge</div><div style="font-size:12px;color:var(--text3);font-weight:500;">File CSV esportato dal gestore password del browser. Aggiunge, non sovrascrive.</div></div>
+            <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
             <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
           </label>
 
@@ -10418,7 +10499,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.8.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.10.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
