@@ -1855,6 +1855,22 @@ body::before {
 .tab-panel.active .note-card:nth-child(3)     { animation-delay: 0.09s; }
 
 
+
+/* ══ STILE HOME: Classico / Griglia / Vetro (solo layout, stesse icone emoji) ══ */
+html[data-home-style="a"] .mob-home-grid,html[data-home-style="b"] .mob-home-grid{grid-template-columns:repeat(3,1fr) !important;gap:12px 10px !important;}
+html[data-home-style="a"] .mob-home-card-bar,html[data-home-style="b"] .mob-home-card-bar{display:none !important;}
+html[data-home-style="a"] .mob-home-card-label,html[data-home-style="b"] .mob-home-card-label{font-size:11px !important;}
+html[data-home-style="a"] .mob-home-card-icon,html[data-home-style="b"] .mob-home-card-icon,
+html[data-home-style="a"] .qa-card-icon,html[data-home-style="b"] .qa-card-icon{display:flex;align-items:center;justify-content:center;}
+/* A · Griglia: icona in una tessera arrotondata, niente card */
+html[data-home-style="a"] .mob-home-card,html[data-home-style="a"] .qa-card{background:transparent !important;border-color:transparent !important;box-shadow:none !important;padding:6px 2px !important;}
+html[data-home-style="a"] .mob-home-card-icon,html[data-home-style="a"] .qa-card-icon{width:64px;height:64px;font-size:32px !important;border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14);box-shadow:0 8px 16px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.18);}
+html[data-theme="light"][data-home-style="a"] .mob-home-card-icon,html[data-theme="light"][data-home-style="a"] .qa-card-icon{background:linear-gradient(145deg,#fff,#eef0f6);border-color:rgba(0,0,0,.08);box-shadow:0 6px 14px rgba(0,0,0,.10);}
+/* B · Vetro: card semitrasparenti */
+html[data-home-style="b"] .mob-home-card,html[data-home-style="b"] .qa-card{background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03)) !important;border:1px solid rgba(255,255,255,.12) !important;border-radius:20px !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:14px 6px 10px !important;}
+html[data-home-style="b"] .mob-home-card-icon,html[data-home-style="b"] .qa-card-icon{font-size:36px !important;height:44px;}
+html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="light"][data-home-style="b"] .qa-card{background:linear-gradient(160deg,#fff,#f1f3f9) !important;border-color:rgba(0,0,0,.08) !important;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1899,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.11.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.14.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1969,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.11.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.14.1</div>
         </div>
       </div>
     </div>
@@ -2074,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.11.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.14.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2931,7 +2947,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.11.1',
+  version: 'v13.14.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4167,6 +4183,17 @@ function pwRenderCats(q='') {
       <!-- Freccia -->
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
 
+    // Pulsante rinomina (non apre la categoria)
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.title = 'Rinomina categoria';
+    editBtn.setAttribute('aria-label', 'Rinomina categoria ' + cat.name);
+    editBtn.textContent = '✏️';
+    editBtn.style.cssText = 'width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-size:14px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0;';
+    editBtn.onclick = (e) => { e.stopPropagation(); pwRenameCategory(cat.id, cat.name); };
+    editBtn.ondragstart = (e) => e.stopPropagation();
+    div.insertBefore(editBtn, div.lastElementChild);
+
     grid.appendChild(div);
   });
 }
@@ -4430,44 +4457,159 @@ function pwQuickFix(id) {
 }
 
 
-// Rapporto delle password compromesse SENZA le password (solo titolo, sito, categoria, violazioni, riuso) — sicuro da condividere per fare ordine
-function pwExportBreachReport() {
-  pwLoad();
-  const cnt = {}; _pwItems.forEach(i => { if (!i.deleted && i.password) cnt[i.password] = (cnt[i.password]||0) + 1; });
-  const list = _pwItems.filter(i => !i.deleted && i.pwnedCount > 0)
-    .sort((a, b) => (b.pwnedCount||0) - (a.pwnedCount||0));
-  if (!list.length) { showToast('Nessuna password compromessa da esportare'); return; }
-  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
-  const host = u => { try { return new URL(/^https?:/i.test(u) ? u : 'https://' + u).hostname; } catch(e) { return u || ''; } };
-  const rows = [['Titolo','Sito','Categoria','Violazioni','Riusata in N voci','Debole','Ignorata','Ultima modifica']];
-  list.forEach(i => {
-    const cat = _pwCats.find(c => c.id === i.categoryId);
-    rows.push([i.title||'', host(i.url), cat?.name||'', i.pwnedCount, cnt[i.password]||1,
-      (typeof getStrength === 'function' && getStrength(i.password||'').score <= 1) ? 'sì' : 'no',
-      i.pwnedIgnored ? 'sì' : 'no', i.updatedAt ? i.updatedAt.slice(0,10) : '']);
-  });
-  const csv = '\ufeff' + rows.map(r => r.map(q).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-  a.download = 'homebull-compromesse-' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-  const reused = list.filter(i => cnt[i.password] > 1).length;
-  showToast('📄 Rapporto esportato: ' + list.length + ' voci (' + reused + ' con password riusata). Nessuna password dentro.', 5000);
-}
-
-
 // Gravità di una password compromessa: dipende da quante volte è comparsa nelle violazioni, +1 livello se è riusata altrove
 const PW_SEV = [
-  { lvl:0, name:'Bassa',   dot:'⚪', col:'#9ca3af', bg:'rgba(156,163,175,0.15)' },
-  { lvl:1, name:'Media',   dot:'🟡', col:'#eab308', bg:'rgba(234,179,8,0.15)' },
-  { lvl:2, name:'Alta',    dot:'🟠', col:'#f97316', bg:'rgba(249,115,22,0.15)' },
-  { lvl:3, name:'Critica', dot:'🔴', col:'#ef4444', bg:'rgba(239,68,68,0.15)' }
+  { lvl:0, name:'Bassa',   dot:'⚪', col:'#9ca3af', bg:'rgba(156,163,175,0.15)', desc:'Gravità bassa: comparsa in meno di 20 violazioni e usata in una sola voce. Rischio contenuto.' },
+  { lvl:1, name:'Media',   dot:'🟡', col:'#eab308', bg:'rgba(234,179,8,0.15)',  desc:'Gravità media: da 20 a 499 violazioni, oppure meno di 20 ma riusata in più voci.' },
+  { lvl:2, name:'Alta',    dot:'🟠', col:'#f97316', bg:'rgba(249,115,22,0.15)', desc:'Gravità alta: da 500 a 9.999 violazioni, oppure da 20 a 499 ma riusata in più voci. Da cambiare presto.' },
+  { lvl:3, name:'Critica', dot:'🔴', col:'#ef4444', bg:'rgba(239,68,68,0.15)',  desc:'Gravità critica: 10.000 o più violazioni, oppure 500+ e riusata in più voci. Cambiala per prima.' }
 ];
+// Pallino con spiegazione: al passaggio del mouse (title) e al tocco (avviso), senza aprire la voce
+function pwSevDot(sev) {
+  return '<span title="' + sev.desc + '" onclick="event.stopPropagation();showToast(\'' + sev.desc + '\', 6000)" style="cursor:help;">' + sev.dot + '</span>';
+}
 function pwSeverity(item, reusedCount) {
   const n = item.pwnedCount || 0;
   let l = n >= 10000 ? 3 : n >= 500 ? 2 : n >= 20 ? 1 : 0;
   if ((reusedCount || 1) > 1 && l < 3) l++;
   return PW_SEV[l];
+}
+
+// ══ IMPORT OTP da altre app (Google Authenticator, Aegis, otpauth://) ══
+function _hbB32(bytes) {
+  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'; let bits = 0, val = 0, out = '';
+  for (const b of bytes) { val = (val << 8) | b; bits += 8; while (bits >= 5) { out += A[(val >>> (bits - 5)) & 31]; bits -= 5; } val &= (1 << bits) - 1; }
+  if (bits > 0) out += A[(val << (5 - bits)) & 31];
+  return out;
+}
+function _hbPbRead(buf) {
+  let i = 0; const out = [];
+  const varint = () => { let r = 0, sh = 0, b; do { b = buf[i++]; r += (b & 127) * Math.pow(2, sh); sh += 7; } while (b & 128 && i <= buf.length); return r; };
+  while (i < buf.length) {
+    const tag = varint(), f = Math.floor(tag / 8), w = tag & 7;
+    if (w === 0) out.push([f, varint()]);
+    else if (w === 2) { const l = varint(); out.push([f, buf.subarray(i, i + l)]); i += l; }
+    else if (w === 1) i += 8; else if (w === 5) i += 4; else break;
+  }
+  return out;
+}
+function _hbOtpFromMigration(uri) {
+  const m = uri.match(/[?&]data=([^&\s]+)/); if (!m) return [];
+  let b64 = decodeURIComponent(m[1]).replace(/ /g, '+').replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4) b64 += '=';
+  const bin = atob(b64); const buf = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  const td = new TextDecoder(); const res = [];
+  _hbPbRead(buf).filter(x => x[0] === 1 && x[1] instanceof Uint8Array).forEach(x => {
+    const o = { type: 'totp', algo: 'SHA1', digits: 6, period: 30, name: '', user: '', secret: '' };
+    let label = '', issuer = '';
+    _hbPbRead(x[1]).forEach(([f, v]) => {
+      if (f === 1) o.secret = _hbB32(v);
+      else if (f === 2) label = td.decode(v);
+      else if (f === 3) issuer = td.decode(v);
+      else if (f === 4) o.algo = { 1: 'SHA1', 2: 'SHA256', 3: 'SHA512', 4: 'MD5' }[v] || 'SHA1';
+      else if (f === 5) o.digits = v === 2 ? 8 : 6;
+      else if (f === 6) o.type = v === 1 ? 'hotp' : 'totp';
+    });
+    const parts = label.split(':'); const acct = (parts.length > 1 ? parts.slice(1).join(':') : label).trim();
+    o.name = issuer || (parts.length > 1 ? parts[0].trim() : acct) || 'Account'; o.user = acct === o.name ? '' : acct;
+    res.push(o);
+  });
+  return res;
+}
+function _hbOtpFromUri(uri) {
+  const m = uri.match(/^otpauth:\/\/(totp|hotp)\/([^?]*)\?(.*)$/i); if (!m) return null;
+  const q = new URLSearchParams(m[3]); const secret = (q.get('secret') || '').replace(/\s/g, '').toUpperCase(); if (!secret) return null;
+  let label = ''; try { label = decodeURIComponent(m[2]); } catch (e) { label = m[2]; }
+  const parts = label.split(':'); const acct = (parts.length > 1 ? parts.slice(1).join(':') : label).trim();
+  const issuer = q.get('issuer') || (parts.length > 1 ? parts[0].trim() : '');
+  return { type: m[1].toLowerCase(), secret, algo: (q.get('algorithm') || 'SHA1').toUpperCase(), digits: parseInt(q.get('digits') || '6', 10), period: parseInt(q.get('period') || '30', 10),
+    name: issuer || acct || 'Account', user: issuer && acct !== issuer ? acct : '' };
+}
+function hbParseOtpText(text) {
+  const out = []; text = (text || '').trim();
+  if (text[0] === '{') { // Aegis (JSON non cifrato)
+    try {
+      const j = JSON.parse(text);
+      if (j.db && typeof j.db === 'object' && Array.isArray(j.db.entries)) {
+        j.db.entries.forEach(e => { if (e.info && e.info.secret) out.push({ type: (e.type || 'totp').toLowerCase(), secret: String(e.info.secret).replace(/\s/g, '').toUpperCase(),
+          algo: (e.info.algo || 'SHA1').toUpperCase(), digits: e.info.digits || 6, period: e.info.period || 30, name: e.issuer || e.name || 'Account', user: e.issuer ? (e.name || '') : '' }); });
+        return { items: out };
+      }
+      if (j.db && typeof j.db === 'string') return { items: [], error: 'Il file Aegis è cifrato: esportalo non cifrato (o scansiona i QR)' };
+      if (Array.isArray(j.services)) return { items: [], error: 'Il backup 2FAS è cifrato o in un formato non supportato' };
+    } catch (e) {}
+  }
+  text.split(/\s+/).forEach(tok => {
+    if (/^otpauth-migration:/i.test(tok)) { try { out.push(..._hbOtpFromMigration(tok)); } catch (e) {} }
+    else if (/^otpauth:/i.test(tok)) { const o = _hbOtpFromUri(tok); if (o) out.push(o); }
+  });
+  return { items: out };
+}
+function _hbQrFromImage(file) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      let res = null;
+      for (const maxSide of [img.naturalWidth, 1400, 900]) {
+        const sc = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+        const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+        const d = x.getImageData(0, 0, c.width, c.height);
+        const code = typeof jsQR === 'function' ? jsQR(d.data, c.width, c.height, { inversionAttempts: 'attemptBoth' }) : null;
+        if (code && code.data) { res = code.data; break; }
+      }
+      URL.revokeObjectURL(url); resolve(res);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+function hbOtpAddItems(items) {
+  otpLoad();
+  const have = new Set(_otpAccounts.map(a => (a.secret || '').replace(/\s/g, '').toUpperCase()));
+  let added = 0, dup = 0, unsupported = 0;
+  items.forEach((o, n) => {
+    if (!o.secret) return;
+    if (o.type !== 'totp' || o.algo !== 'SHA1' || o.digits !== 6 || o.period !== 30) { unsupported++; return; } // il generatore interno supporta solo TOTP standard
+    if (have.has(o.secret)) { dup++; return; }
+    have.add(o.secret);
+    _otpAccounts.push({ id: 'otp_' + Date.now() + '_' + n, name: o.name, user: o.user || '', secret: o.secret, icon: '🔐' });
+    added++;
+  });
+  if (added) otpSaveAll();
+  return { added, dup, unsupported };
+}
+function hbOtpReport(r, extra) {
+  const parts = [];
+  parts.push(r.added ? '✅ Importati ' + r.added + ' codici OTP' : 'Nessun nuovo codice importato');
+  if (r.dup) parts.push(r.dup + ' già presenti');
+  if (r.unsupported) parts.push(r.unsupported + ' non supportati (HOTP o formato non standard)');
+  if (extra) parts.push(extra);
+  showToast(parts.join(' · '), 7000);
+}
+async function importOtpFiles(event) {
+  const files = Array.from(event.target.files || []); event.target.value = '';
+  if (!files.length) return;
+  const all = []; let err = '', bad = 0;
+  for (const f of files) {
+    let text = '';
+    if (/^image\//.test(f.type)) { text = await _hbQrFromImage(f) || ''; if (!text) { bad++; continue; } }
+    else text = await f.text();
+    const r = hbParseOtpText(text);
+    if (r.error) err = r.error;
+    all.push(...r.items);
+  }
+  if (!all.length) { showToast('⚠️ ' + (err || 'Nessun codice OTP riconosciuto' + (bad ? ' (QR non leggibile in ' + bad + ' immagini)' : ''))); return; }
+  hbOtpReport(hbOtpAddItems(all), bad ? bad + ' immagini non leggibili' : '');
+  try { if (HB.currentTab === 'otp') otpShowList(); } catch (e) {}
+}
+function importOtpScan() {
+  closeSettings();
+  qrScannerOpen('Scansiona QR di esportazione', data => {
+    const r = hbParseOtpText(data);
+    if (!r.items.length) { showToast('❌ QR non riconosciuto come esportazione OTP'); return; }
+    hbOtpReport(hbOtpAddItems(r.items), 'se Google Authenticator ha più QR, ripeti per ognuno');
+  });
 }
 
 // Smette di avvisare per una password compromessa che l'utente ha scelto di tenere comunque (es. deve restare sempre quella)
@@ -4543,7 +4685,7 @@ function pwShowDetail(itemId) {
   const content = document.getElementById('pw-detail-content');
   content.innerHTML = `
     ${item.pwnedCount > 0 && !item.pwnedIgnored ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;">
-      <div style="font-weight:600;margin-bottom:8px;">${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password).length; const sv = pwSeverity(item, rc); return sv.dot + ' Gravità ' + sv.name.toLowerCase() + ' — '; })()}comparsa in ${item.pwnedCount.toLocaleString('it-IT')} violazion${item.pwnedCount===1?'e':'i'} di dati nota. Cambiala appena possibile.</div>
+      <div style="font-weight:600;margin-bottom:8px;">${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password).length; const sv = pwSeverity(item, rc); return pwSevDot(sv) + ' Gravità ' + sv.name.toLowerCase() + ' — '; })()}comparsa in ${item.pwnedCount.toLocaleString('it-IT')} violazion${item.pwnedCount===1?'e':'i'} di dati nota. Cambiala appena possibile.</div>
       <button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>
       <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
     </div>` : ''}
@@ -5031,7 +5173,7 @@ function pwShowFilteredList(type) {
   } else if (type === 'pwned') {
     filtered = _pwItems.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored)
       .sort((a, b) => (pwSeverity(b, pwCount[b.password]).lvl - pwSeverity(a, pwCount[a.password]).lvl) || ((b.pwnedCount||0) - (a.pwnedCount||0))); // prima le più gravi
-    const tally = [3,2,1,0].map(l => PW_SEV[l].dot + ' ' + filtered.filter(i => pwSeverity(i, pwCount[i.password]).lvl === l).length).join('  ');
+    const tally = [3,2,1,0].map(l => pwSevDot(PW_SEV[l]) + ' ' + filtered.filter(i => pwSeverity(i, pwCount[i.password]).lvl === l).length).join('  ');
     title = '🚨 Compromesse · ' + tally;
   }
 
@@ -5044,7 +5186,7 @@ function pwShowFilteredList(type) {
     let sev = null;
     if (type === 'pwned') {
       sev = pwSeverity(item, pwCount[item.password]);
-      sub = sev.dot + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
+      sub = pwSevDot(sev) + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
     }
     return {
       icon: getCatIcon(cat?.id, cat?.name, cat?.icon),
@@ -7531,7 +7673,7 @@ function patchLocalStorage(){
 // ══ FUNZIONI RIPRISTINATE DA BETA333 ══════════════════════
 
 
-function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock_min')||'0';const es=document.getElementById('expiry-soon-sel');if(es)es.value=localStorage.getItem('hb_expiry_soon_days')||'14';},500);applyCustomColors();}
+function settingsApplyOnLoad(){const t=localStorage.getItem('hb_theme')||localStorage.getItem('hb12_theme')||'dark';document.documentElement.setAttribute('data-theme',t);const ac=localStorage.getItem('hb_accent')||localStorage.getItem('hb13_accent');if(ac){document.documentElement.style.setProperty('--accent',ac);document.documentElement.style.setProperty('--accent-bg',ac+'20');}const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};const ff=localStorage.getItem('hb_font')||'system';if(fm[ff])document.body.style.fontFamily=fm[ff];const fs=localStorage.getItem('hb_fs')||'15';document.documentElement.style.fontSize=fs+'px';const rm={sharp:'4px',normal:'14px',round:'22px'};const rd=localStorage.getItem('hb_radius')||'normal';document.documentElement.style.setProperty('--card-radius',rm[rd]||'14px');const sh=localStorage.getItem('hb_shadow')||'off';document.documentElement.style.setProperty('--card-shadow',sh==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');const am={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};const an=localStorage.getItem('hb_anim')||'normal';document.documentElement.style.setProperty('--anim-speed',am[an]||'0.18s');const bgMap={grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const bg=localStorage.getItem('hb_bg')||'none';if(bg!=='none'&&bgMap[bg]){const sz={dots:'20px 20px',grid:'20px 20px'};document.body.style.backgroundImage=bgMap[bg];document.body.style.backgroundSize=sz[bg]||'';document.body.style.backgroundAttachment='fixed';}setTimeout(()=>{const sel=document.getElementById('autolock-sel');if(sel)sel.value=localStorage.getItem('hb_autolock_min')||'0';const es=document.getElementById('expiry-soon-sel');if(es)es.value=localStorage.getItem('hb_expiry_soon_days')||'14';},500);applyCustomColors();try{hbApplyHomeStyle();}catch(e){}}
 
 function settingsAutolock(min){localStorage.setItem('hb_autolock_min',min);autolockReset();showToast(min==='0'?'Blocco automatico disattivato':'⏱ Blocco dopo '+min+' min');}
 
@@ -7546,14 +7688,34 @@ function settingsLogout(){const ov=document.createElement('div');ov.style.cssTex
 
 
 
+
+// ══ Stile Home (layout): classic | a (griglia) | b (vetro) ══
+function hbHomeStyle(){ try{ return localStorage.getItem('hb_home_style')||'classic'; }catch(e){ return 'classic'; } }
+function hbApplyHomeStyle(){ document.documentElement.setAttribute('data-home-style', hbHomeStyle()); }
+function hbRefreshHomeStyleUI(){
+  const st = hbHomeStyle();
+  ['classic','a','b'].forEach(k=>{
+    const b = document.getElementById('hs-'+k); if(!b) return;
+    b.style.borderColor = k===st ? 'var(--accent)' : 'var(--border)';
+    b.style.background = k===st ? 'var(--accent-bg)' : 'var(--surface)';
+  });
+}
+function setHomeStyle(s){
+  try{ localStorage.setItem('hb_home_style', s); }catch(e){}
+  hbApplyHomeStyle(); hbRefreshHomeStyleUI();
+  showToast(s==='classic'?'🏠 Home classica':(s==='a'?'🏠 Home a griglia':'🏠 Home a card di vetro'));
+}
+hbApplyHomeStyle();
+
 function settingsPage(page) {
-  ['main','grafica','backup','sicurezza','info','cloud'].forEach(p => {
+  ['main','grafica','backup','import','sicurezza','info','cloud'].forEach(p => {
     const el = document.getElementById('set-page-'+p);
     if(el) el.style.display = p===page ? 'block' : 'none';
   });
-  const titles = {main:'⚙️ Impostazioni',grafica:'🎨 Grafica',backup:'💾 Backup',sicurezza:'🔐 Sicurezza',info:'ℹ️ Info'};
+  const titles = {main:'⚙️ Impostazioni',grafica:'🎨 Grafica',backup:'💾 Backup',import:'📥 Importazioni',sicurezza:'🔐 Sicurezza',info:'ℹ️ Info'};
   const t = document.getElementById('set-title'); if(t) t.textContent = titles[page]||'⚙️ Impostazioni';
   const back = document.getElementById('set-back-btn'); if(back) back.style.display = page==='main'?'none':'flex';
+  if(page==='grafica') { try{ hbRefreshHomeStyleUI(); }catch(e){} }
   if(page==='sicurezza') { settingsCheckBio(); try { pwLoad(); pwUpdateBreachStatusUI(pwLastBreachCheckSummary()); } catch(e) {} }
 }
 
@@ -8242,7 +8404,7 @@ function resetColors(){['hb_bg_color','hb_card_color','hb_sidebar_color','hb_tex
 function resetAllGraphics(){
   // Reset tutti i valori grafici
   ['hb_theme','hb_accent','hb13_accent','hb_font','hb_fs','hb_radius','hb_shadow','hb_anim','hb_bg',
-   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color'].forEach(k=>localStorage.removeItem(k));
+   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color','hb_home_style'].forEach(k=>localStorage.removeItem(k));
   // Ripristina stili CSS
   document.documentElement.removeAttribute('style');
   document.body.style.cssText = '';
@@ -10061,16 +10223,29 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Tema, colori, sfondo, animazioni, font</div>
           </button>
 
-          <button onclick="settingsPage('backup')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
-            <div style="font-size:32px;margin-bottom:10px;">💾</div>
-            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Backup</div>
-            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Esporta e importa i tuoi dati</div>
-          </button>
-
           <button onclick="settingsPage('sicurezza')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">🔐</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Sicurezza</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">PIN, biometria, accesso</div>
+          </button>
+
+          <button onclick="settingsPage('backup')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
+            <div style="font-size:32px;margin-bottom:10px;">💾</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Backup</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Esporta e ripristina i tuoi dati</div>
+          </button>
+
+          <button onclick="settingsPage('cloud')" style="position:relative;padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:transform 0.15s;">
+            <div id="set-cloud-dot" style="position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%;background:#10b981;"></div>
+            <div style="font-size:32px;margin-bottom:10px;">☁️</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Backup su Drive</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.4;" id="set-cloud-summary">—</div>
+          </button>
+
+          <button onclick="settingsPage('import')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;">
+            <div style="font-size:32px;margin-bottom:10px;">📥</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Importazioni</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Da Chrome, Bitwarden, LastPass, Google Authenticator</div>
           </button>
 
           <button onclick="settingsPage('info')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
@@ -10078,18 +10253,22 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Info</div>
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Versione, crediti, roadmap</div>
           </button>
-          <button onclick="settingsPage('cloud')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--accent);background:var(--accent-bg);cursor:pointer;text-align:left;font-family:inherit;grid-column:span 2;">
-            <div style="display:flex;align-items:center;gap:12px;">
-              <div style="font-size:32px;">☁️</div>
-              <div style="flex:1;"><div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Backup su Drive</div><div style="font-size:12px;color:var(--text3);" id="set-cloud-summary">—</div></div>
-              <div id="set-cloud-dot" style="width:10px;height:10px;border-radius:50%;background:#10b981;flex-shrink:0;"></div>
-            </div>
-          </button>
         </div>
       </div>
 
       <!-- ── PAGINA GRAFICA ── -->
       <div id="set-page-grafica" style="display:none;padding:0 0 20px;">
+
+        <!-- Stile Home -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🏠 Stile Home</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <button id="hs-classic" onclick="setHomeStyle('classic')" style="padding:12px 6px;border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);text-align:center;"><div style="font-size:13px;font-weight:800;">Classico</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">2 colonne, card</div></button>
+            <button id="hs-a" onclick="setHomeStyle('a')" style="padding:12px 6px;border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);text-align:center;"><div style="font-size:13px;font-weight:800;">Griglia</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">3 colonne, tessere</div></button>
+            <button id="hs-b" onclick="setHomeStyle('b')" style="padding:12px 6px;border-radius:14px;border:2px solid var(--border);background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);text-align:center;"><div style="font-size:13px;font-weight:800;">Vetro</div><div style="font-size:10px;color:var(--text3);margin-top:3px;">3 colonne, card chiare</div></button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.4;margin-top:8px;">Cambia solo la disposizione: le icone restano quelle di prima.</div>
+        </div>
 
         <!-- Tema -->
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
@@ -10257,12 +10436,6 @@ document.addEventListener('keydown', (e) => {
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
           </div>
-          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
-            <span style="font-size:28px;">🌐</span>
-            <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
-            <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
-          </label>
-
           <!-- Backup per sezione -->
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:12px;">📦 Esporta / Importa per sezione</div>
@@ -10312,6 +10485,31 @@ document.addEventListener('keydown', (e) => {
         </div>
       </div>
 
+      <!-- ── PAGINA IMPORTAZIONI ── -->
+      <div id="set-page-import" style="display:none;padding:20px;">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Password</div>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🌐</span>
+            <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
+            <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
+          </label>
+
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:8px;">Codici OTP / 2FA</div>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🔑</span>
+            <div><div style="margin-bottom:3px;">Importa codici OTP da altre app</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Google Authenticator (QR di esportazione), Aegis non cifrato o file di link otpauth://. Puoi scegliere più file o screenshot insieme.</div></div>
+            <input type="file" accept="image/*,.txt,.json,text/plain,application/json" multiple style="display:none;" onchange="importOtpFiles(event)">
+          </label>
+          <button onclick="importOtpScan()" style="width:100%;padding:14px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;text-align:left;">
+            <span style="font-size:24px;">📷</span><div>Scansiona il QR con la fotocamera<div style="font-size:12px;color:var(--text3);font-weight:500;margin-top:2px;">Da Google Authenticator: ⋮ → Trasferisci codici → Esporta</div></div>
+          </button>
+          <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
+            🧹 I file CSV e gli screenshot dei QR contengono password e codici in chiaro: dopo l'importazione cancellali dal dispositivo.
+          </div>
+        </div>
+      </div>
+
       <!-- ── PAGINA NOTIFICHE ── -->
       <div id="set-page-notif" style="display:none;padding:20px;">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
@@ -10350,16 +10548,8 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🛡️ Password compromesse</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" id="pwned-status-txt">Controlla se le tue password sono apparse in violazioni di dati note (Have I Been Pwned). La password non viene mai inviata online — solo un'impronta parziale e irreversibile.</div>
             <button onclick="pwRunBreachCheck(true)" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 Verifica ora tutte le password</button>
-            <button onclick="pwExportBreachReport()" style="width:100%;margin-top:8px;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📄 Esporta rapporto compromesse (senza password)</button>
           </div>
 
-          <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
-            </div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Aggiungi HomeBull alla schermata home</div>
-            <button onclick="triggerInstall()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Installa HomeBull</button>
-          </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏱ Blocco automatico</div>
@@ -10389,7 +10579,7 @@ document.addEventListener('keydown', (e) => {
           </div>
 
           <button onclick="lockApp()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">🔒 Blocca app</button>
-            <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
+          <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
         </div>
       </div>
 
@@ -10399,7 +10589,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.11.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.14.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
@@ -10417,6 +10607,17 @@ document.addEventListener('keydown', (e) => {
               <div style="display:flex;align-items:center;gap:10px;">🎨 <span style="color:var(--text2);">Tema chiaro / scuro</span></div>
             </div>
           </div>
+            <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Aggiungi HomeBull alla schermata home</div>
+            <button onclick="triggerInstall()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Installa HomeBull</button>
+          </div>
+          <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">🔄</span>
+            <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
+          </button>
           <button onclick="hbDiagnose()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 Diagnostica dati locali</button>
         </div>
       </div>
