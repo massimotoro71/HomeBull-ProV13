@@ -1899,7 +1899,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.12.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.13.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1969,7 +1969,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.12.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.13.0</div>
         </div>
       </div>
     </div>
@@ -2074,7 +2074,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.12.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.13.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2931,7 +2931,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.12.1',
+  version: 'v13.13.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7673,11 +7673,11 @@ function settingsLogout(){const ov=document.createElement('div');ov.style.cssTex
 
 
 function settingsPage(page) {
-  ['main','grafica','backup','sicurezza','info','cloud'].forEach(p => {
+  ['main','grafica','backup','import','sicurezza','info','cloud'].forEach(p => {
     const el = document.getElementById('set-page-'+p);
     if(el) el.style.display = p===page ? 'block' : 'none';
   });
-  const titles = {main:'⚙️ Impostazioni',grafica:'🎨 Grafica',backup:'💾 Backup',sicurezza:'🔐 Sicurezza',info:'ℹ️ Info'};
+  const titles = {main:'⚙️ Impostazioni',grafica:'🎨 Grafica',backup:'💾 Backup',import:'📥 Importazioni',sicurezza:'🔐 Sicurezza',info:'ℹ️ Info'};
   const t = document.getElementById('set-title'); if(t) t.textContent = titles[page]||'⚙️ Impostazioni';
   const back = document.getElementById('set-back-btn'); if(back) back.style.display = page==='main'?'none':'flex';
   if(page==='sicurezza') { settingsCheckBio(); try { pwLoad(); pwUpdateBreachStatusUI(pwLastBreachCheckSummary()); } catch(e) {} }
@@ -10190,7 +10190,13 @@ document.addEventListener('keydown', (e) => {
           <button onclick="settingsPage('backup')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">💾</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Backup</div>
-            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Esporta e importa i tuoi dati</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Esporta e ripristina i tuoi dati</div>
+          </button>
+
+          <button onclick="settingsPage('import')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;">
+            <div style="font-size:32px;margin-bottom:10px;">📥</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Importazioni</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Da Chrome, Bitwarden, LastPass, Google Authenticator</div>
           </button>
 
           <button onclick="settingsPage('sicurezza')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
@@ -10383,20 +10389,6 @@ document.addEventListener('keydown', (e) => {
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             ⚠️ L'importazione sovrascrive tutti i dati attuali. Esporta prima un backup di sicurezza.
           </div>
-          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
-            <span style="font-size:28px;">🌐</span>
-            <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
-            <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
-          </label>
-
-          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
-            <span style="font-size:28px;">🔑</span>
-            <div><div style="margin-bottom:3px;">Importa codici OTP da altre app</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Google Authenticator (QR di esportazione), Aegis non cifrato o file di link otpauth://. Puoi scegliere più file o screenshot insieme.</div></div>
-            <input type="file" accept="image/*,.txt,.json,text/plain,application/json" multiple style="display:none;" onchange="importOtpFiles(event)">
-          </label>
-          <button onclick="importOtpScan()" style="width:100%;padding:14px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;text-align:left;">
-            <span style="font-size:24px;">📷</span><div>Scansiona il QR con la fotocamera<div style="font-size:12px;color:var(--text3);font-weight:500;margin-top:2px;">Da Google Authenticator: ⋮ → Trasferisci codici → Esporta</div></div>
-          </button>
           <!-- Backup per sezione -->
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:12px;">📦 Esporta / Importa per sezione</div>
@@ -10433,16 +10425,31 @@ document.addEventListener('keydown', (e) => {
                 <span style="font-size:13px;font-weight:600;">📡 Rete & IT</span>
                 <div style="display:flex;gap:6px;">
                   <button onclick="sectionExport('server')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
-                  <button onclick="sectionImport('server')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
                 </div>
-              </div>
-            </div>
-          </div>
+      </div>
 
-          <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
-            <span style="font-size:28px;">🔄</span>
-            <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
+      <!-- ── PAGINA IMPORTAZIONI ── -->
+      <div id="set-page-import" style="display:none;padding:20px;">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Password</div>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🌐</span>
+            <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
+            <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
+          </label>
+
+          <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:8px;">Codici OTP / 2FA</div>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🔑</span>
+            <div><div style="margin-bottom:3px;">Importa codici OTP da altre app</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Google Authenticator (QR di esportazione), Aegis non cifrato o file di link otpauth://. Puoi scegliere più file o screenshot insieme.</div></div>
+            <input type="file" accept="image/*,.txt,.json,text/plain,application/json" multiple style="display:none;" onchange="importOtpFiles(event)">
+          </label>
+          <button onclick="importOtpScan()" style="width:100%;padding:14px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;text-align:left;">
+            <span style="font-size:24px;">📷</span><div>Scansiona il QR con la fotocamera<div style="font-size:12px;color:var(--text3);font-weight:500;margin-top:2px;">Da Google Authenticator: ⋮ → Trasferisci codici → Esporta</div></div>
           </button>
+          <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
+            🧹 I file CSV e gli screenshot dei QR contengono password e codici in chiaro: dopo l'importazione cancellali dal dispositivo.
+          </div>
         </div>
       </div>
 
@@ -10486,13 +10493,6 @@ document.addEventListener('keydown', (e) => {
             <button onclick="pwRunBreachCheck(true)" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔍 Verifica ora tutte le password</button>
           </div>
 
-          <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
-            </div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Aggiungi HomeBull alla schermata home</div>
-            <button onclick="triggerInstall()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Installa HomeBull</button>
-          </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏱ Blocco automatico</div>
@@ -10522,7 +10522,24 @@ document.addEventListener('keydown', (e) => {
           </div>
 
           <button onclick="lockApp()" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px;">🔒 Blocca app</button>
-            <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
+            <div id="install-settings-card" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <div style="font-size:13px;font-weight:800;">📲 Installa app</div>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Aggiungi HomeBull alla schermata home</div>
+            <button onclick="triggerInstall()" style="width:100%;padding:11px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📲 Installa HomeBull</button>
+          </div>
+          <button onclick="sectionImport('server')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
+            <span style="font-size:28px;">🔄</span>
+            <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
+          </button>
+          <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
         </div>
       </div>
 
@@ -10532,7 +10549,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.12.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.13.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
