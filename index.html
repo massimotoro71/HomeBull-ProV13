@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.14.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.15.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.14.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.15.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.14.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.15.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2947,7 +2947,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.14.1',
+  version: 'v13.15.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4689,6 +4689,7 @@ function pwShowDetail(itemId) {
       <button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>
       <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
     </div>` : ''}
+    ${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password).length; return (rc > 1 && !(item.pwnedCount > 0 && !item.pwnedIgnored)) ? `<div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#f97316;"><div style="font-weight:600;margin-bottom:8px;">🔁 Questa password è usata in ${rc} voci: se una viene violata, lo sono tutte.</div><button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;border-radius:10px;border:none;background:#f97316;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button></div>` : ''; })()}
     ${item.pwnedCount > 0 && item.pwnedIgnored ? `<div style="background:rgba(107,114,128,0.1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:var(--text3);">
       ✅ Avviso disattivato per questa password (resta comunque compromessa).
       <button onclick="pwIgnoreBreach('${item.id}', false)" style="margin-left:6px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">Riattiva avviso</button>
@@ -5007,7 +5008,7 @@ function showExpiringListModal(titleText, rows, emptyMsg) {
     <div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 16px;flex-shrink:0;"></div>
     <div style="font-size:16px;font-weight:800;padding:0 20px 14px;flex-shrink:0;">${titleText}</div>
     <div style="overflow-y:auto;padding:0 16px;">
-      ${rows.map(r => `<div onclick="document.body.querySelector('[data-exp-ov]')?.remove();${r.onclick}" style="display:flex;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid var(--border);cursor:pointer;">
+      ${rows.map(r => r.header ? `<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:14px 8px 6px;">${r.header}</div>` : `<div onclick="document.body.querySelector('[data-exp-ov]')?.remove();${r.onclick}" style="display:flex;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid var(--border);cursor:pointer;">
         <div style="width:40px;height:40px;border-radius:12px;background:${r.bg};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${r.icon}</div>
         <div style="flex:1;min-width:0;">
           <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.name}</div>
@@ -5165,8 +5166,10 @@ function pwShowFilteredList(type) {
     filtered = _pwItems.filter(i => getStrength(i.password||'').score <= 1);
     title = '🔴 Password deboli';
   } else if (type === 'dupes') {
-    filtered = _pwItems.filter(i => i.password && pwCount[i.password] > 1);
-    title = '⚠️ Password duplicate';
+    filtered = _pwItems.filter(i => !i.deleted && i.password && pwCount[i.password] > 1)
+      .sort((a, b) => (pwCount[b.password] - pwCount[a.password]) || a.password.localeCompare(b.password) || (a.title||'').localeCompare(b.title||'', 'it'));
+    const nGroups = new Set(filtered.map(i => i.password)).size;
+    title = '⚠️ Password condivise · ' + nGroups + (nGroups === 1 ? ' gruppo' : ' gruppi');
   } else if (type === 'old') {
     filtered = _pwItems.filter(i => i.updatedAt && (now - new Date(i.updatedAt).getTime()) > ninetyDays);
     title = '⏰ Password non aggiornate da 90+ giorni';
@@ -5177,7 +5180,15 @@ function pwShowFilteredList(type) {
     title = '🚨 Compromesse · ' + tally;
   }
 
-  const rows = filtered.map(item => {
+  let _lastDupePw = null, _dupeGroupN = 0;
+  const rows = [];
+  filtered.forEach(item => {
+    if (type === 'dupes' && item.password !== _lastDupePw) {
+      _lastDupePw = item.password; _dupeGroupN++;
+      const inGroup = filtered.filter(x => x.password === item.password);
+      const bad = Math.max(...inGroup.map(x => x.pwnedCount || 0));
+      rows.push({ header: 'Gruppo ' + _dupeGroupN + ' · stessa password in ' + inGroup.length + ' voci' + (bad > 0 ? ' · 🚨 compromessa (' + bad.toLocaleString('it-IT') + ' violazioni)' : '') });
+    }
     const cat = _pwCats.find(c => c.id === item.categoryId);
     let sub = '';
     if (type === 'weak') sub = getStrength(item.password||'').label || 'Debole';
@@ -5188,12 +5199,12 @@ function pwShowFilteredList(type) {
       sev = pwSeverity(item, pwCount[item.password]);
       sub = pwSevDot(sev) + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
     }
-    return {
+    rows.push({
       icon: getCatIcon(cat?.id, cat?.name, cat?.icon),
       bg: sev ? sev.bg : 'rgba(239,68,68,0.15)', col: sev ? sev.col : '#ef4444', text: sub,
       name: item.title || '—',
       onclick: "window._pwReturnToFilter='" + type + "';pwShowDetail('" + item.id + "')"
-    };
+    });
   });
   showExpiringListModal(title, rows, 'Nessuna voce trovata');
 }
@@ -7707,6 +7718,34 @@ function setHomeStyle(s){
 }
 hbApplyHomeStyle();
 
+
+// ══ Svuota gli appunti dopo la copia di password/codici ══
+(function () {
+  try {
+    const cb = navigator.clipboard;
+    if (!cb || cb.__hbWrapped || typeof cb.writeText !== 'function') return;
+    const orig = cb.writeText.bind(cb);
+    let timer = null, due = 0, pending = false;
+    const secs = () => { try { const v = parseInt(localStorage.getItem('hb_clip_clear_sec'), 10); return isNaN(v) ? 30 : v; } catch (e) { return 30; } };
+    const clearNow = () => {
+      clearTimeout(timer); pending = false;
+      orig('').then(() => { try { showToast('🧹 Appunti svuotati'); } catch (e) {} }).catch(() => {});
+    };
+    const wrapped = function (text) {
+      const p = orig(text);
+      p.then(() => {
+        clearTimeout(timer); pending = false;
+        const sc = secs();
+        if (text && sc > 0) { pending = true; due = Date.now() + sc * 1000; timer = setTimeout(clearNow, sc * 1000); }
+      }).catch(() => {});
+      return p;
+    };
+    Object.defineProperty(cb, 'writeText', { value: wrapped, configurable: true, writable: true });
+    Object.defineProperty(cb, '__hbWrapped', { value: true });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && pending && Date.now() >= due) clearNow(); });
+  } catch (e) {}
+})();
+
 function settingsPage(page) {
   ['main','grafica','backup','import','sicurezza','info','cloud'].forEach(p => {
     const el = document.getElementById('set-page-'+p);
@@ -7716,7 +7755,7 @@ function settingsPage(page) {
   const t = document.getElementById('set-title'); if(t) t.textContent = titles[page]||'⚙️ Impostazioni';
   const back = document.getElementById('set-back-btn'); if(back) back.style.display = page==='main'?'none':'flex';
   if(page==='grafica') { try{ hbRefreshHomeStyleUI(); }catch(e){} }
-  if(page==='sicurezza') { settingsCheckBio(); try { pwLoad(); pwUpdateBreachStatusUI(pwLastBreachCheckSummary()); } catch(e) {} }
+  if(page==='sicurezza') { try{ const cs=document.getElementById('clip-clear-sel'); if(cs){ const v=parseInt(localStorage.getItem('hb_clip_clear_sec'),10); cs.value=String(isNaN(v)?30:v); } }catch(e){} settingsCheckBio(); try { pwLoad(); pwUpdateBreachStatusUI(pwLastBreachCheckSummary()); } catch(e) {} }
 }
 
 function settingsRefreshUI() {
@@ -10567,6 +10606,18 @@ document.addEventListener('keydown', (e) => {
           </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🧹 Svuota appunti</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Dopo aver copiato una password o un codice, li cancello dagli appunti. Funziona se l'app è aperta.</div>
+            <select id="clip-clear-sel" onchange="localStorage.setItem('hb_clip_clear_sec',this.value);showToast(this.value==='0'?'Svuotamento appunti disattivato':'✅ Appunti svuotati dopo '+this.value+' secondi')" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;">
+              <option value="0">Mai</option>
+              <option value="15">15 secondi</option>
+              <option value="30">30 secondi</option>
+              <option value="60">1 minuto</option>
+              <option value="120">2 minuti</option>
+            </select>
+          </div>
+
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏰ Avviso scadenze</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Giorni di anticipo per l'avviso "in scadenza" (password e carte)</div>
             <select id="expiry-soon-sel" onchange="localStorage.setItem('hb_expiry_soon_days',this.value);showToast('✅ Preavviso impostato a '+this.value+' giorni');pwRenderExpiryBanner();cardsRenderExpiryBanner();" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;outline:none;font-family:inherit;">
@@ -10589,7 +10640,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.14.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.15.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
