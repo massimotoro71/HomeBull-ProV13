@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.16.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.16.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.16.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.16.1</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.16.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.16.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2948,7 +2948,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.16.0',
+  version: 'v13.16.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7331,18 +7331,25 @@ function otpNewCategory(selEl){
 function otpSetFilter(id){ _otpFilter=id; otpRenderList(document.getElementById('otp-search-inp')?.value||''); }
 function otpRenderCatBar(){
   const bar=document.getElementById('otp-cat-bar'); if(!bar) return;
+  const btn=(on,l,extra='')=>`<button onclick="${on}" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px ${extra?'dashed':'solid'} var(--border);background:${extra?'none':'var(--surface)'};color:${extra?'var(--text3)':'var(--text)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">${l}</button>`;
+  if(!_otpCats.length){ bar.innerHTML=btn('otpManageCats()','➕ Categoria',1); return; }
+  if(_otpFilter==='all'){ bar.innerHTML=btn('otpManageCats()','⚙️ Gestisci categorie',1); return; }
+  const nm=_otpFilter==='none'?'Senza categoria':otpCatName(_otpFilter);
+  bar.innerHTML=btn("otpSetFilter('all')",'← Categorie')+`<div style="align-self:center;font-size:14px;font-weight:800;white-space:nowrap;">🗂 ${_otpEsc(nm)}</div>`;
+}
+function otpRenderCatTiles(list){
+  const palette=['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
   const live=_otpAccounts.filter(a=>!a.deleted);
-  if(!_otpCats.length){
-    bar.innerHTML=`<button onclick="otpManageCats()" style="padding:7px 12px;border-radius:20px;border:1px dashed var(--border);background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">➕ Categoria</button>`;
-    return;
-  }
-  const chip=(id,label,n)=>{const on=_otpFilter===id;return `<button onclick="otpSetFilter('${id}')" style="flex-shrink:0;padding:7px 12px;border-radius:20px;border:1px solid ${on?'var(--accent)':'var(--border)'};background:${on?'var(--accent)':'var(--surface)'};color:${on?'#fff':'var(--text2)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">${label} <span style="opacity:.7;">${n}</span></button>`;};
-  let h=chip('all','Tutti',live.length);
-  _otpCats.slice().sort((a,b)=>a.name.localeCompare(b.name,'it')).forEach(c=>{h+=chip(c.id,_otpEsc(c.name),live.filter(a=>a.categoryId===c.id).length);});
+  const cats=_otpCats.slice().sort((a,b)=>a.name.localeCompare(b.name,'it',{numeric:true,sensitivity:'base'}));
+  const items=cats.map((c,i)=>({id:c.id,name:c.name,n:live.filter(a=>a.categoryId===c.id).length,color:palette[i%palette.length]}));
   const un=live.filter(a=>!a.categoryId||!_otpCats.find(c=>c.id===a.categoryId)).length;
-  if(un) h+=chip('none','Senza categoria',un);
-  h+=`<button onclick="otpManageCats()" style="flex-shrink:0;padding:7px 12px;border-radius:20px;border:1px dashed var(--border);background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚙️ Gestisci</button>`;
-  bar.innerHTML=h;
+  if(un) items.push({id:'none',name:'Senza categoria',n:un,color:'#64748b'});
+  list.style.gridTemplateColumns = window.innerWidth>=700 ? 'repeat(2,1fr)' : '1fr';
+  list.innerHTML=items.map(t=>`<div onclick="otpSetFilter('${t.id}')" style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${t.color};border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+    <div style="width:52px;height:52px;border-radius:16px;background:${t.color}20;border:1px solid ${t.color}40;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">🗂</div>
+    <div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_otpEsc(t.name)}</div><div style="font-size:12px;color:var(--text3);">${t.n} OTP</div></div>
+    <div style="min-width:32px;height:32px;border-radius:10px;background:${t.color}15;border:1px solid ${t.color}30;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${t.color};padding:0 8px;">${t.n}</div>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>`).join('');
 }
 function otpManageCats(){
   document.getElementById('_otp_cats_ov')?.remove();
@@ -7399,6 +7406,8 @@ function otpRenderList(q='') {
   if (!list) return;
   let accounts = _otpAccounts.filter(a=>!a.deleted);
   otpRenderCatBar();
+  if (_otpCats.length && _otpFilter==='all' && !q) { otpRenderCatTiles(list); return; }
+  list.style.gridTemplateColumns = '1fr';
   if (_otpFilter==='none') accounts = accounts.filter(a=>!a.categoryId||!_otpCats.find(c=>c.id===a.categoryId));
   else if (_otpFilter!=='all') accounts = accounts.filter(a=>a.categoryId===_otpFilter);
   if (q) accounts = accounts.filter(a =>
@@ -9116,7 +9125,7 @@ function _fmtSyncTime(iso) {
 
 // L'ultimo salvataggio locale = il più recente tra tutte le sezioni dati, utile per confrontare tra dispositivi
 function getLastLocalSaveTs() {
-  const keys = [PW_KEY, PW_CATS, NOTE_KEY, NOTE_ATT_KEY, OTP_KEY, CARDS_KEY, WIFI_KEY, FINANCE_KEY, SERVER_KEY];
+  const keys = [PW_KEY, PW_CATS, NOTE_KEY, NOTE_ATT_KEY, OTP_KEY, OTP_CATS_KEY, CARDS_KEY, WIFI_KEY, FINANCE_KEY, SERVER_KEY];
   let max = 0;
   keys.forEach(k => { const t = _getLocalTs(k); if (t > max) max = t; });
   return max || null;
@@ -9984,7 +9993,6 @@ function updateSidebarBadges() {
   const pwWarn = document.getElementById('home-pw-warn');
   if (pwWarn) {
     const msgs = [];
-    if (expPw > 0) msgs.push(`⏰ ${expPw} password in scadenza o scadute`);
     if (oldPw > 0) msgs.push(`⚠️ ${oldPw} password non aggiornate da 6+ mesi`);
     pwWarn.textContent = msgs.join(' · ');
     pwWarn.style.display = msgs.length ? 'block' : 'none';
@@ -10742,7 +10750,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.16.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.16.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
