@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.17.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.17.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.17.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.17.1</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.17.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.17.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2948,7 +2948,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.17.0',
+  version: 'v13.17.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5905,9 +5905,17 @@ function qrHandleGalleryImage(event) {
 
 // Parser otpauth:// per OTP
 function qrParseOTP(data) {
-  // otpauth://totp/Label?secret=XXX&issuer=YYY
+  data = (data || '').trim();
+  // Export di Google Authenticator / simili (anche più account in un QR)
+  if (/^otpauth-migration:/i.test(data)) {
+    try { const items = _hbOtpFromMigration(data).filter(i => i.secret); if (!items.length) return null; return { ...items[0], items }; }
+    catch(e) { return null; }
+  }
+  // otpauth://totp/Label?secret=XXX&issuer=YYY (con algoritmo/cifre/periodo)
   if (!data.startsWith('otpauth://')) return null;
   try {
+    const o = _hbOtpFromUri(data);
+    if (o) return { ...o, items: [o] };
     const url = new URL(data);
     const label  = decodeURIComponent(url.pathname.slice(1));
     const secret = url.searchParams.get('secret');
@@ -5915,6 +5923,24 @@ function qrParseOTP(data) {
     const [name, user] = label.includes(':') ? label.split(':',2).map(s=>s.trim()) : [label,''];
     return { name: issuer || name, user: user || name, secret };
   } catch(e) { return null; }
+}
+// Gestisce il risultato di una scansione: più account → importati subito; uno solo → compila il modulo
+function otpScanApply(parsed, fillFn) {
+  const items = parsed.items || [parsed];
+  if (items.length > 1) {
+    const cat = (_otpFilter !== 'all' && _otpFilter !== 'none') ? _otpFilter : '';
+    const before = _otpAccounts.length;
+    const r = hbOtpAddItems(items);
+    if (cat && r.added) { _otpAccounts.slice(before).forEach(a => { a.categoryId = cat; }); otpSaveAll(); }
+    hbOtpReport(r);
+    try { otpRenderList(''); } catch(e) {}
+    return true;
+  }
+  fillFn(items[0]);
+  const o = items[0];
+  const std = (o.type || 'totp') === 'totp' && (o.algo || 'SHA1') === 'SHA1' && (o.digits || 6) === 6 && (o.period || 30) === 30;
+  showToast(std ? '✅ QR letto — verifica e salva' : '⚠️ QR letto, ma usa un formato non standard (' + (o.type||'totp').toUpperCase() + ' ' + (o.algo||'') + ' ' + (o.digits||'') + ' cifre): il codice potrebbe non coincidere', 6000);
+  return false;
 }
 
 // Parser WIFI: per WiFi
@@ -5930,10 +5956,11 @@ function otpScanQR() {
   qrScannerOpen('Scansiona QR 2FA', (data) => {
     const parsed = qrParseOTP(data);
     if (!parsed || !parsed.secret) { showToast('❌ QR non riconosciuto — inserisci manualmente'); return; }
-    document.getElementById('otp-add-name').value   = parsed.name;
-    document.getElementById('otp-add-user').value   = parsed.user;
-    document.getElementById('otp-add-secret').value = parsed.secret;
-    showToast('✅ QR letto — verifica i dati e salva');
+    if (otpScanApply(parsed, o => {
+      document.getElementById('otp-add-name').value   = o.name;
+      document.getElementById('otp-add-user').value   = o.user;
+      document.getElementById('otp-add-secret').value = o.secret;
+    })) otpShowList();
   });
 }
 
@@ -9959,13 +9986,14 @@ function otpScanQRFromModal() {
       showToast('❌ QR non riconosciuto — inserisci manualmente');
       return;
     }
-    const nameInp = document.getElementById('am-otp-name');
-    const userInp = document.getElementById('am-otp-user');
-    const secInp  = document.getElementById('am-otp-secret');
-    if (nameInp && parsed.name) nameInp.value = parsed.name;
-    if (userInp && parsed.user) userInp.value = parsed.user;
-    if (secInp)  secInp.value = parsed.secret.toUpperCase();
-    showToast('✅ QR letto — verifica e salva');
+    if (otpScanApply(parsed, o => {
+      const nameInp = document.getElementById('am-otp-name');
+      const userInp = document.getElementById('am-otp-user');
+      const secInp  = document.getElementById('am-otp-secret');
+      if (nameInp && o.name) nameInp.value = o.name;
+      if (userInp && o.user) userInp.value = o.user;
+      if (secInp)  secInp.value = o.secret.toUpperCase();
+    })) closeAddModal();
   });
   // Riapri modal anche se si annulla lo scanner
   const origClose = window._qrCloseCallback;
@@ -10808,7 +10836,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.17.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.17.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
