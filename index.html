@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.15.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.16.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.15.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.16.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.15.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.16.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2353,6 +2353,7 @@ Aggiungi nuovo dato
               oninput="otpSearch(this.value)"
               style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">
           </div>
+          <div id="otp-cat-bar" style="padding:8px 14px 0;flex-shrink:0;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;"></div>
           <div id="otp-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 24px;display:grid;grid-template-columns:1fr;gap:12px;align-content:start;"></div>
         </div>
 
@@ -2927,7 +2928,7 @@ const HOME_PREFS_KEY  = 'hb12_home_prefs';
 
 
 const MERGE_KEYS = {
-  'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,
+  'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,'hb13_otp_cats':true,
   'hb13_cards':true,'hb13_wifi':true,
   'hb13_finance':true,'hb13_server':true
 };
@@ -2947,7 +2948,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.15.1',
+  version: 'v13.16.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -2966,7 +2967,7 @@ const HB = {
 // ═══════════════════════════════════════════════════════════
 
 const _SENSITIVE_KEYS = [
-  'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+  'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
   'hb13_cards','hb13_wifi','hb13_finance',
   'hb13_server'
 ];
@@ -7301,6 +7302,77 @@ let _otpIcon     = '🔐';
 
 function otpLoad() {
   _otpAccounts = _vaultParse(localStorage.getItem(OTP_KEY), _otpAccounts);
+  _otpCats = _vaultParse(localStorage.getItem(OTP_CATS_KEY), _otpCats);
+}
+const OTP_CATS_KEY = 'hb13_otp_cats';
+let _otpCats = [];
+let _otpFilter = 'all';
+function otpCatsSave() { localStorage.setItem(OTP_CATS_KEY, JSON.stringify(_otpCats)); _setLocalTs(OTP_CATS_KEY); driveAutoBackupOnSave(); }
+function _otpEsc(t){ return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function otpCatName(id){ const c=_otpCats.find(x=>x.id===id); return c?c.name:''; }
+function otpCatSelectHtml(selId, selected){
+  const opts=_otpCats.slice().sort((a,b)=>a.name.localeCompare(b.name,'it')).map(c=>`<option value="${_otpEsc(c.id)}" ${c.id===selected?'selected':''}>${_otpEsc(c.name)}</option>`).join('');
+  return `<div style="margin-bottom:12px;"><div class="pw-field-label" style="margin-bottom:6px;font-size:12px;color:var(--text3);">Categoria</div>
+    <select id="${selId}" onchange="if(this.value==='__new'){otpNewCategory(this);}" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+    <option value="">— Senza categoria —</option>${opts}<option value="__new">➕ Nuova categoria…</option></select></div>`;
+}
+function otpNewCategory(selEl){
+  const name=(prompt('Nome della nuova categoria (es. QNAP, Ufficio, Privato):')||'').trim();
+  if(!name){ if(selEl) selEl.value=''; return null; }
+  let c=_otpCats.find(x=>x.name.toLowerCase()===name.toLowerCase());
+  if(!c){ c={id:'ocat_'+Date.now(),name}; _otpCats.push(c); otpCatsSave(); }
+  if(selEl){
+    const o=document.createElement('option'); o.value=c.id; o.textContent=c.name;
+    const nw=[...selEl.options].find(x=>x.value==='__new'); selEl.insertBefore(o,nw); selEl.value=c.id;
+  }
+  otpRenderList(document.getElementById('otp-search-inp')?.value||'');
+  return c;
+}
+function otpSetFilter(id){ _otpFilter=id; otpRenderList(document.getElementById('otp-search-inp')?.value||''); }
+function otpRenderCatBar(){
+  const bar=document.getElementById('otp-cat-bar'); if(!bar) return;
+  const live=_otpAccounts.filter(a=>!a.deleted);
+  if(!_otpCats.length){
+    bar.innerHTML=`<button onclick="otpManageCats()" style="padding:7px 12px;border-radius:20px;border:1px dashed var(--border);background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">➕ Categoria</button>`;
+    return;
+  }
+  const chip=(id,label,n)=>{const on=_otpFilter===id;return `<button onclick="otpSetFilter('${id}')" style="flex-shrink:0;padding:7px 12px;border-radius:20px;border:1px solid ${on?'var(--accent)':'var(--border)'};background:${on?'var(--accent)':'var(--surface)'};color:${on?'#fff':'var(--text2)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">${label} <span style="opacity:.7;">${n}</span></button>`;};
+  let h=chip('all','Tutti',live.length);
+  _otpCats.slice().sort((a,b)=>a.name.localeCompare(b.name,'it')).forEach(c=>{h+=chip(c.id,_otpEsc(c.name),live.filter(a=>a.categoryId===c.id).length);});
+  const un=live.filter(a=>!a.categoryId||!_otpCats.find(c=>c.id===a.categoryId)).length;
+  if(un) h+=chip('none','Senza categoria',un);
+  h+=`<button onclick="otpManageCats()" style="flex-shrink:0;padding:7px 12px;border-radius:20px;border:1px dashed var(--border);background:none;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⚙️ Gestisci</button>`;
+  bar.innerHTML=h;
+}
+function otpManageCats(){
+  document.getElementById('_otp_cats_ov')?.remove();
+  const ov=document.createElement('div'); ov.id='_otp_cats_ov';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const rows=_otpCats.slice().sort((a,b)=>a.name.localeCompare(b.name,'it')).map(c=>{
+    const n=_otpAccounts.filter(a=>!a.deleted&&a.categoryId===c.id).length;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="flex:1;min-width:0;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_otpEsc(c.name)} <span style="font-size:11px;color:var(--text3);font-weight:600;">${n}</span></div>
+    <button onclick="otpRenameCategory('${c.id}')" style="background:none;border:none;cursor:pointer;font-size:15px;" title="Rinomina">✏️</button>
+    <button onclick="otpDeleteCategory('${c.id}')" style="background:none;border:none;cursor:pointer;font-size:15px;" title="Elimina">🗑</button></div>`;}).join('')||'<div style="font-size:13px;color:var(--text3);padding:10px 0;">Nessuna categoria ancora.</div>';
+  ov.innerHTML=`<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;width:100%;max-height:80vh;overflow-y:auto;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:10px;">🗂 Categorie OTP</div>${rows}
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button onclick="document.getElementById('_otp_cats_ov').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+      <button onclick="otpNewCategory(null);otpManageCats();" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">➕ Nuova</button></div></div>`;
+  document.body.appendChild(ov);
+}
+function otpRenameCategory(id){
+  const c=_otpCats.find(x=>x.id===id); if(!c) return;
+  const name=(prompt('Nuovo nome categoria:',c.name)||'').trim(); if(!name) return;
+  c.name=name; otpCatsSave(); otpRenderList(''); otpManageCats();
+}
+function otpDeleteCategory(id){
+  const c=_otpCats.find(x=>x.id===id); if(!c) return;
+  const n=_otpAccounts.filter(a=>a.categoryId===id).length;
+  if(!confirm(`Eliminare la categoria "${c.name}"?${n?`\n\nI ${n} OTP al suo interno NON vengono eliminati: passano a "Senza categoria".`:''}`)) return;
+  _otpAccounts.forEach(a=>{ if(a.categoryId===id){ delete a.categoryId; a.updatedAt=new Date().toISOString(); } });
+  _otpCats=_otpCats.filter(x=>x.id!==id);
+  if(_otpFilter===id) _otpFilter='all';
+  otpSaveAll(); otpCatsSave(); otpRenderList(''); otpManageCats();
 }
 function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
 
@@ -7326,9 +7398,16 @@ function otpRenderList(q='') {
   const list = document.getElementById('otp-list');
   if (!list) return;
   let accounts = _otpAccounts.filter(a=>!a.deleted);
+  otpRenderCatBar();
+  if (_otpFilter==='none') accounts = accounts.filter(a=>!a.categoryId||!_otpCats.find(c=>c.id===a.categoryId));
+  else if (_otpFilter!=='all') accounts = accounts.filter(a=>a.categoryId===_otpFilter);
   if (q) accounts = accounts.filter(a =>
-    (a.name+a.user).toLowerCase().includes(q.toLowerCase())
+    ((a.name||'')+(a.user||'')+otpCatName(a.categoryId)).toLowerCase().includes(q.toLowerCase())
   );
+  if (_otpCats.length && _otpFilter==='all') {
+    const ord = id => { const c=_otpCats.find(x=>x.id===id); return c?c.name.toLowerCase():'\uffff'; };
+    accounts = accounts.slice().sort((a,b)=> ord(a.categoryId).localeCompare(ord(b.categoryId),'it'));
+  }
   if (!accounts.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:32px;margin-bottom:8px;">🔑</div>
@@ -7338,7 +7417,18 @@ function otpRenderList(q='') {
     return;
   }
   list.innerHTML = '';
+  let _lastGrp = null;
   accounts.forEach(acc => {
+    if (_otpCats.length && _otpFilter==='all') {
+      const gname = otpCatName(acc.categoryId) || 'Senza categoria';
+      if (gname !== _lastGrp) {
+        _lastGrp = gname;
+        const hd = document.createElement('div');
+        hd.style.cssText = 'font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);padding:6px 2px 0;';
+        hd.textContent = '🗂 ' + gname;
+        list.appendChild(hd);
+      }
+    }
     const code = otpGenerate(acc.secret);
     const formatted = otpFormat(code);
     const remaining = 30 - (Math.floor(Date.now()/1000) % 30);
@@ -7550,6 +7640,7 @@ function otpEdit(id) {
     <input id="_oe_name" value="${acc.name}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Username / Email</div>
     <input id="_oe_user" value="${acc.user||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    ${otpCatSelectHtml('_oe_cat', acc.categoryId||'')}
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Chiave segreta (TOTP)</div>
     <input id="_oe_secret" value="${acc.secret||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
     <div style="display:flex;gap:10px;">
@@ -7564,7 +7655,7 @@ function otpEdit(id) {
     const secret = document.getElementById('_oe_secret').value.trim();
     if (!name) { showToast('Inserisci il nome'); return; }
     const idx = _otpAccounts.findIndex(a => a.id === id);
-    if (idx !== -1) { _otpAccounts[idx] = {..._otpAccounts[idx], name, user, secret, updatedAt: new Date().toISOString()}; }
+    if (idx !== -1) { const _cv = document.getElementById('_oe_cat')?.value||''; const _na = {..._otpAccounts[idx], name, user, secret, updatedAt: new Date().toISOString()}; if (_cv && _cv!=='__new') _na.categoryId=_cv; else delete _na.categoryId; _otpAccounts[idx] = _na; }
     otpSaveAll(); otpRenderList(''); ov.remove();
     showToast('✅ Account aggiornato');
   };
@@ -7677,7 +7768,7 @@ function ensureBuffer() {
   } catch(e) {}
 }
 
-const HB_TRACKED_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_cards','hb13_wifi',
+const HB_TRACKED_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi',
   'hb13_finance','hb13_server','hb13_pw_cats','hb13_note_att'];
 
 function patchLocalStorage(){
@@ -8100,8 +8191,8 @@ function runSearch(q) {
       if ([acc.name, acc.user, acc.issuer].some(f => f && f.toLowerCase().includes(ql))) {
         results.push({
           icon: acc.icon || '🔑', title: acc.name,
-          sub: acc.user || acc.issuer || 'OTP / 2FA',
-          badge: '🔑 OTP',
+          sub: (acc.user || acc.issuer || 'OTP / 2FA') + (acc.categoryId && otpCatName(acc.categoryId) ? ' · ' + otpCatName(acc.categoryId) : ''),
+          badge: '🔑 OTP' + (acc.categoryId && otpCatName(acc.categoryId) ? ' · ' + otpCatName(acc.categoryId) : ''),
           action: () => switchTab('otp')
         });
       }
@@ -8676,7 +8767,7 @@ async function driveBackupNow(silent=false) {
     const token = _driveBackupToken || await driveGetBackupToken();
 
     // Raccoglie tutti i dati
-    const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts',
+    const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats',
                   'hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
     const data = {};
     keys.forEach(k => {
@@ -9332,7 +9423,7 @@ async function authLogout() {
 
 // ── Backup locale ──────────────────────────────────────────
 function settingsExport(){
-  const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts',
+  const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
                'hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
   const data={};
   keys.forEach(k=>{
@@ -9378,7 +9469,7 @@ async function settingsExportEncrypted() {
   const pass = await _hbAskPassword('🔒 Password per proteggere il file', true);
   if (!pass) return;
   try {
-    const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
+    const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
     const data={};
     keys.forEach(k=>{ const v=localStorage.getItem(k); if(v) try{ data[k]=JSON.parse(v); }catch(e){ data[k]=v; } });
     const plain = JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data});
@@ -9654,6 +9745,7 @@ function addModalAdapt() {
     otp: `
       ${inp('otp-name','Nome account *','es. Google, GitHub...')}
       ${inp('otp-user','Email / Username','nome@email.com')}
+      ${otpCatSelectHtml('am-otp-cat', _otpFilter!=='all'&&_otpFilter!=='none'?_otpFilter:'')}
       <div style="margin-bottom:12px;">
         <div class="pw-field-label" style="margin-bottom:6px;">Chiave segreta *</div>
         <div style="display:flex;gap:8px;">
@@ -9754,7 +9846,8 @@ function addModalSave() {
     const name = g('otp-name'), secret = (document.getElementById('am-otp-secret')?.value||'').trim().replace(/\s/g,'').toUpperCase();
     if (!name) { showToast('Inserisci il nome account'); return; }
     if (!secret) { showToast('Inserisci la chiave segreta'); return; }
-    _otpAccounts.push({ id:'otp_'+Date.now(), name, user:g('otp-user'), secret, icon:'🔐' });
+    const _ocat = document.getElementById('am-otp-cat')?.value||'';
+    _otpAccounts.push({ id:'otp_'+Date.now(), name, user:g('otp-user'), secret, icon:'🔐', ...( _ocat && _ocat!=='__new' ? {categoryId:_ocat} : {}) });
     otpSaveAll(); showToast('✅ Account OTP aggiunto');
     if (typeof otpRenderList === 'function') otpRenderList();
 
@@ -10081,7 +10174,7 @@ function getCardCircuitLogo(label) {
 const SECTION_KEYS = {
   'passwords': ['hb13_passwords','hb13_pw_cats'],
   'notes':     ['hb13_notes'],
-  'otp':       ['hb13_otp_accounts'],
+  'otp':       ['hb13_otp_accounts','hb13_otp_cats'],
   'cards':     ['hb13_cards','hb13_finance'],
   'server':    ['hb13_server','hb13_wifi'],
 };
@@ -10649,7 +10742,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.15.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.16.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
