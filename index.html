@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.16.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.17.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.16.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.17.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.16.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.17.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2948,7 +2948,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.16.1',
+  version: 'v13.17.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3854,6 +3854,14 @@ function updateHomeStats() {
     alerts.unshift({ icon:'🚨', color:'#ef4444', text: pwPwned.length + ' password compromess' + (pwPwned.length===1?'a':'e') + ' — cambiale subito', time: '', tab: 'passwords', action: "switchTab('passwords');setTimeout(()=>pwShowFilteredList('pwned'),150)" });
   }
 
+  // 2d. Promemoria backup (Drive o file): mai fatto o più vecchio di 30 giorni
+  if ((_pwItems||[]).filter(i => !i.deleted).length > 0) {
+    const _lb = hbLastBackupTs();
+    const _days = _lb ? Math.floor((Date.now() - _lb) / 86400000) : null;
+    if (_days === null) alerts.push({ icon:'💾', color:'#f97316', text:'Nessun backup fatto — salva una copia dei tuoi dati', time:'', action:'hbOpenBackupSettings()' });
+    else if (_days > 30) alerts.push({ icon:'💾', color:'#f97316', text:'Ultimo backup ' + _days + ' giorni fa — conviene rifarlo', time:'', action:'hbOpenBackupSettings()' });
+  }
+
   // 3. OTP attivi
   const _otpAlerts = JSON.parse(localStorage.getItem('hb13_otp')||'[]');
   if (_otpAlerts.length > 0) {
@@ -3868,7 +3876,14 @@ function updateHomeStats() {
   }
 
   // Render alert — cliccabili se hanno un tab associato (o un'azione diretta personalizzata)
-  alertBox.innerHTML = alerts.slice(0, 5).map(a => `
+  const _h = hbHealthStats();
+  const _hc = _h.score >= 80 ? '#10b981' : (_h.score >= 60 ? '#f59e0b' : '#ef4444');
+  const _scoreCard = _h.n ? `<div onclick="hbShowHealth()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-left:4px solid ${_hc};border-radius:14px;margin-bottom:8px;cursor:pointer;">
+      <div style="width:50px;height:50px;border-radius:50%;border:4px solid ${_hc};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:${_hc};flex-shrink:0;">${_h.score}</div>
+      <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">Salute password</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:2px;">${_h.pwned} compromesse · ${_h.weak} deboli · ${_h.reused} condivise</div></div>
+      <div style="font-size:14px;color:var(--text3);">›</div></div>` : '';
+  alertBox.innerHTML = _scoreCard + alerts.slice(0, 5).map(a => `
     <div onclick="${a.action ? a.action : (a.tab ? `switchTab('${a.tab}')` : '')}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;${(a.tab || a.action) ? 'cursor:pointer;' : ''}">
       <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
       <div style="flex:1;min-width:0;font-size:13px;font-weight:600;color:var(--text);line-height:1.4;">${a.text}</div>
@@ -3889,6 +3904,44 @@ function updateHomeStats() {
                   (_serverItems||[]).filter(s=>!s.deleted).length;
     statsEl.textContent = total > 0 ? `${total} elementi salvati · ${pwCount} password · ${otpCount} OTP` : '';
   }
+}
+
+// ── Salute del vault + promemoria backup (Home) ──
+function hbHealthStats() {
+  const items = (_pwItems||[]).filter(i => !i.deleted && i.password);
+  const n = items.length;
+  const cnt = {}; items.forEach(i => cnt[i.password] = (cnt[i.password]||0) + 1);
+  const pwned = items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored).length;
+  const weak = items.filter(i => getStrength(i.password).score <= 1).length;
+  const reused = items.filter(i => cnt[i.password] > 1).length;
+  const expired = items.filter(i => { const e = pwExpiryInfo(i); return e && (e.status==='expired'||e.status==='today'); }).length;
+  const old = items.filter(i => i.updatedAt && (Date.now() - new Date(i.updatedAt).getTime()) > 180*86400000).length;
+  const pen = n ? (40*pwned + 25*weak + 20*reused + 10*expired + 5*old) / n : 0;
+  const score = Math.max(0, Math.min(100, Math.round(100 - pen)));
+  return { n, pwned, weak, reused, expired, old, score };
+}
+function hbLastBackupTs() {
+  let max = 0;
+  ['hb_drive_backup_ts','hb_file_backup_ts'].forEach(k => { try { const v = localStorage.getItem(k); if (v) { const t = new Date(v).getTime(); if (t > max) max = t; } } catch(e){} });
+  return max || null;
+}
+function hbOpenBackupSettings() { openSettings(); setTimeout(() => { try { settingsPage('backup'); } catch(e){} }, 200); }
+function hbShowHealth() {
+  const h = hbHealthStats();
+  document.getElementById('_hh_ov')?.remove();
+  const row = (ic, label, n, act) => `<div ${n && act ? `onclick="document.getElementById('_hh_ov').remove();${act}"` : ''} style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);${n && act ? 'cursor:pointer;' : ''}"><div style="font-size:18px;">${ic}</div><div style="flex:1;font-size:13px;font-weight:600;">${label}</div><div style="font-size:14px;font-weight:800;color:${n?'#ef4444':'#10b981'};">${n || '✓'}</div></div>`;
+  const ov = document.createElement('div'); ov.id = '_hh_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;width:100%;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px;">🛡 Salute delle password: ${h.score}/100</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Calcolato su ${h.n} password. Tocca una riga per vedere l'elenco.</div>
+    ${row('🚨','Compromesse (peso maggiore)',h.pwned,"switchTab('passwords');setTimeout(()=>pwShowFilteredList('pwned'),150)")}
+    ${row('🔴','Deboli',h.weak,"switchTab('passwords');setTimeout(()=>pwShowFilteredList('weak'),150)")}
+    ${row('⚠️','Condivise tra più voci',h.reused,"switchTab('passwords');setTimeout(()=>pwShowFilteredList('dupes'),150)")}
+    ${row('⏰','Scadute',h.expired,"switchTab('passwords')")}
+    ${row('📅','Non aggiornate da 6+ mesi',h.old,"switchTab('passwords');setTimeout(()=>pwShowFilteredList('old'),150)")}
+    <button onclick="document.getElementById('_hh_ov').remove()" style="width:100%;margin-top:16px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>`;
+  document.body.appendChild(ov);
 }
 
 let toastTimer;
@@ -7413,9 +7466,12 @@ function otpRenderList(q='') {
   if (q) accounts = accounts.filter(a =>
     ((a.name||'')+(a.user||'')+otpCatName(a.categoryId)).toLowerCase().includes(q.toLowerCase())
   );
+  const _cmp = (x,y)=>(x||'').localeCompare(y||'','it',{numeric:true,sensitivity:'base'});
   if (_otpCats.length && _otpFilter==='all') {
-    const ord = id => { const c=_otpCats.find(x=>x.id===id); return c?c.name.toLowerCase():'\uffff'; };
-    accounts = accounts.slice().sort((a,b)=> ord(a.categoryId).localeCompare(ord(b.categoryId),'it'));
+    const ord = id => { const c=_otpCats.find(x=>x.id===id); return c?c.name:'\uffff'; };
+    accounts = accounts.slice().sort((a,b)=> _cmp(ord(a.categoryId),ord(b.categoryId)) || _cmp(a.name,b.name));
+  } else {
+    accounts = accounts.slice().sort((a,b)=> _cmp(a.name,b.name));
   }
   if (!accounts.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
@@ -9445,6 +9501,7 @@ function settingsExport(){
   a.href=URL.createObjectURL(blob);
   a.download='homebull-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();
+  try{ localStorage.setItem('hb_file_backup_ts', new Date().toISOString()); updateSidebarBadges(); }catch(e){}
   showToast('✅ Backup esportato!');
 }
 
@@ -9491,6 +9548,7 @@ async function settingsExportEncrypted() {
     a.href=URL.createObjectURL(new Blob([out],{type:'application/json'}));
     a.download='homebull-cifrato-'+new Date().toISOString().slice(0,10)+'.json';
     a.click();
+    try{ localStorage.setItem('hb_file_backup_ts', new Date().toISOString()); updateSidebarBadges(); }catch(e){}
     showToast('✅ Backup cifrato esportato');
   } catch(e) { showToast('⚠️ Export fallito: ' + (e.message||e)); }
 }
@@ -10750,7 +10808,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.16.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.17.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
