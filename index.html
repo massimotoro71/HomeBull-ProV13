@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.18.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.19.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.18.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.19.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.18.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.19.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2223,10 +2223,13 @@ Aggiungi nuovo dato
           <div style="display:flex;gap:8px;align-items:center;">
             <div class="pw-search-bar" style="flex:1;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input id="pw-cat-search" type="text" placeholder="Cerca categoria..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              <input id="pw-cat-search" type="text" placeholder="Cerca password..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
             <button onclick="pwNewCategory()" style="flex-shrink:0;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Categoria</button>
           </div>
+        </div>
+        <div style="padding:0 14px 8px;flex-shrink:0;">
+          <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
         </div>
         <div id="pw-expiry-banner" style="display:none;margin:0 14px 10px;"></div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -2948,7 +2951,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.18.1',
+  version: 'v13.19.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4120,8 +4123,22 @@ function pwShowCats(q='') {
   pwRenderCats(q);
 }
 
+let _pwSearchCat = '';
+function pwFillSearchCat() {
+  const sel = document.getElementById('pw-search-cat'); if (!sel) return;
+  if (_pwSearchCat && !_pwCats.find(c => c.id === _pwSearchCat)) _pwSearchCat = '';
+  const opts = _pwCats.slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
+    .map(c => '<option value="' + c.id + '">📁 ' + String(c.name||'').replace(/[<>&"]/g, '') + ' (' + _pwItems.filter(i => !i.deleted && i.categoryId === c.id).length + ')</option>').join('');
+  sel.innerHTML = '<option value="">🔎 Cerca in: tutte le categorie</option>' + opts;
+  sel.value = _pwSearchCat;
+}
+function pwSetSearchCat(v) {
+  _pwSearchCat = v || '';
+  pwRenderCats((document.getElementById('pw-cat-search') || {}).value || '');
+}
 function pwRenderCats(q='') {
   const grid = document.getElementById('pw-cats-grid');
+  try { pwFillSearchCat(); } catch(e) {}
 
   if (!_lsCacheReady) {
     grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text3);">⏳ Caricamento...</div>';
@@ -4133,20 +4150,21 @@ function pwRenderCats(q='') {
 
   pwRenderExpiryBanner();
 
-  // Modalità ricerca
-  if (q) {
+  // Modalità ricerca (anche senza testo, se è scelta una categoria: mostra le password di quella categoria)
+  if (q || _pwSearchCat) {
     const banner = document.getElementById('pw-expiry-banner');
     if (banner) banner.style.display = 'none';
     const ql = q.toLowerCase();
-    const matches = _pwItems.filter(i => !i.deleted && (
+    const matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || i.categoryId === _pwSearchCat) && (!ql || (
       (i.title||'').toLowerCase().includes(ql) ||
       (i.username||'').toLowerCase().includes(ql) ||
       (i.url||'').toLowerCase().includes(ql) ||
-      (i.notes||'').toLowerCase().includes(ql)
-    ));
+      (i.notes||'').toLowerCase().includes(ql) ||
+      ((_pwCats.find(c => c.id === i.categoryId) || {}).name || '').toLowerCase().includes(ql)
+    ))).sort((a, b) => (a.title||'').localeCompare(b.title||'', 'it', { numeric: true, sensitivity: 'base' }));
     if (!matches.length) {
       grid.style.display = 'block';
-      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessun risultato per "' + q + '"</div>';
+      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">' + (q ? 'Nessun risultato per "' + q.replace(/[<>&]/g, '') + '"' : 'Nessuna password in questa categoria') + (_pwSearchCat && q ? ' in questa categoria' : '') + '</div>';
       return;
     }
     grid.style.display = 'flex';
@@ -10856,7 +10874,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.18.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.19.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
