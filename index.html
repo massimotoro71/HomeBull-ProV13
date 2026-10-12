@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.19.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.20.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.19.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.20.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.19.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.20.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2258,6 +2258,14 @@ Aggiungi nuovo dato
               <option value="weak">Prima le deboli</option>
               <option value="strong">Prima le forti</option>
             </select>
+            <button id="pw-sel-toggle" onclick="pwSelToggleMode()" style="flex-shrink:0;padding:7px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
+          </div>
+          <div id="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
+            <button id="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
+            <span id="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
+            <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
+            <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
+            <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
           </div>
 
         </div>
@@ -2951,7 +2959,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.19.0',
+  version: 'v13.20.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4338,6 +4346,7 @@ function pwFilterCats(q) { pwRenderCats(q); }
 function pwShowItems(catId, catName) {
   window._pwReturnToFilter = null; // navigazione manuale in una categoria: non è più valido il "torna all'elenco filtrato"
   _pwCurCat = catId;
+  _pwSelMode = false; _pwSel.clear();
   document.getElementById('pw-view-cats').style.display = 'none';
   document.getElementById('pw-view-items').style.display = 'flex';
   document.getElementById('pw-view-detail').style.display = 'none';
@@ -4361,6 +4370,7 @@ function pwRenderItems(q='') {
   else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it', { numeric: true, sensitivity: 'base' }));
   else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
   else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
+  window._pwVisibleIds = items.map(i => i.id);
   const count = _pwItems.filter(i => i.categoryId === _pwCurCat).length;
   document.getElementById('pw-cat-count').textContent = count + ' password';
   if (!items.length) {
@@ -4396,8 +4406,102 @@ function pwRenderItems(q='') {
         <button onclick="event.stopPropagation();pwEditItem('${item.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="event.stopPropagation();pwDeleteConfirm('${item.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑</button>
       </div>`;
+    if (_pwSelMode) {
+      const on = _pwSel.has(item.id);
+      card.querySelectorAll('button').forEach(b => { b.style.display = 'none'; });
+      const box = document.createElement('div');
+      box.style.cssText = 'width:24px;height:24px;border-radius:7px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border2,var(--border))') + ';background:' + (on ? 'var(--accent)' : 'transparent') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;margin-right:10px;';
+      box.textContent = on ? '✓' : '';
+      const hd = card.querySelector('.pw-item-header'); if (hd) hd.insertBefore(box, hd.firstChild);
+      if (on) card.style.borderColor = 'var(--accent)';
+      card.onclick = () => pwSelToggleItem(item.id);
+    }
     list.appendChild(card);
   });
+  pwSelUpdateUI();
+}
+
+// ── Selezione multipla (stile email): seleziona, preferiti, sposta, elimina ──
+let _pwSelMode = false;
+const _pwSel = new Set();
+function _pwItemQ() { return document.getElementById('pw-item-search')?.value || ''; }
+function pwSelUpdateUI() {
+  const bar = document.getElementById('pw-sel-bar'), tg = document.getElementById('pw-sel-toggle');
+  if (bar) bar.style.display = _pwSelMode ? 'flex' : 'none';
+  if (tg) tg.textContent = _pwSelMode ? '✕ Fine' : '☑️ Seleziona';
+  const vis = window._pwVisibleIds || [];
+  const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
+  const a = document.getElementById('pw-sel-all'); if (a) a.textContent = all ? '☑ Nessuna' : '☐ Tutte';
+  const c = document.getElementById('pw-sel-count'); if (c) c.textContent = _pwSel.size + ' sel.';
+}
+function pwSelToggleMode(force) {
+  _pwSelMode = typeof force === 'boolean' ? force : !_pwSelMode;
+  if (!_pwSelMode) _pwSel.clear();
+  pwRenderItems(_pwItemQ());
+}
+function pwSelToggleItem(id) {
+  if (_pwSel.has(id)) _pwSel.delete(id); else _pwSel.add(id);
+  pwRenderItems(_pwItemQ());
+}
+function pwSelAll() {
+  const vis = window._pwVisibleIds || [];
+  const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
+  vis.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
+  pwRenderItems(_pwItemQ());
+}
+function _pwSelDone(msg) {
+  _pwSelMode = false; _pwSel.clear();
+  pwRenderItems(_pwItemQ());
+  try { updateHomeStats(); updateHomeFavorites(); } catch(e) {}
+  const sub = document.getElementById('topbar-sub'); if (sub) sub.textContent = _pwItems.length + ' password';
+  if (msg) showToast(msg, 4000);
+}
+function pwSelFav() {
+  if (!_pwSel.size) { showToast('Seleziona prima qualche password'); return; }
+  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+  const makeFav = sel.some(i => !i.favorite);
+  sel.forEach(i => { i.favorite = makeFav; });
+  pwSave();
+  _pwSelDone(makeFav ? '⭐ ' + sel.length + ' aggiunte ai preferiti' : sel.length + ' tolte dai preferiti');
+}
+function pwSelDelete() {
+  const n = _pwSel.size;
+  if (!n) { showToast('Seleziona prima qualche password'); return; }
+  if (!confirm('Eliminare ' + n + (n === 1 ? ' password' : ' password') + '?\n\nL\'operazione non è reversibile: se non hai un backup recente, fallo prima.')) return;
+  _pwItems = _pwItems.filter(i => !_pwSel.has(i.id));
+  pwSave();
+  _pwSelDone('🗑 ' + n + ' password eliminate');
+}
+function pwSelMove() {
+  if (!_pwSel.size) { showToast('Seleziona prima qualche password'); return; }
+  document.getElementById('_pw_mv_ov')?.remove();
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const opts = _pwCats.filter(c => c.id !== _pwCurCat).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
+    .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
+  const ov = document.createElement('div'); ov.id = '_pw_mv_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:360px;width:100%;border:1px solid var(--border);">' +
+    '<div style="font-size:15px;font-weight:800;margin-bottom:12px;">📁 Sposta ' + _pwSel.size + ' password in…</div>' +
+    '<select id="_pw_mv_sel" style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;margin-bottom:14px;">' + opts + '<option value="__new">➕ Nuova categoria…</option></select>' +
+    '<div style="display:flex;gap:10px;"><button onclick="document.getElementById(\'_pw_mv_ov\').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>' +
+    '<button id="_pw_mv_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Sposta</button></div></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_pw_mv_ok').onclick = () => {
+    let target = document.getElementById('_pw_mv_sel').value, name = '';
+    if (target === '__new') {
+      name = (prompt('Nome della nuova categoria:') || '').trim();
+      if (!name) return;
+      let c = _pwCats.find(x => (x.name||'').toLowerCase() === name.toLowerCase());
+      if (!c) { c = { id: 'cat_' + Date.now(), name, icon: '📁' }; _pwCats.push(c); }
+      target = c.id; name = c.name;
+    } else { name = (_pwCats.find(c => c.id === target) || {}).name || ''; }
+    if (!target) { showToast('Scegli una categoria'); return; }
+    const n = _pwSel.size;
+    _pwItems.forEach(i => { if (_pwSel.has(i.id)) i.categoryId = target; });
+    pwSave();
+    ov.remove();
+    _pwSelDone('📁 ' + n + ' password spostate in "' + name + '"');
+  };
 }
 
 // ── Diagnostica dati locali (per capire se un vault "vuoto" è dati persi o un bug di visualizzazione) ──
@@ -10874,7 +10978,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.19.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.20.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
