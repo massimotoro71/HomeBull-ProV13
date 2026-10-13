@@ -1875,22 +1875,6 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
 
-function cardsSearch(q) {
-  const list = document.getElementById('cards-list');
-  if (!list) return;
-  if (!q.trim()) { cardsRender(); return; }
-  const ql = q.toLowerCase();
-  const filtered = _cards.filter(c =>
-    (c.holder||'').toLowerCase().includes(ql) ||
-    (c.number||'').replace(/\s/g,'').includes(ql) ||
-    (c.bank||'').toLowerCase().includes(ql) ||
-    (c.type||'').toLowerCase().includes(ql)
-  );
-  const orig = _cards;
-  _cards = filtered;
-  cardsRender();
-  _cards = orig;
-}
 
 </script>
 <script>
@@ -1915,7 +1899,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.23.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.23.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1969,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.23.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.23.1</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2074,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.23.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.23.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2982,7 +2966,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.23.0',
+  version: 'v13.23.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3363,34 +3347,9 @@ async function deriveKey(pin, salt) {
   );
 }
 
-async function hbEncrypt(text) {
-  if (!HB.sessionKey) return text;
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const enc = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv }, HB.sessionKey, new TextEncoder().encode(text)
-  );
-  const combined = new Uint8Array(12 + enc.byteLength);
-  combined.set(iv, 0);
-  combined.set(new Uint8Array(enc), 12);
-  let bin = '';
-  for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
-  return 'hb12:' + btoa(bin);
-}
 
-async function hbDecrypt(data) {
-  if (!HB.sessionKey || !data.startsWith('hb12:')) return data;
-  try {
-    const combined = new Uint8Array(atob(data.slice(5)).split('').map(c => c.charCodeAt(0)));
-    const dec = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: combined.slice(0, 12) },
-      HB.sessionKey, combined.slice(12)
-    );
-    return new TextDecoder().decode(dec);
-  } catch(e) { return null; }
-}
 
 // ── User persistence (email only, no secrets) ──────────────
-function saveUser(u) { localStorage.setItem('hb12_user', JSON.stringify(u)); }
 
 // ── Unlock ─────────────────────────────────────────────────
 function unlockApp() {
@@ -3664,9 +3623,6 @@ function topbarBack() {
 }
 
 // ── More Drawer ────────────────────────────────────────────
-function openMoreDrawer() {
-  document.getElementById('more-drawer').classList.add('open');
-}
 function closeMoreDrawer() {
   document.getElementById('more-drawer').classList.remove('open');
 }
@@ -4723,7 +4679,6 @@ function hbDiagnose() {
   };
 }
 
-function pwFilterItems(q) { pwRenderItems(q); }
 
 function pwToggleFavorite(id) {
   const item = _pwItems.find(i => i.id === id);
@@ -5005,14 +4960,6 @@ function pwOpenDirect(id) {
   }, 200);
 }
 
-function pwToggleSearch() {
-  const wrap = document.getElementById('pw-item-search-wrap');
-  const inp  = document.getElementById('pw-item-search');
-  const show = wrap.style.display === 'none';
-  wrap.style.display = show ? 'block' : 'none';
-  if (show) { inp.value=''; inp.focus(); }
-  else { inp.value=''; pwRenderItems(''); }
-}
 
 // Dettaglio
 function pwShowDetail(itemId) {
@@ -5740,64 +5687,7 @@ function pwExportCategoryPrint(cat, items) {
 //  IMPORT PASSWORD via QR — scansiona QR condiviso da altro dispositivo
 // ═══════════════════════════════════════════════════════════
 
-function pwShowQRImportPreview(data) {
-  const ov = document.createElement('div');
-  ov.id = '_qrimp_ov';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);">
-    <div style="font-size:32px;text-align:center;margin-bottom:12px;">📷</div>
-    <div style="font-size:15px;font-weight:800;text-align:center;margin-bottom:14px;">Importa password?</div>
-    <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:16px;">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px;">${data.title || 'Senza nome'}</div>
-      <div style="font-size:12px;color:var(--text3);">${data.username || '—'}</div>
-      ${data.url ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${data.url}</div>` : ''}
-    </div>
-    <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:16px;">La password verrà aggiunta alla categoria "Importate"</div>
-    <div style="display:flex;gap:10px;">
-      <button id="_qri_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_qri_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  document.getElementById('_qri_cancel').onclick = () => ov.remove();
-  document.getElementById('_qri_ok').onclick = () => {
-    ov.remove();
-    let cat = _pwCats.find(c => c.name === 'Importate');
-    if (!cat) {
-      cat = { id: 'cat_imp_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
-      _pwCats.push(cat);
-    }
-    _pwItems.push({
-      id: 'pw_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-      categoryId: cat.id,
-      title: data.title || 'Senza nome',
-      username: data.username || '',
-      password: data.password || '',
-      url: data.url || '',
-      createdAt: new Date().toISOString(),
-      color:  window._ceColor || card.color,
-      updatedAt: new Date().toISOString(),
-    });
-    pwSave();
-    pwRenderCats();
-    showToast('✅ Password importata!');
-  };
-}
 
-function pwImportCSV() {
-  const input = document.getElementById('pw-csv-input');
-  if (!input) {
-    // Crea input al volo se non esiste (es. dalla lista)
-    const inp = document.createElement('input');
-    inp.type = 'file'; inp.accept = '.csv';
-    inp.style.display = 'none';
-    inp.onchange = pwHandleCSV;
-    document.body.appendChild(inp);
-    inp.click();
-    return;
-  }
-  input.click();
-}
 
 async function pwHandleCSV(event) {
   const file = event.target.files?.[0];
@@ -6609,7 +6499,6 @@ function noteRenderList(q='') {
   });
 }
 
-function noteSearch(q) { noteRenderList(q); }
 
 // ── Editor ───────────────────────────────────────────────
 function noteNew() {
@@ -8138,8 +8027,7 @@ function otpDeleteConfirm(id) {
 // ── Fine OTP ──────────────────────────────────────────────
 
 
-// ── Carica condivisioni da Firebase ──────────────────────
-async function loadShares() { return; } // rimosso — UI condivisione dismessa
+// ── Carica condivisioni da Firebase ────────────────────── // rimosso — UI condivisione dismessa
 
 
 // ── Indicatore ultimo backup (Google Drive) ───────────────
@@ -8167,15 +8055,7 @@ function updateSyncBadge() {
 // Aggiorna badge ogni 30 secondi
 setInterval(() => { if (HB.currentTab === 'home') updateSyncBadge(); }, 30000);
 
-function cloudPageOpen(){
-  driveUpdateBackupUI();
-  updateSyncBadge();
-}
 
-async function cloudSyncNow(){
-  await driveBackupNow(false);
-  updateSyncBadge();
-}
 
 
 // ── Biometria PIN ──────────────────────────────────────────
@@ -8227,24 +8107,10 @@ function earlyBackHandler() {
 }
 
 // Alias globale
-function ensureBuffer() {
-  try {
-    if (history.length < 3) history.pushState({ hb: 'app' }, '');
-  } catch(e) {}
-}
 
 const HB_TRACKED_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi',
   'hb13_finance','hb13_server','hb13_pw_cats','hb13_note_att'];
 
-function patchLocalStorage(){
-  const origSet = localStorage.setItem.bind(localStorage);
-  localStorage.setItem = function(key, value) {
-    origSet(key, value);
-    if(HB_TRACKED_KEYS.includes(key)){
-      _setLocalTs(key, Date.now());
-    }
-  };
-}
 
 // ══ FUNZIONI RIPRISTINATE DA BETA333 ══════════════════════
 
@@ -8380,44 +8246,7 @@ function closeSettings() {
 }
 
 function openMobileMenu(){}
-function closeMobileMenu(){}
 
-function openHomeCustom() {
-  const prefs = loadHomePrefs();
-  // Precompila checkbox sezioni
-  const defaults = { search:true, quick:true, stats:true, alerts:true };
-  ['search','quick','stats','alerts'].forEach(k => {
-    const el = document.getElementById('hc-' + k);
-    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
-  });
-  // Precompila quick access
-  qaSelected = [];
-  const container = document.getElementById('qa-all-tabs-home');
-  container.innerHTML = '';
-  ALL_TABS_META.forEach(tab => {
-    const el = document.createElement('div');
-    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
-    el.dataset.id = tab.id;
-    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
-    el.onclick = () => {
-      if (qaSelected.includes(tab.id)) {
-        qaSelected = qaSelected.filter(t => t !== tab.id);
-        el.classList.remove('selected');
-      } else if (qaSelected.length < 8) {
-        qaSelected.push(tab.id);
-        el.classList.add('selected');
-      } else {
-        showToast('Massimo 6 schede');
-      }
-    };
-    container.appendChild(el);
-  });
-  // Tema
-  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
-  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
-  document.getElementById('home-custom-modal').style.display = 'flex';
-}
 
 function closeHomeCustom() {
   document.getElementById('home-custom-modal').style.display = 'none';
@@ -8987,7 +8816,6 @@ function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-sche
 
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
 
-function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const r=document.documentElement;r.style.setProperty('--app-bg-image',bgs[t]||'none');r.style.setProperty('--app-bg-size',sz[t]||'');document.body.style.backgroundImage=bgs[t]||'';document.body.style.backgroundSize=sz[t]||'';document.body.style.backgroundAttachment='fixed';localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
 
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 
@@ -9164,14 +8992,6 @@ function skipBioAndEnter() {
   unlockApp();
 }
 
-function pinKeyLeftAction() {
-  const credId = localStorage.getItem(HB_BIO_KEY);
-  if (credId && HB.authState === 'pin-login') {
-    tryBiometric();
-  } else {
-    pinClear();
-  }
-}
 
 async function _bioEncrypt(key, text) {
   const iv  = crypto.getRandomValues(new Uint8Array(12));
@@ -9207,22 +9027,6 @@ function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(loca
 
 function _tsKey(k){ return 'hb_ts_' + k; }
 
-function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
-  if(!local||!Array.isArray(local)) return cloud||[];
-  if(!cloud||!Array.isArray(cloud)) return local||[];
-  const map = {};
-  local.forEach(item => { if(item.id) map[item.id]=item; });
-  cloud.forEach(item => {
-    if(!item.id) return;
-    if(!map[item.id]) { map[item.id]=item; }
-    else {
-      const lt = new Date(map[item.id].deletedAt||map[item.id][tsField]||0).getTime();
-      const ct = new Date(item.deletedAt||item[tsField]||0).getTime();
-      if(ct>lt) map[item.id]=item;
-    }
-  });
-  return Object.values(map);
-}
 
 function markDeleted(arr,id){ return arr.map(i=>i.id===id?{...i,deleted:true,deletedAt:new Date().toISOString()}:i); }
 
@@ -9625,24 +9429,6 @@ function driveUpdateBackupUI() {
   if (b3) { b3.style.background  = mode==='30min' ? 'var(--accent)':'var(--surface)'; b3.style.color  = mode==='30min' ? 'white':'var(--text)'; b3.style.border  = mode==='30min' ? 'none':'1px solid var(--border)'; }
 }
 
-function wifiSearch(q) {
-  if (!q.trim()) { wifiRender(); return; }
-  const ql = q.toLowerCase();
-  const filtered = _wifiNets.filter(n =>
-    (n.ssid||'').toLowerCase().includes(ql) ||
-    (n.notes||'').toLowerCase().includes(ql)
-  );
-  const list = document.getElementById('wifi-list');
-  if (!list) return;
-  if (!filtered.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna rete trovata</div>';
-    return;
-  }
-  const backup = _wifiNets;
-  _wifiNets = filtered;
-  wifiRender();
-  _wifiNets = backup;
-}
 
 function pwEditItem(itemId) {
   const item = _pwItems.find(i => i.id === itemId);
@@ -10519,15 +10305,6 @@ function genPassword(inputId) {
 
 
 // ── Copia con feedback visivo ──────────────────────────────
-function copyWithFeedback(text, el) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('📋 Copiato!', 1200);
-    if (el) {
-      el.classList.add('copy-pulse');
-      setTimeout(() => el.classList.remove('copy-pulse'), 700);
-    }
-  }).catch(() => showToast('❌ Copia non riuscita'));
-}
 
 
 // ── Formattazione note ─────────────────────────────────────
@@ -11219,7 +10996,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.23.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.23.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
