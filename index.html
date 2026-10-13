@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.20.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.21.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.20.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.21.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.20.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.21.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2229,7 +2229,17 @@ Aggiungi nuovo dato
           </div>
         </div>
         <div style="padding:0 14px 8px;flex-shrink:0;">
-          <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
+            <button class="pw-sel-toggle pw-sel-toggle-cats" onclick="pwSelToggleMode()" style="display:none;flex-shrink:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
+          </div>
+          <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
+            <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
+            <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
+            <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
+            <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
+            <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
+          </div>
         </div>
         <div id="pw-expiry-banner" style="display:none;margin:0 14px 10px;"></div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -2238,31 +2248,30 @@ Aggiungi nuovo dato
       <!-- Vista: Lista password di una categoria -->
       <div id="pw-view-items" style="display:none;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <button onclick="pwBack()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <button onclick="pwBack()" title="Indietro" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="flex:1;min-width:0;">
-              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;"></div>
+            <div style="flex:1;min-width:0;padding-left:4px;">
+              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
               <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
             </div>
-
-            <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📊</button>
-            <button onclick="pwExportCategoryMenu()" title="Esporta categoria" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📤</button>
-            <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📷</button>
+            <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Ordina">⇅
+              <select id="pw-sort-sel" aria-label="Ordina" onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems(document.getElementById('pw-item-search')?.value||'')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                <option value="az">A → Z</option>
+                <option value="za">Z → A</option>
+                <option value="weak">Prima le deboli</option>
+                <option value="strong">Prima le forti</option>
+              </select>
+            </div>
+            <button class="pw-sel-toggle" onclick="pwSelToggleMode()" title="Seleziona" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">☑️</button>
+            <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📊</button>
+            <button onclick="pwExportCategoryMenu()" title="Esporta categoria" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📤</button>
+            <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📷</button>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <select onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems()" style="flex:1;padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:600;outline:none;font-family:inherit;">
-              <option value="az">A → Z</option>
-              <option value="za">Z → A</option>
-              <option value="weak">Prima le deboli</option>
-              <option value="strong">Prima le forti</option>
-            </select>
-            <button id="pw-sel-toggle" onclick="pwSelToggleMode()" style="flex-shrink:0;padding:7px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
-          </div>
-          <div id="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
-            <button id="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
-            <span id="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
+          <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
+            <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
+            <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
             <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
             <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
             <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
@@ -2959,7 +2968,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.20.0',
+  version: 'v13.21.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4159,6 +4168,9 @@ function pwRenderCats(q='') {
   pwRenderExpiryBanner();
 
   // Modalità ricerca (anche senza testo, se è scelta una categoria: mostra le password di quella categoria)
+  const _selTg = document.querySelector('.pw-sel-toggle-cats');
+  if (_selTg) _selTg.style.display = (q || _pwSearchCat) ? 'inline-block' : 'none';
+  if (!(q || _pwSearchCat) && _pwSelMode) { _pwSelMode = false; _pwSel.clear(); }
   if (q || _pwSearchCat) {
     const banner = document.getElementById('pw-expiry-banner');
     if (banner) banner.style.display = 'none';
@@ -4179,6 +4191,7 @@ function pwRenderCats(q='') {
     grid.style.flexDirection = 'column';
     grid.style.gap = '8px';
     grid.innerHTML = '';
+    window._pwVisibleIds = matches.map(i => i.id);
     matches.forEach(item => {
       const cat = _pwCats.find(c => c.id === item.categoryId);
       const s = getStrength(item.password||'');
@@ -4191,11 +4204,22 @@ function pwRenderCats(q='') {
         + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||'') + (cat ? ' · ' + cat.name : '') + '</div>'
         + '</div>'
         + '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:' + s.bg + ';color:' + s.col + ';">' + s.label + '</span>';
+      if (_pwSelMode) {
+        const on = _pwSel.has(item.id);
+        const box = document.createElement('div');
+        box.style.cssText = 'width:24px;height:24px;border-radius:7px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border2,var(--border))') + ';background:' + (on ? 'var(--accent)' : 'transparent') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;';
+        box.textContent = on ? '✓' : '';
+        div.insertBefore(box, div.firstChild);
+        if (on) div.style.borderColor = 'var(--accent)';
+        div.onclick = () => pwSelToggleItem(item.id);
+      }
       grid.appendChild(div);
     });
+    pwSelUpdateUI();
     return;
   }
 
+  pwSelUpdateUI();
   const cats = _pwCats
     .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => {
@@ -4366,6 +4390,7 @@ function pwRenderItems(q='') {
 
   // Ordinamento
   const sort = localStorage.getItem('hb_pw_sort') || 'az';
+  const _ss = document.getElementById('pw-sort-sel'); if (_ss) _ss.value = sort;
   if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it', { numeric: true, sensitivity: 'base' }));
   else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it', { numeric: true, sensitivity: 'base' }));
   else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
@@ -4424,34 +4449,40 @@ function pwRenderItems(q='') {
 // ── Selezione multipla (stile email): seleziona, preferiti, sposta, elimina ──
 let _pwSelMode = false;
 const _pwSel = new Set();
-function _pwItemQ() { return document.getElementById('pw-item-search')?.value || ''; }
+function _pwInItemsView() { const v = document.getElementById('pw-view-items'); return !!v && v.style.display === 'flex'; }
+function _pwSelRerender() {
+  if (_pwInItemsView()) pwRenderItems(document.getElementById('pw-item-search')?.value || '');
+  else pwRenderCats(document.getElementById('pw-cat-search')?.value || '');
+}
 function pwSelUpdateUI() {
-  const bar = document.getElementById('pw-sel-bar'), tg = document.getElementById('pw-sel-toggle');
-  if (bar) bar.style.display = _pwSelMode ? 'flex' : 'none';
-  if (tg) tg.textContent = _pwSelMode ? '✕ Fine' : '☑️ Seleziona';
+  document.querySelectorAll('.pw-sel-bar').forEach(b => { b.style.display = _pwSelMode ? 'flex' : 'none'; });
+  document.querySelectorAll('.pw-sel-toggle').forEach(t => {
+    const long = t.classList.contains('pw-sel-toggle-cats');
+    t.textContent = _pwSelMode ? (long ? '✕ Fine' : '✕') : (long ? '☑️ Seleziona' : '☑️');
+  });
   const vis = window._pwVisibleIds || [];
   const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
-  const a = document.getElementById('pw-sel-all'); if (a) a.textContent = all ? '☑ Nessuna' : '☐ Tutte';
-  const c = document.getElementById('pw-sel-count'); if (c) c.textContent = _pwSel.size + ' sel.';
+  document.querySelectorAll('.pw-sel-all').forEach(a => { a.textContent = all ? '☑ Nessuna' : '☐ Tutte'; });
+  document.querySelectorAll('.pw-sel-count').forEach(c => { c.textContent = _pwSel.size + ' sel.'; });
 }
 function pwSelToggleMode(force) {
   _pwSelMode = typeof force === 'boolean' ? force : !_pwSelMode;
   if (!_pwSelMode) _pwSel.clear();
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
 }
 function pwSelToggleItem(id) {
   if (_pwSel.has(id)) _pwSel.delete(id); else _pwSel.add(id);
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
 }
 function pwSelAll() {
   const vis = window._pwVisibleIds || [];
   const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
   vis.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
 }
 function _pwSelDone(msg) {
   _pwSelMode = false; _pwSel.clear();
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
   try { updateHomeStats(); updateHomeFavorites(); } catch(e) {}
   const sub = document.getElementById('topbar-sub'); if (sub) sub.textContent = _pwItems.length + ' password';
   if (msg) showToast(msg, 4000);
@@ -4476,7 +4507,7 @@ function pwSelMove() {
   if (!_pwSel.size) { showToast('Seleziona prima qualche password'); return; }
   document.getElementById('_pw_mv_ov')?.remove();
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const opts = _pwCats.filter(c => c.id !== _pwCurCat).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
+  const opts = _pwCats.filter(c => !(_pwInItemsView() && c.id === _pwCurCat)).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
     .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
   const ov = document.createElement('div'); ov.id = '_pw_mv_ov';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -10978,7 +11009,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.20.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.21.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
