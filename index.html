@@ -1915,7 +1915,7 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.21.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.22.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1985,7 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.21.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.22.0</div>
         </div>
       </div>
     </div>
@@ -2090,7 +2090,7 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.21.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.22.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2968,7 +2968,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.21.0',
+  version: 'v13.22.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4451,6 +4451,7 @@ let _pwSelMode = false;
 const _pwSel = new Set();
 function _pwInItemsView() { const v = document.getElementById('pw-view-items'); return !!v && v.style.display === 'flex'; }
 function _pwSelRerender() {
+  if (window._pwFl) { _pwFlRender(); return; }
   if (_pwInItemsView()) pwRenderItems(document.getElementById('pw-item-search')?.value || '');
   else pwRenderCats(document.getElementById('pw-cat-search')?.value || '');
 }
@@ -4482,6 +4483,13 @@ function pwSelAll() {
 }
 function _pwSelDone(msg) {
   _pwSelMode = false; _pwSel.clear();
+  if (window._pwFl) { // azione fatta da un elenco filtrato: aggiorna e riapri l'elenco rimasto
+    const t = window._pwFl.type;
+    try { updateHomeStats(); updateHomeFavorites(); } catch(e) {}
+    if (msg) showToast(msg, 4000);
+    pwShowFilteredList(t);
+    return;
+  }
   _pwSelRerender();
   try { updateHomeStats(); updateHomeFavorites(); } catch(e) {}
   const sub = document.getElementById('topbar-sub'); if (sub) sub.textContent = _pwItems.length + ' password';
@@ -4507,7 +4515,7 @@ function pwSelMove() {
   if (!_pwSel.size) { showToast('Seleziona prima qualche password'); return; }
   document.getElementById('_pw_mv_ov')?.remove();
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const opts = _pwCats.filter(c => !(_pwInItemsView() && c.id === _pwCurCat)).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
+  const opts = _pwCats.filter(c => !(!window._pwFl && _pwInItemsView() && c.id === _pwCurCat)).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
     .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
   const ov = document.createElement('div'); ov.id = '_pw_mv_ov';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -5224,6 +5232,85 @@ function cardExpiryInfo(card) {
 }
 
 // Modale generico "elenco in scadenza", riusato da Password e Portafoglio
+
+// ── Elenchi filtrati (compromesse, deboli, condivise, vecchie) con selezione multipla ──
+function _pwFlClose() {
+  document.querySelectorAll('[data-exp-ov]').forEach(e => e.remove());
+  _pwSelMode = false; _pwSel.clear(); window._pwFl = null;
+  try { _pwSelRerender(); } catch(e) {}
+}
+function pwFilteredModal(titleText, rows, type) {
+  document.querySelectorAll('[data-exp-ov]').forEach(e => e.remove());
+  if (!rows.some(r => r.id)) { _pwSelMode = false; _pwSel.clear(); window._pwFl = null; showToast('Nessuna voce trovata 🎉'); try { _pwSelRerender(); } catch(e) {} return; }
+  window._pwFl = { type, title: titleText, rows };
+  window._pwVisibleIds = rows.filter(r => r.id).map(r => r.id);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  overlay.setAttribute('data-exp-ov', '1');
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:86dvh;display:flex;flex-direction:column;padding:20px 0 calc(16px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 12px;flex-shrink:0;"></div>' +
+    '<div style="font-size:16px;font-weight:800;padding:0 20px 10px;flex-shrink:0;">' + titleText + '</div>' +
+    '<div id="_fl_tb" style="padding:0 16px 8px;flex-shrink:0;"></div>' +
+    '<div id="_fl_list" style="overflow-y:auto;padding:0 16px;"></div>' +
+    '<button onclick="_pwFlClose()" style="margin:14px 16px 0;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Chiudi</button>';
+  overlay.appendChild(box);
+  overlay.onclick = (e) => { if (e.target === overlay) _pwFlClose(); };
+  document.body.appendChild(overlay);
+  _pwFlRender();
+}
+function _pwFlRender() {
+  const fl = window._pwFl; if (!fl) return;
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const tb = document.getElementById('_fl_tb'), list = document.getElementById('_fl_list');
+  if (!tb || !list) return;
+  const btn = 'padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+  const ids = window._pwVisibleIds || [];
+  const all = ids.length > 0 && ids.every(id => _pwSel.has(id));
+  if (!_pwSelMode) {
+    tb.innerHTML = '<button onclick="pwSelToggleMode()" style="' + btn + '">☑️ Seleziona e lavora sulle voci</button>';
+  } else {
+    let chips = '';
+    if (fl.type === 'pwned') {
+      chips = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"><span style="font-size:11px;color:var(--text3);align-self:center;">Seleziona per gravità:</span>' +
+        [3,2,1,0].map(l => { const n = fl.rows.filter(r => r.id && r.lvl === l).length; return n ? '<button onclick="pwFlSelLevel(' + l + ')" style="' + btn + '">' + pwSevDot(PW_SEV[l]) + ' ' + esc(PW_SEV[l].name) + ' ' + n + '</button>' : ''; }).join('') + '</div>';
+    }
+    tb.innerHTML = '<div style="display:flex;align-items:center;gap:5px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">' +
+      '<button onclick="pwSelAll()" style="' + btn + '">' + (all ? '☑ Nessuna' : '☐ Tutte') + '</button>' +
+      '<span style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">' + _pwSel.size + ' sel.</span>' +
+      '<button onclick="pwSelFav()" title="Preferiti" style="' + btn + '">⭐</button>' +
+      '<button onclick="pwSelMove()" title="Sposta in categoria" style="' + btn + '">📁 Sposta</button>' +
+      (fl.type === 'pwned' ? '<button onclick="pwFlIgnore()" title="Non segnalare più" style="' + btn + '">🙈 Ignora</button>' : '') +
+      '<button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>' +
+      '<button onclick="pwSelToggleMode(false)" title="Esci dalla selezione" style="' + btn + '">✕</button></div>' + chips;
+  }
+  list.innerHTML = fl.rows.map(r => {
+    if (r.header) return '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:14px 8px 6px;">' + esc(r.header) + '</div>';
+    const on = _pwSel.has(r.id);
+    const box = _pwSelMode ? '<div style="width:24px;height:24px;border-radius:7px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border2,var(--border))') + ';background:' + (on ? 'var(--accent)' : 'transparent') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;">' + (on ? '✓' : '') + '</div>' : '';
+    const click = _pwSelMode ? "pwSelToggleItem('" + r.id + "')" : "_pwFlClose();" + r.onclick;
+    return '<div onclick="' + click + '" style="display:flex;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid var(--border);cursor:pointer;' + (on ? 'background:rgba(99,102,241,0.08);' : '') + '">' + box +
+      '<div style="width:40px;height:40px;border-radius:12px;background:' + r.bg + ';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + r.icon + '</div>' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(r.name) + '</div>' +
+      '<div style="font-size:11px;color:' + r.col + ';font-weight:600;margin-top:2px;">' + r.text + '</div></div>' +
+      (_pwSelMode ? '' : '<div style="font-size:14px;color:var(--text3);flex-shrink:0;">›</div>') + '</div>';
+  }).join('');
+}
+function pwFlSelLevel(l) {
+  const fl = window._pwFl; if (!fl) return;
+  const ids = fl.rows.filter(r => r.id && r.lvl === l).map(r => r.id);
+  const all = ids.every(id => _pwSel.has(id));
+  ids.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
+  _pwFlRender();
+}
+function pwFlIgnore() {
+  const n = _pwSel.size;
+  if (!n) { showToast('Seleziona prima qualche password'); return; }
+  if (!confirm('Non segnalare più ' + n + (n === 1 ? ' password' : ' password') + ' come compromesse?\n\nResteranno salvate, ma sparirebbero da questo elenco e dagli avvisi.')) return;
+  _pwItems.forEach(i => { if (_pwSel.has(i.id)) i.pwnedIgnored = true; });
+  pwSave();
+  _pwSelDone('🙈 ' + n + ' password non più segnalate');
+}
 function showExpiringListModal(titleText, rows, emptyMsg) {
   if (!rows.length) { showToast(emptyMsg || 'Nulla in scadenza 🎉'); return; }
   const overlay = document.createElement('div');
@@ -5426,13 +5513,14 @@ function pwShowFilteredList(type) {
       sub = pwSevDot(sev) + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
     }
     rows.push({
+      id: item.id, lvl: sev ? sev.lvl : null,
       icon: getCatIcon(cat?.id, cat?.name, cat?.icon),
       bg: sev ? sev.bg : 'rgba(239,68,68,0.15)', col: sev ? sev.col : '#ef4444', text: sub,
       name: item.title || '—',
       onclick: "window._pwReturnToFilter='" + type + "';pwShowDetail('" + item.id + "')"
     });
   });
-  showExpiringListModal(title, rows, 'Nessuna voce trovata');
+  pwFilteredModal(title, rows, type);
 }
 
 // ── Esportazione categoria (testo / PDF) ──────────────────
@@ -11009,7 +11097,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.21.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.22.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
