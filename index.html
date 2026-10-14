@@ -1906,11 +1906,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-<<<<<<< HEAD
   <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.24.1</div>
-=======
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.23.1</div>
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1980,11 +1976,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-<<<<<<< HEAD
           <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.24.1</div>
-=======
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.23.1</div>
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
         </div>
       </div>
     </div>
@@ -2089,11 +2081,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-<<<<<<< HEAD
             <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.24.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
-=======
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.23.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2257,23 +2245,6 @@ Aggiungi nuovo dato
             <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
             <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
           </div>
-<<<<<<< HEAD
-=======
-        </div>
-        <div style="padding:0 14px 8px;flex-shrink:0;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
-            <button class="pw-sel-toggle pw-sel-toggle-cats" onclick="pwSelToggleMode()" style="display:none;flex-shrink:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
-          </div>
-          <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
-            <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
-            <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
-            <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
-            <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
-            <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
-            <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
-          </div>
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
         </div>
         <div id="pw-expiry-banner" style="display:none;margin:0 14px 10px;"></div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -2291,11 +2262,7 @@ Aggiungi nuovo dato
               <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
             </div>
             <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Ordina">⇅
-<<<<<<< HEAD
               <select id="pw-sort-sel" aria-label="Ordina" onchange="pwSetSort(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
-=======
-              <select id="pw-sort-sel" aria-label="Ordina" onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems(document.getElementById('pw-item-search')?.value||'')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
                 <option value="az">A → Z</option>
                 <option value="za">Z → A</option>
                 <option value="weak">Prima le deboli</option>
@@ -2303,19 +2270,7 @@ Aggiungi nuovo dato
               </select>
             </div>
             <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Filtra">🧹
-<<<<<<< HEAD
               <select id="pw-filter-sel" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;"></select>
-=======
-              <select id="pw-filter-sel" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
-                <option value="">Tutte le voci</option>
-                <option value="dupes">🔁 Duplicati (stesso sito e utente)</option>
-                <option value="nouser">👤 Senza utente</option>
-                <option value="pwned">🔴 Compromesse</option>
-                <option value="weak">🟠 Deboli</option>
-                <option value="old">⏳ Non aggiornate (90+ gg)</option>
-                <option value="fav">⭐ Preferite</option>
-              </select>
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
             </div>
             <button class="pw-sel-toggle" onclick="pwSelToggleMode()" title="Seleziona" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">☑️</button>
             <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📊</button>
@@ -3023,11 +2978,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-<<<<<<< HEAD
   version: 'v13.24.1',
-=======
-  version: 'v13.23.1',
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4179,11 +4130,7 @@ function pwFillSearchCat() {
   if (_pwSearchCat === '__none' && !_orph.length) _pwSearchCat = '';
   const opts = _pwCats.slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
     .map(c => '<option value="' + c.id + '">📁 ' + String(c.name||'').replace(/[<>&"]/g, '') + ' (' + _pwItems.filter(i => !i.deleted && i.categoryId === c.id).length + ')</option>').join('');
-<<<<<<< HEAD
   sel.innerHTML = '<option value="">🔎 Tutte le categorie</option>' + opts + (_orph.length ? '<option value="__none">❓ Senza categoria (' + _orph.length + ')</option>' : '');
-=======
-  sel.innerHTML = '<option value="">🔎 Cerca in: tutte le categorie</option>' + opts + (_orph.length ? '<option value="__none">❓ Senza categoria (' + _orph.length + ')</option>' : '');
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   sel.value = _pwSearchCat;
 }
 function pwSetSearchCat(v) {
@@ -4206,7 +4153,6 @@ function pwRenderCats(q='') {
 
   // Modalità ricerca (anche senza testo, se è scelta una categoria: mostra le password di quella categoria)
   const _selTg = document.querySelector('.pw-sel-toggle-cats');
-<<<<<<< HEAD
   const _resMode = !!(q || _pwSearchCat || window._pwItemFilter || _pwSelMode);
   _pwFillFilterSel('pw-filter-sel-c', _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat))));
   ['pw-sort-sel-c'].forEach(id => { const e = document.getElementById(id); if (e) { try { e.value = localStorage.getItem('hb_pw_sort') || 'az'; } catch(er) {} } });
@@ -4216,15 +4162,6 @@ function pwRenderCats(q='') {
     if (banner) banner.style.display = 'none';
     const ql = q.toLowerCase();
     let matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat)) && (!ql || (
-=======
-  if (_selTg) _selTg.style.display = (q || _pwSearchCat) ? 'inline-block' : 'none';
-  if (!(q || _pwSearchCat) && _pwSelMode) { _pwSelMode = false; _pwSel.clear(); }
-  if (q || _pwSearchCat) {
-    const banner = document.getElementById('pw-expiry-banner');
-    if (banner) banner.style.display = 'none';
-    const ql = q.toLowerCase();
-    const matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat)) && (!ql || (
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
       (i.title||'').toLowerCase().includes(ql) ||
       (i.username||'').toLowerCase().includes(ql) ||
       (i.url||'').toLowerCase().includes(ql) ||
@@ -4245,10 +4182,7 @@ function pwRenderCats(q='') {
     grid.style.gap = '8px';
     grid.innerHTML = '';
     window._pwVisibleIds = matches.map(i => i.id);
-<<<<<<< HEAD
     const _seenC = {};
-=======
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
     matches.forEach(item => {
       const _gh = _pwGroupHeader(_fresC, item, _seenC); if (_gh) grid.appendChild(_gh);
       const cat = _pwCats.find(c => c.id === item.categoryId);
@@ -4435,13 +4369,8 @@ function _pwHost(u) {
   u = u.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').replace(/^www\./, '');
   return u.split(/[\/?#]/)[0].replace(/:\d+$/, '');
 }
-<<<<<<< HEAD
 function _pwApplyItemFilter(items, fOverride) {
   const f = fOverride != null ? fOverride : (window._pwItemFilter || '');
-=======
-function _pwApplyItemFilter(items) {
-  const f = window._pwItemFilter || '';
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   if (!f) return { items };
   if (f === 'dupes') {
     const map = {};
@@ -4464,7 +4393,6 @@ function _pwApplyItemFilter(items) {
 function pwSetItemFilter(v) {
   window._pwItemFilter = v || '';
   _pwSelMode = false; _pwSel.clear();
-<<<<<<< HEAD
   _pwSelRerender();
 }
 function pwSetSort(v) {
@@ -4527,21 +4455,6 @@ function pwExportScope() {
 function pwSelExport(list) {
   const sel = Array.isArray(list) ? list : _pwItems.filter(i => _pwSel.has(i.id));
   window._pwExItems = sel;
-=======
-  pwRenderItems(document.getElementById('pw-item-search')?.value || '');
-}
-function _pwUpdateFilterChip(n) {
-  const c = document.getElementById('pw-filter-chip'); if (!c) return;
-  const f = window._pwItemFilter || '';
-  if (!f) { c.style.display = 'none'; c.innerHTML = ''; return; }
-  c.style.display = 'flex';
-  c.innerHTML = '<span style="flex:1;min-width:0;">🧹 ' + _PW_FILTER_NAMES[f] + ' · ' + n + (n === 1 ? ' voce' : ' voci') + '</span><button onclick="pwSetItemFilter(\'\')" title="Rimuovi filtro" style="border:none;background:none;color:var(--text);font-size:15px;cursor:pointer;padding:2px 6px;">✕</button>';
-}
-
-// ── Esporta solo le selezionate ──
-function pwSelExport() {
-  const sel = _pwItems.filter(i => _pwSel.has(i.id));
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   if (!sel.length) { showToast('Seleziona prima qualche password'); return; }
   const old = document.getElementById('_pw_ex_ov'); if (old) old.remove();
   const ov = document.createElement('div');
@@ -4550,11 +4463,7 @@ function pwSelExport() {
   ov.onclick = e => { if (e.target === ov) ov.remove(); };
   const b = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;text-align:left;';
   ov.innerHTML = '<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 24px;width:100%;max-width:520px;">' +
-<<<<<<< HEAD
     '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + (Array.isArray(list) ? ' voci' : ' selezionate') + '</div>' +
-=======
-    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + ' selezionate</div>' +
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
     '<div style="font-size:12px;color:#f59e0b;margin-bottom:14px;">⚠️ Il file contiene le password in chiaro: eliminalo dopo l\'uso.</div>' +
     '<button style="' + b + '" onclick="pwSelExportCSV()">📄 CSV (reimportabile da Impostazioni → Importazioni)</button>' +
     '<button style="' + b + '" onclick="pwSelExportTXT()">📝 File di testo</button>' +
@@ -4562,11 +4471,7 @@ function pwSelExport() {
   document.body.appendChild(ov);
 }
 function pwSelExportCSV() {
-<<<<<<< HEAD
   const sel = window._pwExItems || [];
-=======
-  const sel = _pwItems.filter(i => _pwSel.has(i.id));
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
   const rows = [['name','url','username','password','note','categoria']];
   sel.forEach(i => {
@@ -4583,7 +4488,6 @@ function pwSelExportCSV() {
   showToast('✅ CSV scaricato (' + sel.length + ' voci)');
 }
 function pwSelExportTXT() {
-<<<<<<< HEAD
   const sel = window._pwExItems || [];
   const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
   pwExportCategoryText({ name: 'Selezione' }, sel);
@@ -4592,16 +4496,6 @@ function pwShowItems(catId, catName, keepFilter) {
   window._pwReturnToFilter = null; // navigazione manuale in una categoria: non è più valido il "torna all'elenco filtrato"
   _pwCurCat = catId;
   if (!keepFilter) window._pwItemFilter = '';
-=======
-  const sel = _pwItems.filter(i => _pwSel.has(i.id));
-  const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
-  pwExportCategoryText({ name: 'Selezione' }, sel);
-}
-function pwShowItems(catId, catName) {
-  window._pwReturnToFilter = null; // navigazione manuale in una categoria: non è più valido il "torna all'elenco filtrato"
-  _pwCurCat = catId;
-  window._pwItemFilter = '';
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   _pwSelMode = false; _pwSel.clear();
   document.getElementById('pw-view-cats').style.display = 'none';
   document.getElementById('pw-view-items').style.display = 'flex';
@@ -4623,26 +4517,9 @@ function pwRenderItems(q='') {
   const _catTotal = items.length;
   const _fres = _pwApplyItemFilter(items);
   items = _fres.items;
-<<<<<<< HEAD
   _pwFillFilterSel('pw-filter-sel', _pwItems.filter(i => i.categoryId === _pwCurCat));
   _pwUpdateFilterChip(items.length);
   _pwOrderItems(items, _fres);
-=======
-  const _fsel = document.getElementById('pw-filter-sel'); if (_fsel) _fsel.value = window._pwItemFilter || '';
-  _pwUpdateFilterChip(items.length);
-  // Ordinamento
-  const sort = localStorage.getItem('hb_pw_sort') || 'az';
-  const _ss = document.getElementById('pw-sort-sel'); if (_ss) _ss.value = sort;
-  if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it', { numeric: true, sensitivity: 'base' }));
-  else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it', { numeric: true, sensitivity: 'base' }));
-  else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
-  else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
-  if (_fres.groups) { // duplicati: voci dello stesso gruppo vicine
-    const gi = {}; _fres.groups.forEach((g, n) => g.ids.forEach(id => { gi[id] = n; }));
-    const first = {}; items.forEach((it, n) => { if (first['g' + gi[it.id]] == null) first['g' + gi[it.id]] = n; });
-    items.sort((a, b) => (first['g' + gi[a.id]] - first['g' + gi[b.id]]) || 0);
-  }
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   window._pwVisibleIds = items.map(i => i.id);
   document.getElementById('pw-cat-count').textContent = window._pwItemFilter ? (items.length + ' di ' + _catTotal + ' password') : (_catTotal + ' password');
   if (!items.length) {
@@ -4652,20 +4529,7 @@ function pwRenderItems(q='') {
   list.innerHTML = '';
   const _seenG = {};
   items.forEach(item => {
-<<<<<<< HEAD
     const _gh = _pwGroupHeader(_fres, item, _seenG); if (_gh) list.appendChild(_gh);
-=======
-    if (_fres.groups) {
-      const gn = _fres.groups.findIndex(g => g.ids.indexOf(item.id) >= 0);
-      if (gn >= 0 && !_seenG[gn]) {
-        _seenG[gn] = 1; const g = _fres.groups[gn];
-        const h = document.createElement('div');
-        h.style.cssText = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:12px 4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        h.textContent = '🔁 ' + g.ids.length + ' voci · ' + g.label;
-        list.appendChild(h);
-      }
-    }
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
     const strength = getStrength(item.password);
     const expInfo = pwExpiryInfo(item);
     const cat = _pwCats.find(c => c.id === item.categoryId);
@@ -11182,11 +11046,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-<<<<<<< HEAD
             <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.24.1</div>
-=======
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.23.1</div>
->>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
