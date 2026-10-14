@@ -1871,26 +1871,17 @@ html[data-theme="light"][data-home-style="a"] .mob-home-card-icon,html[data-them
 html[data-home-style="b"] .mob-home-card,html[data-home-style="b"] .qa-card{background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03)) !important;border:1px solid rgba(255,255,255,.12) !important;border-radius:20px !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:14px 6px 10px !important;}
 html[data-home-style="b"] .mob-home-card-icon,html[data-home-style="b"] .qa-card-icon{font-size:36px !important;height:44px;}
 html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="light"][data-home-style="b"] .qa-card{background:linear-gradient(160deg,#fff,#f1f3f9) !important;border-color:rgba(0,0,0,.08) !important;}
+@media(max-width:640px){
+#pw-view-cats .pw-search-bar{order:1;flex:1 1 140px !important;min-width:0 !important;}
+#pw-view-cats .pw-newcat-btn{order:2;padding:10px 11px !important;}
+#pw-view-cats #pw-search-cat{order:3;flex:1 1 100px !important;min-width:0 !important;padding:8px 6px !important;font-size:12px !important;text-overflow:ellipsis;}
+#pw-view-cats .pw-cat-tools{order:4;gap:3px !important;}
+#pw-view-cats .pw-cat-tools > *{width:30px !important;height:34px !important;font-size:14px !important;}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
 
-function cardsSearch(q) {
-  const list = document.getElementById('cards-list');
-  if (!list) return;
-  if (!q.trim()) { cardsRender(); return; }
-  const ql = q.toLowerCase();
-  const filtered = _cards.filter(c =>
-    (c.holder||'').toLowerCase().includes(ql) ||
-    (c.number||'').replace(/\s/g,'').includes(ql) ||
-    (c.bank||'').toLowerCase().includes(ql) ||
-    (c.type||'').toLowerCase().includes(ql)
-  );
-  const orig = _cards;
-  _cards = filtered;
-  cardsRender();
-  _cards = orig;
-}
 
 </script>
 <script>
@@ -1915,7 +1906,11 @@ function cardsSearch(q) {
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.20.0</div>
+<<<<<<< HEAD
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.24.1</div>
+=======
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.23.1</div>
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1985,7 +1980,11 @@ function cardsSearch(q) {
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.20.0</div>
+<<<<<<< HEAD
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.24.1</div>
+=======
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.23.1</div>
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
         </div>
       </div>
     </div>
@@ -2090,7 +2089,11 @@ function cardsSearch(q) {
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.20.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+<<<<<<< HEAD
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.24.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+=======
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.23.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2220,16 +2223,57 @@ Aggiungi nuovo dato
       <!-- Vista: Lista categorie -->
       <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <div class="pw-search-bar" style="flex:1;">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="flex:0 1 230px;min-width:150px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Tutte le categorie</option></select>
+            <div class="pw-search-bar" style="flex:1 1 170px;min-width:150px;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input id="pw-cat-search" type="text" placeholder="Cerca password..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              <input id="pw-cat-search" type="text" placeholder="Cerca password..." oninput="pwFilterCats(this.value)" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
-            <button onclick="pwNewCategory()" style="flex-shrink:0;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Categoria</button>
+            <div class="pw-cat-tools" style="display:flex;gap:6px;flex-shrink:0;">
+              <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Ordina">⇅
+                <select id="pw-sort-sel-c" aria-label="Ordina" onchange="pwSetSort(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                  <option value="az">A → Z</option>
+                  <option value="za">Z → A</option>
+                  <option value="weak">Prima le deboli</option>
+                  <option value="strong">Prima le forti</option>
+                </select>
+              </div>
+              <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Filtra">🧹
+                <select id="pw-filter-sel-c" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;"></select>
+              </div>
+              <button class="pw-sel-toggle" onclick="pwSelToggleMode()" title="Seleziona" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">☑️</button>
+              <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📊</button>
+              <button onclick="pwExportScope()" title="Esporta" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📤</button>
+              <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📷</button>
+            </div>
+            <button class="pw-newcat-btn" onclick="pwNewCategory()" style="flex-shrink:0;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Categoria</button>
           </div>
+          <div id="pw-filter-chip-c" style="display:none;align-items:center;gap:8px;margin-top:8px;padding:6px 10px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid var(--accent);font-size:12px;font-weight:700;color:var(--text);"></div>
+          <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
+            <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
+            <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
+            <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
+            <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
+            <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
+            <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
+          </div>
+<<<<<<< HEAD
+=======
         </div>
         <div style="padding:0 14px 8px;flex-shrink:0;">
-          <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
+            <button class="pw-sel-toggle pw-sel-toggle-cats" onclick="pwSelToggleMode()" style="display:none;flex-shrink:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
+          </div>
+          <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
+            <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
+            <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
+            <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
+            <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
+            <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
+            <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
+          </div>
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
         </div>
         <div id="pw-expiry-banner" style="display:none;margin:0 14px 10px;"></div>
         <div id="pw-cats-grid" style="flex:1;overflow-y:auto;padding:8px 14px 100px;"></div>
@@ -2238,33 +2282,53 @@ Aggiungi nuovo dato
       <!-- Vista: Lista password di una categoria -->
       <div id="pw-view-items" style="display:none;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <button onclick="pwBack()" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <button onclick="pwBack()" title="Indietro" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div style="flex:1;min-width:0;">
-              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;"></div>
+            <div style="flex:1;min-width:0;padding-left:4px;">
+              <div id="pw-cat-name" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
               <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
             </div>
-
-            <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📊</button>
-            <button onclick="pwExportCategoryMenu()" title="Esporta categoria" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📤</button>
-            <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;">📷</button>
+            <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Ordina">⇅
+<<<<<<< HEAD
+              <select id="pw-sort-sel" aria-label="Ordina" onchange="pwSetSort(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+=======
+              <select id="pw-sort-sel" aria-label="Ordina" onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems(document.getElementById('pw-item-search')?.value||'')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
+                <option value="az">A → Z</option>
+                <option value="za">Z → A</option>
+                <option value="weak">Prima le deboli</option>
+                <option value="strong">Prima le forti</option>
+              </select>
+            </div>
+            <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Filtra">🧹
+<<<<<<< HEAD
+              <select id="pw-filter-sel" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;"></select>
+=======
+              <select id="pw-filter-sel" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                <option value="">Tutte le voci</option>
+                <option value="dupes">🔁 Duplicati (stesso sito e utente)</option>
+                <option value="nouser">👤 Senza utente</option>
+                <option value="pwned">🔴 Compromesse</option>
+                <option value="weak">🟠 Deboli</option>
+                <option value="old">⏳ Non aggiornate (90+ gg)</option>
+                <option value="fav">⭐ Preferite</option>
+              </select>
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
+            </div>
+            <button class="pw-sel-toggle" onclick="pwSelToggleMode()" title="Seleziona" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">☑️</button>
+            <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📊</button>
+            <button onclick="pwExportCategoryMenu()" title="Esporta categoria" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📤</button>
+            <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📷</button>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <select onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems()" style="flex:1;padding:7px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;font-weight:600;outline:none;font-family:inherit;">
-              <option value="az">A → Z</option>
-              <option value="za">Z → A</option>
-              <option value="weak">Prima le deboli</option>
-              <option value="strong">Prima le forti</option>
-            </select>
-            <button id="pw-sel-toggle" onclick="pwSelToggleMode()" style="flex-shrink:0;padding:7px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
-          </div>
-          <div id="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
-            <button id="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
-            <span id="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
+          <div id="pw-filter-chip" style="display:none;align-items:center;gap:8px;margin-top:8px;padding:6px 10px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid var(--accent);font-size:12px;font-weight:700;color:var(--text);"></div>
+          <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
+            <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
+            <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
             <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
             <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
+            <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
             <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
           </div>
 
@@ -2959,7 +3023,11 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.20.0',
+<<<<<<< HEAD
+  version: 'v13.24.1',
+=======
+  version: 'v13.23.1',
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3340,34 +3408,9 @@ async function deriveKey(pin, salt) {
   );
 }
 
-async function hbEncrypt(text) {
-  if (!HB.sessionKey) return text;
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const enc = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv }, HB.sessionKey, new TextEncoder().encode(text)
-  );
-  const combined = new Uint8Array(12 + enc.byteLength);
-  combined.set(iv, 0);
-  combined.set(new Uint8Array(enc), 12);
-  let bin = '';
-  for (let i = 0; i < combined.length; i++) bin += String.fromCharCode(combined[i]);
-  return 'hb12:' + btoa(bin);
-}
 
-async function hbDecrypt(data) {
-  if (!HB.sessionKey || !data.startsWith('hb12:')) return data;
-  try {
-    const combined = new Uint8Array(atob(data.slice(5)).split('').map(c => c.charCodeAt(0)));
-    const dec = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: combined.slice(0, 12) },
-      HB.sessionKey, combined.slice(12)
-    );
-    return new TextDecoder().decode(dec);
-  } catch(e) { return null; }
-}
 
 // ── User persistence (email only, no secrets) ──────────────
-function saveUser(u) { localStorage.setItem('hb12_user', JSON.stringify(u)); }
 
 // ── Unlock ─────────────────────────────────────────────────
 function unlockApp() {
@@ -3641,9 +3684,6 @@ function topbarBack() {
 }
 
 // ── More Drawer ────────────────────────────────────────────
-function openMoreDrawer() {
-  document.getElementById('more-drawer').classList.add('open');
-}
 function closeMoreDrawer() {
   document.getElementById('more-drawer').classList.remove('open');
 }
@@ -4134,10 +4174,16 @@ function pwShowCats(q='') {
 let _pwSearchCat = '';
 function pwFillSearchCat() {
   const sel = document.getElementById('pw-search-cat'); if (!sel) return;
-  if (_pwSearchCat && !_pwCats.find(c => c.id === _pwSearchCat)) _pwSearchCat = '';
+  const _orph = _pwItems.filter(i => !i.deleted && !_pwCats.find(c => c.id === i.categoryId));
+  if (_pwSearchCat && _pwSearchCat !== '__none' && !_pwCats.find(c => c.id === _pwSearchCat)) _pwSearchCat = '';
+  if (_pwSearchCat === '__none' && !_orph.length) _pwSearchCat = '';
   const opts = _pwCats.slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
     .map(c => '<option value="' + c.id + '">📁 ' + String(c.name||'').replace(/[<>&"]/g, '') + ' (' + _pwItems.filter(i => !i.deleted && i.categoryId === c.id).length + ')</option>').join('');
-  sel.innerHTML = '<option value="">🔎 Cerca in: tutte le categorie</option>' + opts;
+<<<<<<< HEAD
+  sel.innerHTML = '<option value="">🔎 Tutte le categorie</option>' + opts + (_orph.length ? '<option value="__none">❓ Senza categoria (' + _orph.length + ')</option>' : '');
+=======
+  sel.innerHTML = '<option value="">🔎 Cerca in: tutte le categorie</option>' + opts + (_orph.length ? '<option value="__none">❓ Senza categoria (' + _orph.length + ')</option>' : '');
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   sel.value = _pwSearchCat;
 }
 function pwSetSearchCat(v) {
@@ -4159,27 +4205,52 @@ function pwRenderCats(q='') {
   pwRenderExpiryBanner();
 
   // Modalità ricerca (anche senza testo, se è scelta una categoria: mostra le password di quella categoria)
+  const _selTg = document.querySelector('.pw-sel-toggle-cats');
+<<<<<<< HEAD
+  const _resMode = !!(q || _pwSearchCat || window._pwItemFilter || _pwSelMode);
+  _pwFillFilterSel('pw-filter-sel-c', _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat))));
+  ['pw-sort-sel-c'].forEach(id => { const e = document.getElementById(id); if (e) { try { e.value = localStorage.getItem('hb_pw_sort') || 'az'; } catch(er) {} } });
+  if (!window._pwItemFilter) _pwUpdateFilterChip(0);
+  if (_resMode) {
+    const banner = document.getElementById('pw-expiry-banner');
+    if (banner) banner.style.display = 'none';
+    const ql = q.toLowerCase();
+    let matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat)) && (!ql || (
+=======
+  if (_selTg) _selTg.style.display = (q || _pwSearchCat) ? 'inline-block' : 'none';
+  if (!(q || _pwSearchCat) && _pwSelMode) { _pwSelMode = false; _pwSel.clear(); }
   if (q || _pwSearchCat) {
     const banner = document.getElementById('pw-expiry-banner');
     if (banner) banner.style.display = 'none';
     const ql = q.toLowerCase();
-    const matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || i.categoryId === _pwSearchCat) && (!ql || (
+    const matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat)) && (!ql || (
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
       (i.title||'').toLowerCase().includes(ql) ||
       (i.username||'').toLowerCase().includes(ql) ||
       (i.url||'').toLowerCase().includes(ql) ||
       (i.notes||'').toLowerCase().includes(ql) ||
       ((_pwCats.find(c => c.id === i.categoryId) || {}).name || '').toLowerCase().includes(ql)
-    ))).sort((a, b) => (a.title||'').localeCompare(b.title||'', 'it', { numeric: true, sensitivity: 'base' }));
+    )));
+    const _fresC = _pwApplyItemFilter(matches);
+    matches = _fresC.items;
+    _pwUpdateFilterChip(matches.length);
+    _pwOrderItems(matches, _fresC);
     if (!matches.length) {
       grid.style.display = 'block';
-      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">' + (q ? 'Nessun risultato per "' + q.replace(/[<>&]/g, '') + '"' : 'Nessuna password in questa categoria') + (_pwSearchCat && q ? ' in questa categoria' : '') + '</div>';
+      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">' + (window._pwItemFilter && !q ? '✅ Nessuna voce con questo filtro' : q ? 'Nessun risultato per "' + q.replace(/[<>&]/g, '') + '"' : 'Nessuna password in questa categoria') + (_pwSearchCat && q ? ' in questa categoria' : '') + '</div>';
       return;
     }
     grid.style.display = 'flex';
     grid.style.flexDirection = 'column';
     grid.style.gap = '8px';
     grid.innerHTML = '';
+    window._pwVisibleIds = matches.map(i => i.id);
+<<<<<<< HEAD
+    const _seenC = {};
+=======
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
     matches.forEach(item => {
+      const _gh = _pwGroupHeader(_fresC, item, _seenC); if (_gh) grid.appendChild(_gh);
       const cat = _pwCats.find(c => c.id === item.categoryId);
       const s = getStrength(item.password||'');
       const div = document.createElement('div');
@@ -4191,11 +4262,22 @@ function pwRenderCats(q='') {
         + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||'') + (cat ? ' · ' + cat.name : '') + '</div>'
         + '</div>'
         + '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:' + s.bg + ';color:' + s.col + ';">' + s.label + '</span>';
+      if (_pwSelMode) {
+        const on = _pwSel.has(item.id);
+        const box = document.createElement('div');
+        box.style.cssText = 'width:24px;height:24px;border-radius:7px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border2,var(--border))') + ';background:' + (on ? 'var(--accent)' : 'transparent') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;';
+        box.textContent = on ? '✓' : '';
+        div.insertBefore(box, div.firstChild);
+        if (on) div.style.borderColor = 'var(--accent)';
+        div.onclick = () => pwSelToggleItem(item.id);
+      }
       grid.appendChild(div);
     });
+    pwSelUpdateUI();
     return;
   }
 
+  pwSelUpdateUI();
   const cats = _pwCats
     .filter(c => !q || c.name.toLowerCase().includes(q.toLowerCase()))
     .sort((a, b) => {
@@ -4343,9 +4425,183 @@ function pwRenameCategory(catId, currentName) {
 function pwFilterCats(q) { pwRenderCats(q); }
 
 // Vista items
+// ── Filtri rapidi dentro la categoria ──
+window._pwItemFilter = '';
+const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite' };
+function _pwHost(u) {
+  u = String(u || '').trim().toLowerCase();
+  if (!u) return '';
+  if (/^android:/.test(u)) return u;
+  u = u.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').replace(/^www\./, '');
+  return u.split(/[\/?#]/)[0].replace(/:\d+$/, '');
+}
+<<<<<<< HEAD
+function _pwApplyItemFilter(items, fOverride) {
+  const f = fOverride != null ? fOverride : (window._pwItemFilter || '');
+=======
+function _pwApplyItemFilter(items) {
+  const f = window._pwItemFilter || '';
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
+  if (!f) return { items };
+  if (f === 'dupes') {
+    const map = {};
+    items.forEach(i => {
+      const site = _pwHost(i.url) || String(i.title || '').trim().toLowerCase();
+      const k = site + '|' + String(i.username || '').trim().toLowerCase();
+      (map[k] = map[k] || { label: (site || '—') + ' · ' + (String(i.username || '').trim() || 'senza utente'), ids: [] }).ids.push(i.id);
+    });
+    const groups = Object.keys(map).map(k => map[k]).filter(g => g.ids.length > 1).sort((a, b) => a.label.localeCompare(b.label, 'it'));
+    const keep = new Set(); groups.forEach(g => g.ids.forEach(id => keep.add(id)));
+    return { items: items.filter(i => keep.has(i.id)), groups };
+  }
+  if (f === 'nouser') return { items: items.filter(i => !String(i.username || '').trim()) };
+  if (f === 'pwned') return { items: items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored) };
+  if (f === 'weak') return { items: items.filter(i => i.password && getStrength(i.password).score <= 1) };
+  if (f === 'old') { const lim = Date.now() - 90 * 86400000; return { items: items.filter(i => i.updatedAt && new Date(i.updatedAt).getTime() < lim) }; }
+  if (f === 'fav') return { items: items.filter(i => i.favorite) };
+  return { items };
+}
+function pwSetItemFilter(v) {
+  window._pwItemFilter = v || '';
+  _pwSelMode = false; _pwSel.clear();
+<<<<<<< HEAD
+  _pwSelRerender();
+}
+function pwSetSort(v) {
+  try { localStorage.setItem('hb_pw_sort', v); } catch(e) {}
+  _pwSelRerender();
+}
+// riempie il menu del filtro con i numeri (quante voci per ogni filtro nel perimetro attuale)
+function _pwFillFilterSel(selId, scope) {
+  const sel = document.getElementById(selId); if (!sel) return;
+  const lab = { dupes:'🔁 Duplicati', nouser:'👤 Senza utente', pwned:'🔴 Compromesse', weak:'🟠 Deboli', old:'⏳ Non aggiornate (90+ gg)', fav:'⭐ Preferite' };
+  let h = '<option value="">Tutte le voci (' + scope.length + ')</option>';
+  Object.keys(lab).forEach(k => { h += '<option value="' + k + '">' + lab[k] + ' (' + _pwApplyItemFilter(scope, k).items.length + ')</option>'; });
+  sel.innerHTML = h; sel.value = window._pwItemFilter || '';
+}
+function _pwOrderItems(items, fres) {
+  const sort = (function(){ try { return localStorage.getItem('hb_pw_sort') || 'az'; } catch(e) { return 'az'; } })();
+  ['pw-sort-sel','pw-sort-sel-c'].forEach(id => { const e = document.getElementById(id); if (e) e.value = sort; });
+  const t = x => (x.title||'');
+  if (sort === 'az') items.sort((a,b) => t(a).localeCompare(t(b),'it',{numeric:true,sensitivity:'base'}));
+  else if (sort === 'za') items.sort((a,b) => t(b).localeCompare(t(a),'it',{numeric:true,sensitivity:'base'}));
+  else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
+  else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
+  if (fres && fres.groups) {
+    const gi = {}; fres.groups.forEach((g, n) => g.ids.forEach(id => { gi[id] = n; }));
+    const first = {}; items.forEach((it, n) => { if (first[gi[it.id]] == null) first[gi[it.id]] = n; });
+    items.sort((a, b) => (first[gi[a.id]] - first[gi[b.id]]) || 0);
+  }
+  return items;
+}
+function _pwGroupHeader(fres, item, seen) {
+  if (!fres || !fres.groups) return null;
+  const gn = fres.groups.findIndex(g => g.ids.indexOf(item.id) >= 0);
+  if (gn < 0 || seen[gn]) return null;
+  seen[gn] = 1; const g = fres.groups[gn];
+  const h = document.createElement('div');
+  h.style.cssText = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:12px 4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  h.textContent = '🔁 ' + g.ids.length + ' voci · ' + g.label;
+  return h;
+}
+function _pwUpdateFilterChip(n) {
+  const f = window._pwItemFilter || '';
+  ['pw-filter-chip','pw-filter-chip-c'].forEach(id => {
+  const c = document.getElementById(id); if (!c) return;
+  if (!f) { c.style.display = 'none'; c.innerHTML = ''; return; }
+  c.style.display = 'flex';
+  c.innerHTML = '<span style="flex:1;min-width:0;">🧹 ' + _PW_FILTER_NAMES[f] + ' · ' + n + (n === 1 ? ' voce' : ' voci') + '</span><button onclick="pwSetItemFilter(\'\')" title="Rimuovi filtro" style="border:none;background:none;color:var(--text);font-size:15px;cursor:pointer;padding:2px 6px;">✕</button>';
+  });
+}
+
+// ── Esporta solo le selezionate ──
+function pwExportScope() {
+  const vis = window._pwVisibleIds;
+  const resMode = !!((document.getElementById('pw-cat-search')||{}).value || _pwSearchCat || window._pwItemFilter || _pwSelMode);
+  if (_pwSelMode && _pwSel.size) { pwSelExport(); return; }
+  const ids = resMode && vis ? new Set(vis) : null;
+  const list = _pwItems.filter(i => !i.deleted && (!ids || ids.has(i.id)));
+  if (!list.length) { showToast('Nessuna password da esportare'); return; }
+  pwSelExport(list);
+}
+function pwSelExport(list) {
+  const sel = Array.isArray(list) ? list : _pwItems.filter(i => _pwSel.has(i.id));
+  window._pwExItems = sel;
+=======
+  pwRenderItems(document.getElementById('pw-item-search')?.value || '');
+}
+function _pwUpdateFilterChip(n) {
+  const c = document.getElementById('pw-filter-chip'); if (!c) return;
+  const f = window._pwItemFilter || '';
+  if (!f) { c.style.display = 'none'; c.innerHTML = ''; return; }
+  c.style.display = 'flex';
+  c.innerHTML = '<span style="flex:1;min-width:0;">🧹 ' + _PW_FILTER_NAMES[f] + ' · ' + n + (n === 1 ? ' voce' : ' voci') + '</span><button onclick="pwSetItemFilter(\'\')" title="Rimuovi filtro" style="border:none;background:none;color:var(--text);font-size:15px;cursor:pointer;padding:2px 6px;">✕</button>';
+}
+
+// ── Esporta solo le selezionate ──
+function pwSelExport() {
+  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
+  if (!sel.length) { showToast('Seleziona prima qualche password'); return; }
+  const old = document.getElementById('_pw_ex_ov'); if (old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = '_pw_ex_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+  ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  const b = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;text-align:left;';
+  ov.innerHTML = '<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 24px;width:100%;max-width:520px;">' +
+<<<<<<< HEAD
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + (Array.isArray(list) ? ' voci' : ' selezionate') + '</div>' +
+=======
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + ' selezionate</div>' +
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
+    '<div style="font-size:12px;color:#f59e0b;margin-bottom:14px;">⚠️ Il file contiene le password in chiaro: eliminalo dopo l\'uso.</div>' +
+    '<button style="' + b + '" onclick="pwSelExportCSV()">📄 CSV (reimportabile da Impostazioni → Importazioni)</button>' +
+    '<button style="' + b + '" onclick="pwSelExportTXT()">📝 File di testo</button>' +
+    '<button style="' + b + 'text-align:center;color:var(--text3);" onclick="document.getElementById(\'_pw_ex_ov\').remove()">Annulla</button></div>';
+  document.body.appendChild(ov);
+}
+function pwSelExportCSV() {
+<<<<<<< HEAD
+  const sel = window._pwExItems || [];
+=======
+  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const rows = [['name','url','username','password','note','categoria']];
+  sel.forEach(i => {
+    const cat = _pwCats.find(c => c.id === i.categoryId);
+    const note = [i.notes, i.pin ? 'PIN: ' + i.pin : ''].filter(Boolean).join('\n');
+    rows.push([i.title, i.url, i.username, i.password, note, cat ? cat.name : '']);
+  });
+  const csv = '﻿' + rows.map(r => r.map(q).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url;
+  a.download = 'HomeBull-selezione-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
+  showToast('✅ CSV scaricato (' + sel.length + ' voci)');
+}
+function pwSelExportTXT() {
+<<<<<<< HEAD
+  const sel = window._pwExItems || [];
+  const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
+  pwExportCategoryText({ name: 'Selezione' }, sel);
+}
+function pwShowItems(catId, catName, keepFilter) {
+  window._pwReturnToFilter = null; // navigazione manuale in una categoria: non è più valido il "torna all'elenco filtrato"
+  _pwCurCat = catId;
+  if (!keepFilter) window._pwItemFilter = '';
+=======
+  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+  const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
+  pwExportCategoryText({ name: 'Selezione' }, sel);
+}
 function pwShowItems(catId, catName) {
   window._pwReturnToFilter = null; // navigazione manuale in una categoria: non è più valido il "torna all'elenco filtrato"
   _pwCurCat = catId;
+  window._pwItemFilter = '';
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   _pwSelMode = false; _pwSel.clear();
   document.getElementById('pw-view-cats').style.display = 'none';
   document.getElementById('pw-view-items').style.display = 'flex';
@@ -4364,21 +4620,52 @@ function pwRenderItems(q='') {
     (i.username||'').toLowerCase().includes(q.toLowerCase())
   );
 
+  const _catTotal = items.length;
+  const _fres = _pwApplyItemFilter(items);
+  items = _fres.items;
+<<<<<<< HEAD
+  _pwFillFilterSel('pw-filter-sel', _pwItems.filter(i => i.categoryId === _pwCurCat));
+  _pwUpdateFilterChip(items.length);
+  _pwOrderItems(items, _fres);
+=======
+  const _fsel = document.getElementById('pw-filter-sel'); if (_fsel) _fsel.value = window._pwItemFilter || '';
+  _pwUpdateFilterChip(items.length);
   // Ordinamento
   const sort = localStorage.getItem('hb_pw_sort') || 'az';
+  const _ss = document.getElementById('pw-sort-sel'); if (_ss) _ss.value = sort;
   if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it', { numeric: true, sensitivity: 'base' }));
   else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it', { numeric: true, sensitivity: 'base' }));
   else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
   else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
+  if (_fres.groups) { // duplicati: voci dello stesso gruppo vicine
+    const gi = {}; _fres.groups.forEach((g, n) => g.ids.forEach(id => { gi[id] = n; }));
+    const first = {}; items.forEach((it, n) => { if (first['g' + gi[it.id]] == null) first['g' + gi[it.id]] = n; });
+    items.sort((a, b) => (first['g' + gi[a.id]] - first['g' + gi[b.id]]) || 0);
+  }
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
   window._pwVisibleIds = items.map(i => i.id);
-  const count = _pwItems.filter(i => i.categoryId === _pwCurCat).length;
-  document.getElementById('pw-cat-count').textContent = count + ' password';
+  document.getElementById('pw-cat-count').textContent = window._pwItemFilter ? (items.length + ' di ' + _catTotal + ' password') : (_catTotal + ' password');
   if (!items.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna password</div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">' + (window._pwItemFilter ? '✅ Nessuna voce con questo filtro' : 'Nessuna password') + '</div>';
     return;
   }
   list.innerHTML = '';
+  const _seenG = {};
   items.forEach(item => {
+<<<<<<< HEAD
+    const _gh = _pwGroupHeader(_fres, item, _seenG); if (_gh) list.appendChild(_gh);
+=======
+    if (_fres.groups) {
+      const gn = _fres.groups.findIndex(g => g.ids.indexOf(item.id) >= 0);
+      if (gn >= 0 && !_seenG[gn]) {
+        _seenG[gn] = 1; const g = _fres.groups[gn];
+        const h = document.createElement('div');
+        h.style.cssText = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:12px 4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+        h.textContent = '🔁 ' + g.ids.length + ' voci · ' + g.label;
+        list.appendChild(h);
+      }
+    }
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
     const strength = getStrength(item.password);
     const expInfo = pwExpiryInfo(item);
     const cat = _pwCats.find(c => c.id === item.categoryId);
@@ -4424,34 +4711,48 @@ function pwRenderItems(q='') {
 // ── Selezione multipla (stile email): seleziona, preferiti, sposta, elimina ──
 let _pwSelMode = false;
 const _pwSel = new Set();
-function _pwItemQ() { return document.getElementById('pw-item-search')?.value || ''; }
+function _pwInItemsView() { const v = document.getElementById('pw-view-items'); return !!v && v.style.display === 'flex'; }
+function _pwSelRerender() {
+  if (window._pwFl) { _pwFlRender(); return; }
+  if (_pwInItemsView()) pwRenderItems(document.getElementById('pw-item-search')?.value || '');
+  else pwRenderCats(document.getElementById('pw-cat-search')?.value || '');
+}
 function pwSelUpdateUI() {
-  const bar = document.getElementById('pw-sel-bar'), tg = document.getElementById('pw-sel-toggle');
-  if (bar) bar.style.display = _pwSelMode ? 'flex' : 'none';
-  if (tg) tg.textContent = _pwSelMode ? '✕ Fine' : '☑️ Seleziona';
+  document.querySelectorAll('.pw-sel-bar').forEach(b => { b.style.display = _pwSelMode ? 'flex' : 'none'; });
+  document.querySelectorAll('.pw-sel-toggle').forEach(t => {
+    const long = t.classList.contains('pw-sel-toggle-cats');
+    t.textContent = _pwSelMode ? (long ? '✕ Fine' : '✕') : (long ? '☑️ Seleziona' : '☑️');
+  });
   const vis = window._pwVisibleIds || [];
   const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
-  const a = document.getElementById('pw-sel-all'); if (a) a.textContent = all ? '☑ Nessuna' : '☐ Tutte';
-  const c = document.getElementById('pw-sel-count'); if (c) c.textContent = _pwSel.size + ' sel.';
+  document.querySelectorAll('.pw-sel-all').forEach(a => { a.textContent = all ? '☑ Nessuna' : '☐ Tutte'; });
+  document.querySelectorAll('.pw-sel-count').forEach(c => { c.textContent = _pwSel.size + ' sel.'; });
 }
 function pwSelToggleMode(force) {
   _pwSelMode = typeof force === 'boolean' ? force : !_pwSelMode;
   if (!_pwSelMode) _pwSel.clear();
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
 }
 function pwSelToggleItem(id) {
   if (_pwSel.has(id)) _pwSel.delete(id); else _pwSel.add(id);
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
 }
 function pwSelAll() {
   const vis = window._pwVisibleIds || [];
   const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
   vis.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
-  pwRenderItems(_pwItemQ());
+  _pwSelRerender();
 }
 function _pwSelDone(msg) {
   _pwSelMode = false; _pwSel.clear();
-  pwRenderItems(_pwItemQ());
+  if (window._pwFl) { // azione fatta da un elenco filtrato: aggiorna e riapri l'elenco rimasto
+    const t = window._pwFl.type;
+    try { updateHomeStats(); updateHomeFavorites(); } catch(e) {}
+    if (msg) showToast(msg, 4000);
+    pwShowFilteredList(t);
+    return;
+  }
+  _pwSelRerender();
   try { updateHomeStats(); updateHomeFavorites(); } catch(e) {}
   const sub = document.getElementById('topbar-sub'); if (sub) sub.textContent = _pwItems.length + ' password';
   if (msg) showToast(msg, 4000);
@@ -4476,7 +4777,7 @@ function pwSelMove() {
   if (!_pwSel.size) { showToast('Seleziona prima qualche password'); return; }
   document.getElementById('_pw_mv_ov')?.remove();
   const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const opts = _pwCats.filter(c => c.id !== _pwCurCat).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
+  const opts = _pwCats.filter(c => !(!window._pwFl && _pwInItemsView() && c.id === _pwCurCat)).slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
     .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
   const ov = document.createElement('div'); ov.id = '_pw_mv_ov';
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -4563,7 +4864,6 @@ function hbDiagnose() {
   };
 }
 
-function pwFilterItems(q) { pwRenderItems(q); }
 
 function pwToggleFavorite(id) {
   const item = _pwItems.find(i => i.id === id);
@@ -4845,14 +5145,6 @@ function pwOpenDirect(id) {
   }, 200);
 }
 
-function pwToggleSearch() {
-  const wrap = document.getElementById('pw-item-search-wrap');
-  const inp  = document.getElementById('pw-item-search');
-  const show = wrap.style.display === 'none';
-  wrap.style.display = show ? 'block' : 'none';
-  if (show) { inp.value=''; inp.focus(); }
-  else { inp.value=''; pwRenderItems(''); }
-}
 
 // Dettaglio
 function pwShowDetail(itemId) {
@@ -4997,6 +5289,7 @@ async function pwCopyHistory(itemId, idx) {
 
 // Navigazione back
 function pwBack() {
+  window._pwItemFilter = '';
   pwShowCats();
   document.getElementById('topbar-title').textContent = 'Password';
   document.getElementById('topbar-sub').textContent = _pwItems.length + ' password';
@@ -5012,7 +5305,7 @@ function pwBackToItems() {
     return;
   }
   const cat = _pwCats.find(c => c.id === _pwCurCat);
-  if (cat) pwShowItems(cat.id, cat.name);
+  if (cat) pwShowItems(cat.id, cat.name, true);
   else pwBack();
 }
 
@@ -5193,6 +5486,86 @@ function cardExpiryInfo(card) {
 }
 
 // Modale generico "elenco in scadenza", riusato da Password e Portafoglio
+
+// ── Elenchi filtrati (compromesse, deboli, condivise, vecchie) con selezione multipla ──
+function _pwFlClose() {
+  document.querySelectorAll('[data-exp-ov]').forEach(e => e.remove());
+  _pwSelMode = false; _pwSel.clear(); window._pwFl = null;
+  try { _pwSelRerender(); } catch(e) {}
+}
+function pwFilteredModal(titleText, rows, type) {
+  document.querySelectorAll('[data-exp-ov]').forEach(e => e.remove());
+  if (!rows.some(r => r.id)) { _pwSelMode = false; _pwSel.clear(); window._pwFl = null; showToast('Nessuna voce trovata 🎉'); try { _pwSelRerender(); } catch(e) {} return; }
+  window._pwFl = { type, title: titleText, rows };
+  window._pwVisibleIds = rows.filter(r => r.id).map(r => r.id);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
+  overlay.setAttribute('data-exp-ov', '1');
+  const box = document.createElement('div');
+  box.style.cssText = 'background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;width:100%;max-width:540px;max-height:86dvh;display:flex;flex-direction:column;padding:20px 0 calc(16px + env(safe-area-inset-bottom,0px));';
+  box.innerHTML = '<div style="width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 12px;flex-shrink:0;"></div>' +
+    '<div style="font-size:16px;font-weight:800;padding:0 20px 10px;flex-shrink:0;">' + titleText + '</div>' +
+    '<div id="_fl_tb" style="padding:0 16px 8px;flex-shrink:0;"></div>' +
+    '<div id="_fl_list" style="overflow-y:auto;padding:0 16px;"></div>' +
+    '<button onclick="_pwFlClose()" style="margin:14px 16px 0;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Chiudi</button>';
+  overlay.appendChild(box);
+  overlay.onclick = (e) => { if (e.target === overlay) _pwFlClose(); };
+  document.body.appendChild(overlay);
+  _pwFlRender();
+}
+function _pwFlRender() {
+  const fl = window._pwFl; if (!fl) return;
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const tb = document.getElementById('_fl_tb'), list = document.getElementById('_fl_list');
+  if (!tb || !list) return;
+  const btn = 'padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+  const ids = window._pwVisibleIds || [];
+  const all = ids.length > 0 && ids.every(id => _pwSel.has(id));
+  if (!_pwSelMode) {
+    tb.innerHTML = '<button onclick="pwSelToggleMode()" style="' + btn + '">☑️ Seleziona e lavora sulle voci</button>';
+  } else {
+    let chips = '';
+    if (fl.type === 'pwned') {
+      chips = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"><span style="font-size:11px;color:var(--text3);align-self:center;">Seleziona per gravità:</span>' +
+        [3,2,1,0].map(l => { const n = fl.rows.filter(r => r.id && r.lvl === l).length; return n ? '<button onclick="pwFlSelLevel(' + l + ')" style="' + btn + '">' + pwSevDot(PW_SEV[l]) + ' ' + esc(PW_SEV[l].name) + ' ' + n + '</button>' : ''; }).join('') + '</div>';
+    }
+    tb.innerHTML = '<div style="display:flex;align-items:center;gap:5px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">' +
+      '<button onclick="pwSelAll()" style="' + btn + '">' + (all ? '☑ Nessuna' : '☐ Tutte') + '</button>' +
+      '<span style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">' + _pwSel.size + ' sel.</span>' +
+      '<button onclick="pwSelFav()" title="Preferiti" style="' + btn + '">⭐</button>' +
+      '<button onclick="pwSelMove()" title="Sposta in categoria" style="' + btn + '">📁 Sposta</button>' +
+      (fl.type === 'pwned' ? '<button onclick="pwFlIgnore()" title="Non segnalare più" style="' + btn + '">🙈 Ignora</button>' : '') +
+      '<button onclick="pwSelExport()" title="Esporta selezionate" style="' + btn + '">📤</button>' +
+      '<button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>' +
+      '<button onclick="pwSelToggleMode(false)" title="Esci dalla selezione" style="' + btn + '">✕</button></div>' + chips;
+  }
+  list.innerHTML = fl.rows.map(r => {
+    if (r.header) return '<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);padding:14px 8px 6px;">' + esc(r.header) + '</div>';
+    const on = _pwSel.has(r.id);
+    const box = _pwSelMode ? '<div style="width:24px;height:24px;border-radius:7px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border2,var(--border))') + ';background:' + (on ? 'var(--accent)' : 'transparent') + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;flex-shrink:0;">' + (on ? '✓' : '') + '</div>' : '';
+    const click = _pwSelMode ? "pwSelToggleItem('" + r.id + "')" : "_pwFlClose();" + r.onclick;
+    return '<div onclick="' + click + '" style="display:flex;align-items:center;gap:12px;padding:12px 8px;border-bottom:1px solid var(--border);cursor:pointer;' + (on ? 'background:rgba(99,102,241,0.08);' : '') + '">' + box +
+      '<div style="width:40px;height:40px;border-radius:12px;background:' + r.bg + ';display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">' + r.icon + '</div>' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(r.name) + '</div>' +
+      '<div style="font-size:11px;color:' + r.col + ';font-weight:600;margin-top:2px;">' + r.text + '</div></div>' +
+      (_pwSelMode ? '' : '<div style="font-size:14px;color:var(--text3);flex-shrink:0;">›</div>') + '</div>';
+  }).join('');
+}
+function pwFlSelLevel(l) {
+  const fl = window._pwFl; if (!fl) return;
+  const ids = fl.rows.filter(r => r.id && r.lvl === l).map(r => r.id);
+  const all = ids.every(id => _pwSel.has(id));
+  ids.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
+  _pwFlRender();
+}
+function pwFlIgnore() {
+  const n = _pwSel.size;
+  if (!n) { showToast('Seleziona prima qualche password'); return; }
+  if (!confirm('Non segnalare più ' + n + (n === 1 ? ' password' : ' password') + ' come compromesse?\n\nResteranno salvate, ma sparirebbero da questo elenco e dagli avvisi.')) return;
+  _pwItems.forEach(i => { if (_pwSel.has(i.id)) i.pwnedIgnored = true; });
+  pwSave();
+  _pwSelDone('🙈 ' + n + ' password non più segnalate');
+}
 function showExpiringListModal(titleText, rows, emptyMsg) {
   if (!rows.length) { showToast(emptyMsg || 'Nulla in scadenza 🎉'); return; }
   const overlay = document.createElement('div');
@@ -5395,13 +5768,14 @@ function pwShowFilteredList(type) {
       sub = pwSevDot(sev) + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
     }
     rows.push({
+      id: item.id, lvl: sev ? sev.lvl : null,
       icon: getCatIcon(cat?.id, cat?.name, cat?.icon),
       bg: sev ? sev.bg : 'rgba(239,68,68,0.15)', col: sev ? sev.col : '#ef4444', text: sub,
       name: item.title || '—',
       onclick: "window._pwReturnToFilter='" + type + "';pwShowDetail('" + item.id + "')"
     });
   });
-  showExpiringListModal(title, rows, 'Nessuna voce trovata');
+  pwFilteredModal(title, rows, type);
 }
 
 // ── Esportazione categoria (testo / PDF) ──────────────────
@@ -5499,64 +5873,7 @@ function pwExportCategoryPrint(cat, items) {
 //  IMPORT PASSWORD via QR — scansiona QR condiviso da altro dispositivo
 // ═══════════════════════════════════════════════════════════
 
-function pwShowQRImportPreview(data) {
-  const ov = document.createElement('div');
-  ov.id = '_qrimp_ov';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
-  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;border:1px solid var(--border);">
-    <div style="font-size:32px;text-align:center;margin-bottom:12px;">📷</div>
-    <div style="font-size:15px;font-weight:800;text-align:center;margin-bottom:14px;">Importa password?</div>
-    <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:16px;">
-      <div style="font-size:14px;font-weight:700;margin-bottom:4px;">${data.title || 'Senza nome'}</div>
-      <div style="font-size:12px;color:var(--text3);">${data.username || '—'}</div>
-      ${data.url ? `<div style="font-size:11px;color:var(--text3);margin-top:2px;">${data.url}</div>` : ''}
-    </div>
-    <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:16px;">La password verrà aggiunta alla categoria "Importate"</div>
-    <div style="display:flex;gap:10px;">
-      <button id="_qri_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
-      <button id="_qri_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  document.getElementById('_qri_cancel').onclick = () => ov.remove();
-  document.getElementById('_qri_ok').onclick = () => {
-    ov.remove();
-    let cat = _pwCats.find(c => c.name === 'Importate');
-    if (!cat) {
-      cat = { id: 'cat_imp_' + Date.now(), name: 'Importate', color: '#6366f1', icon: '📥' };
-      _pwCats.push(cat);
-    }
-    _pwItems.push({
-      id: 'pw_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
-      categoryId: cat.id,
-      title: data.title || 'Senza nome',
-      username: data.username || '',
-      password: data.password || '',
-      url: data.url || '',
-      createdAt: new Date().toISOString(),
-      color:  window._ceColor || card.color,
-      updatedAt: new Date().toISOString(),
-    });
-    pwSave();
-    pwRenderCats();
-    showToast('✅ Password importata!');
-  };
-}
 
-function pwImportCSV() {
-  const input = document.getElementById('pw-csv-input');
-  if (!input) {
-    // Crea input al volo se non esiste (es. dalla lista)
-    const inp = document.createElement('input');
-    inp.type = 'file'; inp.accept = '.csv';
-    inp.style.display = 'none';
-    inp.onchange = pwHandleCSV;
-    document.body.appendChild(inp);
-    inp.click();
-    return;
-  }
-  input.click();
-}
 
 async function pwHandleCSV(event) {
   const file = event.target.files?.[0];
@@ -6368,7 +6685,6 @@ function noteRenderList(q='') {
   });
 }
 
-function noteSearch(q) { noteRenderList(q); }
 
 // ── Editor ───────────────────────────────────────────────
 function noteNew() {
@@ -7897,8 +8213,7 @@ function otpDeleteConfirm(id) {
 // ── Fine OTP ──────────────────────────────────────────────
 
 
-// ── Carica condivisioni da Firebase ──────────────────────
-async function loadShares() { return; } // rimosso — UI condivisione dismessa
+// ── Carica condivisioni da Firebase ────────────────────── // rimosso — UI condivisione dismessa
 
 
 // ── Indicatore ultimo backup (Google Drive) ───────────────
@@ -7926,15 +8241,7 @@ function updateSyncBadge() {
 // Aggiorna badge ogni 30 secondi
 setInterval(() => { if (HB.currentTab === 'home') updateSyncBadge(); }, 30000);
 
-function cloudPageOpen(){
-  driveUpdateBackupUI();
-  updateSyncBadge();
-}
 
-async function cloudSyncNow(){
-  await driveBackupNow(false);
-  updateSyncBadge();
-}
 
 
 // ── Biometria PIN ──────────────────────────────────────────
@@ -7986,24 +8293,10 @@ function earlyBackHandler() {
 }
 
 // Alias globale
-function ensureBuffer() {
-  try {
-    if (history.length < 3) history.pushState({ hb: 'app' }, '');
-  } catch(e) {}
-}
 
 const HB_TRACKED_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi',
   'hb13_finance','hb13_server','hb13_pw_cats','hb13_note_att'];
 
-function patchLocalStorage(){
-  const origSet = localStorage.setItem.bind(localStorage);
-  localStorage.setItem = function(key, value) {
-    origSet(key, value);
-    if(HB_TRACKED_KEYS.includes(key)){
-      _setLocalTs(key, Date.now());
-    }
-  };
-}
 
 // ══ FUNZIONI RIPRISTINATE DA BETA333 ══════════════════════
 
@@ -8139,44 +8432,7 @@ function closeSettings() {
 }
 
 function openMobileMenu(){}
-function closeMobileMenu(){}
 
-function openHomeCustom() {
-  const prefs = loadHomePrefs();
-  // Precompila checkbox sezioni
-  const defaults = { search:true, quick:true, stats:true, alerts:true };
-  ['search','quick','stats','alerts'].forEach(k => {
-    const el = document.getElementById('hc-' + k);
-    if (el) el.checked = prefs[k] !== undefined ? prefs[k] : defaults[k];
-  });
-  // Precompila quick access
-  qaSelected = [];
-  const container = document.getElementById('qa-all-tabs-home');
-  container.innerHTML = '';
-  ALL_TABS_META.forEach(tab => {
-    const el = document.createElement('div');
-    el.className = 'qa-tab-option' + (qaSelected.includes(tab.id) ? ' selected' : '');
-    el.dataset.id = tab.id;
-    el.innerHTML = `<div class="qa-tab-option-icon">${tab.icon}</div><div class="qa-tab-option-label">${tab.label}</div>`;
-    el.onclick = () => {
-      if (qaSelected.includes(tab.id)) {
-        qaSelected = qaSelected.filter(t => t !== tab.id);
-        el.classList.remove('selected');
-      } else if (qaSelected.length < 8) {
-        qaSelected.push(tab.id);
-        el.classList.add('selected');
-      } else {
-        showToast('Massimo 6 schede');
-      }
-    };
-    container.appendChild(el);
-  });
-  // Tema
-  const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-  document.getElementById('theme-dark-btn').style.borderWidth  = theme === 'dark'  ? '2px' : '1px';
-  document.getElementById('theme-light-btn').style.borderWidth = theme === 'light' ? '2px' : '1px';
-  document.getElementById('home-custom-modal').style.display = 'flex';
-}
 
 function closeHomeCustom() {
   document.getElementById('home-custom-modal').style.display = 'none';
@@ -8746,7 +9002,6 @@ function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-sche
 
 function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
 
-function setBg(t){const bgs={none:'',grad1:'linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15))',grad2:'linear-gradient(135deg,rgba(15,23,42,0.8),rgba(30,58,95,0.8))',grad3:'linear-gradient(135deg,rgba(6,78,59,0.5),rgba(6,95,70,0.5))',dots:'radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px)',grid:'linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px)'};const sz={dots:'20px 20px',grid:'20px 20px'};const r=document.documentElement;r.style.setProperty('--app-bg-image',bgs[t]||'none');r.style.setProperty('--app-bg-size',sz[t]||'');document.body.style.backgroundImage=bgs[t]||'';document.body.style.backgroundSize=sz[t]||'';document.body.style.backgroundAttachment='fixed';localStorage.setItem('hb_bg',t);settingsRefreshUI();showToast('🖼 Sfondo aggiornato');}
 
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
 
@@ -8923,14 +9178,6 @@ function skipBioAndEnter() {
   unlockApp();
 }
 
-function pinKeyLeftAction() {
-  const credId = localStorage.getItem(HB_BIO_KEY);
-  if (credId && HB.authState === 'pin-login') {
-    tryBiometric();
-  } else {
-    pinClear();
-  }
-}
 
 async function _bioEncrypt(key, text) {
   const iv  = crypto.getRandomValues(new Uint8Array(12));
@@ -8966,22 +9213,6 @@ function _setLocalTs(k,t){ Object.getPrototypeOf(localStorage).setItem.call(loca
 
 function _tsKey(k){ return 'hb_ts_' + k; }
 
-function mergeArraysByIdFull(local, cloud, tsField='updatedAt') {
-  if(!local||!Array.isArray(local)) return cloud||[];
-  if(!cloud||!Array.isArray(cloud)) return local||[];
-  const map = {};
-  local.forEach(item => { if(item.id) map[item.id]=item; });
-  cloud.forEach(item => {
-    if(!item.id) return;
-    if(!map[item.id]) { map[item.id]=item; }
-    else {
-      const lt = new Date(map[item.id].deletedAt||map[item.id][tsField]||0).getTime();
-      const ct = new Date(item.deletedAt||item[tsField]||0).getTime();
-      if(ct>lt) map[item.id]=item;
-    }
-  });
-  return Object.values(map);
-}
 
 function markDeleted(arr,id){ return arr.map(i=>i.id===id?{...i,deleted:true,deletedAt:new Date().toISOString()}:i); }
 
@@ -9384,24 +9615,6 @@ function driveUpdateBackupUI() {
   if (b3) { b3.style.background  = mode==='30min' ? 'var(--accent)':'var(--surface)'; b3.style.color  = mode==='30min' ? 'white':'var(--text)'; b3.style.border  = mode==='30min' ? 'none':'1px solid var(--border)'; }
 }
 
-function wifiSearch(q) {
-  if (!q.trim()) { wifiRender(); return; }
-  const ql = q.toLowerCase();
-  const filtered = _wifiNets.filter(n =>
-    (n.ssid||'').toLowerCase().includes(ql) ||
-    (n.notes||'').toLowerCase().includes(ql)
-  );
-  const list = document.getElementById('wifi-list');
-  if (!list) return;
-  if (!filtered.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">Nessuna rete trovata</div>';
-    return;
-  }
-  const backup = _wifiNets;
-  _wifiNets = filtered;
-  wifiRender();
-  _wifiNets = backup;
-}
 
 function pwEditItem(itemId) {
   const item = _pwItems.find(i => i.id === itemId);
@@ -10278,15 +10491,6 @@ function genPassword(inputId) {
 
 
 // ── Copia con feedback visivo ──────────────────────────────
-function copyWithFeedback(text, el) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast('📋 Copiato!', 1200);
-    if (el) {
-      el.classList.add('copy-pulse');
-      setTimeout(() => el.classList.remove('copy-pulse'), 700);
-    }
-  }).catch(() => showToast('❌ Copia non riuscita'));
-}
 
 
 // ── Formattazione note ─────────────────────────────────────
@@ -10978,7 +11182,11 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.20.0</div>
+<<<<<<< HEAD
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.24.1</div>
+=======
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.23.1</div>
+>>>>>>> 0649fc1b9be21fe86c8db6419115341a3a70d166
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
