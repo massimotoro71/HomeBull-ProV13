@@ -1906,7 +1906,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.24.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.25.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1976,7 +1976,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.24.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.25.0</div>
         </div>
       </div>
     </div>
@@ -2081,7 +2081,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.24.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.25.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2978,7 +2978,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.24.1',
+  version: 'v13.25.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3924,7 +3924,7 @@ function hbHealthStats() {
   const n = items.length;
   const cnt = {}; items.forEach(i => cnt[i.password] = (cnt[i.password]||0) + 1);
   const pwned = items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored).length;
-  const weak = items.filter(i => getStrength(i.password).score <= 1).length;
+  const weak = items.filter(i => i.password && getStrength(i.password).score <= 1).length;
   const reused = items.filter(i => cnt[i.password] > 1).length;
   const expired = items.filter(i => { const e = pwExpiryInfo(i); return e && (e.status==='expired'||e.status==='today'); }).length;
   const old = items.filter(i => i.updatedAt && (Date.now() - new Date(i.updatedAt).getTime()) > 180*86400000).length;
@@ -4361,7 +4361,7 @@ function pwFilterCats(q) { pwRenderCats(q); }
 // Vista items
 // ── Filtri rapidi dentro la categoria ──
 window._pwItemFilter = '';
-const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite' };
+const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite', todo:'Da completare (senza password)' };
 function _pwHost(u) {
   u = String(u || '').trim().toLowerCase();
   if (!u) return '';
@@ -4383,6 +4383,7 @@ function _pwApplyItemFilter(items, fOverride) {
     const keep = new Set(); groups.forEach(g => g.ids.forEach(id => keep.add(id)));
     return { items: items.filter(i => keep.has(i.id)), groups };
   }
+  if (f === 'todo') return { items: items.filter(i => !i.password) };
   if (f === 'nouser') return { items: items.filter(i => !String(i.username || '').trim()) };
   if (f === 'pwned') return { items: items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored) };
   if (f === 'weak') return { items: items.filter(i => i.password && getStrength(i.password).score <= 1) };
@@ -4402,7 +4403,7 @@ function pwSetSort(v) {
 // riempie il menu del filtro con i numeri (quante voci per ogni filtro nel perimetro attuale)
 function _pwFillFilterSel(selId, scope) {
   const sel = document.getElementById(selId); if (!sel) return;
-  const lab = { dupes:'🔁 Duplicati', nouser:'👤 Senza utente', pwned:'🔴 Compromesse', weak:'🟠 Deboli', old:'⏳ Non aggiornate (90+ gg)', fav:'⭐ Preferite' };
+  const lab = { dupes:'🔁 Duplicati', nouser:'👤 Senza utente', pwned:'🔴 Compromesse', weak:'🟠 Deboli', old:'⏳ Non aggiornate (90+ gg)', fav:'⭐ Preferite', todo:'📝 Da completare' };
   let h = '<option value="">Tutte le voci (' + scope.length + ')</option>';
   Object.keys(lab).forEach(k => { h += '<option value="' + k + '">' + lab[k] + ' (' + _pwApplyItemFilter(scope, k).items.length + ')</option>'; });
   sel.innerHTML = h; sel.value = window._pwItemFilter || '';
@@ -5514,7 +5515,8 @@ function pwShowStats() {
   _pwItems.forEach(item => {
     const pw = item.password || '';
     const s  = getStrength(pw);
-    if (s.score <= 1) weak++;
+    if (!pw) { /* da completare: non conta */ }
+    else if (s.score <= 1) weak++;
     else if (s.score <= 3) medium++;
     else strong++;
 
@@ -5595,7 +5597,7 @@ function pwShowFilteredList(type) {
 
   let filtered = [], title = '';
   if (type === 'weak') {
-    filtered = _pwItems.filter(i => getStrength(i.password||'').score <= 1);
+    filtered = _pwItems.filter(i => i.password && getStrength(i.password).score <= 1);
     title = '🔴 Password deboli';
   } else if (type === 'dupes') {
     filtered = _pwItems.filter(i => !i.deleted && i.password && pwCount[i.password] > 1)
@@ -9881,6 +9883,111 @@ function importChromeCSV(event) {
   reader.readAsText(file);
 }
 
+// ── Importa segnalibri (Chrome/Edge .html): crea voci "da completare" e completa i link mancanti ──
+function _bmHost(u) {
+  u = String(u || '').trim().toLowerCase();
+  u = u.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').replace(/^www\./, '');
+  return u.split(/[\/?#]/)[0].replace(/:\d+$/, '');
+}
+function _bmNorm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, ''); }
+function _bmParse(htmlText) {
+  const dec = t => { const d = document.createElement('textarea'); d.innerHTML = t; return d.value.trim(); };
+  const tok = /<H3[^>]*>([\s\S]*?)<\/H3>|<DL[^>]*>|<\/DL>|<A\s[^>]*?HREF="([^"]*)"[^>]*>([\s\S]*?)<\/A>/gi;
+  const stack = []; let pend = null, m; const out = [];
+  while ((m = tok.exec(htmlText))) {
+    const t = m[0].toUpperCase();
+    if (t.indexOf('<H3') === 0) pend = dec(m[1]);
+    else if (t.indexOf('<DL') === 0) { stack.push(pend); pend = null; }
+    else if (t.indexOf('</DL') === 0) stack.pop();
+    else {
+      const url = dec(m[2]);
+      if (!/^https?:\/\//i.test(url)) continue;
+      const path = stack.filter(Boolean);
+      out.push({ title: dec(m[3].replace(/<[^>]*>/g, '')), url, folder: path.length > 1 ? path[path.length - 1] : (path.length ? 'Segnalibri' : 'Segnalibri') });
+    }
+  }
+  return out;
+}
+function importBookmarks(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const bms = _bmParse(String(e.target.result || ''));
+      if (!bms.length) { showToast('Nessun segnalibro trovato nel file'); return; }
+      pwLoad();
+      const live = _pwItems.filter(i => !i.deleted);
+      const hostSet = new Set(live.map(i => _bmHost(i.url)).filter(Boolean));
+      const nolink = live.filter(i => !String(i.url || '').trim() && i.title);
+      const usedItems = new Set(), seenHost = new Set();
+      const res = { nuovi: [], link: [], presenti: [], doppi: [] };
+      bms.forEach(b => {
+        const h = _bmHost(b.url);
+        if (seenHost.has(h)) { res.doppi.push(b); return; }
+        seenHost.add(h);
+        if (hostSet.has(h)) { res.presenti.push(b); return; }
+        const nb = _bmNorm(b.title);
+        let hit = null;
+        if (nb) hit = nolink.find(i => { if (usedItems.has(i.id)) return false; const ni = _bmNorm(i.title); return ni && (ni === nb || (Math.min(ni.length, nb.length) >= 4 && (nb.indexOf(ni) >= 0 || ni.indexOf(nb) >= 0))); });
+        if (hit) { usedItems.add(hit.id); res.link.push({ b, item: hit }); return; }
+        res.nuovi.push(b);
+      });
+      _bmPreview(res, bms.length);
+    } catch (err) { showToast('⚠️ Lettura segnalibri fallita: ' + (err.message || err)); }
+  };
+  reader.readAsText(file);
+}
+function _bmPreview(res, total) {
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  window._bmRes = res;
+  const folders = {}; res.nuovi.forEach(b => { folders[b.folder] = (folders[b.folder] || 0) + 1; });
+  const fk = Object.keys(folders).sort((a, b) => a.localeCompare(b, 'it'));
+  document.getElementById('_bm_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_bm_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:14px;';
+  const sec = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:14px 0 6px;';
+  const row = 'display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13px;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:20px;max-width:460px;width:100%;max-height:90vh;display:flex;flex-direction:column;border:1px solid var(--border);">' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">🔖 Importa segnalibri</div>' +
+    '<div style="font-size:12px;color:var(--text3);">' + total + ' segnalibri · <b>' + res.nuovi.length + '</b> nuovi · <b>' + res.link.length + '</b> link da aggiungere · ' + res.presenti.length + ' già presenti · ' + res.doppi.length + ' doppi nel file</div>' +
+    '<div style="overflow-y:auto;flex:1;min-height:0;padding-right:2px;">' +
+    (res.link.length ? '<div style="' + sec + '">Aggiungi il link a voci esistenti (senza indirizzo)</div>' + res.link.map((x, n) => '<label style="' + row + 'cursor:pointer;"><input type="checkbox" class="_bm_lk" data-n="' + n + '" checked><span style="flex:1;min-width:0;"><b>' + esc(x.item.title) + '</b><br><span style="font-size:11px;color:var(--text3);word-break:break-all;">' + esc(x.b.title) + ' → ' + esc(x.b.url) + '</span></span></label>').join('') : '') +
+    (fk.length ? '<div style="' + sec + '">Nuove voci "da completare" (senza password) — per cartella</div>' + fk.map((f, n) => '<label style="' + row + 'cursor:pointer;"><input type="checkbox" class="_bm_fd" data-f="' + esc(f) + '" checked><span style="flex:1;min-width:0;">📁 ' + esc(f) + '</span><span style="color:var(--text3);font-weight:700;">' + folders[f] + '</span></label>').join('') : '') +
+    (res.presenti.length ? '<details style="margin-top:12px;"><summary style="font-size:12px;color:var(--text3);cursor:pointer;">' + res.presenti.length + ' già presenti (saltati)</summary>' + res.presenti.map(b => '<div style="font-size:11px;color:var(--text3);padding:3px 0;word-break:break-all;">' + esc(b.title) + ' · ' + esc(_bmHost(b.url)) + '</div>').join('') + '</details>' : '') +
+    '</div>' +
+    '<div style="display:flex;gap:10px;margin-top:14px;">' +
+    '<button onclick="document.getElementById(\'_bm_ov\').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>' +
+    '<button onclick="bmApply()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div></div>';
+  document.body.appendChild(ov);
+}
+function bmApply() {
+  const res = window._bmRes; if (!res) return;
+  const ov = document.getElementById('_bm_ov');
+  const okLink = new Set([...ov.querySelectorAll('._bm_lk:checked')].map(c => +c.dataset.n));
+  const okFold = new Set([...ov.querySelectorAll('._bm_fd:checked')].map(c => c.dataset.f));
+  const stamp = Date.now(), nowIso = new Date().toISOString();
+  let nLink = 0, nNew = 0, newCats = 0;
+  res.link.forEach((x, n) => { if (okLink.has(n) && !String(x.item.url || '').trim()) { x.item.url = x.b.url; nLink++; } });
+  const catFor = nm => {
+    let c = _pwCats.find(x => (x.name || '').toLowerCase() === nm.toLowerCase());
+    if (!c) { c = { id: 'cat_' + stamp + '_' + _pwCats.length, name: nm, icon: '📁' }; _pwCats.push(c); newCats++; }
+    return c;
+  };
+  res.nuovi.forEach((b, n) => {
+    if (!okFold.has(b.folder)) return;
+    let title = b.title; if (!title) { try { title = new URL(b.url).hostname; } catch (_) { title = b.url; } }
+    _pwItems.push({ id: 'pw_' + stamp + '_bm' + n, title, password: '', username: '', url: b.url, pin: '', notes: 'Da segnalibri: completare utente e password', categoryId: catFor(b.folder).id, createdAt: nowIso, updatedAt: nowIso });
+    nNew++;
+  });
+  ov.remove(); window._bmRes = null;
+  if (!nNew && !nLink) { showToast('Niente da importare'); return; }
+  pwSave();
+  try { updateHomeStats(); } catch (e) {}
+  showToast('✅ ' + nNew + ' voci da completare' + (newCats ? ' (' + newCats + ' nuove categorie)' : '') + ' · ' + nLink + ' link aggiunti — le trovi col filtro 🧹 "Da completare"', 7000);
+}
+
 function settingsImport(event){
   const file=event.target.files[0];
   if(!file) return;
@@ -10939,6 +11046,11 @@ document.addEventListener('keydown', (e) => {
             <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
             <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
           </label>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🔖</span>
+            <div><div style="margin-bottom:3px;">Importa segnalibri (file .html)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Da Chrome / Edge: Gestione segnalibri → ⋮ → Esporta. Crea voci "da completare" per i siti nuovi e aggiunge il link alle voci senza indirizzo. Non tocca utenti e password.</div></div>
+            <input type="file" accept=".html,.htm,text/html" style="display:none;" onchange="importBookmarks(event)">
+          </label>
 
           <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:8px;">Codici OTP / 2FA</div>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
@@ -11046,7 +11158,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.24.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.25.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
