@@ -1871,6 +1871,24 @@ html[data-theme="light"][data-home-style="a"] .mob-home-card-icon,html[data-them
 html[data-home-style="b"] .mob-home-card,html[data-home-style="b"] .qa-card{background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03)) !important;border:1px solid rgba(255,255,255,.12) !important;border-radius:20px !important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:14px 6px 10px !important;}
 html[data-home-style="b"] .mob-home-card-icon,html[data-home-style="b"] .qa-card-icon{font-size:36px !important;height:44px;}
 html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="light"][data-home-style="b"] .qa-card{background:linear-gradient(160deg,#fff,#f1f3f9) !important;border-color:rgba(0,0,0,.08) !important;}
+@media(max-width:640px){
+#pw-view-cats .pw-search-bar{order:1;flex:1 1 140px !important;min-width:0 !important;}
+#pw-view-cats .pw-newcat-btn{order:2;padding:10px 11px !important;}
+#pw-view-cats #pw-search-cat{order:3;flex:1 1 100px !important;min-width:0 !important;padding:8px 6px !important;font-size:12px !important;text-overflow:ellipsis;}
+#pw-view-cats .pw-cat-tools{order:4;gap:3px !important;}
+#pw-view-cats .pw-cat-tools > *{width:30px !important;height:34px !important;font-size:14px !important;}
+}
+@media(min-width:900px){
+#pw-items-list{display:grid !important;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:10px;align-content:start;}
+#pw-items-list > .pw-item-card{display:flex;align-items:center;gap:14px;margin-bottom:0;padding:12px 16px;}
+#pw-items-list > .pw-item-card .pw-item-header{flex:1;min-width:0;margin-bottom:0;}
+#pw-items-list > :not(.pw-item-card){grid-column:1/-1;}
+#pw-view-detail > div:first-child{padding-left:max(14px,calc((100% - 760px)/2)) !important;padding-right:max(14px,calc((100% - 760px)/2)) !important;}
+#pw-detail-content{padding-left:max(14px,calc((100% - 760px)/2)) !important;padding-right:max(14px,calc((100% - 760px)/2)) !important;}
+#pw-detail-content .pw-field-row{display:grid;grid-template-columns:150px 1fr auto;align-items:center;column-gap:16px;}
+#pw-detail-content .pw-field-label{margin-bottom:0;}
+#pw-detail-content .pw-field-actions{margin-top:0;}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1899,7 +1917,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.23.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.26.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1969,7 +1987,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.23.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.26.1</div>
         </div>
       </div>
     </div>
@@ -2074,7 +2092,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.23.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.26.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2204,19 +2222,32 @@ Aggiungi nuovo dato
       <!-- Vista: Lista categorie -->
       <div id="pw-view-cats" style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 14px 8px;flex-shrink:0;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <div class="pw-search-bar" style="flex:1;">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="flex:0 1 230px;min-width:150px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Tutte le categorie</option></select>
+            <div class="pw-search-bar" style="flex:1 1 170px;min-width:150px;">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input id="pw-cat-search" type="text" placeholder="Cerca password..." oninput="pwFilterCats(this.value)" style="flex:1;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
+              <input id="pw-cat-search" type="text" placeholder="Cerca password..." oninput="pwFilterCats(this.value)" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);font-family:inherit;">
             </div>
-            <button onclick="pwNewCategory()" style="flex-shrink:0;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Categoria</button>
+            <div class="pw-cat-tools" style="display:flex;gap:6px;flex-shrink:0;">
+              <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Ordina">⇅
+                <select id="pw-sort-sel-c" aria-label="Ordina" onchange="pwSetSort(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+                  <option value="az">A → Z</option>
+                  <option value="za">Z → A</option>
+                  <option value="weak">Prima le deboli</option>
+                  <option value="strong">Prima le forti</option>
+                </select>
+              </div>
+              <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Filtra">🧹
+                <select id="pw-filter-sel-c" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;"></select>
+              </div>
+              <button class="pw-sel-toggle" onclick="pwSelToggleMode()" title="Seleziona" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">☑️</button>
+              <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📊</button>
+              <button onclick="pwExportScope()" title="Esporta" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📤</button>
+              <button onclick="pwScanQR()" title="Scansiona QR" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📷</button>
+            </div>
+            <button class="pw-newcat-btn" onclick="pwNewCategory()" style="flex-shrink:0;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Categoria</button>
           </div>
-        </div>
-        <div style="padding:0 14px 8px;flex-shrink:0;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <select id="pw-search-cat" onchange="pwSetSearchCat(this.value)" title="Cerca in" style="flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;"><option value="">🔎 Cerca in: tutte le categorie</option></select>
-            <button class="pw-sel-toggle pw-sel-toggle-cats" onclick="pwSelToggleMode()" style="display:none;flex-shrink:0;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">☑️ Seleziona</button>
-          </div>
+          <div id="pw-filter-chip-c" style="display:none;align-items:center;gap:8px;margin-top:8px;padding:6px 10px;border-radius:10px;background:rgba(99,102,241,0.12);border:1px solid var(--accent);font-size:12px;font-weight:700;color:var(--text);"></div>
           <div class="pw-sel-bar" style="display:none;align-items:center;gap:5px;margin-top:8px;padding:8px 10px;border-radius:12px;background:var(--surface);border:1px solid var(--accent);flex-wrap:wrap;">
             <button class="pw-sel-all" onclick="pwSelAll()" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">☐ Tutte</button>
             <span class="pw-sel-count" style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">0 sel.</span>
@@ -2242,7 +2273,7 @@ Aggiungi nuovo dato
               <div id="pw-cat-count" style="font-size:11px;color:var(--text3);font-weight:600;"></div>
             </div>
             <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Ordina">⇅
-              <select id="pw-sort-sel" aria-label="Ordina" onchange="localStorage.setItem('hb_pw_sort',this.value);pwRenderItems(document.getElementById('pw-item-search')?.value||'')" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
+              <select id="pw-sort-sel" aria-label="Ordina" onchange="pwSetSort(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
                 <option value="az">A → Z</option>
                 <option value="za">Z → A</option>
                 <option value="weak">Prima le deboli</option>
@@ -2250,15 +2281,7 @@ Aggiungi nuovo dato
               </select>
             </div>
             <div style="position:relative;width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;" title="Filtra">🧹
-              <select id="pw-filter-sel" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;">
-                <option value="">Tutte le voci</option>
-                <option value="dupes">🔁 Duplicati (stesso sito e utente)</option>
-                <option value="nouser">👤 Senza utente</option>
-                <option value="pwned">🔴 Compromesse</option>
-                <option value="weak">🟠 Deboli</option>
-                <option value="old">⏳ Non aggiornate (90+ gg)</option>
-                <option value="fav">⭐ Preferite</option>
-              </select>
+              <select id="pw-filter-sel" aria-label="Filtra" onchange="pwSetItemFilter(this.value)" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;"></select>
             </div>
             <button class="pw-sel-toggle" onclick="pwSelToggleMode()" title="Seleziona" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">☑️</button>
             <button onclick="pwShowStats()" title="Statistiche" style="width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;flex-shrink:0;">📊</button>
@@ -2966,7 +2989,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.23.1',
+  version: 'v13.26.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3912,7 +3935,7 @@ function hbHealthStats() {
   const n = items.length;
   const cnt = {}; items.forEach(i => cnt[i.password] = (cnt[i.password]||0) + 1);
   const pwned = items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored).length;
-  const weak = items.filter(i => getStrength(i.password).score <= 1).length;
+  const weak = items.filter(i => i.password && getStrength(i.password).score <= 1).length;
   const reused = items.filter(i => cnt[i.password] > 1).length;
   const expired = items.filter(i => { const e = pwExpiryInfo(i); return e && (e.status==='expired'||e.status==='today'); }).length;
   const old = items.filter(i => i.updatedAt && (Date.now() - new Date(i.updatedAt).getTime()) > 180*86400000).length;
@@ -4118,7 +4141,7 @@ function pwFillSearchCat() {
   if (_pwSearchCat === '__none' && !_orph.length) _pwSearchCat = '';
   const opts = _pwCats.slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' }))
     .map(c => '<option value="' + c.id + '">📁 ' + String(c.name||'').replace(/[<>&"]/g, '') + ' (' + _pwItems.filter(i => !i.deleted && i.categoryId === c.id).length + ')</option>').join('');
-  sel.innerHTML = '<option value="">🔎 Cerca in: tutte le categorie</option>' + opts + (_orph.length ? '<option value="__none">❓ Senza categoria (' + _orph.length + ')</option>' : '');
+  sel.innerHTML = '<option value="">🔎 Tutte le categorie</option>' + opts + (_orph.length ? '<option value="__none">❓ Senza categoria (' + _orph.length + ')</option>' : '');
   sel.value = _pwSearchCat;
 }
 function pwSetSearchCat(v) {
@@ -4141,22 +4164,30 @@ function pwRenderCats(q='') {
 
   // Modalità ricerca (anche senza testo, se è scelta una categoria: mostra le password di quella categoria)
   const _selTg = document.querySelector('.pw-sel-toggle-cats');
-  if (_selTg) _selTg.style.display = (q || _pwSearchCat) ? 'inline-block' : 'none';
-  if (!(q || _pwSearchCat) && _pwSelMode) { _pwSelMode = false; _pwSel.clear(); }
-  if (q || _pwSearchCat) {
+  const _resMode = !!(q || _pwSearchCat || window._pwItemFilter || _pwSelMode);
+  _pwFillFilterSel('pw-filter-sel-c', _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat))));
+  ['pw-sort-sel-c'].forEach(id => { const e = document.getElementById(id); if (e) { try { e.value = localStorage.getItem('hb_pw_sort') || 'az'; } catch(er) {} } });
+  if (!window._pwItemFilter) _pwUpdateFilterChip(0);
+  if (_resMode) {
     const banner = document.getElementById('pw-expiry-banner');
     if (banner) banner.style.display = 'none';
     const ql = q.toLowerCase();
-    const matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat)) && (!ql || (
+    let matches = _pwItems.filter(i => !i.deleted && (!_pwSearchCat || (_pwSearchCat === '__none' ? !_pwCats.find(c => c.id === i.categoryId) : i.categoryId === _pwSearchCat)) && (!ql || (
       (i.title||'').toLowerCase().includes(ql) ||
       (i.username||'').toLowerCase().includes(ql) ||
+      (i.email||'').toLowerCase().includes(ql) ||
+      (i.pec||'').toLowerCase().includes(ql) ||
       (i.url||'').toLowerCase().includes(ql) ||
       (i.notes||'').toLowerCase().includes(ql) ||
       ((_pwCats.find(c => c.id === i.categoryId) || {}).name || '').toLowerCase().includes(ql)
-    ))).sort((a, b) => (a.title||'').localeCompare(b.title||'', 'it', { numeric: true, sensitivity: 'base' }));
+    )));
+    const _fresC = _pwApplyItemFilter(matches);
+    matches = _fresC.items;
+    _pwUpdateFilterChip(matches.length);
+    _pwOrderItems(matches, _fresC);
     if (!matches.length) {
       grid.style.display = 'block';
-      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">' + (q ? 'Nessun risultato per "' + q.replace(/[<>&]/g, '') + '"' : 'Nessuna password in questa categoria') + (_pwSearchCat && q ? ' in questa categoria' : '') + '</div>';
+      grid.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text3);font-size:13px;">' + (window._pwItemFilter && !q ? '✅ Nessuna voce con questo filtro' : q ? 'Nessun risultato per "' + q.replace(/[<>&]/g, '') + '"' : 'Nessuna password in questa categoria') + (_pwSearchCat && q ? ' in questa categoria' : '') + '</div>';
       return;
     }
     grid.style.display = 'flex';
@@ -4164,7 +4195,9 @@ function pwRenderCats(q='') {
     grid.style.gap = '8px';
     grid.innerHTML = '';
     window._pwVisibleIds = matches.map(i => i.id);
+    const _seenC = {};
     matches.forEach(item => {
+      const _gh = _pwGroupHeader(_fresC, item, _seenC); if (_gh) grid.appendChild(_gh);
       const cat = _pwCats.find(c => c.id === item.categoryId);
       const s = getStrength(item.password||'');
       const div = document.createElement('div');
@@ -4173,7 +4206,7 @@ function pwRenderCats(q='') {
       div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🔐</div>'
         + '<div style="flex:1;min-width:0;">'
         + '<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (item.title||'Senza nome') + '</div>'
-        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||'') + (cat ? ' · ' + cat.name : '') + '</div>'
+        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||item.email||'') + (cat ? ' · ' + cat.name : '') + '</div>'
         + '</div>'
         + '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:' + s.bg + ';color:' + s.col + ';">' + s.label + '</span>';
       if (_pwSelMode) {
@@ -4341,7 +4374,7 @@ function pwFilterCats(q) { pwRenderCats(q); }
 // Vista items
 // ── Filtri rapidi dentro la categoria ──
 window._pwItemFilter = '';
-const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite' };
+const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite', todo:'Da completare (senza password)' };
 function _pwHost(u) {
   u = String(u || '').trim().toLowerCase();
   if (!u) return '';
@@ -4349,8 +4382,8 @@ function _pwHost(u) {
   u = u.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').replace(/^www\./, '');
   return u.split(/[\/?#]/)[0].replace(/:\d+$/, '');
 }
-function _pwApplyItemFilter(items) {
-  const f = window._pwItemFilter || '';
+function _pwApplyItemFilter(items, fOverride) {
+  const f = fOverride != null ? fOverride : (window._pwItemFilter || '');
   if (!f) return { items };
   if (f === 'dupes') {
     const map = {};
@@ -4363,7 +4396,8 @@ function _pwApplyItemFilter(items) {
     const keep = new Set(); groups.forEach(g => g.ids.forEach(id => keep.add(id)));
     return { items: items.filter(i => keep.has(i.id)), groups };
   }
-  if (f === 'nouser') return { items: items.filter(i => !String(i.username || '').trim()) };
+  if (f === 'todo') return { items: items.filter(i => !i.password) };
+  if (f === 'nouser') return { items: items.filter(i => !String(i.username || '').trim() && !String(i.email || '').trim()) };
   if (f === 'pwned') return { items: items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored) };
   if (f === 'weak') return { items: items.filter(i => i.password && getStrength(i.password).score <= 1) };
   if (f === 'old') { const lim = Date.now() - 90 * 86400000; return { items: items.filter(i => i.updatedAt && new Date(i.updatedAt).getTime() < lim) }; }
@@ -4373,19 +4407,68 @@ function _pwApplyItemFilter(items) {
 function pwSetItemFilter(v) {
   window._pwItemFilter = v || '';
   _pwSelMode = false; _pwSel.clear();
-  pwRenderItems(document.getElementById('pw-item-search')?.value || '');
+  _pwSelRerender();
+}
+function pwSetSort(v) {
+  try { localStorage.setItem('hb_pw_sort', v); } catch(e) {}
+  _pwSelRerender();
+}
+// riempie il menu del filtro con i numeri (quante voci per ogni filtro nel perimetro attuale)
+function _pwFillFilterSel(selId, scope) {
+  const sel = document.getElementById(selId); if (!sel) return;
+  const lab = { dupes:'🔁 Duplicati', nouser:'👤 Senza utente', pwned:'🔴 Compromesse', weak:'🟠 Deboli', old:'⏳ Non aggiornate (90+ gg)', fav:'⭐ Preferite', todo:'📝 Da completare' };
+  let h = '<option value="">Tutte le voci (' + scope.length + ')</option>';
+  Object.keys(lab).forEach(k => { h += '<option value="' + k + '">' + lab[k] + ' (' + _pwApplyItemFilter(scope, k).items.length + ')</option>'; });
+  sel.innerHTML = h; sel.value = window._pwItemFilter || '';
+}
+function _pwOrderItems(items, fres) {
+  const sort = (function(){ try { return localStorage.getItem('hb_pw_sort') || 'az'; } catch(e) { return 'az'; } })();
+  ['pw-sort-sel','pw-sort-sel-c'].forEach(id => { const e = document.getElementById(id); if (e) e.value = sort; });
+  const t = x => (x.title||'');
+  if (sort === 'az') items.sort((a,b) => t(a).localeCompare(t(b),'it',{numeric:true,sensitivity:'base'}));
+  else if (sort === 'za') items.sort((a,b) => t(b).localeCompare(t(a),'it',{numeric:true,sensitivity:'base'}));
+  else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
+  else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
+  if (fres && fres.groups) {
+    const gi = {}; fres.groups.forEach((g, n) => g.ids.forEach(id => { gi[id] = n; }));
+    const first = {}; items.forEach((it, n) => { if (first[gi[it.id]] == null) first[gi[it.id]] = n; });
+    items.sort((a, b) => (first[gi[a.id]] - first[gi[b.id]]) || 0);
+  }
+  return items;
+}
+function _pwGroupHeader(fres, item, seen) {
+  if (!fres || !fres.groups) return null;
+  const gn = fres.groups.findIndex(g => g.ids.indexOf(item.id) >= 0);
+  if (gn < 0 || seen[gn]) return null;
+  seen[gn] = 1; const g = fres.groups[gn];
+  const h = document.createElement('div');
+  h.style.cssText = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:12px 4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  h.textContent = '🔁 ' + g.ids.length + ' voci · ' + g.label;
+  return h;
 }
 function _pwUpdateFilterChip(n) {
-  const c = document.getElementById('pw-filter-chip'); if (!c) return;
   const f = window._pwItemFilter || '';
+  ['pw-filter-chip','pw-filter-chip-c'].forEach(id => {
+  const c = document.getElementById(id); if (!c) return;
   if (!f) { c.style.display = 'none'; c.innerHTML = ''; return; }
   c.style.display = 'flex';
   c.innerHTML = '<span style="flex:1;min-width:0;">🧹 ' + _PW_FILTER_NAMES[f] + ' · ' + n + (n === 1 ? ' voce' : ' voci') + '</span><button onclick="pwSetItemFilter(\'\')" title="Rimuovi filtro" style="border:none;background:none;color:var(--text);font-size:15px;cursor:pointer;padding:2px 6px;">✕</button>';
+  });
 }
 
 // ── Esporta solo le selezionate ──
-function pwSelExport() {
-  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+function pwExportScope() {
+  const vis = window._pwVisibleIds;
+  const resMode = !!((document.getElementById('pw-cat-search')||{}).value || _pwSearchCat || window._pwItemFilter || _pwSelMode);
+  if (_pwSelMode && _pwSel.size) { pwSelExport(); return; }
+  const ids = resMode && vis ? new Set(vis) : null;
+  const list = _pwItems.filter(i => !i.deleted && (!ids || ids.has(i.id)));
+  if (!list.length) { showToast('Nessuna password da esportare'); return; }
+  pwSelExport(list);
+}
+function pwSelExport(list) {
+  const sel = Array.isArray(list) ? list : _pwItems.filter(i => _pwSel.has(i.id));
+  window._pwExItems = sel;
   if (!sel.length) { showToast('Seleziona prima qualche password'); return; }
   const old = document.getElementById('_pw_ex_ov'); if (old) old.remove();
   const ov = document.createElement('div');
@@ -4394,7 +4477,7 @@ function pwSelExport() {
   ov.onclick = e => { if (e.target === ov) ov.remove(); };
   const b = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;text-align:left;';
   ov.innerHTML = '<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 24px;width:100%;max-width:520px;">' +
-    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + ' selezionate</div>' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + (Array.isArray(list) ? ' voci' : ' selezionate') + '</div>' +
     '<div style="font-size:12px;color:#f59e0b;margin-bottom:14px;">⚠️ Il file contiene le password in chiaro: eliminalo dopo l\'uso.</div>' +
     '<button style="' + b + '" onclick="pwSelExportCSV()">📄 CSV (reimportabile da Impostazioni → Importazioni)</button>' +
     '<button style="' + b + '" onclick="pwSelExportTXT()">📝 File di testo</button>' +
@@ -4402,12 +4485,12 @@ function pwSelExport() {
   document.body.appendChild(ov);
 }
 function pwSelExportCSV() {
-  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+  const sel = window._pwExItems || [];
   const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
   const rows = [['name','url','username','password','note','categoria']];
   sel.forEach(i => {
     const cat = _pwCats.find(c => c.id === i.categoryId);
-    const note = [i.notes, i.pin ? 'PIN: ' + i.pin : ''].filter(Boolean).join('\n');
+    const note = [i.notes, i.pin ? 'PIN: ' + i.pin : '', i.email ? 'Email: ' + i.email : '', i.pec ? 'PEC: ' + i.pec : ''].filter(Boolean).join('\n');
     rows.push([i.title, i.url, i.username, i.password, note, cat ? cat.name : '']);
   });
   const csv = '﻿' + rows.map(r => r.map(q).join(',')).join('\r\n');
@@ -4419,14 +4502,14 @@ function pwSelExportCSV() {
   showToast('✅ CSV scaricato (' + sel.length + ' voci)');
 }
 function pwSelExportTXT() {
-  const sel = _pwItems.filter(i => _pwSel.has(i.id));
+  const sel = window._pwExItems || [];
   const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
   pwExportCategoryText({ name: 'Selezione' }, sel);
 }
-function pwShowItems(catId, catName) {
+function pwShowItems(catId, catName, keepFilter) {
   window._pwReturnToFilter = null; // navigazione manuale in una categoria: non è più valido il "torna all'elenco filtrato"
   _pwCurCat = catId;
-  window._pwItemFilter = '';
+  if (!keepFilter) window._pwItemFilter = '';
   _pwSelMode = false; _pwSel.clear();
   document.getElementById('pw-view-cats').style.display = 'none';
   document.getElementById('pw-view-items').style.display = 'flex';
@@ -4442,26 +4525,17 @@ function pwRenderItems(q='') {
   let items = _pwItems.filter(i => i.categoryId === _pwCurCat);
   if (q) items = items.filter(i =>
     (i.title||'').toLowerCase().includes(q.toLowerCase()) ||
-    (i.username||'').toLowerCase().includes(q.toLowerCase())
+    (i.username||'').toLowerCase().includes(q.toLowerCase()) ||
+    (i.email||'').toLowerCase().includes(q.toLowerCase()) ||
+    (i.pec||'').toLowerCase().includes(q.toLowerCase())
   );
 
   const _catTotal = items.length;
   const _fres = _pwApplyItemFilter(items);
   items = _fres.items;
-  const _fsel = document.getElementById('pw-filter-sel'); if (_fsel) _fsel.value = window._pwItemFilter || '';
+  _pwFillFilterSel('pw-filter-sel', _pwItems.filter(i => i.categoryId === _pwCurCat));
   _pwUpdateFilterChip(items.length);
-  // Ordinamento
-  const sort = localStorage.getItem('hb_pw_sort') || 'az';
-  const _ss = document.getElementById('pw-sort-sel'); if (_ss) _ss.value = sort;
-  if (sort === 'az') items.sort((a,b) => (a.title||'').localeCompare(b.title||'','it', { numeric: true, sensitivity: 'base' }));
-  else if (sort === 'za') items.sort((a,b) => (b.title||'').localeCompare(a.title||'','it', { numeric: true, sensitivity: 'base' }));
-  else if (sort === 'weak') items.sort((a,b) => getStrength(a.password).score - getStrength(b.password).score);
-  else if (sort === 'strong') items.sort((a,b) => getStrength(b.password).score - getStrength(a.password).score);
-  if (_fres.groups) { // duplicati: voci dello stesso gruppo vicine
-    const gi = {}; _fres.groups.forEach((g, n) => g.ids.forEach(id => { gi[id] = n; }));
-    const first = {}; items.forEach((it, n) => { if (first['g' + gi[it.id]] == null) first['g' + gi[it.id]] = n; });
-    items.sort((a, b) => (first['g' + gi[a.id]] - first['g' + gi[b.id]]) || 0);
-  }
+  _pwOrderItems(items, _fres);
   window._pwVisibleIds = items.map(i => i.id);
   document.getElementById('pw-cat-count').textContent = window._pwItemFilter ? (items.length + ' di ' + _catTotal + ' password') : (_catTotal + ' password');
   if (!items.length) {
@@ -4471,16 +4545,7 @@ function pwRenderItems(q='') {
   list.innerHTML = '';
   const _seenG = {};
   items.forEach(item => {
-    if (_fres.groups) {
-      const gn = _fres.groups.findIndex(g => g.ids.indexOf(item.id) >= 0);
-      if (gn >= 0 && !_seenG[gn]) {
-        _seenG[gn] = 1; const g = _fres.groups[gn];
-        const h = document.createElement('div');
-        h.style.cssText = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:12px 4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        h.textContent = '🔁 ' + g.ids.length + ' voci · ' + g.label;
-        list.appendChild(h);
-      }
-    }
+    const _gh = _pwGroupHeader(_fres, item, _seenG); if (_gh) list.appendChild(_gh);
     const strength = getStrength(item.password);
     const expInfo = pwExpiryInfo(item);
     const cat = _pwCats.find(c => c.id === item.categoryId);
@@ -4493,7 +4558,7 @@ function pwRenderItems(q='') {
         <div class="pw-item-icon" style="background:${cat?.color||'rgba(99,102,241,0.1)'}20;">${icon}</div>
         <div style="flex:1;min-width:0;">
           <div class="pw-item-title">${item.title||'—'}</div>
-          <div class="pw-item-user">${item.username||''}</div>
+          <div class="pw-item-user">${item.username||item.email||''}</div>
           ${item.updatedAt ? `<div style="font-size:10px;color:var(--text3);margin-top:1px;">${timeAgo(item.updatedAt)}</div>` : ''}
         </div>
         <button onclick="event.stopPropagation();pwToggleFavorite('${item.id}')" title="${item.favorite?'Rimuovi dai preferiti':'Aggiungi ai preferiti'}" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px;flex-shrink:0;line-height:1;">${item.favorite ? '⭐' : '☆'}</button>
@@ -4939,7 +5004,7 @@ function updateHomeFavorites() {
       <div style="width:38px;height:38px;border-radius:11px;background:${cat?.color||'rgba(99,102,241,0.1)'}20;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.title||'—'}</div>
-        <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.username||''}</div>
+        <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.username||item.email||''}</div>
       </div>
       <button onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -4994,7 +5059,7 @@ function pwShowDetail(itemId) {
       ✅ Avviso disattivato per questa password (resta comunque compromessa).
       <button onclick="pwIgnoreBreach('${item.id}', false)" style="margin-left:6px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">Riattiva avviso</button>
     </div>` : ''}
-    ${item.username ? `<div class="pw-field-row"><div class="pw-field-label">Email / Username</div><div class="pw-field-value">${item.username}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
+    ${item.username ? `<div class="pw-field-row"><div class="pw-field-label">UserID</div><div class="pw-field-value">${item.username}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
     <div class="pw-field-row">
       <div class="pw-field-label">Password</div>
       <div class="pw-field-value" id="pd-pw" style="font-family:monospace;letter-spacing:0.05em;">${pw}</div>
@@ -5004,8 +5069,10 @@ function pwShowDetail(itemId) {
       </div>
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
-    ${(() => { const e = pwExpiryInfo(item); return e ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${e.col};font-weight:700;">${e.text}</div></div>` : ''; })()}
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
+    ${item.email ? `<div class="pw-field-row"><div class="pw-field-label">Email</div><div class="pw-field-value">${item.email}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','email')">📋 Copia</button></div></div>` : ''}
+    ${item.pec ? `<div class="pw-field-row"><div class="pw-field-label">PEC</div><div class="pw-field-value">${item.pec}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','pec')">📋 Copia</button></div></div>` : ''}
+    ${(() => { const e = pwExpiryInfo(item); return e ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${e.col};font-weight:700;">${e.text}</div></div>` : ''; })()}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
     ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map((h,hi)=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);"><span id="pd-pwh-'+item.id+'-'+hi+'" style="font-family:monospace;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);flex-shrink:0;">'+timeAgo(h.changedAt)+'</span><button class="pw-field-btn pwh-toggle" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">👁</button><button class="pw-field-btn pwh-copy" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">📋</button></div>').join('')}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
@@ -5104,6 +5171,7 @@ async function pwCopyHistory(itemId, idx) {
 
 // Navigazione back
 function pwBack() {
+  window._pwItemFilter = '';
   pwShowCats();
   document.getElementById('topbar-title').textContent = 'Password';
   document.getElementById('topbar-sub').textContent = _pwItems.length + ' password';
@@ -5119,7 +5187,7 @@ function pwBackToItems() {
     return;
   }
   const cat = _pwCats.find(c => c.id === _pwCurCat);
-  if (cat) pwShowItems(cat.id, cat.name);
+  if (cat) pwShowItems(cat.id, cat.name, true);
   else pwBack();
 }
 
@@ -5464,7 +5532,8 @@ function pwShowStats() {
   _pwItems.forEach(item => {
     const pw = item.password || '';
     const s  = getStrength(pw);
-    if (s.score <= 1) weak++;
+    if (!pw) { /* da completare: non conta */ }
+    else if (s.score <= 1) weak++;
     else if (s.score <= 3) medium++;
     else strong++;
 
@@ -5545,7 +5614,7 @@ function pwShowFilteredList(type) {
 
   let filtered = [], title = '';
   if (type === 'weak') {
-    filtered = _pwItems.filter(i => getStrength(i.password||'').score <= 1);
+    filtered = _pwItems.filter(i => i.password && getStrength(i.password).score <= 1);
     title = '🔴 Password deboli';
   } else if (type === 'dupes') {
     filtered = _pwItems.filter(i => !i.deleted && i.password && pwCount[i.password] > 1)
@@ -5624,7 +5693,9 @@ function pwExportCategoryText(cat, items) {
   txt += '='.repeat(50) + '\n\n';
   items.forEach((item, i) => {
     txt += `${i+1}. ${item.title || 'Senza titolo'}\n`;
-    if (item.username) txt += `   Utente:   ${item.username}\n`;
+    if (item.username) txt += `   UserID:   ${item.username}\n`;
+    if (item.email) txt += `   Email:    ${item.email}\n`;
+    if (item.pec)   txt += `   PEC:      ${item.pec}\n`;
     txt += `   Password: ${item.password || '—'}\n`;
     if (item.url)   txt += `   Sito:     ${item.url}\n`;
     if (item.pin)   txt += `   PIN:      ${item.pin}\n`;
@@ -5913,6 +5984,52 @@ async function pwHandleImport(event) {
   event.target.value = '';
 }
 
+
+// ── Campi del modulo password (stesso ordine per "Nuova" e "Modifica") ──
+function _pwEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function _pwFormFields(p, item, isNew) {
+  item = item || {};
+  const lab = t => '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">' + t + '</div>';
+  const inp = 'width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;';
+  const eye = id => '<button type="button" id="' + id + '" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button>';
+  const box = (t, html) => '<div style="margin-bottom:11px;">' + lab(t) + html + '</div>';
+  const text = (id, v, ph, type) => '<input id="' + p + '_' + id + '" type="' + (type || 'text') + '" value="' + _pwEsc(v) + '" placeholder="' + ph + '" style="' + inp + '">';
+  const expStart = isNew ? pwTodayISO() : (item.expiryStartDate || (item.createdAt ? item.createdAt.slice(0,10) : pwTodayISO()));
+  return [
+    box('Titolo *', text('title', item.title, 'es. Google, Amazon, Netflix...')),
+    box('UserID', text('user', item.username, 'nome utente / codice', 'text')),
+    box('Password' + (isNew ? ' *' : ''), '<div style="display:flex;gap:8px;"><input id="' + p + '_pass" type="password" value="' + _pwEsc(item.password) + '" placeholder="Inserisci o genera..." style="flex:1;min-width:0;' + inp + 'font-family:monospace;">' + eye(p + '_eye') + '<button type="button" id="' + p + '_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">🎲</button></div>'),
+    box('PIN', '<div style="display:flex;gap:8px;"><input id="' + p + '_pin" type="password" value="' + _pwEsc(item.pin) + '" placeholder="PIN numerico..." style="flex:1;min-width:0;' + inp + 'font-family:monospace;">' + eye(p + '_pin_eye') + '</div>'),
+    box('URL', text('url', item.url, 'https://...', 'url')),
+    box('Email', text('email', item.email, 'es. mario@email.com', 'email')),
+    box('PEC', text('pec', item.pec, 'es. mario@pec.it', 'email')),
+    '<div style="margin-bottom:11px;">' + lab('⏰ Scadenza password') +
+      '<select id="' + p + '_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:8px;">' + pwExpOptionsHtml(isNew ? 'none' : (item.expiryDays || 'none')) + '</select>' +
+      '<div style="display:flex;gap:8px;"><input id="' + p + '_exp_start" type="date" value="' + expStart + '" title="Data di inizio da cui calcolare la scadenza" style="flex:1;min-width:0;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;">' +
+      '<button id="' + p + '_exp_today" type="button" title="Imposta a oggi" style="padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Oggi</button></div>' +
+      '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data — correggila se la password esisteva già da prima</div>' +
+      (!isNew && item.expiryDate ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;">' + ((pwExpiryInfo(item) || {}).text || '') + '</div>' : '') + '</div>',
+    '<div style="margin-bottom:16px;">' + lab('Note') + '<textarea id="' + p + '_note" rows="3" style="' + inp + 'font-size:14px;resize:none;font-family:inherit;">' + _pwEsc(item.notes) + '</textarea></div>'
+  ].join('');
+}
+function _pwFormWire(p) {
+  const tog = id => { const e = document.getElementById(id); if (e) e.type = e.type === 'password' ? 'text' : 'password'; };
+  const b = (id, fn) => { const e = document.getElementById(id); if (e) e.onclick = fn; };
+  b(p + '_eye', () => tog(p + '_pass'));
+  b(p + '_pin_eye', () => tog(p + '_pin'));
+  b(p + '_dice', () => {
+    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    let pw = ''; a.forEach(x => pw += c[x % c.length]);
+    const i = document.getElementById(p + '_pass'); i.value = pw; i.type = 'text';
+  });
+  b(p + '_exp_today', () => { document.getElementById(p + '_exp_start').value = pwTodayISO(); });
+}
+function _pwFormRead(p) {
+  const v = id => (document.getElementById(p + '_' + id)?.value || '').trim();
+  return { title: v('title'), username: v('user'), email: v('email'), pec: v('pec'), url: v('url'), pin: v('pin'), notes: v('note') };
+}
+
 function pwNewItem() {
   if (!_pwCats.length) { showToast('Crea prima una categoria 📁'); return; }
   const catOpts = _pwCats.map(c =>
@@ -5927,31 +6044,7 @@ function pwNewItem() {
     '<div style="font-size:18px;font-weight:800;margin-bottom:18px;">🔐 Nuova Password</div>',
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
     '<select id="_pwn_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
-    '<input id="_pwn_title" type="text" placeholder="es. Google, Amazon, Netflix..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
-    '<input id="_pwn_url" type="url" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
-    '<input id="_pwn_user" type="text" placeholder="es. mario@email.com" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password *</div>',
-    '<div style="display:flex;gap:8px;">',
-    '<input id="_pwn_pass" type="password" placeholder="Inserisci o genera..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
-    '<button id="_pwn_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button>',
-    '<button id="_pwn_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">🎲</button>',
-    '</div></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
-    '<div style="display:flex;gap:8px;"><input id="_pwn_pin" type="password" placeholder="PIN numerico..." style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
-    '<button id="_pwn_pin_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;flex-shrink:0;">👁</button></div></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">⏰ Scadenza password</div>',
-    '<select id="_pwn_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:8px;">'+pwExpOptionsHtml('none')+'</select>',
-    '<div style="display:flex;gap:8px;">',
-    '<input id="_pwn_exp_start" type="date" value="'+pwTodayISO()+'" title="Data di inizio da cui calcolare la scadenza" style="flex:1;min-width:0;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;font-family:inherit;">',
-    '<button id="_pwn_exp_today" type="button" title="Imposta a oggi" style="padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Oggi</button>',
-    '</div>',
-    '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data (di default oggi — cambiala se la password esiste già da un po\')</div>',
-    '</div>',
-    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
-    '<textarea id="_pwn_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;"></textarea></div>',
+    _pwFormFields('_pwn', null, true),
     '<div style="display:flex;gap:10px;">',
     '<button id="_pwn_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
     '<button id="_pwn_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>',
@@ -5961,23 +6054,7 @@ function pwNewItem() {
   document.body.appendChild(overlay);
   setTimeout(() => document.getElementById('_pwn_title')?.focus(), 100);
   document.getElementById('_pwn_cancel').onclick = () => overlay.remove();
-  document.getElementById('_pwn_pin_eye').onclick = () => {
-    const i = document.getElementById('_pwn_pin');
-    i.type = i.type === 'password' ? 'text' : 'password';
-  };
-  document.getElementById('_pwn_eye').onclick = () => {
-    const i = document.getElementById('_pwn_pass');
-    i.type = i.type === 'password' ? 'text' : 'password';
-  };
-  document.getElementById('_pwn_dice').onclick = () => {
-    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
-    const a = new Uint8Array(16); crypto.getRandomValues(a);
-    let p = ''; a.forEach(b => p += c[b % c.length]);
-    const i = document.getElementById('_pwn_pass'); i.value = p; i.type = 'text';
-  };
-  document.getElementById('_pwn_exp_today').onclick = () => {
-    document.getElementById('_pwn_exp_start').value = pwTodayISO();
-  };
+  _pwFormWire('_pwn');
   document.getElementById('_pwn_save').onclick = () => {
     const title = document.getElementById('_pwn_title')?.value.trim();
     const pass  = document.getElementById('_pwn_pass')?.value;
@@ -5988,10 +6065,7 @@ function pwNewItem() {
       id: 'pw_' + Date.now(),
       title,
       password:  pass,
-      username:  document.getElementById('_pwn_user')?.value.trim() || '',
-      url:       document.getElementById('_pwn_url')?.value.trim() || '',
-      pin:       document.getElementById('_pwn_pin')?.value.trim() || '',
-      notes:     document.getElementById('_pwn_note')?.value.trim() || '',
+      ..._pwFormRead('_pwn'),
       categoryId: document.getElementById('_pwn_cat')?.value,
       expiryDays: expDays,
       expiryStartDate: expStart,
@@ -8452,12 +8526,12 @@ function runSearch(q) {
   // ── Password ──────────────────────────────────────────
   if (typeof _pwItems !== 'undefined') {
     _pwItems.filter(i => !i.deleted).forEach(item => {
-      if ([item.title, item.username, item.url, item.notes]
+      if ([item.title, item.username, item.email, item.pec, item.url, item.notes]
           .some(f => f && f.toLowerCase().includes(ql))) {
         const cat = _pwCats?.find(c => c.id === item.categoryId);
         results.push({
           icon: cat?.icon || '🔐', title: item.title,
-          sub: (item.username || item.url || 'Password') + (cat ? ' · ' + cat.name : ''),
+          sub: (item.username || item.email || item.url || 'Password') + (cat ? ' · ' + cat.name : ''),
           badge: '🔐 ' + (cat ? cat.name : 'Password'),
           action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
         });
@@ -9448,29 +9522,7 @@ function pwEditItem(itemId) {
     '</div>',
     '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Categoria</div>',
     '<select id="_pwe_cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;">'+catOpts+'</select></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Titolo / Sito *</div>',
-    '<input id="_pwe_title" type="text" value="'+(item.title||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">URL</div>',
-    '<input id="_pwe_url" type="url" value="'+(item.url||'')+'" placeholder="https://..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Email / Username</div>',
-    '<input id="_pwe_user" type="text" value="'+(item.username||'')+'" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Password</div>',
-    '<div style="display:flex;gap:8px;"><input id="_pwe_pass" type="password" value="'+(item.password||'')+'" style="flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;">',
-    '<button id="_pwe_eye" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">👁</button>',
-    '<button id="_pwe_dice" style="padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px;">🎲</button></div></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">PIN</div>',
-    '<input id="_pwe_pin" type="password" value="'+(item.pin||'')+'" placeholder="PIN numerico..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:15px;outline:none;box-sizing:border-box;font-family:monospace;"></div>',
-    '<div style="margin-bottom:11px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">⏰ Scadenza password</div>',
-    '<select id="_pwe_exp" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:8px;">'+pwExpOptionsHtml(item.expiryDays)+'</select>',
-    '<div style="display:flex;gap:8px;">',
-    '<input id="_pwe_exp_start" type="date" value="'+(item.expiryStartDate || (item.createdAt ? item.createdAt.slice(0,10) : pwTodayISO()))+'" title="Data di inizio da cui calcolare la scadenza" style="flex:1;min-width:0;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;font-family:inherit;">',
-    '<button id="_pwe_exp_today" type="button" title="Imposta a oggi" style="padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Oggi</button>',
-    '</div>',
-    '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data — correggila se la password esisteva già da prima</div>',
-    item.expiryDate ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;">'+(pwExpiryInfo(item)?.text||'')+'</div>' : '',
-    '</div>',
-    '<div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:5px;">Note</div>',
-    '<textarea id="_pwe_note" rows="3" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;outline:none;box-sizing:border-box;resize:none;font-family:inherit;">'+(item.notes||'')+'</textarea></div>',
+    _pwFormFields('_pwe', item, false),
     '<div style="display:flex;gap:10px;">',
     '<button id="_pwe_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>',
     '<button id="_pwe_save" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva Modifiche</button>',
@@ -9480,19 +9532,7 @@ function pwEditItem(itemId) {
   document.body.appendChild(overlay);
   document.getElementById('_pwe_cancel').onclick = () => overlay.remove();
   document.getElementById('_pwe_del').onclick = () => { overlay.remove(); pwDeleteConfirm(itemId); };
-  document.getElementById('_pwe_eye').onclick = () => {
-    const i = document.getElementById('_pwe_pass');
-    i.type = i.type === 'password' ? 'text' : 'password';
-  };
-  document.getElementById('_pwe_dice').onclick = () => {
-    const c = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*';
-    const a = new Uint8Array(16); crypto.getRandomValues(a);
-    let p = ''; a.forEach(b => p += c[b % c.length]);
-    const i = document.getElementById('_pwe_pass'); i.value = p; i.type = 'text';
-  };
-  document.getElementById('_pwe_exp_today').onclick = () => {
-    document.getElementById('_pwe_exp_start').value = pwTodayISO();
-  };
+  _pwFormWire('_pwe');
   document.getElementById('_pwe_save').onclick = () => {
     const title = document.getElementById('_pwe_title')?.value.trim();
     const pass  = document.getElementById('_pwe_pass')?.value;
@@ -9516,12 +9556,9 @@ function pwEditItem(itemId) {
         : (expDays === 'none' ? '' : item.expiryDate);
       _pwItems[idx] = {
         ...item,
+        ..._pwFormRead('_pwe'),
         title,
         password: pass,
-        username: document.getElementById('_pwe_user')?.value.trim() || '',
-        url:      document.getElementById('_pwe_url')?.value.trim() || '',
-        pin:      document.getElementById('_pwe_pin')?.value.trim() || '',
-        notes:    document.getElementById('_pwe_note')?.value.trim() || '',
         categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
         expiryDays: expDays,
         expiryStartDate: expStart,
@@ -9829,6 +9866,111 @@ function importChromeCSV(event) {
     } catch(err) { showToast('⚠️ Import fallito: ' + (err.message||err)); }
   };
   reader.readAsText(file);
+}
+
+// ── Importa segnalibri (Chrome/Edge .html): crea voci "da completare" e completa i link mancanti ──
+function _bmHost(u) {
+  u = String(u || '').trim().toLowerCase();
+  u = u.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').replace(/^www\./, '');
+  return u.split(/[\/?#]/)[0].replace(/:\d+$/, '');
+}
+function _bmNorm(t) { return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, ''); }
+function _bmParse(htmlText) {
+  const dec = t => { const d = document.createElement('textarea'); d.innerHTML = t; return d.value.trim(); };
+  const tok = /<H3[^>]*>([\s\S]*?)<\/H3>|<DL[^>]*>|<\/DL>|<A\s[^>]*?HREF="([^"]*)"[^>]*>([\s\S]*?)<\/A>/gi;
+  const stack = []; let pend = null, m; const out = [];
+  while ((m = tok.exec(htmlText))) {
+    const t = m[0].toUpperCase();
+    if (t.indexOf('<H3') === 0) pend = dec(m[1]);
+    else if (t.indexOf('<DL') === 0) { stack.push(pend); pend = null; }
+    else if (t.indexOf('</DL') === 0) stack.pop();
+    else {
+      const url = dec(m[2]);
+      if (!/^https?:\/\//i.test(url)) continue;
+      const path = stack.filter(Boolean);
+      out.push({ title: dec(m[3].replace(/<[^>]*>/g, '')), url, folder: path.length > 1 ? path[path.length - 1] : (path.length ? 'Segnalibri' : 'Segnalibri') });
+    }
+  }
+  return out;
+}
+function importBookmarks(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const bms = _bmParse(String(e.target.result || ''));
+      if (!bms.length) { showToast('Nessun segnalibro trovato nel file'); return; }
+      pwLoad();
+      const live = _pwItems.filter(i => !i.deleted);
+      const hostSet = new Set(live.map(i => _bmHost(i.url)).filter(Boolean));
+      const nolink = live.filter(i => !String(i.url || '').trim() && i.title);
+      const usedItems = new Set(), seenHost = new Set();
+      const res = { nuovi: [], link: [], presenti: [], doppi: [] };
+      bms.forEach(b => {
+        const h = _bmHost(b.url);
+        if (seenHost.has(h)) { res.doppi.push(b); return; }
+        seenHost.add(h);
+        if (hostSet.has(h)) { res.presenti.push(b); return; }
+        const nb = _bmNorm(b.title);
+        let hit = null;
+        if (nb) hit = nolink.find(i => { if (usedItems.has(i.id)) return false; const ni = _bmNorm(i.title); return ni && (ni === nb || (Math.min(ni.length, nb.length) >= 4 && (nb.indexOf(ni) >= 0 || ni.indexOf(nb) >= 0))); });
+        if (hit) { usedItems.add(hit.id); res.link.push({ b, item: hit }); return; }
+        res.nuovi.push(b);
+      });
+      _bmPreview(res, bms.length);
+    } catch (err) { showToast('⚠️ Lettura segnalibri fallita: ' + (err.message || err)); }
+  };
+  reader.readAsText(file);
+}
+function _bmPreview(res, total) {
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  window._bmRes = res;
+  const folders = {}; res.nuovi.forEach(b => { folders[b.folder] = (folders[b.folder] || 0) + 1; });
+  const fk = Object.keys(folders).sort((a, b) => a.localeCompare(b, 'it'));
+  document.getElementById('_bm_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_bm_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:14px;';
+  const sec = 'font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:14px 0 6px;';
+  const row = 'display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid var(--border);font-size:13px;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:20px;max-width:460px;width:100%;max-height:90vh;display:flex;flex-direction:column;border:1px solid var(--border);">' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">🔖 Importa segnalibri</div>' +
+    '<div style="font-size:12px;color:var(--text3);">' + total + ' segnalibri · <b>' + res.nuovi.length + '</b> nuovi · <b>' + res.link.length + '</b> link da aggiungere · ' + res.presenti.length + ' già presenti · ' + res.doppi.length + ' doppi nel file</div>' +
+    '<div style="overflow-y:auto;flex:1;min-height:0;padding-right:2px;">' +
+    (res.link.length ? '<div style="' + sec + '">Aggiungi il link a voci esistenti (senza indirizzo)</div>' + res.link.map((x, n) => '<label style="' + row + 'cursor:pointer;"><input type="checkbox" class="_bm_lk" data-n="' + n + '" checked><span style="flex:1;min-width:0;"><b>' + esc(x.item.title) + '</b><br><span style="font-size:11px;color:var(--text3);word-break:break-all;">' + esc(x.b.title) + ' → ' + esc(x.b.url) + '</span></span></label>').join('') : '') +
+    (fk.length ? '<div style="' + sec + '">Nuove voci "da completare" (senza password) — per cartella</div>' + fk.map((f, n) => '<label style="' + row + 'cursor:pointer;"><input type="checkbox" class="_bm_fd" data-f="' + esc(f) + '" checked><span style="flex:1;min-width:0;">📁 ' + esc(f) + '</span><span style="color:var(--text3);font-weight:700;">' + folders[f] + '</span></label>').join('') : '') +
+    (res.presenti.length ? '<details style="margin-top:12px;"><summary style="font-size:12px;color:var(--text3);cursor:pointer;">' + res.presenti.length + ' già presenti (saltati)</summary>' + res.presenti.map(b => '<div style="font-size:11px;color:var(--text3);padding:3px 0;word-break:break-all;">' + esc(b.title) + ' · ' + esc(_bmHost(b.url)) + '</div>').join('') + '</details>' : '') +
+    '</div>' +
+    '<div style="display:flex;gap:10px;margin-top:14px;">' +
+    '<button onclick="document.getElementById(\'_bm_ov\').remove()" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>' +
+    '<button onclick="bmApply()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Importa</button></div></div>';
+  document.body.appendChild(ov);
+}
+function bmApply() {
+  const res = window._bmRes; if (!res) return;
+  const ov = document.getElementById('_bm_ov');
+  const okLink = new Set([...ov.querySelectorAll('._bm_lk:checked')].map(c => +c.dataset.n));
+  const okFold = new Set([...ov.querySelectorAll('._bm_fd:checked')].map(c => c.dataset.f));
+  const stamp = Date.now(), nowIso = new Date().toISOString();
+  let nLink = 0, nNew = 0, newCats = 0;
+  res.link.forEach((x, n) => { if (okLink.has(n) && !String(x.item.url || '').trim()) { x.item.url = x.b.url; nLink++; } });
+  const catFor = nm => {
+    let c = _pwCats.find(x => (x.name || '').toLowerCase() === nm.toLowerCase());
+    if (!c) { c = { id: 'cat_' + stamp + '_' + _pwCats.length, name: nm, icon: '📁' }; _pwCats.push(c); newCats++; }
+    return c;
+  };
+  res.nuovi.forEach((b, n) => {
+    if (!okFold.has(b.folder)) return;
+    let title = b.title; if (!title) { try { title = new URL(b.url).hostname; } catch (_) { title = b.url; } }
+    _pwItems.push({ id: 'pw_' + stamp + '_bm' + n, title, password: '', username: '', url: b.url, pin: '', notes: 'Da segnalibri: completare utente e password', categoryId: catFor(b.folder).id, createdAt: nowIso, updatedAt: nowIso });
+    nNew++;
+  });
+  ov.remove(); window._bmRes = null;
+  if (!nNew && !nLink) { showToast('Niente da importare'); return; }
+  pwSave();
+  try { updateHomeStats(); } catch (e) {}
+  showToast('✅ ' + nNew + ' voci da completare' + (newCats ? ' (' + newCats + ' nuove categorie)' : '') + ' · ' + nLink + ' link aggiunti — le trovi col filtro 🧹 "Da completare"', 7000);
 }
 
 function settingsImport(event){
@@ -10889,6 +11031,11 @@ document.addEventListener('keydown', (e) => {
             <div><div style="margin-bottom:3px;">Importa da altri gestori (CSV)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Chrome / Edge, Bitwarden o LastPass: riconosco il formato da solo. Aggiunge, non sovrascrive.</div></div>
             <input type="file" accept=".csv,text/csv" style="display:none;" onchange="importChromeCSV(event)">
           </label>
+          <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
+            <span style="font-size:28px;">🔖</span>
+            <div><div style="margin-bottom:3px;">Importa segnalibri (file .html)</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Da Chrome / Edge: Gestione segnalibri → ⋮ → Esporta. Crea voci "da completare" per i siti nuovi e aggiunge il link alle voci senza indirizzo. Non tocca utenti e password.</div></div>
+            <input type="file" accept=".html,.htm,text/html" style="display:none;" onchange="importBookmarks(event)">
+          </label>
 
           <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:8px;">Codici OTP / 2FA</div>
           <label style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;">
@@ -10996,7 +11143,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.23.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.26.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
