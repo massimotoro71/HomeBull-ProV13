@@ -1920,7 +1920,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.28.2</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.29.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1990,7 +1990,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.28.2</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.29.1</div>
         </div>
       </div>
     </div>
@@ -2095,7 +2095,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.28.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.29.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2257,6 +2257,7 @@ Aggiungi nuovo dato
             <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
             <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
             <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
+            <button class="pw-ignore-btn" onclick="pwIgnoreSel()" title="Ignora (non segnalare più) / Ripristina" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🙈</button>
             <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
           </div>
         </div>
@@ -2298,6 +2299,7 @@ Aggiungi nuovo dato
             <button onclick="pwSelFav()" title="Preferiti" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">⭐</button>
             <button onclick="pwSelMove()" title="Sposta in categoria" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📁 Sposta</button>
             <button onclick="pwSelExport()" title="Esporta selezionate" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">📤</button>
+            <button class="pw-ignore-btn" onclick="pwIgnoreSel()" title="Ignora (non segnalare più) / Ripristina" style="padding:7px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🙈</button>
             <button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>
           </div>
 
@@ -2992,7 +2994,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.28.2',
+  version: 'v13.29.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3933,14 +3935,14 @@ function updateHomeStats() {
 }
 
 // ── Salute del vault + promemoria backup (Home) ──
-function _pwAnyWeak(i) { return [i.password, i.emailPassword, i.pecPassword].some(x => x && getStrength(x).score <= 1); }
+function _pwAnyWeak(i) { return !i.ignoreWeak && [i.password, i.emailPassword, i.pecPassword].some(x => x && getStrength(x).score <= 1); }
 function hbHealthStats() {
   const items = (_pwItems||[]).filter(i => !i.deleted && i.password);
   const n = items.length;
-  const cnt = {}; items.forEach(i => cnt[i.password] = (cnt[i.password]||0) + 1);
+  const cnt = {}; items.filter(i => !i.ignoreDupe).forEach(i => cnt[i.password] = (cnt[i.password]||0) + 1);
   const pwned = items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored).length;
   const weak = items.filter(_pwAnyWeak).length;
-  const reused = items.filter(i => cnt[i.password] > 1).length;
+  const reused = items.filter(i => !i.ignoreDupe && cnt[i.password] > 1).length;
   const expired = items.filter(i => { const e = pwExpiryInfo(i); return e && (e.status==='expired'||e.status==='today'); }).length;
   const old = items.filter(i => i.updatedAt && (Date.now() - new Date(i.updatedAt).getTime()) > 180*86400000).length;
   const pen = n ? (40*pwned + 25*weak + 20*reused + 10*expired + 5*old) / n : 0;
@@ -4209,8 +4211,8 @@ function pwRenderCats(q='') {
       div.onclick = () => pwShowDetail(item.id);
       div.innerHTML = '<div style="width:44px;height:44px;border-radius:14px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🔐</div>'
         + '<div style="flex:1;min-width:0;">'
-        + '<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (item.title||'Senza nome') + '</div>'
-        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + (item.username||item.email||'') + (cat ? ' · ' + cat.name : '') + '</div>'
+        + '<div style="font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(item.title||'Senza nome') + '</div>'
+        + '<div style="font-size:12px;color:var(--text3);margin-top:2px;">' + hbEsc(item.username||item.email||'') + (cat ? ' · ' + hbEsc(cat.name) : '') + '</div>'
         + '</div>'
         + '<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:' + s.bg + ';color:' + s.col + ';">' + s.label + '</span>';
       if (_pwSelMode) {
@@ -4298,7 +4300,7 @@ function pwRenderCats(q='') {
       <div style="width:52px;height:52px;border-radius:16px;background:${color}20;border:1px solid ${color}40;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">${icon}</div>
       <!-- Testo -->
       <div style="flex:1;min-width:0;">
-        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;">${cat.name}</div>
+        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;">${hbEsc(cat.name)}</div>
         <div style="font-size:12px;color:var(--text3);">${count} password${count === 1 ? '' : ''}</div>
       </div>
       <!-- Badge contatore -->
@@ -4378,7 +4380,7 @@ function pwFilterCats(q) { pwRenderCats(q); }
 // Vista items
 // ── Filtri rapidi dentro la categoria ──
 window._pwItemFilter = '';
-const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite', todo:'Da completare (senza password)' };
+const _PW_FILTER_NAMES = { dupes:'Duplicati (stesso sito e utente)', nouser:'Senza utente', pwned:'Compromesse', weak:'Deboli', old:'Non aggiornate (90+ gg)', fav:'Preferite', todo:'Da completare (senza password)', ignored:'Ignorate (non segnalate)' };
 function _pwHost(u) {
   u = String(u || '').trim().toLowerCase();
   if (!u) return '';
@@ -4391,7 +4393,7 @@ function _pwApplyItemFilter(items, fOverride) {
   if (!f) return { items };
   if (f === 'dupes') {
     const map = {};
-    items.forEach(i => {
+    items.filter(i => !i.ignoreDupe).forEach(i => {
       const site = _pwHost(i.url) || String(i.title || '').trim().toLowerCase();
       const k = site + '|' + String(i.username || '').trim().toLowerCase();
       (map[k] = map[k] || { label: (site || '—') + ' · ' + (String(i.username || '').trim() || 'senza utente'), ids: [] }).ids.push(i.id);
@@ -4400,6 +4402,7 @@ function _pwApplyItemFilter(items, fOverride) {
     const keep = new Set(); groups.forEach(g => g.ids.forEach(id => keep.add(id)));
     return { items: items.filter(i => keep.has(i.id)), groups };
   }
+  if (f === 'ignored') return { items: items.filter(i => i.ignoreWeak || i.ignoreDupe || i.pwnedIgnored) };
   if (f === 'todo') return { items: items.filter(i => !i.password) };
   if (f === 'nouser') return { items: items.filter(i => !String(i.username || '').trim() && !String(i.email || '').trim()) };
   if (f === 'pwned') return { items: items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored) };
@@ -4420,7 +4423,7 @@ function pwSetSort(v) {
 // riempie il menu del filtro con i numeri (quante voci per ogni filtro nel perimetro attuale)
 function _pwFillFilterSel(selId, scope) {
   const sel = document.getElementById(selId); if (!sel) return;
-  const lab = { dupes:'🔁 Duplicati', nouser:'👤 Senza utente', pwned:'🔴 Compromesse', weak:'🟠 Deboli', old:'⏳ Non aggiornate (90+ gg)', fav:'⭐ Preferite', todo:'📝 Da completare' };
+  const lab = { dupes:'🔁 Duplicati', nouser:'👤 Senza utente', pwned:'🔴 Compromesse', weak:'🟠 Deboli', old:'⏳ Non aggiornate (90+ gg)', fav:'⭐ Preferite', todo:'📝 Da completare', ignored:'🙈 Ignorate' };
   let h = '<option value="">Tutte le voci (' + scope.length + ')</option>';
   Object.keys(lab).forEach(k => { h += '<option value="' + k + '">' + lab[k] + ' (' + _pwApplyItemFilter(scope, k).items.length + ')</option>'; });
   sel.innerHTML = h; sel.value = window._pwItemFilter || '';
@@ -4561,8 +4564,8 @@ function pwRenderItems(q='') {
       <div class="pw-item-header">
         <div class="pw-item-icon" style="background:${cat?.color||'rgba(99,102,241,0.1)'}20;">${icon}</div>
         <div style="flex:1;min-width:0;">
-          <div class="pw-item-title">${item.title||'—'}</div>
-          <div class="pw-item-user">${item.username||item.email||''}</div>
+          <div class="pw-item-title">${hbEsc(item.title||'—')}</div>
+          <div class="pw-item-user">${hbEsc(item.username||item.email||'')}</div>
           ${item.updatedAt ? `<div style="font-size:10px;color:var(--text3);margin-top:1px;">${timeAgo(item.updatedAt)}</div>` : ''}
         </div>
         <button onclick="event.stopPropagation();pwToggleFavorite('${item.id}')" title="${item.favorite?'Rimuovi dai preferiti':'Aggiungi ai preferiti'}" style="background:none;border:none;cursor:pointer;font-size:18px;padding:4px;flex-shrink:0;line-height:1;">${item.favorite ? '⭐' : '☆'}</button>
@@ -4611,6 +4614,7 @@ function pwSelUpdateUI() {
   const all = vis.length > 0 && vis.every(id => _pwSel.has(id));
   document.querySelectorAll('.pw-sel-all').forEach(a => { a.textContent = all ? '☑ Nessuna' : '☐ Tutte'; });
   document.querySelectorAll('.pw-sel-count').forEach(c => { c.textContent = _pwSel.size + ' sel.'; });
+  document.querySelectorAll('.pw-ignore-btn').forEach(b => { const k = _pwIgnoreKind(); b.textContent = k === 'restore' ? '↩ Ripristina' : '🙈'; b.style.opacity = k ? '1' : '0.5'; });
 }
 function pwSelToggleMode(force) {
   _pwSelMode = typeof force === 'boolean' ? force : !_pwSelMode;
@@ -5007,8 +5011,8 @@ function updateHomeFavorites() {
     return `<div onclick="pwOpenDirect('${item.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;">
       <div style="width:38px;height:38px;border-radius:11px;background:${cat?.color||'rgba(99,102,241,0.1)'}20;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.title||'—'}</div>
-        <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.username||item.email||''}</div>
+        <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(item.title||'—')}</div>
+        <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(item.username||item.email||'')}</div>
       </div>
       <button onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -5064,12 +5068,22 @@ function pwShowDetail(itemId) {
       <button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>
       <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
     </div>` : ''}
-    ${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password).length; return (rc > 1 && !(item.pwnedCount > 0 && !item.pwnedIgnored)) ? `<div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#f97316;"><div style="font-weight:600;margin-bottom:8px;">🔁 Questa password è usata in ${rc} voci: se una viene violata, lo sono tutte.</div><button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;border-radius:10px;border:none;background:#f97316;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button></div>` : ''; })()}
+    ${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password && !x.ignoreDupe).length; return (rc > 1 && !item.ignoreDupe && !(item.pwnedCount > 0 && !item.pwnedIgnored)) ? `<div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#f97316;"><div style="font-weight:600;margin-bottom:8px;">🔁 Questa password è usata in ${rc} voci: se una viene violata, lo sono tutte.</div><button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;border-radius:10px;border:none;background:#f97316;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button></div>` : ''; })()}
+    ${(() => {
+      const box = 'border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;';
+      const lk = 'margin-left:6px;background:none;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;';
+      const rc2 = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password && !x.ignoreDupe).length;
+      let h = '';
+      if (_pwAnyWeak(item)) h += `<div style="${box}background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.35);color:#eab308;">🟠 Password debole. <button onclick="pwIgnoreOne('${item.id}','weak')" style="${lk}color:#eab308;">Va bene così, non segnalarla</button></div>`;
+      if (rc2 > 1 && !item.ignoreDupe) h += `<div style="${box}background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.25);color:#f97316;">🔁 Condivisa con altre voci. <button onclick="pwIgnoreOne('${item.id}','dupe')" style="${lk}color:#f97316;">Va bene così (uso interno), non segnalarla</button></div>`;
+      if (item.ignoreWeak || item.ignoreDupe) h += `<div style="${box}background:rgba(107,114,128,0.1);border:1px solid var(--border);color:var(--text3);">🙈 Ignorata nei controlli (${[item.ignoreWeak ? 'debole' : '', item.ignoreDupe ? 'condivisa' : ''].filter(Boolean).join(', ')}). <button onclick="pwRestoreOne('${item.id}')" style="${lk}color:var(--accent);">Ripristina</button></div>`;
+      return h;
+    })()}
     ${item.pwnedCount > 0 && item.pwnedIgnored ? `<div style="background:rgba(107,114,128,0.1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:var(--text3);">
       ✅ Avviso disattivato per questa password (resta comunque compromessa).
       <button onclick="pwIgnoreBreach('${item.id}', false)" style="margin-left:6px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;">Riattiva avviso</button>
     </div>` : ''}
-    ${item.username ? `<div class="pw-field-row pw-g-acc"><div class="pw-field-label">UserID</div><div class="pw-field-value">${item.username}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
+    ${item.username ? `<div class="pw-field-row pw-g-acc"><div class="pw-field-label">UserID</div><div class="pw-field-value">${hbEsc(item.username)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','username')">📋 Copia</button></div></div>` : ''}
     <div class="pw-field-row pw-g-acc">
       <div class="pw-field-label">Password</div>
       <div class="pw-field-value" id="pd-pw" style="font-family:monospace;letter-spacing:0.05em;">${pw}</div>
@@ -5079,13 +5093,13 @@ function pwShowDetail(itemId) {
       </div>
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
-    ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${item.url}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="window.open('${item.url}','_blank')">🔗 Apri</button></div></div>` : ''}
-    ${item.email ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Email</div><div class="pw-field-value">${item.email}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','email')">📋 Copia</button></div></div>` : ''}
+    ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${hbEsc(item.url)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwOpenUrl('${item.id}')">🔗 Apri</button></div></div>` : ''}
+    ${item.email ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Email</div><div class="pw-field-value">${hbEsc(item.email)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','email')">📋 Copia</button></div></div>` : ''}
     ${item.emailPassword ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Password email</div><div class="pw-field-value" id="pd-ep" style="font-family:monospace;letter-spacing:0.05em;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pdToggleSecret('${item.id}','emailPassword','pd-ep')">👁 Mostra</button><button class="pw-field-btn" onclick="pwCopy('${item.id}','emailPassword')">📋 Copia</button></div></div>` : ''}
-    ${item.pec ? `<div class="pw-field-row pw-g-pec"><div class="pw-field-label">PEC</div><div class="pw-field-value">${item.pec}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','pec')">📋 Copia</button></div></div>` : ''}
+    ${item.pec ? `<div class="pw-field-row pw-g-pec"><div class="pw-field-label">PEC</div><div class="pw-field-value">${hbEsc(item.pec)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','pec')">📋 Copia</button></div></div>` : ''}
     ${item.pecPassword ? `<div class="pw-field-row pw-g-pec"><div class="pw-field-label">Password PEC</div><div class="pw-field-value" id="pd-pp" style="font-family:monospace;letter-spacing:0.05em;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pdToggleSecret('${item.id}','pecPassword','pd-pp')">👁 Mostra</button><button class="pw-field-btn" onclick="pwCopy('${item.id}','pecPassword')">📋 Copia</button></div></div>` : ''}
     ${(() => { const e = pwExpiryInfo(item); return e ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${e.col};font-weight:700;">${e.text}</div></div>` : ''; })()}
-    ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${item.notes}</div></div>` : ''}
+    ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${hbEsc(item.notes)}</div></div>` : ''}
     ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map((h,hi)=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);"><span id="pd-pwh-'+item.id+'-'+hi+'" style="font-family:monospace;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);flex-shrink:0;">'+timeAgo(h.changedAt)+'</span><button class="pw-field-btn pwh-toggle" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">👁</button><button class="pw-field-btn pwh-copy" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">📋</button></div>').join('')}</div></div>` : ''}
     <div style="display:flex;gap:10px;margin-top:8px;">
       <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
@@ -5447,7 +5461,7 @@ function _pwFlRender() {
       '<span style="flex:1;min-width:34px;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;">' + _pwSel.size + ' sel.</span>' +
       '<button onclick="pwSelFav()" title="Preferiti" style="' + btn + '">⭐</button>' +
       '<button onclick="pwSelMove()" title="Sposta in categoria" style="' + btn + '">📁 Sposta</button>' +
-      (fl.type === 'pwned' ? '<button onclick="pwFlIgnore()" title="Non segnalare più" style="' + btn + '">🙈 Ignora</button>' : '') +
+      (['pwned','weak','dupes'].indexOf(fl.type) >= 0 ? '<button onclick="pwIgnoreSel()" title="Non segnalare più" style="' + btn + '">🙈 Ignora</button>' : '') +
       '<button onclick="pwSelExport()" title="Esporta selezionate" style="' + btn + '">📤</button>' +
       '<button onclick="pwSelDelete()" title="Elimina" style="padding:7px 10px;border-radius:9px;border:none;background:#ef4444;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">🗑 Elimina</button>' +
       '<button onclick="pwSelToggleMode(false)" title="Esci dalla selezione" style="' + btn + '">✕</button></div>' + chips;
@@ -5471,13 +5485,33 @@ function pwFlSelLevel(l) {
   ids.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
   _pwFlRender();
 }
-function pwFlIgnore() {
+function _pwIgnoreKind() { const t = window._pwFl ? window._pwFl.type : (window._pwItemFilter || ''); return ({ weak: 'ignoreWeak', dupes: 'ignoreDupe', pwned: 'pwnedIgnored', ignored: 'restore' })[t] || ''; }
+function pwIgnoreSel() {
+  const kind = _pwIgnoreKind();
+  if (!kind) { showToast('Usa 🙈 da un filtro 🧹: Deboli, Duplicati, Compromesse (o Ignorate per ripristinare)', 5000); return; }
   const n = _pwSel.size;
   if (!n) { showToast('Seleziona prima qualche password'); return; }
-  if (!confirm('Non segnalare più ' + n + (n === 1 ? ' password' : ' password') + ' come compromesse?\n\nResteranno salvate, ma sparirebbero da questo elenco e dagli avvisi.')) return;
-  _pwItems.forEach(i => { if (_pwSel.has(i.id)) i.pwnedIgnored = true; });
-  pwSave();
-  _pwSelDone('🙈 ' + n + ' password non più segnalate');
+  if (kind === 'restore') {
+    if (!confirm('Ripristinare ' + n + ' voci? Torneranno a comparire nei controlli.')) return;
+    _pwItems.forEach(i => { if (_pwSel.has(i.id)) { i.ignoreWeak = false; i.ignoreDupe = false; i.pwnedIgnored = false; } });
+    pwSave(); _pwSelDone('↩ ' + n + ' voci ripristinate'); return;
+  }
+  const what = { ignoreWeak: 'deboli', ignoreDupe: 'duplicate / condivise', pwnedIgnored: 'compromesse' }[kind];
+  if (!confirm('Non segnalare più ' + n + ' voci come ' + what + '?\n\nResteranno salvate. Spariscono da questo elenco, dagli avvisi e dal punteggio. Le ritrovi dal filtro 🧹 "Ignorate" e puoi ripristinarle.')) return;
+  _pwItems.forEach(i => { if (_pwSel.has(i.id)) i[kind] = true; });
+  pwSave(); _pwSelDone('🙈 ' + n + ' voci non più segnalate');
+}
+function pwIgnoreOne(id, kind) {
+  const it = _pwItems.find(i => i.id === id); if (!it) return;
+  it[kind === 'weak' ? 'ignoreWeak' : 'ignoreDupe'] = true;
+  pwSave(); try { updateHomeStats(); } catch (e) {}
+  pwShowDetail(id); showToast('🙈 Non verrà più segnalata');
+}
+function pwRestoreOne(id) {
+  const it = _pwItems.find(i => i.id === id); if (!it) return;
+  it.ignoreWeak = false; it.ignoreDupe = false;
+  pwSave(); try { updateHomeStats(); } catch (e) {}
+  pwShowDetail(id); showToast('↩ Di nuovo nei controlli');
 }
 function showExpiringListModal(titleText, rows, emptyMsg) {
   if (!rows.length) { showToast(emptyMsg || 'Nulla in scadenza 🎉'); return; }
@@ -5564,14 +5598,14 @@ function pwShowStats() {
     const pw = item.password || '';
     const s  = getStrength(pw);
     if (!pw) { /* da completare: non conta */ }
-    else if (s.score <= 1) weak++;
+    else if (s.score <= 1) { if (!item.ignoreWeak) weak++; }
     else if (s.score <= 3) medium++;
     else strong++;
-    if (!(pw && s.score <= 1) && [item.emailPassword, item.pecPassword].some(x => x && getStrength(x).score <= 1)) weak++;
+    if (!item.ignoreWeak && !(pw && s.score <= 1) && [item.emailPassword, item.pecPassword].some(x => x && getStrength(x).score <= 1)) weak++;
 
     // Duplicati
-    if (pw && seen[pw]) dupes++;
-    if (pw) seen[pw] = true;
+    if (pw && seen[pw] && !item.ignoreDupe) dupes++;
+    if (pw && !item.ignoreDupe) seen[pw] = true;
 
     // Vecchie (non aggiornate da 90gg)
     if (item.updatedAt && (now - new Date(item.updatedAt).getTime()) > ninetyDays) old++;
@@ -5642,14 +5676,14 @@ function pwShowFilteredList(type) {
   const now = Date.now();
   const ninetyDays = 90 * 24 * 60 * 60 * 1000;
   const pwCount = {};
-  _pwItems.forEach(i => { if (i.password) pwCount[i.password] = (pwCount[i.password]||0) + 1; });
+  _pwItems.forEach(i => { if (i.password && !i.ignoreDupe) pwCount[i.password] = (pwCount[i.password]||0) + 1; });
 
   let filtered = [], title = '';
   if (type === 'weak') {
     filtered = _pwItems.filter(i => !i.deleted && _pwAnyWeak(i));
     title = '🔴 Password deboli';
   } else if (type === 'dupes') {
-    filtered = _pwItems.filter(i => !i.deleted && i.password && pwCount[i.password] > 1)
+    filtered = _pwItems.filter(i => !i.deleted && !i.ignoreDupe && i.password && pwCount[i.password] > 1)
       .sort((a, b) => (pwCount[b.password] - pwCount[a.password]) || a.password.localeCompare(b.password) || (a.title||'').localeCompare(b.title||'', 'it'));
     const nGroups = new Set(filtered.map(i => i.password)).size;
     title = '⚠️ Password condivise · ' + nGroups + (nGroups === 1 ? ' gruppo' : ' gruppi');
@@ -5705,7 +5739,7 @@ function pwExportCategoryMenu() {
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);';
   box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">⚠️</div>
-    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Esportare "${cat?.name||'categoria'}"?</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Esportare "${hbEsc(cat?.name||'categoria')}"?</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Il file conterrà ${items.length} password <strong>in chiaro, non cifrate</strong>. Conservalo con cura e cancellalo quando non ti serve più.</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
       <button id="_pwexp_txt" style="padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📄 Scarica come testo (.txt)</button>
@@ -5751,13 +5785,13 @@ function pwExportCategoryPrint(cat, items) {
   const rows = items.map((item, i) => `
     <tr>
       <td style="padding:8px;border:1px solid #ccc;">${i+1}</td>
-      <td style="padding:8px;border:1px solid #ccc;font-weight:700;">${(item.title||'—').replace(/</g,'&lt;')}</td>
-      <td style="padding:8px;border:1px solid #ccc;">${(item.username||'—').replace(/</g,'&lt;')}</td>
-      <td style="padding:8px;border:1px solid #ccc;font-family:monospace;">${(item.password||'—').replace(/</g,'&lt;')}</td>
-      <td style="padding:8px;border:1px solid #ccc;">${(item.url||'—').replace(/</g,'&lt;')}</td>
-      <td style="padding:8px;border:1px solid #ccc;">${(item.notes||'—').replace(/</g,'&lt;')}</td>
+      <td style="padding:8px;border:1px solid #ccc;font-weight:700;">${hbEsc(item.title||'—')}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${hbEsc(item.username||'—')}</td>
+      <td style="padding:8px;border:1px solid #ccc;font-family:monospace;">${hbEsc(item.password||'—')}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${hbEsc(item.url||'—')}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${hbEsc(item.notes||'—')}</td>
     </tr>`).join('');
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>HomeBull - ${cat?.name||''}</title>
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>HomeBull - ${hbEsc(cat?.name||'')}</title>
     <style>
       body{font-family:Arial,sans-serif;padding:24px;color:#111;}
       h1{font-size:18px;margin-bottom:2px;}
@@ -5767,7 +5801,7 @@ function pwExportCategoryPrint(cat, items) {
       .warn{margin-top:20px;font-size:11px;color:#999;}
       @media print { body{padding:0;} }
     </style></head><body>
-    <h1>🔐 HomeBull Pro — ${(cat?.name||'Categoria').replace(/</g,'&lt;')}</h1>
+    <h1>🔐 HomeBull Pro — ${hbEsc(cat?.name||'Categoria')}</h1>
     <div class="sub">Esportato il ${now} — ${items.length} password</div>
     <table>
       <tr><th>#</th><th>Titolo</th><th>Utente</th><th>Password</th><th>Sito</th><th>Note</th></tr>
@@ -6020,6 +6054,14 @@ async function pwHandleImport(event) {
 
 
 // ── Campi del modulo password (stesso ordine per "Nuova" e "Modifica") ──
+function hbEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function pwOpenUrl(id) {
+  const it = _pwItems.find(i => i.id === id); if (!it || !it.url) return;
+  let u = String(it.url).trim();
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = 'https://' + u;
+  if (!/^https?:\/\//i.test(u)) { showToast('Indirizzo non apribile'); return; }
+  window.open(u, '_blank', 'noopener');
+}
 function _pwCatsSorted() { return _pwCats.slice().sort((a, b) => (a.name||'').localeCompare(b.name||'', 'it', { numeric: true, sensitivity: 'base' })); }
 function _pwEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function _pwFormFields(p, item, isNew) {
@@ -6078,7 +6120,7 @@ function _pwFormRead(p) {
 function pwNewItem() {
   if (!_pwCats.length) { showToast('Crea prima una categoria 📁'); return; }
   const catOpts = _pwCatsSorted().map(c =>
-    '<option value="'+c.id+'">'+getCatIcon(c.id,c.name,c.icon)+' '+c.name+'</option>'
+    '<option value="'+c.id+'">'+getCatIcon(c.id,c.name,c.icon)+' '+hbEsc(c.name)+'</option>'
   ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
@@ -7701,8 +7743,8 @@ function pwShareQR(itemId) {
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
   ov.innerHTML = `
     <div style="background:#fff;border-radius:24px;padding:24px;max-width:320px;width:100%;text-align:center;">
-      <div style="font-size:13px;font-weight:800;color:#0a0a1f;margin-bottom:4px;">${item.title}</div>
-      <div style="font-size:11px;color:#6b7280;margin-bottom:14px;">${item.username || ''}</div>
+      <div style="font-size:13px;font-weight:800;color:#0a0a1f;margin-bottom:4px;">${hbEsc(item.title)}</div>
+      <div style="font-size:11px;color:#6b7280;margin-bottom:14px;">${hbEsc(item.username || '')}</div>
       <canvas id="_qr_share_canvas" style="border-radius:12px;max-width:100%;"></canvas>
       <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;">
         <div style="width:36px;height:36px;border-radius:50%;border:3px solid #6366f1;display:flex;align-items:center;justify-content:center;">
@@ -8539,9 +8581,9 @@ function runSearchDebounced(q) {
 function searchHighlight(text, q) {
   if (!text) return '';
   const safe = String(text);
-  const idx = safe.toLowerCase().indexOf(q.toLowerCase());
-  if (idx === -1) return safe;
   const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const idx = safe.toLowerCase().indexOf(q.toLowerCase());
+  if (idx === -1) return esc(safe);
   return esc(safe.slice(0,idx)) + '<mark>' + esc(safe.slice(idx, idx+q.length)) + '</mark>' + esc(safe.slice(idx+q.length));
 }
 
@@ -8594,7 +8636,7 @@ function runSearch(q) {
         const cat = _pwCats?.find(c => c.id === item.categoryId);
         results.push({
           icon: cat?.icon || '🔐', title: item.title,
-          sub: (item.username || item.email || item.url || 'Password') + (cat ? ' · ' + cat.name : ''),
+          sub: (item.username || item.email || item.url || 'Password') + (cat ? ' · ' + cat.name : ''), /* mostrato come testo */
           badge: '🔐 ' + (cat ? cat.name : 'Password'),
           action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
         });
@@ -8705,7 +8747,7 @@ function runSearch(q) {
         '<div class="search-result-title">' + searchHighlight(r.title, q) + '</div>' +
         '<div class="search-result-sub">' + searchHighlight(r.sub, q) + '</div>' +
       '</div>' +
-      '<div class="search-result-tab">' + r.badge + '</div>';
+      '<div class="search-result-tab">' + hbEsc(r.badge) + '</div>';
     el.onclick = () => { closeGlobalSearch(); setTimeout(() => r.action(), 150); };
     container.appendChild(el);
   });
@@ -9571,7 +9613,7 @@ function pwEditItem(itemId) {
   const item = _pwItems.find(i => i.id === itemId);
   if (!item) return;
   const catOpts = _pwCatsSorted().map(c =>
-    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+getCatIcon(c.id,c.name,c.icon)+' '+c.name+'</option>'
+    '<option value="'+c.id+'"'+(c.id===item.categoryId?' selected':'')+'>'+getCatIcon(c.id,c.name,c.icon)+' '+hbEsc(c.name)+'</option>'
   ).join('');
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
@@ -10141,7 +10183,7 @@ function addModalAdapt() {
       <div style="margin-bottom:12px;">
         <div class="pw-field-label" style="margin-bottom:6px;">Categoria *</div>
         <select id="am-pw-cat" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;">
-          ${_pwCatsSorted().map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+          ${_pwCatsSorted().map(c=>`<option value="${c.id}">${hbEsc(c.name)}</option>`).join('')}
         </select>
       </div>
       ${inp('pw-title','Nome / Sito *','es. Google, Instagram...')}
@@ -11206,7 +11248,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.28.2</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.29.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
