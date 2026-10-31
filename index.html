@@ -1892,6 +1892,40 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
 .pw-field-row.pw-g-acc{border-left:4px solid #6366f1;background:linear-gradient(rgba(99,102,241,0.07),rgba(99,102,241,0.07)),var(--surface);}
 .pw-field-row.pw-g-mail{border-left:4px solid #10b981;background:linear-gradient(rgba(16,185,129,0.07),rgba(16,185,129,0.07)),var(--surface);}
 .pw-field-row.pw-g-pec{border-left:4px solid #f59e0b;background:linear-gradient(rgba(245,158,11,0.07),rgba(245,158,11,0.07)),var(--surface);}
+
+/* ══ v13.30 EFFETTI GRAFICI ═════════════════════════════════ */
+html{scroll-behavior:smooth;}
+/* cambio scheda: dissolvenza + leggero zoom */
+.tab-panel.active{animation:fxPanelIn .32s cubic-bezier(.2,.8,.2,1) both;}
+@keyframes fxPanelIn{from{opacity:0;transform:translateY(8px) scale(.995);}to{opacity:1;transform:none;}}
+/* finestre: sfondo che sfuma, riquadro che "salta" dentro */
+body > div[style*="position:fixed"][style*="inset:0"]{animation:fxOvIn .22s ease both;}
+body > div[style*="position:fixed"][style*="inset:0"] > div{animation:fxPopIn .34s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes fxOvIn{from{opacity:0;}to{opacity:1;}}
+@keyframes fxPopIn{from{opacity:0;transform:translateY(18px) scale(.94);}to{opacity:1;transform:none;}}
+/* avviso (toast) con piccolo rimbalzo */
+#toast{transition:opacity .25s,transform .38s cubic-bezier(.34,1.56,.64,1);}
+/* schede: sollevamento e bagliore (solo dove c'è il mouse) */
+.pw-item-card,.pw-cat-card,.mob-home-card,.note-card,.finance-card,.wifi-card{transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s;}
+@media (hover:hover){
+  .pw-item-card:hover,.pw-cat-card:hover,.mob-home-card:hover,.note-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.35),0 0 0 1px rgba(99,102,241,.45),0 0 22px rgba(99,102,241,.18);}
+  .pw-item-card:active,.pw-cat-card:active{transform:scale(.98);}
+}
+/* pulsanti: riflesso luminoso al passaggio e pressione morbida */
+button{transition:transform .15s,filter .2s,box-shadow .2s,background-color .2s;}
+button:active{transform:scale(.95);}
+@media (hover:hover){button:not(:disabled):hover{filter:brightness(1.12);}}
+.btn-primary,.pw-btn-primary,button[class*="primary"]{position:relative;overflow:hidden;}
+.btn-primary::after,.pw-btn-primary::after,button[class*="primary"]::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);transform:skewX(-20deg);pointer-events:none;}
+@media (hover:hover){.btn-primary:hover::after,.pw-btn-primary:hover::after,button[class*="primary"]:hover::after{left:130%;transition:left .65s ease;}}
+/* campi: anello luminoso quando selezionati */
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px rgba(99,102,241,.28);transition:box-shadow .2s;}
+/* barra di scorrimento sottile */
+*{scrollbar-width:thin;scrollbar-color:rgba(130,130,170,.45) transparent;}
+/* chi preferisce meno movimento non vede nulla di tutto questo */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s !important;animation-delay:0s !important;transition-duration:.001s !important;scroll-behavior:auto !important;}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 <script>
@@ -1920,7 +1954,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.29.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.29.2</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1990,7 +2024,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.29.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.29.2</div>
         </div>
       </div>
     </div>
@@ -2095,7 +2129,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.29.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.29.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2994,7 +3028,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.29.1',
+  version: 'v13.29.2',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -11248,7 +11282,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.29.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.29.2</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
