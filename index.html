@@ -1921,7 +1921,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.29.5</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1991,7 +1991,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.29.5</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.0</div>
         </div>
       </div>
     </div>
@@ -2096,7 +2096,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.29.5</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3001,7 +3001,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.29.5',
+  version: 'v13.30.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3942,14 +3942,42 @@ function updateHomeStats() {
 }
 
 // ── Salute del vault + promemoria backup (Home) ──
+// Password "condivise": lo stesso valore usato da proprietari diversi (password principale, password Email, password PEC).
+// La stessa casella email ripetuta in più voci conta come UN solo proprietario (non è un riuso).
+function _pwSlots(i) {
+  const o = [];
+  if (i.password) o.push(['main', i.password, 'i:' + i.id]);
+  if (i.emailPassword) o.push(['email', i.emailPassword, i.email ? 'm:' + String(i.email).trim().toLowerCase() : 'i:' + i.id + ':e']);
+  if (i.pecPassword) o.push(['pec', i.pecPassword, i.pec ? 'm:' + String(i.pec).trim().toLowerCase() : 'i:' + i.id + ':p']);
+  return o;
+}
+function _pwSharedMap() {
+  const m = new Map();
+  (_pwItems || []).forEach(i => {
+    if (i.deleted || i.ignoreDupe) return;
+    _pwSlots(i).forEach(([k, v, o]) => { if (!m.has(v)) m.set(v, new Set()); m.get(v).add(o); });
+  });
+  return m;
+}
+function _pwSharedN(i, m) { let n = 1; _pwSlots(i).forEach(([k, v]) => { const st = m.get(v); if (st && st.size > n) n = st.size; }); return n; }
+function _pwSharedVal(i, m) { let b = null, n = 1; _pwSlots(i).forEach(([k, v]) => { const st = m.get(v); if (st && st.size > n) { n = st.size; b = v; } }); return b; }
+// Quale password di una voce è compromessa (le voci vecchie hanno solo il conteggio della principale)
+function _pwPwnedParts(i) {
+  return { main: i.pwnedMain !== undefined ? (i.pwnedMain || 0) : (i.pwnedCount || 0), email: i.pwnedEmail || 0, pec: i.pwnedPec || 0 };
+}
+function _pwPwnedWhich(i) {
+  const p = _pwPwnedParts(i), a = [];
+  if (p.main > 0) a.push('principale'); if (p.email > 0) a.push('Email'); if (p.pec > 0) a.push('PEC');
+  return a;
+}
 function _pwAnyWeak(i) { return !i.ignoreWeak && [i.password, i.emailPassword, i.pecPassword].some(x => x && getStrength(x).score <= 1); }
 function hbHealthStats() {
   const items = (_pwItems||[]).filter(i => !i.deleted && i.password);
   const n = items.length;
-  const cnt = {}; items.filter(i => !i.ignoreDupe).forEach(i => cnt[i.password] = (cnt[i.password]||0) + 1);
+  const _sm = _pwSharedMap();
   const pwned = items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored).length;
   const weak = items.filter(_pwAnyWeak).length;
-  const reused = items.filter(i => !i.ignoreDupe && cnt[i.password] > 1).length;
+  const reused = items.filter(i => !i.ignoreDupe && _pwSharedN(i, _sm) > 1).length;
   const expired = items.filter(i => { const e = pwExpiryInfo(i); return e && (e.status==='expired'||e.status==='today'); }).length;
   const old = items.filter(i => i.updatedAt && (Date.now() - new Date(i.updatedAt).getTime()) > 180*86400000).length;
   const pen = n ? (40*pwned + 25*weak + 20*reused + 10*expired + 5*old) / n : 0;
@@ -4402,8 +4430,9 @@ function _pwApplyItemFilter(items, fOverride) {
     const map = {};
     items.filter(i => !i.ignoreDupe).forEach(i => {
       const site = _pwHost(i.url) || String(i.title || '').trim().toLowerCase();
-      const k = site + '|' + String(i.username || '').trim().toLowerCase();
-      (map[k] = map[k] || { label: (site || '—') + ' · ' + (String(i.username || '').trim() || 'senza utente'), ids: [] }).ids.push(i.id);
+      const _u = String(i.username || i.email || '').trim();
+      const k = site + '|' + _u.toLowerCase();
+      (map[k] = map[k] || { label: (site || '—') + ' · ' + (_u || 'senza utente'), ids: [] }).ids.push(i.id);
     });
     const groups = Object.keys(map).map(k => map[k]).filter(g => g.ids.length > 1).sort((a, b) => a.label.localeCompare(b.label, 'it'));
     const keep = new Set(); groups.forEach(g => g.ids.forEach(id => keep.add(id)));
@@ -4824,7 +4853,7 @@ function pwQuickFix(id) {
       ...it,
       password: cur,
       pwHistory: history,
-      pwnedCount: undefined, pwnedCheckedAt: undefined, pwnedIgnored: false,
+      pwnedCount: undefined, pwnedMain: undefined, pwnedEmail: undefined, pwnedPec: undefined, pwnedExtra: false, pwnedCheckedAt: undefined, pwnedIgnored: false,
       expiryDate: expDays !== 'none' ? pwComputeExpiryDate(expDays, pwTodayISO()) : it.expiryDate,
       expiryStartDate: expDays !== 'none' ? pwTodayISO() : it.expiryStartDate,
       updatedAt: new Date().toISOString()
@@ -5070,16 +5099,28 @@ function pwShowDetail(itemId) {
       <div style="flex:1;min-width:0;"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);">Categoria</div><div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_dCat ? _dCat.name.replace(/</g,'&lt;') : 'Nessuna categoria'}</div></div>
       ${_dCat ? '<span style="color:var(--text3);font-size:16px;">›</span>' : ''}
     </div>
-    ${item.pwnedCount > 0 && !item.pwnedIgnored ? `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;">
-      <div style="font-weight:600;margin-bottom:8px;">${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password).length; const sv = pwSeverity(item, rc); return pwSevDot(sv) + ' Gravità ' + sv.name.toLowerCase() + ' — '; })()}comparsa in ${item.pwnedCount.toLocaleString('it-IT')} violazion${item.pwnedCount===1?'e':'i'} di dati nota. Cambiala appena possibile.</div>
-      <button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>
+    ${(() => {
+      const _sm = _pwSharedMap(), _n = _pwSharedN(item, _sm), _v = _pwSharedVal(item, _sm), _pp = _pwPwnedParts(item), _wh = _pwPwnedWhich(item);
+      const mainBad = _pp.main > 0;
+      let h = '';
+      if (item.pwnedCount > 0 && !item.pwnedIgnored) {
+        const sv = pwSeverity(item, _n);
+        const which = _wh.length && !(mainBad && _wh.length === 1) ? ' (password ' + _wh.join(' + ') + ')' : '';
+        h += `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#ef4444;">
+      <div style="font-weight:600;margin-bottom:8px;">${pwSevDot(sv)} Gravità ${sv.name.toLowerCase()} — comparsa in ${item.pwnedCount.toLocaleString('it-IT')} violazion${item.pwnedCount===1?'e':'i'} di dati nota${which}. Cambiala appena possibile${mainBad ? '' : ' dal sito o dal gestore della casella, poi aggiorna questa voce'}.</div>
+      ${mainBad ? `<button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;margin-bottom:8px;border-radius:10px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>` : ''}
       <button onclick="pwIgnoreBreach('${item.id}')" style="width:100%;padding:9px;border-radius:10px;border:1px solid rgba(239,68,68,0.35);background:transparent;color:#ef4444;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Va bene, continua a usarla senza avvisarmi più</button>
-    </div>` : ''}
-    ${(() => { const rc = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password && !x.ignoreDupe).length; return (rc > 1 && !item.ignoreDupe && !(item.pwnedCount > 0 && !item.pwnedIgnored)) ? `<div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#f97316;"><div style="font-weight:600;margin-bottom:8px;">🔁 Questa password è usata in ${rc} voci: se una viene violata, lo sono tutte.</div><button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;border-radius:10px;border:none;background:#f97316;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button></div>` : ''; })()}
+    </div>`;
+      }
+      if (_n > 1 && !item.ignoreDupe && !(item.pwnedCount > 0 && !item.pwnedIgnored)) {
+        h += `<div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.35);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13px;color:#f97316;"><div style="font-weight:600;margin-bottom:8px;">🔁 ${_v === item.password ? 'Questa password' : 'La password ' + (_v === item.emailPassword ? 'Email' : 'PEC')} è usata in ${_n} punti diversi: se una viene violata, lo sono tutte.</div>${_v === item.password ? `<button onclick="pwQuickFix('${item.id}')" style="width:100%;padding:11px;border-radius:10px;border:none;background:#f97316;color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">🎲 Genera nuova password e correggi</button>` : ''}</div>`;
+      }
+      return h;
+    })()}
     ${(() => {
       const box = 'border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;';
       const lk = 'margin-left:6px;background:none;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:underline;padding:0;';
-      const rc2 = _pwItems.filter(x => !x.deleted && x.password && x.password === item.password && !x.ignoreDupe).length;
+      const rc2 = item.ignoreDupe ? 1 : _pwSharedN(item, _pwSharedMap());
       let h = '';
       if (_pwAnyWeak(item)) h += `<div style="${box}background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.35);color:#eab308;">🟠 Password debole. <button onclick="pwIgnoreOne('${item.id}','weak')" style="${lk}color:#eab308;">Va bene così, non segnalarla</button></div>`;
       if (rc2 > 1 && !item.ignoreDupe) h += `<div style="${box}background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.25);color:#f97316;">🔁 Condivisa con altre voci. <button onclick="pwIgnoreOne('${item.id}','dupe')" style="${lk}color:#f97316;">Va bene così (uso interno), non segnalarla</button></div>`;
@@ -5308,22 +5349,32 @@ async function pwRunBreachCheck(force = false) {
   if (force) { showToast('🔍 Verifica password compromesse in corso...'); pwUpdateBreachStatusUI('🔍 Verifica in corso...'); }
   try {
     const now = Date.now();
-    const toCheck = _pwItems.filter(i => !i.deleted && i.password && !i.pwnedIgnored &&
-      (force || !i.pwnedCheckedAt || (now - new Date(i.pwnedCheckedAt).getTime()) > PW_BREACH_RECHECK_MS));
+    const toCheck = _pwItems.filter(i => !i.deleted && (i.password || i.emailPassword || i.pecPassword) && !i.pwnedIgnored &&
+      (force || !i.pwnedCheckedAt || ((i.emailPassword || i.pecPassword) && !i.pwnedExtra) || (now - new Date(i.pwnedCheckedAt).getTime()) > PW_BREACH_RECHECK_MS));
     if (!toCheck.length) {
       if (force) showToast('✅ Nessuna password da controllare');
       pwUpdateBreachStatusUI(pwLastBreachCheckSummary());
       return;
     }
     let changed = false, failed = 0;
+    const cache = new Map();
+    const chk = async pw => {
+      if (!pw) return 0;
+      if (cache.has(pw)) return cache.get(pw);
+      const c = await pwnedCheckPassword(pw);
+      if (c !== null) cache.set(pw, c);
+      await new Promise(r => setTimeout(r, 300)); // non martellare l'API pubblica
+      return c;
+    };
     for (const item of toCheck) {
-      const count = await pwnedCheckPassword(item.password);
-      if (count !== null) {
-        item.pwnedCount = count;
+      const m = await chk(item.password), e = await chk(item.emailPassword), pc = await chk(item.pecPassword);
+      if (m !== null && e !== null && pc !== null) {
+        item.pwnedMain = m; item.pwnedEmail = e; item.pwnedPec = pc;
+        item.pwnedCount = Math.max(m, e, pc);
+        item.pwnedExtra = true;
         item.pwnedCheckedAt = new Date().toISOString();
         changed = true;
       } else failed++;
-      await new Promise(r => setTimeout(r, 300)); // non martellare l'API pubblica
     }
     if (changed) {
       localStorage.setItem(PW_KEY, JSON.stringify(_pwItems));
@@ -5597,7 +5648,7 @@ function pwShowStats() {
   if (!_pwItems.length) { showToast('Nessuna password salvata'); return; }
 
   let weak=0, medium=0, strong=0, dupes=0, old=0, expiring=0, pwned=0;
-  const seen = {};
+  const _sm = _pwSharedMap();
   const now  = Date.now();
   const ninetyDays = 90 * 24 * 60 * 60 * 1000;
 
@@ -5611,8 +5662,7 @@ function pwShowStats() {
     if (!item.ignoreWeak && !(pw && s.score <= 1) && [item.emailPassword, item.pecPassword].some(x => x && getStrength(x).score <= 1)) weak++;
 
     // Duplicati
-    if (pw && seen[pw] && !item.ignoreDupe) dupes++;
-    if (pw && !item.ignoreDupe) seen[pw] = true;
+    if (!item.deleted && !item.ignoreDupe && _pwSharedN(item, _sm) > 1) dupes++;
 
     // Vecchie (non aggiornate da 90gg)
     if (item.updatedAt && (now - new Date(item.updatedAt).getTime()) > ninetyDays) old++;
@@ -5682,46 +5732,46 @@ function pwShowFilteredList(type) {
   document.querySelectorAll('body > div[style*="z-index:9999"]').forEach(el => el.remove());
   const now = Date.now();
   const ninetyDays = 90 * 24 * 60 * 60 * 1000;
-  const pwCount = {};
-  _pwItems.forEach(i => { if (i.password && !i.ignoreDupe) pwCount[i.password] = (pwCount[i.password]||0) + 1; });
+  const _sm = _pwSharedMap(); const shN = i => _pwSharedN(i, _sm), shV = i => _pwSharedVal(i, _sm);
 
   let filtered = [], title = '';
   if (type === 'weak') {
     filtered = _pwItems.filter(i => !i.deleted && _pwAnyWeak(i));
     title = '🔴 Password deboli';
   } else if (type === 'dupes') {
-    filtered = _pwItems.filter(i => !i.deleted && !i.ignoreDupe && i.password && pwCount[i.password] > 1)
-      .sort((a, b) => (pwCount[b.password] - pwCount[a.password]) || a.password.localeCompare(b.password) || (a.title||'').localeCompare(b.title||'', 'it'));
-    const nGroups = new Set(filtered.map(i => i.password)).size;
+    filtered = _pwItems.filter(i => !i.deleted && !i.ignoreDupe && shN(i) > 1)
+      .sort((a, b) => (shN(b) - shN(a)) || String(shV(a)).localeCompare(String(shV(b))) || (a.title||'').localeCompare(b.title||'', 'it'));
+    const nGroups = new Set(filtered.map(shV)).size;
     title = '⚠️ Password condivise · ' + nGroups + (nGroups === 1 ? ' gruppo' : ' gruppi');
   } else if (type === 'old') {
     filtered = _pwItems.filter(i => i.updatedAt && (now - new Date(i.updatedAt).getTime()) > ninetyDays);
     title = '⏰ Password non aggiornate da 90+ giorni';
   } else if (type === 'pwned') {
     filtered = _pwItems.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored)
-      .sort((a, b) => (pwSeverity(b, pwCount[b.password]).lvl - pwSeverity(a, pwCount[a.password]).lvl) || ((b.pwnedCount||0) - (a.pwnedCount||0))); // prima le più gravi
-    const tally = [3,2,1,0].map(l => pwSevDot(PW_SEV[l]) + ' ' + filtered.filter(i => pwSeverity(i, pwCount[i.password]).lvl === l).length).join('  ');
+      .sort((a, b) => (pwSeverity(b, shN(b)).lvl - pwSeverity(a, shN(a)).lvl) || ((b.pwnedCount||0) - (a.pwnedCount||0))); // prima le più gravi
+    const tally = [3,2,1,0].map(l => pwSevDot(PW_SEV[l]) + ' ' + filtered.filter(i => pwSeverity(i, shN(i)).lvl === l).length).join('  ');
     title = '🚨 Compromesse · ' + tally;
   }
 
   let _lastDupePw = null, _dupeGroupN = 0;
   const rows = [];
   filtered.forEach(item => {
-    if (type === 'dupes' && item.password !== _lastDupePw) {
-      _lastDupePw = item.password; _dupeGroupN++;
-      const inGroup = filtered.filter(x => x.password === item.password);
+    if (type === 'dupes' && shV(item) !== _lastDupePw) {
+      _lastDupePw = shV(item); _dupeGroupN++;
+      const inGroup = filtered.filter(x => shV(x) === _lastDupePw);
       const bad = Math.max(...inGroup.map(x => x.pwnedCount || 0));
       rows.push({ header: 'Gruppo ' + _dupeGroupN + ' · stessa password in ' + inGroup.length + ' voci' + (bad > 0 ? ' · 🚨 compromessa (' + bad.toLocaleString('it-IT') + ' violazioni)' : '') });
     }
     const cat = _pwCats.find(c => c.id === item.categoryId);
     let sub = '';
     if (type === 'weak') sub = (item.password && getStrength(item.password).score <= 1) ? (getStrength(item.password).label || 'Debole') : (!item.emailPassword || getStrength(item.emailPassword).score > 1 ? 'Password PEC debole' : 'Password email debole');
-    else if (type === 'dupes') sub = 'Riusata in ' + pwCount[item.password] + ' voci';
+    else if (type === 'dupes') sub = 'Riusata in ' + shN(item) + ' punti' + (shV(item) === item.password ? '' : ' · password ' + (shV(item) === item.emailPassword ? 'Email' : 'PEC'));
     else if (type === 'old') sub = 'Ultima modifica: ' + (item.updatedAt ? new Date(item.updatedAt).toLocaleDateString('it-IT') : '—');
     let sev = null;
     if (type === 'pwned') {
-      sev = pwSeverity(item, pwCount[item.password]);
-      sub = pwSevDot(sev) + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (item.password && pwCount[item.password] > 1 ? ' · riusata in ' + pwCount[item.password] + ' voci' : '');
+      sev = pwSeverity(item, shN(item));
+      const _wh = _pwPwnedWhich(item);
+      sub = pwSevDot(sev) + ' ' + sev.name + ' · in ' + item.pwnedCount.toLocaleString('it-IT') + ' violazion' + (item.pwnedCount===1?'e':'i') + (_wh.length && !(_wh.length === 1 && _wh[0] === 'principale') ? ' · password ' + _wh.join(' + ') : '') + (shN(item) > 1 ? ' · riusata in ' + shN(item) + ' punti' : '');
     }
     rows.push({
       id: item.id, lvl: sev ? sev.lvl : null,
@@ -5732,6 +5782,56 @@ function pwShowFilteredList(type) {
     });
   });
   pwFilteredModal(title, rows, type);
+}
+
+// ── Sposta le email scritte nello UserID nel campo Email (con anteprima) ──
+const _PW_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function pwMigrateEmails() {
+  document.querySelectorAll('body > div[style*="z-index:9999"]').forEach(el => el.remove());
+  const rows = [];
+  _pwItems.forEach(i => {
+    if (i.deleted) return;
+    const u = String(i.username || '').trim();
+    if (!u || !_PW_EMAIL_RE.test(u)) return;
+    const e = String(i.email || '').trim();
+    if (!e) rows.push({ i, act: 'move' });
+    else if (e.toLowerCase() === u.toLowerCase()) rows.push({ i, act: 'clear' });
+    else rows.push({ i, act: 'conflict' });
+  });
+  if (!rows.length) { showToast('✅ Nessuna email negli UserID: è già tutto a posto'); return; }
+  rows.sort((a, b) => (a.act === 'conflict') - (b.act === 'conflict') || (a.i.title || '').localeCompare(b.i.title || '', 'it'));
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:14px;';
+  const ok = rows.filter(r => r.act !== 'conflict').length;
+  const lbl = { move: '➡️ Sposta nel campo Email', clear: '🧹 Già presente in Email: svuota lo UserID', conflict: '⚠️ Email diversa già presente: non tocco' };
+  ov.innerHTML = `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:560px;max-height:90dvh;display:flex;flex-direction:column;">
+    <div style="padding:16px 16px 8px;"><div style="font-size:17px;font-weight:900;">📧 Email nello UserID</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:4px;">Trovate ${rows.length} voci con un indirizzo email nello UserID (${ok} sistemabili). Togli la spunta a quelle che vuoi lasciare come sono. Non cambio la data di modifica.</div></div>
+    <div id="_pwm_list" style="overflow-y:auto;padding:4px 12px;flex:1;">${rows.map((r, k) => `
+      <label style="display:flex;gap:10px;align-items:flex-start;padding:10px 6px;border-bottom:1px solid var(--border);${r.act === 'conflict' ? 'opacity:.55;' : 'cursor:pointer;'}">
+        <input type="checkbox" data-k="${k}" ${r.act === 'conflict' ? 'disabled' : 'checked'} style="margin-top:3px;">
+        <span style="min-width:0;"><span style="display:block;font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;">${hbEsc(r.i.title || '—')}</span>
+        <span style="display:block;font-size:12px;color:var(--text2);word-break:break-all;">${hbEsc(r.i.username)}</span>
+        <span style="display:block;font-size:11px;color:var(--text3);">${lbl[r.act]}${r.act === 'conflict' ? ' (' + hbEsc(r.i.email) + ')' : ''}</span></span>
+      </label>`).join('')}</div>
+    <div style="display:flex;gap:10px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));">
+      <button id="_pwm_no" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_pwm_ok" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Applica alle selezionate</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  ov.querySelector('#_pwm_no').onclick = () => ov.remove();
+  ov.querySelector('#_pwm_ok').onclick = () => {
+    let n = 0;
+    ov.querySelectorAll('input[data-k]:checked').forEach(cb => {
+      const r = rows[+cb.dataset.k]; const it = _pwItems.find(x => x.id === r.i.id); if (!it) return;
+      if (r.act === 'move') it.email = String(it.username).trim();
+      it.username = ''; n++;
+    });
+    ov.remove();
+    if (n) { pwSave(); try { updateHomeStats(); } catch(e) {} try { pwRenderCats(''); } catch(e) {} }
+    showToast(n ? '✅ Sistemate ' + n + ' voci' : 'Nessuna voce modificata');
+  };
 }
 
 // ── Esportazione categoria (testo / PDF) ──────────────────
@@ -5794,7 +5894,9 @@ function pwExportCategoryPrint(cat, items) {
       <td style="padding:8px;border:1px solid #ccc;">${i+1}</td>
       <td style="padding:8px;border:1px solid #ccc;font-weight:700;">${hbEsc(item.title||'—')}</td>
       <td style="padding:8px;border:1px solid #ccc;">${hbEsc(item.username||'—')}</td>
-      <td style="padding:8px;border:1px solid #ccc;font-family:monospace;">${hbEsc(item.password||'—')}</td>
+      <td style="padding:8px;border:1px solid #ccc;font-family:monospace;">${hbEsc(item.password||'—')}${item.pin ? '<br><span style="font-family:Arial;color:#666;">PIN:</span> ' + hbEsc(item.pin) : ''}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${item.email ? hbEsc(item.email) : '—'}${item.emailPassword ? '<br><span style="color:#666;">Pass:</span> <span style="font-family:monospace;">' + hbEsc(item.emailPassword) + '</span>' : ''}</td>
+      <td style="padding:8px;border:1px solid #ccc;">${item.pec ? hbEsc(item.pec) : '—'}${item.pecPassword ? '<br><span style="color:#666;">Pass:</span> <span style="font-family:monospace;">' + hbEsc(item.pecPassword) + '</span>' : ''}</td>
       <td style="padding:8px;border:1px solid #ccc;">${hbEsc(item.url||'—')}</td>
       <td style="padding:8px;border:1px solid #ccc;">${hbEsc(item.notes||'—')}</td>
     </tr>`).join('');
@@ -5806,12 +5908,13 @@ function pwExportCategoryPrint(cat, items) {
       table{border-collapse:collapse;width:100%;font-size:12px;}
       th{background:#6366f1;color:white;padding:8px;text-align:left;border:1px solid #ccc;}
       .warn{margin-top:20px;font-size:11px;color:#999;}
-      @media print { body{padding:0;} }
+      td{vertical-align:top;word-break:break-word;}
+      @media print { body{padding:0;} @page{size:A4 landscape;margin:10mm;} }
     </style></head><body>
     <h1>🔐 HomeBull Pro — ${hbEsc(cat?.name||'Categoria')}</h1>
     <div class="sub">Esportato il ${now} — ${items.length} password</div>
     <table>
-      <tr><th>#</th><th>Titolo</th><th>Utente</th><th>Password</th><th>Sito</th><th>Note</th></tr>
+      <tr><th>#</th><th>Titolo</th><th>Utente</th><th>Password / PIN</th><th>Email</th><th>PEC</th><th>Sito</th><th>Note</th></tr>
       ${rows}
     </table>
     <div class="warn">Documento generato da HomeBull Pro — contiene dati sensibili in chiaro, conservare con cura.</div>
@@ -9703,9 +9806,11 @@ function pwEditItem(itemId) {
       const expiryDate = (expChanged || (passChanged && expDays !== 'none'))
         ? pwComputeExpiryDate(expDays, expStart)
         : (expDays === 'none' ? '' : item.expiryDate);
+      const _fr = _pwFormRead('_pwe');
+      const _resetPwn = passChanged || (_fr.emailPassword || '') !== (item.emailPassword || '') || (_fr.pecPassword || '') !== (item.pecPassword || '');
       _pwItems[idx] = {
         ...item,
-        ..._pwFormRead('_pwe'),
+        ..._fr,
         title,
         password: pass,
         categoryId: document.getElementById('_pwe_cat')?.value || item.categoryId,
@@ -9714,8 +9819,12 @@ function pwEditItem(itemId) {
         expiryDate: expiryDate,
         pwHistory: history,
         // Se la password è cambiata, il vecchio controllo "compromessa" non è più valido — forza un nuovo controllo
-        pwnedCount: passChanged ? undefined : item.pwnedCount,
-        pwnedCheckedAt: passChanged ? undefined : item.pwnedCheckedAt,
+        pwnedCount: _resetPwn ? undefined : item.pwnedCount,
+        pwnedMain: _resetPwn ? undefined : item.pwnedMain,
+        pwnedEmail: _resetPwn ? undefined : item.pwnedEmail,
+        pwnedPec: _resetPwn ? undefined : item.pwnedPec,
+        pwnedExtra: _resetPwn ? false : item.pwnedExtra,
+        pwnedCheckedAt: _resetPwn ? undefined : item.pwnedCheckedAt,
         updatedAt: new Date().toISOString()
       };
       pwSave();
@@ -11235,6 +11344,10 @@ document.addEventListener('keydown', (e) => {
             <button id="bio-btn" onclick="settingsToggleBio()" style="width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Attiva biometria</button>
           </div>
 
+          <button onclick="pwMigrateEmails()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;text-align:left;">
+            <span style="font-size:28px;">📧</span>
+            <div><div style="margin-bottom:3px;">Sposta le email dallo UserID al campo Email</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Ti mostro prima l'elenco e scegli tu quali sistemare.</div></div>
+          </button>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🛡️ Password compromesse</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" id="pwned-status-txt">Controlla se le tue password sono apparse in violazioni di dati note (Have I Been Pwned). La password non viene mai inviata online — solo un'impronta parziale e irreversibile.</div>
@@ -11292,7 +11405,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.29.5</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
