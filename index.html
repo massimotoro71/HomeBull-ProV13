@@ -1921,7 +1921,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.29.3</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.29.4</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1991,7 +1991,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.29.3</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.29.4</div>
         </div>
       </div>
     </div>
@@ -2096,7 +2096,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.29.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.29.4</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2345,6 +2345,12 @@ Aggiungi nuovo dato
                 <option value="modified">✏️ Per modifica</option>
                 <option value="created">📅 Per data</option>
                 <option value="title">🔤 Per titolo</option>
+              </select>
+              <select id="note-kind-sel" onchange="_noteKindFilter=this.value;noteRenderList(document.getElementById('note-search-inp')?.value||'')" style="padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;outline:none;">
+                <option value="">📝 Tutte</option>
+                <option value="bitlocker">🔑 Chiavi BitLocker</option>
+                <option value="backup">🛡️ Codici di backup</option>
+                <option value="free">✏️ Libere</option>
               </select>
             </div>
           </div>
@@ -2995,7 +3001,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.29.3',
+  version: 'v13.29.4',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6428,6 +6434,12 @@ const NOTE_KEY = 'hb13_notes';
 const NOTE_ATT_KEY = 'hb13_note_att';
 let _notes = [];
 let _noteEditId = null; // null = nuova nota
+let _noteKindFilter = '';
+let _noteNewKind = '';   // tipo della nota che si sta creando/modificando ('', 'bitlocker', 'backup')
+const NOTE_KINDS = {
+  bitlocker: { icon:'🔑', label:'Chiave BitLocker', title:'BitLocker – ', body:'PC / Disco: \nID chiave: \nChiave di ripristino (48 cifre): \n\nNote: ' },
+  backup:    { icon:'🛡️', label:'Codici di backup', title:'Codici backup – ', body:'Servizio / Account: \n\nCodici (uno per riga):\n1) \n2) \n3) \n4) \n5) \n6) \n7) \n8) \n\nNote: ' }
+};
 let _noteAttStore = {};        // { noteId: [ {id,name,type,size,dataUrl} ] }
 let _noteCurrentAtts = [];     // allegati della nota attualmente in modifica
 const NOTE_ATT_MAX_COUNT = 4;
@@ -6618,6 +6630,7 @@ function noteRenderList(q='') {
     if (noteSort === 'created') return new Date(b.createdAt||0)-new Date(a.createdAt||0);
     return new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0);
   });
+  if (_noteKindFilter) notes = notes.filter(n => _noteKindFilter==='free' ? !n.kind : n.kind===_noteKindFilter);
   if (q) notes = notes.filter(n =>
     (n.title+n.content).toLowerCase().includes(q.toLowerCase())
   );
@@ -6647,13 +6660,16 @@ function noteRenderList(q='') {
     card.onclick = () => noteEdit(note.id);
     const d = new Date(note.updatedAt);
     const dateStr = d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
-    const preview = (note.content||'').replace(/\n/g,' ').trim();
+    const kd = NOTE_KINDS[note.kind];
+    // le chiavi/codici non mostrano il contenuto nell'elenco: si vede solo aprendo la nota
+    const preview = kd ? '••••••••••••' : (note.content||'').replace(/\n/g,' ').trim();
     card.innerHTML = `
-      <div class="note-card-title">${note.title || 'Senza titolo'}</div>
-      ${preview ? `<div class="note-card-preview">${preview}</div>` : ''}
+      <div class="note-card-title">${kd ? kd.icon+' ' : ''}${hbEsc(note.title || 'Senza titolo')}</div>
+      ${preview ? `<div class="note-card-preview">${hbEsc(preview)}</div>` : ''}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}${(_noteAttStore[note.id]||[]).length ? ' · 📎 '+_noteAttStore[note.id].length : ''}</span>
         <div style="display:flex;gap:6px;">
+          ${kd ? `<button onclick="event.stopPropagation();noteCopy('${note.id}')" title="Copia contenuto" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;">📋</button>` : ''}
           <button onclick="event.stopPropagation();noteEdit('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
           <button onclick="event.stopPropagation();noteDelete('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑</button>
         </div>
@@ -6665,11 +6681,33 @@ function noteRenderList(q='') {
 
 // ── Editor ───────────────────────────────────────────────
 function noteNew() {
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+  ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  const row = (k, ic, lb, sub) => `<button data-k="${k}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;margin-bottom:8px;border-radius:14px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-family:inherit;"><span style="font-size:22px;">${ic}</span><span><span style="display:block;font-size:14px;font-weight:800;">${lb}</span><span style="display:block;font-size:12px;color:var(--text3);">${sub}</span></span></button>`;
+  ov.innerHTML = `<div style="width:100%;max-width:480px;background:var(--surface);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));">
+    <div style="font-size:15px;font-weight:900;margin-bottom:12px;">Nuova nota</div>
+    ${row('', '✏️', 'Nota libera', 'Testo a piacere')}
+    ${row('bitlocker', '🔑', 'Chiave BitLocker', 'PC, ID chiave e chiave di ripristino')}
+    ${row('backup', '🛡️', 'Codici di backup', 'Codici di emergenza di un account')}
+  </div>`;
+  ov.querySelectorAll('button[data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k; ov.remove(); noteNewOfKind(k); });
+  document.body.appendChild(ov);
+}
+
+function noteCopy(id) {
+  const n = _notes.find(x => x.id === id); if (!n) return;
+  navigator.clipboard.writeText(n.content || '').then(() => showToast('📋 Copiato'), () => showToast('Copia non riuscita'));
+}
+
+function noteNewOfKind(kind) {
+  _noteNewKind = kind || '';
   _noteEditId = 'note_' + Date.now();
   _noteCurrentAtts = [];
-  document.getElementById('note-title-inp').value = '';
-  document.getElementById('note-content-inp').value = '';
-  document.getElementById('note-editor-date').textContent = 'Nuova nota';
+  const _kd = NOTE_KINDS[_noteNewKind];
+  document.getElementById('note-title-inp').value = _kd ? _kd.title : '';
+  document.getElementById('note-content-inp').value = _kd ? _kd.body : '';
+  document.getElementById('note-editor-date').textContent = _kd ? 'Nuova nota – ' + _kd.label : 'Nuova nota';
   const histLink = document.getElementById('note-history-link');
   if (histLink) histLink.style.display = 'none';
   noteRenderAttachments();
@@ -6681,6 +6719,7 @@ function noteEdit(id) {
   const note = _notes.find(n => n.id === id);
   if (!note) return;
   _noteEditId = id;
+  _noteNewKind = note.kind || '';
   _noteCurrentAtts = (_noteAttStore[id] || []).slice();
   document.getElementById('note-title-inp').value = note.title || '';
   document.getElementById('note-content-inp').value = note.content || '';
@@ -6765,8 +6804,11 @@ function noteSave() {
       note.history = history;
     }
     note.title = title; note.content = content; note.updatedAt = now;
+    if (_noteNewKind) note.kind = _noteNewKind; else delete note.kind;
   } else {
-    _notes.push({ id:_noteEditId, title, content, createdAt:now, updatedAt:now });
+    const nn = { id:_noteEditId, title, content, createdAt:now, updatedAt:now };
+    if (_noteNewKind) nn.kind = _noteNewKind;
+    _notes.push(nn);
   }
   if (_noteCurrentAtts.length) _noteAttStore[_noteEditId] = _noteCurrentAtts;
   else delete _noteAttStore[_noteEditId];
@@ -6816,7 +6858,8 @@ function noteImportFromBackup(notesArr) {
         title: n.title || '',
         content: n.content || '',
         createdAt: n.createdAt || new Date().toISOString(),
-        updatedAt: n.updatedAt || new Date().toISOString()
+        updatedAt: n.updatedAt || new Date().toISOString(),
+        ...(n.kind ? { kind: n.kind } : {})
       });
     }
   });
@@ -11249,7 +11292,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.29.3</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.29.4</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
