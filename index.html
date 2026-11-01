@@ -1921,7 +1921,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1991,7 +1991,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.1</div>
         </div>
       </div>
     </div>
@@ -2096,7 +2096,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3001,7 +3001,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.30.0',
+  version: 'v13.30.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4523,6 +4523,7 @@ function pwSelExport(list) {
     '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">📤 Esporta ' + sel.length + (Array.isArray(list) ? ' voci' : ' selezionate') + '</div>' +
     '<div style="font-size:12px;color:#f59e0b;margin-bottom:14px;">⚠️ Il file contiene le password in chiaro: eliminalo dopo l\'uso.</div>' +
     '<button style="' + b + '" onclick="pwSelExportCSV()">📄 CSV (reimportabile da Impostazioni → Importazioni)</button>' +
+    '<button style="' + b + '" onclick="pwSelExportChrome()">🌐 CSV per Chrome / Google (solo voci con sito e password)</button>' +
     '<button style="' + b + '" onclick="pwSelExportTXT()">📝 File di testo</button>' +
     '<button style="' + b + 'text-align:center;color:var(--text3);" onclick="document.getElementById(\'_pw_ex_ov\').remove()">Annulla</button></div>';
   document.body.appendChild(ov);
@@ -4543,6 +4544,30 @@ function pwSelExportCSV() {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
   const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
   showToast('✅ CSV scaricato (' + sel.length + ' voci)');
+}
+// CSV nel formato che Chrome importa (Password → Impostazioni → Importa): name,url,username,password,note.
+// Chrome scarta le righe senza indirizzo del sito o senza password, quindi le salto e te lo dico.
+function pwSelExportChrome() {
+  const sel = window._pwExItems || [];
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const rows = [['name','url','username','password','note']];
+  let noUrl = 0, noPw = 0;
+  sel.forEach(i => {
+    if (!i.password) { noPw++; return; }
+    let u = String(i.url || '').trim();
+    if (!u) { noUrl++; return; }
+    if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = 'https://' + u;
+    rows.push([i.title, u, i.username || i.email || '', i.password, i.notes || '']);
+  });
+  const n = rows.length - 1;
+  const ov = document.getElementById('_pw_ex_ov'); if (ov) ov.remove();
+  if (!n) { showToast('Nessuna voce con sito e password da esportare'); return; }
+  const csv = rows.map(r => r.map(q).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url;
+  a.download = 'HomeBull-per-Chrome-' + new Date().toISOString().slice(0, 10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  showToast('✅ CSV per Chrome: ' + n + ' voci' + (noUrl || noPw ? ' · saltate ' + (noUrl + noPw) + ' (' + (noUrl ? noUrl + ' senza sito' : '') + (noUrl && noPw ? ', ' : '') + (noPw ? noPw + ' senza password' : '') + ')' : ''), 6000);
 }
 function pwSelExportTXT() {
   const sel = window._pwExItems || [];
@@ -11405,7 +11430,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
