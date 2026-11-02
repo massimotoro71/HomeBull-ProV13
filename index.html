@@ -1886,6 +1886,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
 #pw-view-detail > div:first-child{padding-left:max(14px,calc((100% - 760px)/2)) !important;padding-right:max(14px,calc((100% - 760px)/2)) !important;}
 #pw-detail-content{padding-left:max(14px,calc((100% - 760px)/2)) !important;padding-right:max(14px,calc((100% - 760px)/2)) !important;}
 #pw-detail-content .pw-field-row{display:grid;grid-template-columns:150px 1fr auto;align-items:center;column-gap:16px;}
+#pw-detail-content .pw-field-row > details{grid-column:1/-1;min-width:0;}
 #pw-detail-content .pw-field-label{margin-bottom:0;}
 #pw-detail-content .pw-field-actions{margin-top:0;}
 }
@@ -1921,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.2</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.3</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1991,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.2</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.3</div>
         </div>
       </div>
     </div>
@@ -2096,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3001,7 +3002,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.30.2',
+  version: 'v13.30.3',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -11447,7 +11448,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.2</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.3</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
