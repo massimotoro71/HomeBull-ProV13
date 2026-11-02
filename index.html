@@ -1921,7 +1921,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.2</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1991,7 +1991,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.2</div>
         </div>
       </div>
     </div>
@@ -2096,7 +2096,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3001,7 +3001,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.30.1',
+  version: 'v13.30.2',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -5173,7 +5173,16 @@ function pwShowDetail(itemId) {
     ${item.pecPassword ? `<div class="pw-field-row pw-g-pec"><div class="pw-field-label">Password PEC</div><div class="pw-field-value" id="pd-pp" style="font-family:monospace;letter-spacing:0.05em;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pdToggleSecret('${item.id}','pecPassword','pd-pp')">👁 Mostra</button><button class="pw-field-btn" onclick="pwCopy('${item.id}','pecPassword')">📋 Copia</button></div></div>` : ''}
     ${(() => { const e = pwExpiryInfo(item); return e ? `<div class="pw-field-row"><div class="pw-field-label">Scadenza</div><div class="pw-field-value" style="color:${e.col};font-weight:700;">${e.text}</div></div>` : ''; })()}
     ${item.notes ? `<div class="pw-field-row"><div class="pw-field-label">Note</div><div class="pw-field-value" style="white-space:pre-wrap;font-size:13px;">${hbEsc(item.notes)}</div></div>` : ''}
-    ${item.pwHistory?.length ? `<div class="pw-field-row"><div class="pw-field-label">🕐 Cronologia password</div><div class="pw-field-value">${item.pwHistory.map((h,hi)=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);"><span id="pd-pwh-'+item.id+'-'+hi+'" style="font-family:monospace;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);flex-shrink:0;">'+timeAgo(h.changedAt)+'</span><button class="pw-field-btn pwh-toggle" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">👁</button><button class="pw-field-btn pwh-copy" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">📋</button></div>').join('')}</div></div>` : ''}
+    ${(() => {
+      const kinds = [['main','pwHistory','Principale'],['email','emailPwHistory','Email'],['pec','pecPwHistory','PEC']];
+      const tot = kinds.reduce((n,k)=>n+((item[k[1]]||[]).length),0);
+      if (!tot) return '';
+      const sections = kinds.filter(k => (item[k[1]]||[]).length).map(k => {
+        const rows = item[k[1]].map((h,hi)=>'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);"><span id="pd-pwh-'+k[0]+'-'+item.id+'-'+hi+'" style="font-family:monospace;color:var(--text2);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;">'+('•'.repeat(Math.min(h.password?.length||0,12)))+'</span><span style="font-size:10px;color:var(--text3);flex-shrink:0;">'+timeAgo(h.changedAt)+'</span><button class="pw-field-btn pwh-toggle" data-kind="'+k[0]+'" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">👁</button><button class="pw-field-btn pwh-copy" data-kind="'+k[0]+'" data-itemid="'+item.id+'" data-idx="'+hi+'" style="flex-shrink:0;padding:4px 8px;font-size:11px;">📋</button></div>').join('');
+        return (kinds.filter(x => (item[x[1]]||[]).length).length > 1 ? '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:8px 0 2px;">'+k[2]+'</div>' : '') + rows;
+      }).join('');
+      return `<div class="pw-field-row"><details><summary style="cursor:pointer;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">🕐 Cronologia password (${tot})</summary><div class="pw-field-value" style="margin-top:6px;">${sections}</div></details></div>`;
+    })()}
     <div style="display:flex;gap:10px;margin-top:8px;">
       <button onclick="pwShareQR('${item.id}')" style="padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">📱 QR</button>
       <button onclick="pwEditItem('${item.id}')" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✏️ Modifica</button>
@@ -5182,10 +5191,10 @@ function pwShowDetail(itemId) {
   const _chip = document.getElementById('pd-cat-chip');
   if (_chip && _dCat) _chip.onclick = () => { window._pwReturnToFilter = null; pwShowItems(_dCat.id, _dCat.name); };
   content.querySelectorAll('.pwh-toggle').forEach(btn => {
-    btn.onclick = () => pdTogglePwHistory(btn.dataset.itemid, parseInt(btn.dataset.idx));
+    btn.onclick = () => pdTogglePwHistory(btn.dataset.itemid, parseInt(btn.dataset.idx), btn.dataset.kind);
   });
   content.querySelectorAll('.pwh-copy').forEach(btn => {
-    btn.onclick = () => pwCopyHistory(btn.dataset.itemid, parseInt(btn.dataset.idx));
+    btn.onclick = () => pwCopyHistory(btn.dataset.itemid, parseInt(btn.dataset.idx), btn.dataset.kind);
   });
 }
 
@@ -5256,17 +5265,19 @@ async function pwCopy(itemId, field) {
   } catch(e) { showToast('Copia non disponibile'); }
 }
 
-function pdTogglePwHistory(itemId, idx) {
+const _PW_HKEY = { main: 'pwHistory', email: 'emailPwHistory', pec: 'pecPwHistory' };
+function pdTogglePwHistory(itemId, idx, kind) {
+  kind = kind || 'main';
   const item = _pwItems.find(i => i.id === itemId);
-  const h = item?.pwHistory?.[idx];
-  const el = document.getElementById('pd-pwh-' + itemId + '-' + idx);
+  const h = item?.[_PW_HKEY[kind]]?.[idx];
+  const el = document.getElementById('pd-pwh-' + kind + '-' + itemId + '-' + idx);
   if (!el || !h) return;
   el.textContent = el.textContent.includes('•') ? (h.password || '—') : '•'.repeat(Math.min(h.password?.length || 0, 12));
 }
 
-async function pwCopyHistory(itemId, idx) {
+async function pwCopyHistory(itemId, idx, kind) {
   const item = _pwItems.find(i => i.id === itemId);
-  const h = item?.pwHistory?.[idx];
+  const h = item?.[_PW_HKEY[kind || 'main']]?.[idx];
   if (!h) return;
   try {
     await navigator.clipboard.writeText(h.password || '');
@@ -9832,6 +9843,10 @@ function pwEditItem(itemId) {
         ? pwComputeExpiryDate(expDays, expStart)
         : (expDays === 'none' ? '' : item.expiryDate);
       const _fr = _pwFormRead('_pwe');
+      // Cronologia anche per password Email e PEC (max 5 ciascuna, come la principale)
+      const _histOf = (oldV, newV, arr) => { const h = (arr || []).slice(); if (newV && oldV && newV !== oldV) { h.unshift({ password: oldV, changedAt: new Date().toISOString() }); if (h.length > 5) h.length = 5; } return h; };
+      const _emailHist = _histOf(item.emailPassword, _fr.emailPassword, item.emailPwHistory);
+      const _pecHist = _histOf(item.pecPassword, _fr.pecPassword, item.pecPwHistory);
       const _resetPwn = passChanged || (_fr.emailPassword || '') !== (item.emailPassword || '') || (_fr.pecPassword || '') !== (item.pecPassword || '');
       _pwItems[idx] = {
         ...item,
@@ -9843,6 +9858,8 @@ function pwEditItem(itemId) {
         expiryStartDate: expStart,
         expiryDate: expiryDate,
         pwHistory: history,
+        emailPwHistory: _emailHist,
+        pecPwHistory: _pecHist,
         // Se la password è cambiata, il vecchio controllo "compromessa" non è più valido — forza un nuovo controllo
         pwnedCount: _resetPwn ? undefined : item.pwnedCount,
         pwnedMain: _resetPwn ? undefined : item.pwnedMain,
@@ -11430,7 +11447,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.2</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
