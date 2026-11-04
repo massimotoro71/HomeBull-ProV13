@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.3</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.5</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.3</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.5</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.5</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3002,7 +3002,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.30.3',
+  version: 'v13.30.5',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3890,12 +3890,15 @@ function updateHomeStats() {
     alerts.unshift({ icon:'🚨', color:'#ef4444', text: pwPwned.length + ' password compromess' + (pwPwned.length===1?'a':'e') + ' — cambiale subito', time: '', tab: 'passwords', action: "switchTab('passwords');setTimeout(()=>pwShowFilteredList('pwned'),150)" });
   }
 
-  // 2d. Promemoria backup (Drive o file): mai fatto o più vecchio di 30 giorni
+  // 2d. Promemoria backup (Drive o file): mai fatto, più vecchio di 7 giorni, o con molte modifiche non ancora salvate
   if ((_pwItems||[]).filter(i => !i.deleted).length > 0) {
     const _lb = hbLastBackupTs();
     const _days = _lb ? Math.floor((Date.now() - _lb) / 86400000) : null;
-    if (_days === null) alerts.push({ icon:'💾', color:'#f97316', text:'Nessun backup fatto — salva una copia dei tuoi dati', time:'', action:'hbOpenBackupSettings()' });
-    else if (_days > 30) alerts.push({ icon:'💾', color:'#f97316', text:'Ultimo backup ' + _days + ' giorni fa — conviene rifarlo', time:'', action:'hbOpenBackupSettings()' });
+    const _chg = _lb ? [...(_pwItems||[]), ...(typeof _notes !== 'undefined' ? _notes : [])].filter(x => !x.deleted && x.updatedAt && new Date(x.updatedAt).getTime() > _lb).length : 0;
+    const _chgTxt = _chg ? ' · ' + _chg + ' modific' + (_chg === 1 ? 'a' : 'he') + ' non ancora salvat' + (_chg === 1 ? 'a' : 'e') : '';
+    if (_days === null) alerts.unshift({ icon:'💾', color:'#ef4444', text:'Nessun backup fatto — salva subito una copia dei tuoi dati', time:'', action:'hbOpenBackupSettings()' });
+    else if (_days > 14 || _chg >= 50) alerts.unshift({ icon:'💾', color:'#ef4444', text:'Ultimo backup ' + (_days === 0 ? 'oggi' : _days + ' giorni fa') + _chgTxt + ' — rifallo adesso', time:'', action:'hbOpenBackupSettings()' });
+    else if (_days > 7 || _chg >= 20) alerts.push({ icon:'💾', color:'#f97316', text:'Ultimo backup ' + (_days === 0 ? 'oggi' : _days + ' giorni fa') + _chgTxt + ' — conviene rifarlo', time:'', action:'hbOpenBackupSettings()' });
   }
 
   // 3. OTP attivi
@@ -4439,9 +4442,9 @@ function _pwApplyItemFilter(items, fOverride) {
     const keep = new Set(); groups.forEach(g => g.ids.forEach(id => keep.add(id)));
     return { items: items.filter(i => keep.has(i.id)), groups };
   }
-  if (f === 'ignored') return { items: items.filter(i => i.ignoreWeak || i.ignoreDupe || i.pwnedIgnored) };
+  if (f === 'ignored') return { items: items.filter(i => i.ignoreWeak || i.ignoreDupe || i.pwnedIgnored || i.ignoreNoUser) };
   if (f === 'todo') return { items: items.filter(i => !i.password) };
-  if (f === 'nouser') return { items: items.filter(i => !String(i.username || '').trim() && !String(i.email || '').trim()) };
+  if (f === 'nouser') return { items: items.filter(i => !i.ignoreNoUser && !String(i.username || '').trim() && !String(i.email || '').trim()) };
   if (f === 'pwned') return { items: items.filter(i => i.pwnedCount > 0 && !i.pwnedIgnored) };
   if (f === 'weak') return { items: items.filter(_pwAnyWeak) };
   if (f === 'old') { const lim = Date.now() - 90 * 86400000; return { items: items.filter(i => i.updatedAt && new Date(i.updatedAt).getTime() < lim) }; }
@@ -5150,7 +5153,8 @@ function pwShowDetail(itemId) {
       let h = '';
       if (_pwAnyWeak(item)) h += `<div style="${box}background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.35);color:#eab308;">🟠 Password debole. <button onclick="pwIgnoreOne('${item.id}','weak')" style="${lk}color:#eab308;">Va bene così, non segnalarla</button></div>`;
       if (rc2 > 1 && !item.ignoreDupe) h += `<div style="${box}background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.25);color:#f97316;">🔁 Condivisa con altre voci. <button onclick="pwIgnoreOne('${item.id}','dupe')" style="${lk}color:#f97316;">Va bene così (uso interno), non segnalarla</button></div>`;
-      if (item.ignoreWeak || item.ignoreDupe) h += `<div style="${box}background:rgba(107,114,128,0.1);border:1px solid var(--border);color:var(--text3);">🙈 Ignorata nei controlli (${[item.ignoreWeak ? 'debole' : '', item.ignoreDupe ? 'condivisa' : ''].filter(Boolean).join(', ')}). <button onclick="pwRestoreOne('${item.id}')" style="${lk}color:var(--accent);">Ripristina</button></div>`;
+      if (!item.ignoreNoUser && !String(item.username || '').trim() && !String(item.email || '').trim()) h += `<div style="${box}background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);color:var(--text2);">👤 Senza utente. <button onclick="pwIgnoreOne('${item.id}','nouser')" style="${lk}color:var(--accent);">Va bene così, non segnalarla</button></div>`;
+      if (item.ignoreWeak || item.ignoreDupe || item.ignoreNoUser) h += `<div style="${box}background:rgba(107,114,128,0.1);border:1px solid var(--border);color:var(--text3);">🙈 Ignorata nei controlli (${[item.ignoreWeak ? 'debole' : '', item.ignoreDupe ? 'condivisa' : '', item.ignoreNoUser ? 'senza utente' : ''].filter(Boolean).join(', ')}). <button onclick="pwRestoreOne('${item.id}')" style="${lk}color:var(--accent);">Ripristina</button></div>`;
       return h;
     })()}
     ${item.pwnedCount > 0 && item.pwnedIgnored ? `<div style="background:rgba(107,114,128,0.1);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:12px;color:var(--text3);">
@@ -5580,31 +5584,31 @@ function pwFlSelLevel(l) {
   ids.forEach(id => { if (all) _pwSel.delete(id); else _pwSel.add(id); });
   _pwFlRender();
 }
-function _pwIgnoreKind() { const t = window._pwFl ? window._pwFl.type : (window._pwItemFilter || ''); return ({ weak: 'ignoreWeak', dupes: 'ignoreDupe', pwned: 'pwnedIgnored', ignored: 'restore' })[t] || ''; }
+function _pwIgnoreKind() { const t = window._pwFl ? window._pwFl.type : (window._pwItemFilter || ''); return ({ weak: 'ignoreWeak', dupes: 'ignoreDupe', pwned: 'pwnedIgnored', nouser: 'ignoreNoUser', ignored: 'restore' })[t] || ''; }
 function pwIgnoreSel() {
   const kind = _pwIgnoreKind();
-  if (!kind) { showToast('Usa 🙈 da un filtro 🧹: Deboli, Duplicati, Compromesse (o Ignorate per ripristinare)', 5000); return; }
+  if (!kind) { showToast('Usa 🙈 da un filtro 🧹: Deboli, Duplicati, Compromesse, Senza utente (o Ignorate per ripristinare)', 5000); return; }
   const n = _pwSel.size;
   if (!n) { showToast('Seleziona prima qualche password'); return; }
   if (kind === 'restore') {
     if (!confirm('Ripristinare ' + n + ' voci? Torneranno a comparire nei controlli.')) return;
-    _pwItems.forEach(i => { if (_pwSel.has(i.id)) { i.ignoreWeak = false; i.ignoreDupe = false; i.pwnedIgnored = false; } });
+    _pwItems.forEach(i => { if (_pwSel.has(i.id)) { i.ignoreWeak = false; i.ignoreDupe = false; i.pwnedIgnored = false; i.ignoreNoUser = false; } });
     pwSave(); _pwSelDone('↩ ' + n + ' voci ripristinate'); return;
   }
-  const what = { ignoreWeak: 'deboli', ignoreDupe: 'duplicate / condivise', pwnedIgnored: 'compromesse' }[kind];
+  const what = { ignoreWeak: 'deboli', ignoreDupe: 'duplicate / condivise', pwnedIgnored: 'compromesse', ignoreNoUser: 'senza utente' }[kind];
   if (!confirm('Non segnalare più ' + n + ' voci come ' + what + '?\n\nResteranno salvate. Spariscono da questo elenco, dagli avvisi e dal punteggio. Le ritrovi dal filtro 🧹 "Ignorate" e puoi ripristinarle.')) return;
   _pwItems.forEach(i => { if (_pwSel.has(i.id)) i[kind] = true; });
   pwSave(); _pwSelDone('🙈 ' + n + ' voci non più segnalate');
 }
 function pwIgnoreOne(id, kind) {
   const it = _pwItems.find(i => i.id === id); if (!it) return;
-  it[kind === 'weak' ? 'ignoreWeak' : 'ignoreDupe'] = true;
+  it[kind === 'weak' ? 'ignoreWeak' : kind === 'nouser' ? 'ignoreNoUser' : 'ignoreDupe'] = true;
   pwSave(); try { updateHomeStats(); } catch (e) {}
   pwShowDetail(id); showToast('🙈 Non verrà più segnalata');
 }
 function pwRestoreOne(id) {
   const it = _pwItems.find(i => i.id === id); if (!it) return;
-  it.ignoreWeak = false; it.ignoreDupe = false;
+  it.ignoreWeak = false; it.ignoreDupe = false; it.ignoreNoUser = false;
   pwSave(); try { updateHomeStats(); } catch (e) {}
   pwShowDetail(id); showToast('↩ Di nuovo nei controlli');
 }
@@ -11316,10 +11320,6 @@ document.addEventListener('keydown', (e) => {
             </div>
           </div>
 
-          <button onclick="forceAppUpdate()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
-            <span style="font-size:28px;">🔄</span>
-            <div><div style="margin-bottom:3px;">Forza aggiornamento</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Svuota cache e ricarica l'app</div></div>
-          </button>
         </div>
       </div>
 
@@ -11448,7 +11448,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.3</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.5</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
