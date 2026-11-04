@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.5</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.6</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.5</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.6</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.5</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.6</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3002,7 +3002,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.30.5',
+  version: 'v13.30.6',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8557,6 +8557,7 @@ function settingsPage(page) {
 }
 
 function settingsRefreshUI() {
+  try { hbRenderPresets(); } catch (e) {}
   const S = {
     theme: localStorage.getItem('hb_theme')||'dark',
     accent: localStorage.getItem('hb_accent_name')||'indigo',
@@ -9179,9 +9180,44 @@ async function forceAppUpdate() {
   setTimeout(() => location.reload(true), 1200);
 }
 
+// ── Temi pronti: combinano tema chiaro/scuro, sfondo, schede e colore principale (usano le stesse impostazioni di sotto)
+const HB_PRESETS = {
+  classico: { n:'Classico',  t:'dark',  ac:'#6366f1', an:'indigo', bg:null,      card:null },
+  oceano:   { n:'Oceano',    t:'dark',  ac:'#06b6d4', an:'cyan',   bg:'#07161f', card:'#0f2836' },
+  foresta:  { n:'Foresta',   t:'dark',  ac:'#10b981', an:'green',  bg:'#08140e', card:'#112519' },
+  tramonto: { n:'Tramonto',  t:'dark',  ac:'#f97316', an:'orange', bg:'#190d0c', card:'#2a1714' },
+  ametista: { n:'Ametista',  t:'dark',  ac:'#8b5cf6', an:'purple', bg:'#120a1f', card:'#1e1332' },
+  carbone:  { n:'Carbone',   t:'dark',  ac:'#6366f1', an:'indigo', bg:'#0a0a0a', card:'#181818' },
+  carta:    { n:'Carta',     t:'light', ac:'#d97706', an:'amber',  bg:'#f6f1e7', card:'#fffdf8' },
+  cielo:    { n:'Cielo',     t:'light', ac:'#0284c7', an:'cyan',   bg:'#eaf4fa', card:'#ffffff' },
+  menta:    { n:'Menta',     t:'light', ac:'#059669', an:'green',  bg:'#eef7f1', card:'#ffffff' }
+};
+function hbRenderPresets() {
+  const box = document.getElementById('hb-presets'); if (!box) return;
+  let cur = ''; try { cur = localStorage.getItem('hb_preset') || ''; } catch (e) {}
+  box.innerHTML = Object.keys(HB_PRESETS).map(k => {
+    const p = HB_PRESETS[k], bg = p.bg || '#0a0a12', cd = p.card || '#1a1a28', on = cur === k;
+    return '<button onclick="hbApplyPreset(\'' + k + '\')" style="padding:8px 6px;border-radius:14px;border:2px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';background:var(--surface);cursor:pointer;font-family:inherit;color:var(--text);font-size:11px;font-weight:700;">' +
+      '<span style="display:flex;height:34px;border-radius:9px;overflow:hidden;margin-bottom:6px;border:1px solid rgba(128,128,128,.25);"><span style="flex:1;background:' + bg + ';"></span><span style="flex:1;background:' + cd + ';"></span><span style="flex:1;background:' + p.ac + ';"></span></span>' + p.n + '</button>';
+  }).join('');
+}
+function hbApplyPreset(k) {
+  const p = HB_PRESETS[k]; if (!p) return;
+  try {
+    localStorage.setItem('hb_theme', p.t);
+    localStorage.removeItem('hb_bg_color'); localStorage.removeItem('hb_card_color'); localStorage.removeItem('hb_text_color');
+    if (p.bg) { localStorage.setItem('hb_bg_color', p.bg); localStorage.setItem('hb_card_color', p.card); }
+    localStorage.setItem('hb_accent', p.ac); localStorage.setItem('hb_accent_name', p.an); localStorage.setItem('hb_preset', k);
+  } catch (e) {}
+  document.documentElement.removeAttribute('style'); document.body.style.background = '';
+  document.documentElement.setAttribute('data-theme', p.t);
+  settingsApplyOnLoad(); try { settingsRefreshUI(); } catch (e) {}
+  hbRenderPresets();
+  showToast('✨ Tema ' + p.n);
+}
 function setTheme(t){const th=t==='auto'?(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):t;document.documentElement.setAttribute('data-theme',th);localStorage.setItem('hb_theme',t);settingsRefreshUI();showToast(th==='dark'?'🌙 Dark':'☀️ Light');}
 
-function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);settingsRefreshUI();showToast('🎨 Colore aggiornato');}
+function setAccent(c,n){document.documentElement.style.setProperty('--accent',c);document.documentElement.style.setProperty('--accent-bg',c+'20');localStorage.setItem('hb_accent',c);localStorage.setItem('hb_accent_name',n);try{localStorage.removeItem('hb_preset')}catch(e){}settingsRefreshUI();showToast('🎨 Colore aggiornato');}
 
 
 function setFont(f){const fm={system:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",serif:"Georgia,serif",mono:"monospace",round:"'Nunito',sans-serif"};document.body.style.fontFamily=fm[f];localStorage.setItem('hb_font',f);settingsRefreshUI();}
@@ -9203,7 +9239,7 @@ function resetColors(){['hb_bg_color','hb_card_color','hb_sidebar_color','hb_tex
 function resetAllGraphics(){
   // Reset tutti i valori grafici
   ['hb_theme','hb_accent','hb13_accent','hb_font','hb_fs','hb_radius','hb_shadow','hb_anim','hb_bg',
-   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color','hb_home_style'].forEach(k=>localStorage.removeItem(k));
+   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color','hb_home_style','hb_preset'].forEach(k=>localStorage.removeItem(k));
   // Ripristina stili CSS
   document.documentElement.removeAttribute('style');
   document.body.style.cssText = '';
@@ -11112,6 +11148,13 @@ document.addEventListener('keydown', (e) => {
           <div style="font-size:11px;color:var(--text3);line-height:1.4;margin-top:8px;">Cambia solo la disposizione: le icone restano quelle di prima.</div>
         </div>
 
+        <!-- Temi pronti -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">✨ Temi pronti</div>
+          <div id="hb-presets" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+          <div style="font-size:11px;color:var(--text3);line-height:1.4;margin-top:8px;">Un tocco e cambiano sfondo, schede e colore. Poi puoi ritoccare tutto qui sotto.</div>
+        </div>
+
         <!-- Tema -->
         <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🌙 Tema</div>
@@ -11448,7 +11491,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.5</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.6</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
