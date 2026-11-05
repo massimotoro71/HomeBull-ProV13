@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.31.3</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.32.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.31.3</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.32.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.31.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.32.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2390,6 +2390,13 @@ Aggiungi nuovo dato
                 <input id="doc-rilascio" type="date" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Data di scadenza
                 <input id="doc-scadenza" type="date" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);grid-column:1/-1;margin-top:4px;border-top:1px solid var(--border);padding-top:8px;">Accesso online collegato (facoltativo)</label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Email
+                <input id="doc-email" type="email" maxlength="120" autocomplete="off" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Password
+                <span style="position:relative;display:block;"><input id="doc-pwd" type="password" maxlength="120" autocomplete="off" style="width:100%;margin-top:3px;padding:9px 38px 9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"><button type="button" onclick="noteDocEye('doc-pwd',this)" title="Mostra / nascondi" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);margin-top:1.5px;background:none;border:none;cursor:pointer;font-size:15px;padding:4px 6px;color:var(--text2);">👁</button></span></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Scadenza password
+                <input id="doc-pwdscad" type="date" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
             </div>
           </div>
           <!-- Barra formattazione note -->
@@ -3022,7 +3029,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.31.3',
+  version: 'v13.32.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3918,6 +3925,11 @@ function updateHomeStats() {
       const left = _docDaysLeft(n.doc), nm = n.title || n.doc.tipo || 'Documento';
       if (left < 0) alerts.push({ icon:'📄', color:'#ef4444', text: nm + ' scaduto', time:'Scaduto', action:'hbOpenDocs()' });
       else if (left <= 60) alerts.push({ icon:'📄', color:'#f97316', text: nm + ' scade tra ' + left + ' giorni', time: left + 'gg', action:'hbOpenDocs()' });
+    });
+    (typeof _notes !== 'undefined' ? _notes : []).filter(n => !n.deleted && n.kind === 'document' && n.doc && n.doc.pwdScad).forEach(n => {
+      const pl = _docDaysLeft({ scadenza: n.doc.pwdScad }), nm = n.title || n.doc.tipo || 'Documento';
+      if (pl < 0) alerts.push({ icon:'🔑', color:'#ef4444', text: 'Password di ' + nm + ' scaduta', time:'Scaduta', action:'hbOpenDocs()' });
+      else if (pl <= 30) alerts.push({ icon:'🔑', color:'#f97316', text: 'Password di ' + nm + ' scade tra ' + pl + ' giorni', time: pl + 'gg', action:'hbOpenDocs()' });
     });
   } catch (e) {}
   // 2d. Promemoria backup (Drive o file): mai fatto, più vecchio di 7 giorni, o con molte modifiche non ancora salvate
@@ -6803,13 +6815,44 @@ function noteDocFill(doc) {
   document.getElementById('doc-intest').value = d.intestatario || '';
   document.getElementById('doc-num').value = d.numero || '';
   document.getElementById('doc-ente').value = d.ente || '';
+  document.getElementById('doc-email').value = d.email || '';
+  document.getElementById('doc-pwdscad').value = d.pwdScad || '';
+  { const e = document.getElementById('doc-pwd'); e.type = 'password'; e.value = d.pwd || ''; const b = e.parentNode.querySelector('button'); if (b) b.textContent = '👁'; }
   ['doc-pin','doc-puk'].forEach(id => { const e = document.getElementById(id); e.type = 'password'; e.value = d[id === 'doc-pin' ? 'pin' : 'puk'] || ''; const b = e.parentNode.querySelector('button'); if (b) b.textContent = '👁'; });
   document.getElementById('doc-rilascio').value = d.rilascio || '';
   document.getElementById('doc-scadenza').value = d.scadenza || '';
 }
+const _noteShown = new Set(); let _noteShownT = null;
+function _noteColor(n) { const f = NOTE_FOLDERS.find(x => x.k === (n.kind || 'free')); return f ? f.color : '#f59e0b'; }
+function noteToggleShow(id, field) {
+  const k = id + ':' + field;
+  if (_noteShown.has(k)) _noteShown.delete(k); else _noteShown.add(k);
+  clearTimeout(_noteShownT); _noteShownT = setTimeout(() => { _noteShown.clear(); try { noteRenderList(''); } catch (e) {} }, 20000);
+  noteRenderList('');
+}
+function noteCopyField(id, field) {
+  const n = _notes.find(x => x.id === id); const v = n && n.doc ? n.doc[field] : '';
+  if (!v) return;
+  navigator.clipboard.writeText(String(v)).then(() => showToast('📋 Copiato'), () => showToast('Copia non riuscita'));
+}
+function _noteRow(id, label, val, field, opt) {
+  opt = opt || {};
+  const open = !opt.secret || _noteShown.has(id + ':' + field);
+  const btn = 'background:none;border:none;cursor:pointer;font-size:15px;padding:3px 5px;color:var(--text2);flex-shrink:0;';
+  return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;">' +
+    '<div style="min-width:0;flex:1;"><div style="font-size:9px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);">' + label + '</div>' +
+    '<div style="font-size:' + (opt.big ? '17' : '13') + 'px;font-weight:' + (opt.big ? '800' : '600') + ';' + (opt.mono !== false ? "font-family:'DM Sans',monospace;" : '') + 'letter-spacing:' + (open && !opt.big ? '0' : '.06em') + ';color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (open ? hbEsc(val) : '••••••••') + '</div></div>' +
+    (opt.secret ? '<button onclick="event.stopPropagation();noteToggleShow(\'' + id + '\',\'' + field + '\')" style="' + btn + '" title="Mostra / nascondi">' + (open ? '🙈' : '👁') + '</button>' : '') +
+    '<button onclick="event.stopPropagation();noteCopyField(\'' + id + '\',\'' + field + '\')" style="' + btn + '" title="Copia">📋</button></div>';
+}
+function _noteBadge(left, okTxt, soonTxt, lateTxt, soonDays) {
+  const col = left < 0 ? '#ef4444' : left <= soonDays ? '#f97316' : '#10b981';
+  const txt = left < 0 ? lateTxt : left <= soonDays ? soonTxt : okTxt;
+  return '<span style="display:inline-block;padding:4px 9px;border-radius:99px;font-size:11px;font-weight:800;color:' + col + ';background:' + col + '1f;">' + txt + '</span>';
+}
 function noteDocEye(id, btn) { const e = document.getElementById(id); if (!e) return; const show = e.type === 'password'; e.type = show ? 'text' : 'password'; btn.textContent = show ? '🙈' : '👁'; }
 function noteDocRead() {
-  return { tipo: document.getElementById('doc-tipo').value, intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), pin: document.getElementById('doc-pin').value.trim(), puk: document.getElementById('doc-puk').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value };
+  return { tipo: document.getElementById('doc-tipo').value, intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), email: document.getElementById('doc-email').value.trim(), pwd: document.getElementById('doc-pwd').value, pwdScad: document.getElementById('doc-pwdscad').value, pin: document.getElementById('doc-pin').value.trim(), puk: document.getElementById('doc-puk').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value };
 }
 function noteDocText(n) {
   const d = n.doc || {}, r = [];
@@ -6822,6 +6865,9 @@ function noteDocText(n) {
   if (d.puk) r.push('PUK: ' + d.puk);
   if (d.rilascio) r.push('Rilascio: ' + _docFmtDate(d.rilascio));
   if (d.scadenza) r.push('Scadenza: ' + _docFmtDate(d.scadenza));
+  if (d.email) r.push('Email: ' + d.email);
+  if (d.pwd) r.push('Password: ' + d.pwd);
+  if (d.pwdScad) r.push('Scadenza password: ' + _docFmtDate(d.pwdScad));
   if (n.content) r.push('', n.content);
   return r.join('\n');
 }
@@ -6853,7 +6899,7 @@ function noteRenderFolders() {
   }).join('');
 }
 function noteShowFolders() {
-  _noteKindFilter = '';
+  _noteKindFilter = ''; _noteShown.clear();
   document.getElementById('note-view-folders').style.display = 'flex';
   document.getElementById('note-view-list').style.display = 'none';
   document.getElementById('note-view-editor').style.display = 'none';
@@ -6920,29 +6966,46 @@ function noteRenderList(q='') {
     card.onclick = () => noteEdit(note.id);
     const d = new Date(note.updatedAt);
     const dateStr = d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
-    const kd = NOTE_KINDS[note.kind];
-    // le chiavi/codici non mostrano il contenuto nell'elenco: si vede solo aprendo la nota
-    let preview = kd ? '••••••••••••' : (note.content||'').replace(/\n/g,' ').trim();
-    let docBadge = '';
+    const kd = NOTE_KINDS[note.kind], col = _noteColor(note), id = note.id, dd = note.doc || {};
+    const icon = kd ? kd.icon : '📝';
+    let sub = note.kind === 'document' ? [dd.tipo, dd.intestatario].filter(Boolean).join(' · ') : kd ? kd.label : '';
+    let body = '';
     if (note.kind === 'document') {
-      const dd = note.doc || {}, left = _docDaysLeft(dd);
-      preview = [dd.tipo, dd.numero ? 'n. ' + _docMask(dd.numero) : '', dd.ente].filter(Boolean).join(' · ');
-      if (left !== null) {
-        const col = left < 0 ? '#ef4444' : left <= 60 ? '#f97316' : '#10b981';
-        const txt = left < 0 ? 'Scaduto il ' + _docFmtDate(dd.scadenza) : left === 0 ? 'Scade oggi' : left <= 60 ? 'Scade tra ' + left + ' giorni (' + _docFmtDate(dd.scadenza) + ')' : 'Scade il ' + _docFmtDate(dd.scadenza);
-        docBadge = '<div style="margin-top:6px;font-size:11px;font-weight:800;color:' + col + ';">' + (left < 0 ? '⛔ ' : left <= 60 ? '⚠️ ' : '✅ ') + txt + '</div>';
-      }
+      const rows = [];
+      if (dd.numero) rows.push(_noteRow(id, 'Numero', dd.numero, 'numero', { secret: true, big: true }));
+      if (dd.ente) rows.push('<div style="padding:4px 0;font-size:12px;color:var(--text3);">🏛 ' + hbEsc(dd.ente) + (dd.rilascio ? ' · rilasciato il ' + _docFmtDate(dd.rilascio) : '') + '</div>');
+      if (dd.pin) rows.push(_noteRow(id, 'PIN', dd.pin, 'pin', { secret: true }));
+      if (dd.puk) rows.push(_noteRow(id, 'PUK', dd.puk, 'puk', { secret: true }));
+      if (dd.email) rows.push(_noteRow(id, 'Email', dd.email, 'email', { mono: false }));
+      if (dd.pwd) rows.push(_noteRow(id, 'Password', dd.pwd, 'pwd', { secret: true }));
+      const sep = '<div style="height:1px;background:var(--border);"></div>';
+      const badges = [];
+      const left = _docDaysLeft(dd);
+      if (left !== null) badges.push(_noteBadge(left, '✅ Scade il ' + _docFmtDate(dd.scadenza), '⚠️ Scade tra ' + left + ' giorni (' + _docFmtDate(dd.scadenza) + ')', '⛔ Scaduto il ' + _docFmtDate(dd.scadenza), 60));
+      if (dd.pwdScad) { const pl = _docDaysLeft({ scadenza: dd.pwdScad }); if (pl !== null) badges.push(_noteBadge(pl, '🔑 Password fino al ' + _docFmtDate(dd.pwdScad), '🔑 Password scade tra ' + pl + ' giorni', '🔑 Password scaduta', 30)); }
+      body = (rows.length ? '<div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px 12px;">' + rows.join(sep) + '</div>' : '') + (badges.length ? '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + badges.join('') + '</div>' : '');
+    } else if (kd) {
+      body = '<div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:18px;letter-spacing:.2em;color:var(--text3);">••••••••••</span><button onclick="event.stopPropagation();noteCopy(\'' + id + '\')" style="background:none;border:none;cursor:pointer;font-size:16px;color:var(--text2);" title="Copia contenuto">📋</button></div>';
+    } else {
+      const pv = (note.content || '').replace(/\n/g, ' ').trim();
+      body = pv ? '<div class="note-card-preview" style="margin:0;">' + hbEsc(pv) + '</div>' : '';
     }
+    const att = (_noteAttStore[id] || []).length;
+    card.style.cssText = 'background:linear-gradient(160deg,' + col + '1f,var(--surface) 60%);border:1px solid ' + col + '40;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;margin-bottom:12px;';
     card.innerHTML = `
-      <div class="note-card-title">${kd ? kd.icon+' ' : ''}${hbEsc(note.title || 'Senza titolo')}</div>
-      ${preview ? `<div class="note-card-preview">${hbEsc(preview)}</div>` : ''}${docBadge}
-      <div class="note-card-footer">
-        <span class="note-card-date">🕐 ${dateStr}${(_noteAttStore[note.id]||[]).length ? ' · 📎 '+_noteAttStore[note.id].length : ''}</span>
-        <div style="display:flex;gap:6px;">
-          ${kd ? `<button onclick="event.stopPropagation();noteCopy('${note.id}')" title="Copia contenuto" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;">📋</button>` : ''}
-          <button onclick="event.stopPropagation();noteEdit('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
-          <button onclick="event.stopPropagation();noteDelete('${note.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px 6px;border-radius:8px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑</button>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:38px;height:38px;border-radius:11px;background:${col}26;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;">${icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(note.title || 'Senza titolo')}</div>
+          ${sub ? `<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(sub)}</div>` : ''}
         </div>
+        <button onclick="event.stopPropagation();noteEdit('${id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" title="Modifica">✏️</button>
+        <button onclick="event.stopPropagation();noteDelete('${id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" title="Elimina">🗑</button>
+      </div>
+      ${body}
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);">
+        <span>🕐 ${dateStr}${att ? ' · 📎 ' + att : ''}</span>
+        ${note.kind === 'document' ? `<button onclick="event.stopPropagation();noteCopy('${id}')" style="background:none;border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);font-family:inherit;">📋 Copia tutto</button>` : ''}
       </div>`;
     list.appendChild(card);
   });
@@ -11638,7 +11701,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.31.3</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.32.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
