@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.31.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.31.2</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.31.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.31.2</div>
         </div>
       </div>
     </div>
@@ -2016,8 +2016,8 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
       </div>
 
       <div class="sidebar-item" data-tab="notes" onclick="switchTab('notes')">
-        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <span class="sidebar-item-label">Note</span>
+        <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span class="sidebar-item-label">Archivio</span>
         <span id="sb-badge-notes" style="margin-left:auto;min-width:20px;height:20px;border-radius:99px;background:var(--accent-bg,rgba(99,102,241,0.15));color:var(--accent);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;"></span>
       </div>
 
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.31.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.31.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2136,8 +2136,8 @@ Aggiungi nuovo dato
           </div>
           <div class="mob-home-card" onclick="switchTab('notes')">
             <div class="mob-home-card-bar" style="background:linear-gradient(90deg,#f59e0b,#f97316);"></div>
-            <div class="mob-home-card-icon">📝</div>
-            <div class="mob-home-card-label">Note</div>
+            <div class="mob-home-card-icon">🗂️</div>
+            <div class="mob-home-card-label">Archivio</div>
             <span id="mhb-notes" class="mob-home-card-badge"></span>
           </div>
           <div class="mob-home-card" onclick="switchTab('otp')">
@@ -2179,8 +2179,8 @@ Aggiungi nuovo dato
           </div>
           <div class="qa-card" onclick="switchTab('notes')" style="cursor:pointer;position:relative;">
             <span id="pc-badge-notes" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
-            <div class="qa-card-icon">📝</div>
-            <div class="qa-card-label">Note</div>
+            <div class="qa-card-icon">🗂️</div>
+            <div class="qa-card-label">Archivio</div>
           </div>
           <div class="qa-card" onclick="switchTab('otp')" style="cursor:pointer;position:relative;">
             <span id="pc-badge-otp" style="position:absolute;top:8px;right:8px;min-width:22px;height:22px;border-radius:99px;background:var(--accent);color:white;font-size:11px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 6px;"></span>
@@ -2338,8 +2338,13 @@ Aggiungi nuovo dato
     <div class="tab-panel" id="panel-notes">
       <div style="display:flex;flex-direction:column;height:100%;">
 
+        <!-- Vista cartelle -->
+        <div id="note-view-folders" style="display:flex;flex-direction:column;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 100px;">
+          <div id="note-folders" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:640px;width:100%;margin:0 auto;"></div>
+        </div>
+
         <!-- Vista lista -->
-        <div id="note-view-list" style="display:flex;flex-direction:column;height:100%;">
+        <div id="note-view-list" style="display:none;flex-direction:column;height:100%;">
           <div style="padding:12px 14px 8px;flex-shrink:0;">
             <div style="display:flex;gap:8px;align-items:center;min-width:0;">
               <select id="note-sort-sel" onchange="localStorage.setItem('hb_note_sort',this.value);noteRenderList('')" style="flex:1 1 0;min-width:0;max-width:100%;padding:8px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;outline:none;">
@@ -2348,7 +2353,6 @@ Aggiungi nuovo dato
                 <option value="title">🔤 Per titolo</option>
               </select>
             </div>
-            <div id="note-kind-chips" style="display:flex;flex-wrap:nowrap;gap:4px;margin-top:8px;"></div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
         </div>
@@ -2830,8 +2834,8 @@ Aggiungi nuovo dato
       </div>
 
       <div class="drawer-item" data-tab="notes" onclick="switchTabFromDrawer('notes')">
-        <div class="drawer-item-icon">📝</div>
-        <div class="drawer-item-label">Note</div>
+        <div class="drawer-item-icon">🗂️</div>
+        <div class="drawer-item-label">Archivio</div>
       </div>
       <div class="drawer-item" data-tab="server" onclick="switchTabFromDrawer('server')">
         <div class="drawer-item-icon">📡</div>
@@ -2969,7 +2973,7 @@ Aggiungi nuovo dato
 // ── Tab metadata ───────────────────────────────────────────
 const ALL_TABS_META = [
   { id:'passwords', icon:'🔐', label:'Password' },
-  { id:'notes',     icon:'📝', label:'Note' },
+  { id:'notes',     icon:'🗂️', label:'Archivio' },
   { id:'otp',       icon:'🔑', label:'OTP / 2FA' },
   { id:'cards',     icon:'💳', label:'Portafoglio' },
   { id:'server',    icon:'📡', label:'Rete & IT' },
@@ -3014,7 +3018,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.31.0',
+  version: 'v13.31.2',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3442,7 +3446,7 @@ function logout() {
 const TAB_CONFIG = {
   home:      { title: 'Home',        sub: '', actions: [] },
   passwords: { title: 'Password',    sub: '', actions: ['search'] },
-  notes:     { title: 'Note',        sub: '', actions: ['add'] },
+  notes:     { title: 'Archivio',    sub: '', actions: ['add'] },
   otp:       { title: 'OTP / 2FA',   sub: 'Codici TOTP', actions: ['add'] },
   cards:     { title: 'Portafoglio', sub: 'Carte e conti', actions: ['add'] },
   server:    { title: 'Rete & IT',   sub: 'Server, credenziali e Wi-Fi', actions: ['add'] },
@@ -3614,7 +3618,7 @@ function renderTopbarActions(actions) {
     if (addView && addView.style.display !== 'none') { otpShowList(); return; }
     otpShowAdd(); return;
   }
-  if (HB.currentTab === 'notes') { noteNew(); return; }
+  if (HB.currentTab === 'notes') { if (_noteKindFilter) { noteNewOfKind(_noteKindFilter === 'free' ? '' : _noteKindFilter); } else noteNew(); return; }
       showToast('Aggiungi ' + TAB_CONFIG[HB.currentTab]?.title + ' — in arrivo');
     };
     container.appendChild(btn);
@@ -3660,6 +3664,8 @@ function topbarBack() {
   if (HB.currentTab === 'notes') {
     const editor = document.getElementById('note-view-editor');
     if (editor && editor.style.display !== 'none') { noteCloseEditor(); return; }
+    const nl = document.getElementById('note-view-list');
+    if (nl && nl.style.display !== 'none') { noteShowFolders(); return; }
   }
   if (HB.currentTab === 'passwords') {
     const items = document.getElementById('pw-view-items');
@@ -6759,19 +6765,20 @@ function noteAttPreview(id) {
 function noteOpen() {
   noteLoad();
   noteAttLoad();
-  noteShowList();
-  document.getElementById('topbar-title').textContent = 'Note';
-  document.getElementById('topbar-sub').textContent = _notes.length + ' note';
-  document.getElementById('topbar-back').classList.remove('visible');
+  noteShowFolders();
 }
 
 // ── Lista ────────────────────────────────────────────────
 function noteShowList(q='') {
+  if (!_noteKindFilter) { noteShowFolders(); return; }
+  const f = NOTE_FOLDERS.find(x => x.k === _noteKindFilter);
+  document.getElementById('note-view-folders').style.display = 'none';
   document.getElementById('note-view-list').style.display = 'flex';
   document.getElementById('note-view-editor').style.display = 'none';
-  document.getElementById('topbar-back').classList.remove('visible');
-  document.getElementById('topbar-title').textContent = 'Note';
-  document.getElementById('topbar-sub').textContent = _notes.length + ' note';
+  document.getElementById('topbar-back').classList.add('visible');
+  document.getElementById('topbar-title').textContent = f ? f.icon + ' ' + f.name : 'Archivio';
+  const n = (_notes || []).filter(x => !x.deleted && _noteInFolder(x, _noteKindFilter)).length;
+  document.getElementById('topbar-sub').textContent = n + (n === 1 ? ' voce' : ' voci');
   noteRenderList(q);
 }
 
@@ -6810,17 +6817,51 @@ function noteDocText(n) {
   if (n.content) r.push('', n.content);
   return r.join('\n');
 }
-function noteRenderChips() {
-  const box = document.getElementById('note-kind-chips'); if (!box) return;
+const NOTE_FOLDERS = [
+  { k:'free',      icon:'📝', name:'Note',      color:'#f59e0b', sub:'Appunti e testi liberi' },
+  { k:'bitlocker', icon:'🔑', name:'Chiavi',    color:'#10b981', sub:'BitLocker e ripristino' },
+  { k:'backup',    icon:'🛡️', name:'Backup',    color:'#6366f1', sub:'Codici di emergenza' },
+  { k:'document',  icon:'📄', name:'Documenti', color:'#06b6d4', sub:'Identità, patente, scadenze' }
+];
+function _noteInFolder(n, k) { return k === 'free' ? !n.kind : n.kind === k; }
+function noteRenderFolders() {
+  const box = document.getElementById('note-folders'); if (!box) return;
   const live = (_notes || []).filter(n => !n.deleted);
-  const cnt = k => k === '' ? live.length : k === 'free' ? live.filter(n => !n.kind).length : live.filter(n => n.kind === k).length;
-  const defs = [['', 'Tutte'], ['free', 'Note'], ['bitlocker', 'Chiavi'], ['backup', 'Backup'], ['document', 'Documenti']];
-  box.innerHTML = defs.map(([k, l]) => { const on = _noteKindFilter === k; return '<button onclick="_noteKindFilter=\'' + k + '\';noteRenderList(\'\')" style="flex:1 1 auto;min-width:0;padding:7px 3px;border-radius:99px;text-align:center;overflow:hidden;text-overflow:ellipsis;border:1px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';background:' + (on ? 'var(--accent-bg)' : 'var(--surface)') + ';color:' + (on ? 'var(--accent)' : 'var(--text2)') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">' + l + ' <span style="opacity:.7;">' + cnt(k) + '</span></button>'; }).join('');
+  box.innerHTML = NOTE_FOLDERS.map(f => {
+    const items = live.filter(n => _noteInFolder(n, f.k));
+    let badge = '';
+    if (f.k === 'document') {
+      const lefts = items.map(n => _docDaysLeft(n.doc)).filter(v => v !== null);
+      const exp = lefts.filter(v => v < 0).length, soon = lefts.filter(v => v >= 0 && v <= 60).length;
+      if (exp) badge = '<div style="margin-top:6px;font-size:11px;font-weight:800;color:#ef4444;">⛔ ' + exp + ' scadut' + (exp === 1 ? 'o' : 'i') + '</div>';
+      else if (soon) badge = '<div style="margin-top:6px;font-size:11px;font-weight:800;color:#f97316;">⚠️ ' + soon + ' in scadenza</div>';
+    }
+    return '<button onclick="noteOpenFolder(\'' + f.k + '\')" style="position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 10px 18px;border-radius:18px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;overflow:hidden;">' +
+      '<span style="font-size:34px;line-height:1;margin-bottom:10px;">' + f.icon + '</span>' +
+      '<span style="font-size:15px;font-weight:800;">' + f.name + '</span>' +
+      '<span style="font-size:11px;color:var(--text3);margin-top:3px;">' + f.sub + '</span>' +
+      '<span style="font-size:12px;font-weight:800;color:' + f.color + ';margin-top:8px;">' + items.length + (items.length === 1 ? ' voce' : ' voci') + '</span>' + badge +
+      '<span style="position:absolute;left:0;right:0;bottom:0;height:3px;background:' + f.color + ';opacity:.8;"></span></button>';
+  }).join('');
 }
-function hbOpenDocs() { try { switchTab('notes'); } catch (e) {} _noteKindFilter = 'document'; try { noteRenderList(''); } catch (e) {} }
+function noteShowFolders() {
+  _noteKindFilter = '';
+  document.getElementById('note-view-folders').style.display = 'flex';
+  document.getElementById('note-view-list').style.display = 'none';
+  document.getElementById('note-view-editor').style.display = 'none';
+  document.getElementById('topbar-back').classList.remove('visible');
+  document.getElementById('topbar-title').textContent = 'Archivio';
+  const n = (_notes || []).filter(x => !x.deleted).length;
+  document.getElementById('topbar-sub').textContent = n + (n === 1 ? ' voce' : ' voci');
+  noteRenderFolders();
+}
+function noteOpenFolder(k) {
+  _noteKindFilter = k;
+  noteShowList('');
+}
+function hbOpenDocs() { try { switchTab('notes'); } catch (e) {} try { noteOpenFolder('document'); } catch (e) {} }
 
 function noteRenderList(q='') {
-  noteRenderChips();
   const list = document.getElementById('note-list');
   if (!list) return;
 
@@ -6848,8 +6889,8 @@ function noteRenderList(q='') {
   if (!notes.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
       <div style="font-size:32px;margin-bottom:8px;">📝</div>
-      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q ? 'Nessun risultato' : 'Nessuna nota'}</div>
-      <div style="font-size:13px;color:var(--text3);">${q ? 'Prova con un termine diverso' : 'Tocca + per aggiungere la prima nota'}</div>
+      <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${q ? 'Nessun risultato' : 'Cartella vuota'}</div>
+      <div style="font-size:13px;color:var(--text3);">${q ? 'Prova con un termine diverso' : 'Tocca + in alto per aggiungere la prima voce'}</div>
     </div>`;
     return;
   }
@@ -6907,7 +6948,7 @@ function noteNew() {
   ov.onclick = e => { if (e.target === ov) ov.remove(); };
   const row = (k, ic, lb, sub) => `<button data-k="${k}" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;margin-bottom:8px;border-radius:14px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-family:inherit;"><span style="font-size:22px;">${ic}</span><span><span style="display:block;font-size:14px;font-weight:800;">${lb}</span><span style="display:block;font-size:12px;color:var(--text3);">${sub}</span></span></button>`;
   ov.innerHTML = `<div style="width:100%;max-width:480px;background:var(--surface);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));">
-    <div style="font-size:15px;font-weight:900;margin-bottom:12px;">Nuova nota</div>
+    <div style="font-size:15px;font-weight:900;margin-bottom:12px;">Nuova voce</div>
     ${row('', '✏️', 'Nota libera', 'Testo a piacere')}
     ${row('bitlocker', '🔑', 'Chiave BitLocker', 'PC, ID chiave e chiave di ripristino')}
     ${row('document', '📄', 'Documento', 'Carta d\'identità, passaporto, patente… con scadenza')}
@@ -6924,12 +6965,13 @@ function noteCopy(id) {
 
 function noteNewOfKind(kind) {
   _noteNewKind = kind || '';
+  _noteKindFilter = kind || 'free';
   _noteEditId = 'note_' + Date.now();
   _noteCurrentAtts = [];
   const _kd = NOTE_KINDS[_noteNewKind];
   document.getElementById('note-title-inp').value = _kd ? _kd.title : '';
   document.getElementById('note-content-inp').value = _kd ? _kd.body : '';
-  document.getElementById('note-editor-date').textContent = _kd ? 'Nuova nota – ' + _kd.label : 'Nuova nota';
+  document.getElementById('note-editor-date').textContent = _kd ? 'Nuova voce – ' + _kd.label : 'Nuova voce';
   noteDocToggle(_noteNewKind === 'document', null);
   const histLink = document.getElementById('note-history-link');
   if (histLink) histLink.style.display = 'none';
@@ -6952,6 +6994,7 @@ function noteEdit(id) {
   if (!note) return;
   _noteEditId = id;
   _noteNewKind = note.kind || '';
+  _noteKindFilter = note.kind || 'free';
   _noteCurrentAtts = (_noteAttStore[id] || []).slice();
   document.getElementById('note-title-inp').value = note.title || '';
   document.getElementById('note-content-inp').value = note.content || '';
@@ -7011,10 +7054,11 @@ function noteRestoreHistory(index) {
 }
 
 function noteShowEditor() {
+  const _nf = document.getElementById('note-view-folders'); if (_nf) _nf.style.display = 'none';
   document.getElementById('note-view-list').style.display = 'none';
   document.getElementById('note-view-editor').style.display = 'flex';
   document.getElementById('topbar-back').classList.add('visible');
-  document.getElementById('topbar-title').textContent = _noteEditId ? 'Modifica nota' : 'Nuova nota';
+  document.getElementById('topbar-title').textContent = _noteEditId ? 'Modifica voce' : 'Nuova voce';
   document.getElementById('topbar-sub').textContent = '';
   // Riparti sempre in modalità modifica, non anteprima
   _noteInPreview = true; // forza il toggle a "spegnere" l'anteprima ripristinando lo stato editor
@@ -7051,7 +7095,7 @@ function noteSave() {
   else delete _noteAttStore[_noteEditId];
   noteAttSaveAll();
   noteSaveAll();
-  showToast('✅ Nota salvata');
+  showToast('✅ Salvato');
   noteCloseEditor();
 }
 
@@ -7066,7 +7110,7 @@ function noteDelete(id) {
   box.style.cssText = 'background:var(--bg2);border-radius:20px;padding:24px;max-width:320px;width:100%;text-align:center;border:1px solid var(--border);';
   box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">🗑</div>
-    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa nota?</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa voce?</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
     <div style="display:flex;gap:10px;">
       <button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
@@ -7081,7 +7125,7 @@ function noteDelete(id) {
     if (_noteAttStore[id]) { delete _noteAttStore[id]; noteAttSaveAll(); }
     noteSaveAll();
     noteRenderList('');
-    showToast('Nota eliminata');
+    showToast('Voce eliminata');
   };
 }
 
@@ -8930,11 +8974,12 @@ function runSearch(q) {
   // ── Note ──────────────────────────────────────────────
   if (typeof _notes !== 'undefined') {
     _notes.filter(n => !n.deleted).forEach(note => {
-      if ([note.title, note.content].some(f => f && f.toLowerCase().includes(ql))) {
+      if ([note.title, note.content, note.doc ? Object.values(note.doc).join(' ') : ''].some(f => f && f.toLowerCase().includes(ql))) {
+        const _k = NOTE_KINDS[note.kind], _hid = note.kind === 'bitlocker' || note.kind === 'backup';
         results.push({
-          icon: '📝', title: note.title || 'Nota senza titolo',
-          sub: (note.content || '').slice(0, 60),
-          badge: '📝 Note',
+          icon: _k ? _k.icon : '📝', title: note.title || 'Senza titolo',
+          sub: _hid ? 'Contenuto nascosto' : note.kind === 'document' ? [note.doc && note.doc.tipo, note.doc && note.doc.scadenza ? 'scade ' + _docFmtDate(note.doc.scadenza) : ''].filter(Boolean).join(' · ') : (note.content || '').slice(0, 60),
+          badge: '🗂️ Archivio',
           action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
         });
       }
@@ -11011,7 +11056,7 @@ const SECTION_KEYS = {
 };
 const SECTION_LABELS = {
   'passwords': '🔐 Password',
-  'notes':     '📝 Note',
+  'notes':     '🗂️ Archivio',
   'otp':       '🔑 OTP / 2FA',
   'cards':     '💳 Portafoglio',
   'server':    '📡 Rete & IT',
@@ -11427,7 +11472,7 @@ document.addEventListener('keydown', (e) => {
                 </div>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;background:var(--bg2);">
-                <span style="font-size:13px;font-weight:600;">📝 Note</span>
+                <span style="font-size:13px;font-weight:600;">🗂️ Archivio (note, chiavi, documenti)</span>
                 <div style="display:flex;gap:6px;">
                   <button onclick="sectionExport('notes')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📤 Esporta</button>
                   <button onclick="sectionImport('notes')" style="padding:6px 12px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">📥 Importa</button>
@@ -11585,13 +11630,13 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.31.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.31.2</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
             <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;">
               <div style="display:flex;align-items:center;gap:10px;">🔐 <span style="color:var(--text2);">Password con categorie</span></div>
-              <div style="display:flex;align-items:center;gap:10px;">📝 <span style="color:var(--text2);">Note</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">🗂️ <span style="color:var(--text2);">Archivio — Note, Chiavi, Backup e Documenti</span></div>
               <div style="display:flex;align-items:center;gap:10px;">🔑 <span style="color:var(--text2);">OTP / 2FA</span></div>
               <div style="display:flex;align-items:center;gap:10px;">💳 <span style="color:var(--text2);">Portafoglio — Carte e Conti</span></div>
               <div style="display:flex;align-items:center;gap:10px;">📡 <span style="color:var(--text2);">Rete & IT — Server e Wi-Fi</span></div>
@@ -11644,7 +11689,7 @@ document.addEventListener('keydown', (e) => {
         <option value="card">💳 Carta di credito/debito</option>
         <option value="finance">🏦 Conto / IBAN</option>
         <option value="otp">🔑 OTP / 2FA</option>
-        <option value="note">📝 Nota</option>
+        <option value="note">🗂️ Archivio (nota, chiave, documento)</option>
         <option value="wifi">📶 Rete Wi-Fi</option>
         <option value="server">📡 Server / Credenziale IT</option>
       </select>
