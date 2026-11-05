@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.30.6</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.31.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.30.6</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.31.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.30.6</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.31.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2347,13 +2347,8 @@ Aggiungi nuovo dato
                 <option value="created">📅 Per data</option>
                 <option value="title">🔤 Per titolo</option>
               </select>
-              <select id="note-kind-sel" onchange="_noteKindFilter=this.value;noteRenderList(document.getElementById('note-search-inp')?.value||'')" style="flex:1 1 0;min-width:0;max-width:100%;padding:8px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;outline:none;">
-                <option value="">📝 Tutte</option>
-                <option value="bitlocker">🔑 Chiavi BitLocker</option>
-                <option value="backup">🛡️ Codici di backup</option>
-                <option value="free">✏️ Libere</option>
-              </select>
             </div>
+            <div id="note-kind-chips" style="display:flex;flex-wrap:nowrap;gap:4px;margin-top:8px;"></div>
           </div>
           <div id="note-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:4px 14px 100px;"></div>
         </div>
@@ -2371,6 +2366,23 @@ Aggiungi nuovo dato
           <div style="padding:6px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
             <span id="note-editor-date" style="font-size:11px;color:var(--text3);font-weight:500;"></span>
             <span id="note-history-link" onclick="noteShowHistory()" style="display:none;font-size:11px;color:var(--accent);font-weight:700;cursor:pointer;">🕐 Cronologia</span>
+          </div>
+          <!-- Campi documento (solo per le note di tipo Documento) -->
+          <div id="note-doc-fields" style="display:none;padding:2px 14px 6px;flex-shrink:0;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Tipo
+                <select id="doc-tipo" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;"></select></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Intestatario
+                <input id="doc-intest" type="text" maxlength="80" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Numero
+                <input id="doc-num" type="text" maxlength="60" autocomplete="off" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Ente di rilascio
+                <input id="doc-ente" type="text" maxlength="80" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Data di rilascio
+                <input id="doc-rilascio" type="date" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+              <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Data di scadenza
+                <input id="doc-scadenza" type="date" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
+            </div>
           </div>
           <!-- Barra formattazione note -->
           <div style="padding:4px 14px;display:flex;gap:6px;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch;">
@@ -3002,7 +3014,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.30.6',
+  version: 'v13.31.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3890,6 +3902,14 @@ function updateHomeStats() {
     alerts.unshift({ icon:'🚨', color:'#ef4444', text: pwPwned.length + ' password compromess' + (pwPwned.length===1?'a':'e') + ' — cambiale subito', time: '', tab: 'passwords', action: "switchTab('passwords');setTimeout(()=>pwShowFilteredList('pwned'),150)" });
   }
 
+  // 2c. Documenti (note di tipo Documento) scaduti o in scadenza
+  try {
+    (typeof _notes !== 'undefined' ? _notes : []).filter(n => !n.deleted && n.kind === 'document' && n.doc && n.doc.scadenza).forEach(n => {
+      const left = _docDaysLeft(n.doc), nm = n.title || n.doc.tipo || 'Documento';
+      if (left < 0) alerts.push({ icon:'📄', color:'#ef4444', text: nm + ' scaduto', time:'Scaduto', action:'hbOpenDocs()' });
+      else if (left <= 60) alerts.push({ icon:'📄', color:'#f97316', text: nm + ' scade tra ' + left + ' giorni', time: left + 'gg', action:'hbOpenDocs()' });
+    });
+  } catch (e) {}
   // 2d. Promemoria backup (Drive o file): mai fatto, più vecchio di 7 giorni, o con molte modifiche non ancora salvate
   if ((_pwItems||[]).filter(i => !i.deleted).length > 0) {
     const _lb = hbLastBackupTs();
@@ -6579,9 +6599,11 @@ const NOTE_ATT_KEY = 'hb13_note_att';
 let _notes = [];
 let _noteEditId = null; // null = nuova nota
 let _noteKindFilter = '';
+const DOC_TYPES = ['Carta d\'identità','Passaporto','Patente','Tessera sanitaria','Codice fiscale','Libretto / Carta di circolazione','Altro documento'];
 let _noteNewKind = '';   // tipo della nota che si sta creando/modificando ('', 'bitlocker', 'backup')
 const NOTE_KINDS = {
   bitlocker: { icon:'🔑', label:'Chiave BitLocker', title:'BitLocker – ', body:'PC / Disco: \nID chiave: \nChiave di ripristino (48 cifre): \n\nNote: ' },
+  document:  { icon:'📄', label:'Documento', title:'', body:'' },
   backup:    { icon:'🛡️', label:'Codici di backup', title:'Codici backup – ', body:'Servizio / Account: \n\nCodici (uno per riga):\n1) \n2) \n3) \n4) \n5) \n6) \n7) \n8) \n\nNote: ' }
 };
 let _noteAttStore = {};        // { noteId: [ {id,name,type,size,dataUrl} ] }
@@ -6753,7 +6775,52 @@ function noteShowList(q='') {
   noteRenderList(q);
 }
 
+// ── Documenti: scadenza, riepilogo, cartelle ──
+function _docDaysLeft(d) {
+  if (!d || !d.scadenza) return null;
+  const t = new Date(d.scadenza + 'T00:00:00'); if (isNaN(t)) return null;
+  const n = new Date(); n.setHours(0, 0, 0, 0);
+  return Math.round((t - n) / 86400000);
+}
+function _docFmtDate(iso) { if (!iso) return ''; const [y, m, dd] = String(iso).split('-'); return (y && m && dd) ? dd + '/' + m + '/' + y : iso; }
+function _docMask(num) { const t = String(num || '').replace(/\s/g, ''); return t.length > 4 ? '•••• ' + t.slice(-4) : t; }
+function noteDocFill(doc) {
+  const sel = document.getElementById('doc-tipo');
+  if (sel && !sel.options.length) sel.innerHTML = DOC_TYPES.map(t => '<option>' + hbEsc(t) + '</option>').join('');
+  const d = doc || {};
+  if (sel) sel.value = d.tipo && DOC_TYPES.includes(d.tipo) ? d.tipo : DOC_TYPES[0];
+  document.getElementById('doc-intest').value = d.intestatario || '';
+  document.getElementById('doc-num').value = d.numero || '';
+  document.getElementById('doc-ente').value = d.ente || '';
+  document.getElementById('doc-rilascio').value = d.rilascio || '';
+  document.getElementById('doc-scadenza').value = d.scadenza || '';
+}
+function noteDocRead() {
+  return { tipo: document.getElementById('doc-tipo').value, intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value };
+}
+function noteDocText(n) {
+  const d = n.doc || {}, r = [];
+  if (n.title) r.push(n.title);
+  if (d.tipo) r.push('Tipo: ' + d.tipo);
+  if (d.intestatario) r.push('Intestatario: ' + d.intestatario);
+  if (d.numero) r.push('Numero: ' + d.numero);
+  if (d.ente) r.push('Ente di rilascio: ' + d.ente);
+  if (d.rilascio) r.push('Rilascio: ' + _docFmtDate(d.rilascio));
+  if (d.scadenza) r.push('Scadenza: ' + _docFmtDate(d.scadenza));
+  if (n.content) r.push('', n.content);
+  return r.join('\n');
+}
+function noteRenderChips() {
+  const box = document.getElementById('note-kind-chips'); if (!box) return;
+  const live = (_notes || []).filter(n => !n.deleted);
+  const cnt = k => k === '' ? live.length : k === 'free' ? live.filter(n => !n.kind).length : live.filter(n => n.kind === k).length;
+  const defs = [['', 'Tutte'], ['free', 'Note'], ['bitlocker', 'Chiavi'], ['backup', 'Backup'], ['document', 'Documenti']];
+  box.innerHTML = defs.map(([k, l]) => { const on = _noteKindFilter === k; return '<button onclick="_noteKindFilter=\'' + k + '\';noteRenderList(\'\')" style="flex:1 1 auto;min-width:0;padding:7px 3px;border-radius:99px;text-align:center;overflow:hidden;text-overflow:ellipsis;border:1px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';background:' + (on ? 'var(--accent-bg)' : 'var(--surface)') + ';color:' + (on ? 'var(--accent)' : 'var(--text2)') + ';font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">' + l + ' <span style="opacity:.7;">' + cnt(k) + '</span></button>'; }).join('');
+}
+function hbOpenDocs() { try { switchTab('notes'); } catch (e) {} _noteKindFilter = 'document'; try { noteRenderList(''); } catch (e) {} }
+
 function noteRenderList(q='') {
+  noteRenderChips();
   const list = document.getElementById('note-list');
   if (!list) return;
 
@@ -6776,7 +6843,7 @@ function noteRenderList(q='') {
   });
   if (_noteKindFilter) notes = notes.filter(n => _noteKindFilter==='free' ? !n.kind : n.kind===_noteKindFilter);
   if (q) notes = notes.filter(n =>
-    (n.title+n.content).toLowerCase().includes(q.toLowerCase())
+    (n.title + n.content + (n.doc ? Object.values(n.doc).join(' ') : '')).toLowerCase().includes(q.toLowerCase())
   );
   if (!notes.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
@@ -6806,10 +6873,20 @@ function noteRenderList(q='') {
     const dateStr = d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
     const kd = NOTE_KINDS[note.kind];
     // le chiavi/codici non mostrano il contenuto nell'elenco: si vede solo aprendo la nota
-    const preview = kd ? '••••••••••••' : (note.content||'').replace(/\n/g,' ').trim();
+    let preview = kd ? '••••••••••••' : (note.content||'').replace(/\n/g,' ').trim();
+    let docBadge = '';
+    if (note.kind === 'document') {
+      const dd = note.doc || {}, left = _docDaysLeft(dd);
+      preview = [dd.tipo, dd.numero ? 'n. ' + _docMask(dd.numero) : '', dd.ente].filter(Boolean).join(' · ');
+      if (left !== null) {
+        const col = left < 0 ? '#ef4444' : left <= 60 ? '#f97316' : '#10b981';
+        const txt = left < 0 ? 'Scaduto il ' + _docFmtDate(dd.scadenza) : left === 0 ? 'Scade oggi' : left <= 60 ? 'Scade tra ' + left + ' giorni (' + _docFmtDate(dd.scadenza) + ')' : 'Scade il ' + _docFmtDate(dd.scadenza);
+        docBadge = '<div style="margin-top:6px;font-size:11px;font-weight:800;color:' + col + ';">' + (left < 0 ? '⛔ ' : left <= 60 ? '⚠️ ' : '✅ ') + txt + '</div>';
+      }
+    }
     card.innerHTML = `
       <div class="note-card-title">${kd ? kd.icon+' ' : ''}${hbEsc(note.title || 'Senza titolo')}</div>
-      ${preview ? `<div class="note-card-preview">${hbEsc(preview)}</div>` : ''}
+      ${preview ? `<div class="note-card-preview">${hbEsc(preview)}</div>` : ''}${docBadge}
       <div class="note-card-footer">
         <span class="note-card-date">🕐 ${dateStr}${(_noteAttStore[note.id]||[]).length ? ' · 📎 '+_noteAttStore[note.id].length : ''}</span>
         <div style="display:flex;gap:6px;">
@@ -6833,6 +6910,7 @@ function noteNew() {
     <div style="font-size:15px;font-weight:900;margin-bottom:12px;">Nuova nota</div>
     ${row('', '✏️', 'Nota libera', 'Testo a piacere')}
     ${row('bitlocker', '🔑', 'Chiave BitLocker', 'PC, ID chiave e chiave di ripristino')}
+    ${row('document', '📄', 'Documento', 'Carta d\'identità, passaporto, patente… con scadenza')}
     ${row('backup', '🛡️', 'Codici di backup', 'Codici di emergenza di un account')}
   </div>`;
   ov.querySelectorAll('button[data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k; ov.remove(); noteNewOfKind(k); });
@@ -6841,7 +6919,7 @@ function noteNew() {
 
 function noteCopy(id) {
   const n = _notes.find(x => x.id === id); if (!n) return;
-  navigator.clipboard.writeText(n.content || '').then(() => showToast('📋 Copiato'), () => showToast('Copia non riuscita'));
+  navigator.clipboard.writeText(n.kind === 'document' ? noteDocText(n) : (n.content || '')).then(() => showToast('📋 Copiato'), () => showToast('Copia non riuscita'));
 }
 
 function noteNewOfKind(kind) {
@@ -6852,11 +6930,21 @@ function noteNewOfKind(kind) {
   document.getElementById('note-title-inp').value = _kd ? _kd.title : '';
   document.getElementById('note-content-inp').value = _kd ? _kd.body : '';
   document.getElementById('note-editor-date').textContent = _kd ? 'Nuova nota – ' + _kd.label : 'Nuova nota';
+  noteDocToggle(_noteNewKind === 'document', null);
   const histLink = document.getElementById('note-history-link');
   if (histLink) histLink.style.display = 'none';
   noteRenderAttachments();
   noteShowEditor();
   setTimeout(() => document.getElementById('note-title-inp').focus(), 200);
+}
+
+function noteDocToggle(on, doc) {
+  const box = document.getElementById('note-doc-fields'); if (!box) return;
+  box.style.display = on ? 'block' : 'none';
+  if (on) noteDocFill(doc);
+  const c = document.getElementById('note-content-inp');
+  if (c) c.placeholder = on ? 'Altri dati riportati sul documento (luogo di nascita, cittadinanza, categorie, note…)' : 'Scrivi qui la tua nota...';
+  const t = document.getElementById('note-title-inp'); if (t) t.placeholder = on ? 'Titolo (es. Carta d\'identità Mario)…' : 'Titolo nota...';
 }
 
 function noteEdit(id) {
@@ -6867,6 +6955,7 @@ function noteEdit(id) {
   _noteCurrentAtts = (_noteAttStore[id] || []).slice();
   document.getElementById('note-title-inp').value = note.title || '';
   document.getElementById('note-content-inp').value = note.content || '';
+  noteDocToggle(note.kind === 'document', note.doc);
   const d = new Date(note.updatedAt);
   document.getElementById('note-editor-date').textContent =
     'Modificata: ' + d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
@@ -6933,8 +7022,10 @@ function noteShowEditor() {
 }
 
 function noteSave() {
-  const title   = document.getElementById('note-title-inp').value.trim();
+  let title   = document.getElementById('note-title-inp').value.trim();
   const content = document.getElementById('note-content-inp').value.trim();
+  const _doc = _noteNewKind === 'document' ? noteDocRead() : null;
+  if (_doc && !title) title = [_doc.tipo, _doc.intestatario].filter(Boolean).join(' – ');
   if (!title && !content && !_noteCurrentAtts.length) { showToast('Scrivi qualcosa prima di salvare'); return; }
   const now = new Date().toISOString();
   let note = _notes.find(n => n.id === _noteEditId);
@@ -6949,9 +7040,11 @@ function noteSave() {
     }
     note.title = title; note.content = content; note.updatedAt = now;
     if (_noteNewKind) note.kind = _noteNewKind; else delete note.kind;
+    if (_doc) note.doc = _doc; else delete note.doc;
   } else {
     const nn = { id:_noteEditId, title, content, createdAt:now, updatedAt:now };
     if (_noteNewKind) nn.kind = _noteNewKind;
+    if (_doc) nn.doc = _doc;
     _notes.push(nn);
   }
   if (_noteCurrentAtts.length) _noteAttStore[_noteEditId] = _noteCurrentAtts;
@@ -7003,7 +7096,8 @@ function noteImportFromBackup(notesArr) {
         content: n.content || '',
         createdAt: n.createdAt || new Date().toISOString(),
         updatedAt: n.updatedAt || new Date().toISOString(),
-        ...(n.kind ? { kind: n.kind } : {})
+        ...(n.kind ? { kind: n.kind } : {}),
+        ...(n.doc ? { doc: n.doc } : {})
       });
     }
   });
@@ -11491,7 +11585,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.30.6</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.31.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
