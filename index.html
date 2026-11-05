@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.32.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.32.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.32.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.32.1</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.32.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.32.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2375,7 +2375,9 @@ Aggiungi nuovo dato
           <div id="note-doc-fields" style="display:none;padding:2px 14px 6px;flex-shrink:0;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Tipo
-                <select id="doc-tipo" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;"></select></label>
+                <select id="doc-tipo" onchange="noteDocTipoChange()" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;"></select></label>
+              <label id="doc-tipo-altro-wrap" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);grid-column:1/-1;display:none;">Nome del documento
+                <input id="doc-tipo-altro" type="text" maxlength="60" placeholder="es. Tessera elettorale, Porto d'armi…" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Intestatario
                 <input id="doc-intest" type="text" maxlength="80" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Numero
@@ -3029,7 +3031,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.32.0',
+  version: 'v13.32.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3922,12 +3924,12 @@ function updateHomeStats() {
   // 2c. Documenti (note di tipo Documento) scaduti o in scadenza
   try {
     (typeof _notes !== 'undefined' ? _notes : []).filter(n => !n.deleted && n.kind === 'document' && n.doc && n.doc.scadenza).forEach(n => {
-      const left = _docDaysLeft(n.doc), nm = n.title || n.doc.tipo || 'Documento';
+      const left = _docDaysLeft(n.doc), nm = n.title || _docTipoName(n.doc) || 'Documento';
       if (left < 0) alerts.push({ icon:'📄', color:'#ef4444', text: nm + ' scaduto', time:'Scaduto', action:'hbOpenDocs()' });
       else if (left <= 60) alerts.push({ icon:'📄', color:'#f97316', text: nm + ' scade tra ' + left + ' giorni', time: left + 'gg', action:'hbOpenDocs()' });
     });
     (typeof _notes !== 'undefined' ? _notes : []).filter(n => !n.deleted && n.kind === 'document' && n.doc && n.doc.pwdScad).forEach(n => {
-      const pl = _docDaysLeft({ scadenza: n.doc.pwdScad }), nm = n.title || n.doc.tipo || 'Documento';
+      const pl = _docDaysLeft({ scadenza: n.doc.pwdScad }), nm = n.title || _docTipoName(n.doc) || 'Documento';
       if (pl < 0) alerts.push({ icon:'🔑', color:'#ef4444', text: 'Password di ' + nm + ' scaduta', time:'Scaduta', action:'hbOpenDocs()' });
       else if (pl <= 30) alerts.push({ icon:'🔑', color:'#f97316', text: 'Password di ' + nm + ' scade tra ' + pl + ' giorni', time: pl + 'gg', action:'hbOpenDocs()' });
     });
@@ -6807,11 +6809,15 @@ function _docDaysLeft(d) {
 }
 function _docFmtDate(iso) { if (!iso) return ''; const [y, m, dd] = String(iso).split('-'); return (y && m && dd) ? dd + '/' + m + '/' + y : iso; }
 function _docMask(num) { const t = String(num || '').replace(/\s/g, ''); return t.length > 4 ? '•••• ' + t.slice(-4) : t; }
+function _docTipoName(d) { d = d || {}; return d.tipo === 'Altro documento' && d.tipoAltro ? d.tipoAltro : (d.tipo || ''); }
+function noteDocTipoChange() { const sel = document.getElementById('doc-tipo'), w = document.getElementById('doc-tipo-altro-wrap'); if (w) w.style.display = sel && sel.value === 'Altro documento' ? 'block' : 'none'; }
 function noteDocFill(doc) {
   const sel = document.getElementById('doc-tipo');
   if (sel && !sel.options.length) sel.innerHTML = DOC_TYPES.map(t => '<option>' + hbEsc(t) + '</option>').join('');
   const d = doc || {};
   if (sel) sel.value = d.tipo && DOC_TYPES.includes(d.tipo) ? d.tipo : DOC_TYPES[0];
+  document.getElementById('doc-tipo-altro').value = d.tipoAltro || '';
+  noteDocTipoChange();
   document.getElementById('doc-intest').value = d.intestatario || '';
   document.getElementById('doc-num').value = d.numero || '';
   document.getElementById('doc-ente').value = d.ente || '';
@@ -6852,12 +6858,12 @@ function _noteBadge(left, okTxt, soonTxt, lateTxt, soonDays) {
 }
 function noteDocEye(id, btn) { const e = document.getElementById(id); if (!e) return; const show = e.type === 'password'; e.type = show ? 'text' : 'password'; btn.textContent = show ? '🙈' : '👁'; }
 function noteDocRead() {
-  return { tipo: document.getElementById('doc-tipo').value, intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), email: document.getElementById('doc-email').value.trim(), pwd: document.getElementById('doc-pwd').value, pwdScad: document.getElementById('doc-pwdscad').value, pin: document.getElementById('doc-pin').value.trim(), puk: document.getElementById('doc-puk').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value };
+  return { tipo: document.getElementById('doc-tipo').value, tipoAltro: document.getElementById('doc-tipo').value === 'Altro documento' ? document.getElementById('doc-tipo-altro').value.trim() : '', intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), email: document.getElementById('doc-email').value.trim(), pwd: document.getElementById('doc-pwd').value, pwdScad: document.getElementById('doc-pwdscad').value, pin: document.getElementById('doc-pin').value.trim(), puk: document.getElementById('doc-puk').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value };
 }
 function noteDocText(n) {
   const d = n.doc || {}, r = [];
   if (n.title) r.push(n.title);
-  if (d.tipo) r.push('Tipo: ' + d.tipo);
+  if (d.tipo) r.push('Tipo: ' + _docTipoName(d));
   if (d.intestatario) r.push('Intestatario: ' + d.intestatario);
   if (d.numero) r.push('Numero: ' + d.numero);
   if (d.ente) r.push('Ente di rilascio: ' + d.ente);
@@ -6938,7 +6944,7 @@ function noteRenderList(q='') {
   });
   if (_noteKindFilter) notes = notes.filter(n => _noteKindFilter==='free' ? !n.kind : n.kind===_noteKindFilter);
   if (q) notes = notes.filter(n =>
-    (n.title + n.content + (n.doc ? [n.doc.tipo,n.doc.intestatario,n.doc.numero,n.doc.ente].join(' ') : '')).toLowerCase().includes(q.toLowerCase())
+    (n.title + n.content + (n.doc ? [_docTipoName(n.doc),n.doc.intestatario,n.doc.numero,n.doc.ente].join(' ') : '')).toLowerCase().includes(q.toLowerCase())
   );
   if (!notes.length) {
     list.innerHTML = `<div style="text-align:center;padding:48px 20px;">
@@ -6968,7 +6974,7 @@ function noteRenderList(q='') {
     const dateStr = d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
     const kd = NOTE_KINDS[note.kind], col = _noteColor(note), id = note.id, dd = note.doc || {};
     const icon = kd ? kd.icon : '📝';
-    let sub = note.kind === 'document' ? [dd.tipo, dd.intestatario].filter(Boolean).join(' · ') : kd ? kd.label : '';
+    let sub = note.kind === 'document' ? [_docTipoName(dd), dd.intestatario].filter(Boolean).join(' · ') : kd ? kd.label : '';
     let body = '';
     if (note.kind === 'document') {
       const rows = [];
@@ -7140,7 +7146,7 @@ function noteSave() {
   let title   = document.getElementById('note-title-inp').value.trim();
   const content = document.getElementById('note-content-inp').value.trim();
   const _doc = _noteNewKind === 'document' ? noteDocRead() : null;
-  if (_doc && !title) title = [_doc.tipo, _doc.intestatario].filter(Boolean).join(' – ');
+  if (_doc && !title) title = [_docTipoName(_doc), _doc.intestatario].filter(Boolean).join(' – ');
   if (!title && !content && !_noteCurrentAtts.length) { showToast('Scrivi qualcosa prima di salvare'); return; }
   const now = new Date().toISOString();
   let note = _notes.find(n => n.id === _noteEditId);
@@ -9045,11 +9051,11 @@ function runSearch(q) {
   // ── Note ──────────────────────────────────────────────
   if (typeof _notes !== 'undefined') {
     _notes.filter(n => !n.deleted).forEach(note => {
-      if ([note.title, note.content, note.doc ? [note.doc.tipo, note.doc.intestatario, note.doc.numero, note.doc.ente].join(' ') : ''].some(f => f && f.toLowerCase().includes(ql))) {
+      if ([note.title, note.content, note.doc ? [_docTipoName(note.doc), note.doc.intestatario, note.doc.numero, note.doc.ente].join(' ') : ''].some(f => f && f.toLowerCase().includes(ql))) {
         const _k = NOTE_KINDS[note.kind], _hid = note.kind === 'bitlocker' || note.kind === 'backup';
         results.push({
           icon: _k ? _k.icon : '📝', title: note.title || 'Senza titolo',
-          sub: _hid ? 'Contenuto nascosto' : note.kind === 'document' ? [note.doc && note.doc.tipo, note.doc && note.doc.scadenza ? 'scade ' + _docFmtDate(note.doc.scadenza) : ''].filter(Boolean).join(' · ') : (note.content || '').slice(0, 60),
+          sub: _hid ? 'Contenuto nascosto' : note.kind === 'document' ? [note.doc && _docTipoName(note.doc), note.doc && note.doc.scadenza ? 'scade ' + _docFmtDate(note.doc.scadenza) : ''].filter(Boolean).join(' · ') : (note.content || '').slice(0, 60),
           badge: '🗂️ Archivio',
           action: () => { switchTab('notes'); setTimeout(() => noteEdit(note.id), 300); }
         });
@@ -11701,7 +11707,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.32.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.32.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
