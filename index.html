@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.32.3</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.33.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.32.3</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.33.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.32.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.33.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3031,7 +3031,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.32.3',
+  version: 'v13.33.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6739,6 +6739,13 @@ async function noteAttHandleFiles(fileList) {
   document.getElementById('note-att-input').value = '';
 }
 
+const _noteAttSel = new Set();
+function noteAttToggleSel(id) { if (_noteAttSel.has(id)) _noteAttSel.delete(id); else _noteAttSel.add(id); noteRenderAttachments(); }
+function noteAttPrintSel() {
+  const imgs = _noteCurrentAtts.filter(a => a.type.startsWith('image/'));
+  const ids = imgs.filter(a => _noteAttSel.has(a.id)).map(a => a.id);
+  noteAttPrint(ids.length ? ids : imgs.map(a => a.id));
+}
 function noteRenderAttachments() {
   const box = document.getElementById('note-att-list');
   if (!box) return;
@@ -6751,12 +6758,14 @@ function noteRenderAttachments() {
     return `<div style="position:relative;width:64px;flex-shrink:0;">
       <div onclick="noteAttPreview('${a.id}')" style="width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">${thumb}</div>
       <div style="font-size:9px;color:var(--text3);margin-top:3px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${noteAttFormatSize(a.size)}</div>
+      ${a.type.startsWith('image/') ? `<button onclick="noteAttToggleSel('${a.id}')" title="Seleziona per stampare" style="position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:7px;border:2px solid #fff;background:${_noteAttSel.has(a.id) ? 'var(--accent)' : 'rgba(0,0,0,.45)'};color:#fff;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">${_noteAttSel.has(a.id) ? '✓' : ''}</button>` : ''}
       <button onclick="noteAttRemove('${a.id}')" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:white;border:2px solid var(--bg2);font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">✕</button>
     </div>`;
-  }).join('');
+  }).join('') + (_noteCurrentAtts.filter(a => a.type.startsWith('image/')).length ? `<button onclick="noteAttPrintSel()" style="flex-shrink:0;width:64px;height:64px;border-radius:12px;border:1px dashed var(--accent);background:var(--surface);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3;">🖨<br>Stampa<br>${_noteAttSel.size ? '(' + [..._noteAttSel].filter(i => _noteCurrentAtts.some(a => a.id === i)).length + ')' : 'tutte'}</button>` : '');
 }
 
 function noteAttRemove(id) {
+  _noteAttSel.delete(id);
   _noteCurrentAtts = _noteCurrentAtts.filter(a => a.id !== id);
   noteRenderAttachments();
 }
@@ -6765,19 +6774,67 @@ function noteAttPreview(id) {
   const a = _noteCurrentAtts.find(x => x.id === id);
   if (!a) return;
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;';
   overlay.onclick = () => overlay.remove();
-  if (a.type.startsWith('image/')) {
-    overlay.innerHTML = `<img src="${a.dataUrl}" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);">`;
+  const isImg = a.type.startsWith('image/'), isPdf = a.type === 'application/pdf' || /\.pdf$/i.test(a.name);
+  const btn = 'padding:10px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;';
+  const bar = '<div onclick="event.stopPropagation()" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;flex-shrink:0;">' +
+    (isImg ? '<button style="' + btn + '" data-act="print">🖨 Stampa</button>' : '') +
+    (isPdf ? '<button style="' + btn + '" data-act="pdf">🖨 Apri per stampare</button>' : '') +
+    '<a href="' + a.dataUrl + '" download="' + hbEsc(a.name) + '" style="' + btn + '">⬇️ Scarica</a>' +
+    '<button style="' + btn + '" data-act="close">✕ Chiudi</button></div>';
+  if (isImg) {
+    overlay.innerHTML = `<img src="${a.dataUrl}" style="max-width:100%;max-height:calc(100% - 70px);min-height:0;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);object-fit:contain;">` + bar;
   } else {
-    overlay.innerHTML = `<div style="background:var(--bg2);border-radius:16px;padding:28px;text-align:center;max-width:280px;">
+    overlay.innerHTML = `<div onclick="event.stopPropagation()" style="background:var(--bg2);border-radius:16px;padding:28px;text-align:center;max-width:300px;">
       <div style="font-size:40px;margin-bottom:10px;">${noteAttIcon(a.type)}</div>
-      <div style="font-size:14px;font-weight:700;margin-bottom:6px;word-break:break-word;">${a.name}</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">${noteAttFormatSize(a.size)}</div>
-      <a href="${a.dataUrl}" download="${a.name}" onclick="event.stopPropagation()" style="display:inline-block;padding:10px 18px;border-radius:10px;background:var(--accent);color:white;text-decoration:none;font-size:13px;font-weight:700;">⬇️ Scarica</a>
-    </div>`;
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px;word-break:break-word;">${hbEsc(a.name)}</div>
+      <div style="font-size:12px;color:var(--text3);">${noteAttFormatSize(a.size)}</div></div>` + bar;
   }
+  overlay.querySelectorAll('[data-act]').forEach(el => el.onclick = e => {
+    e.stopPropagation();
+    const act = el.dataset.act;
+    if (act === 'close') overlay.remove();
+    else if (act === 'print') noteAttPrint([a.id]);
+    else if (act === 'pdf') noteAttOpenPdf(a.id);
+  });
   document.body.appendChild(overlay);
+}
+
+// Stampa le immagini allegate (una = a pagina intera; più immagini = due per pagina, comodo per fronte/retro)
+function noteAttPrint(ids) {
+  const imgs = _noteCurrentAtts.filter(x => (ids || []).includes(x.id) && x.type.startsWith('image/'));
+  if (!imgs.length) { showToast('Nessuna immagine da stampare'); return; }
+  const single = imgs.length === 1;
+  const html = '<!doctype html><html><head><meta charset="utf-8"><title>Stampa allegati</title><style>' +
+    '@page{size:A4;margin:12mm}html,body{margin:0;padding:0;background:#fff}' +
+    '.p{display:flex;align-items:center;justify-content:center;' + (single ? 'height:270mm;' : 'height:130mm;margin-bottom:8mm;') + 'page-break-inside:avoid;break-inside:avoid}' +
+    'img{max-width:100%;max-height:100%;object-fit:contain}</style></head><body>' +
+    imgs.map(x => '<div class="p"><img src="' + x.dataUrl + '"></div>').join('') + '</body></html>';
+  const fr = document.createElement('iframe');
+  fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+  document.body.appendChild(fr);
+  const done = () => setTimeout(() => { try { fr.remove(); } catch (e) {} }, 500);
+  fr.onload = () => {
+    const w = fr.contentWindow, im = Array.from(w.document.images);
+    Promise.all(im.map(i => i.complete ? 1 : new Promise(r => { i.onload = i.onerror = r; }))).then(() => {
+      try { w.addEventListener('afterprint', done); w.focus(); w.print(); } catch (e) { showToast('Stampa non disponibile qui'); done(); }
+    });
+  };
+  fr.srcdoc = html;
+  setTimeout(() => { try { fr.remove(); } catch (e) {} }, 120000);
+}
+// I PDF si aprono nel lettore del browser, che ha già il suo tasto Stampa
+function noteAttOpenPdf(id) {
+  const a = _noteCurrentAtts.find(x => x.id === id); if (!a) return;
+  try {
+    const bin = atob(a.dataUrl.split(',')[1]); const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([u8], { type: 'application/pdf' }));
+    const w = window.open(url, '_blank');
+    if (!w) showToast('⚠️ Consenti i popup per aprire il PDF');
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  } catch (e) { showToast('Impossibile aprire il PDF'); }
 }
 
 function noteOpen() {
@@ -7147,6 +7204,7 @@ function noteRestoreHistory(index) {
 }
 
 function noteShowEditor() {
+  _noteAttSel.clear();
   const _nf = document.getElementById('note-view-folders'); if (_nf) _nf.style.display = 'none';
   document.getElementById('note-view-list').style.display = 'none';
   document.getElementById('note-view-editor').style.display = 'flex';
@@ -11729,7 +11787,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.32.3</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.33.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
