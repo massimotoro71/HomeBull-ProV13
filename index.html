@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.34.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.35.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.34.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.35.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.34.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.35.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3031,7 +3031,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.34.0',
+  version: 'v13.35.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6632,8 +6632,11 @@ const NOTE_KINDS = {
 };
 let _noteAttStore = {};        // { noteId: [ {id,name,type,size,dataUrl} ] }
 let _noteCurrentAtts = [];     // allegati della nota attualmente in modifica
-const NOTE_ATT_MAX_COUNT = 4;
-const NOTE_ATT_MAX_BYTES = 1.5 * 1024 * 1024; // 1.5MB dopo compressione/per file non immagine
+const NOTE_ATT_MAX_COUNT_LOCAL = 4, NOTE_ATT_MAX_COUNT_DRIVE = 10;
+const NOTE_ATT_MAX_BYTES_LOCAL = 1.5 * 1024 * 1024, NOTE_ATT_MAX_BYTES_DRIVE = 8 * 1024 * 1024;
+function noteAttDriveReady() { try { return !!localStorage.getItem('hb_drive_folders'); } catch (e) { return false; } }
+function noteAttMaxCount() { return noteAttDriveReady() ? NOTE_ATT_MAX_COUNT_DRIVE : NOTE_ATT_MAX_COUNT_LOCAL; }
+function noteAttMaxBytes() { return noteAttDriveReady() ? NOTE_ATT_MAX_BYTES_DRIVE : NOTE_ATT_MAX_BYTES_LOCAL; }
 
 function noteLoad() {
   _notes = _vaultParse(localStorage.getItem(NOTE_KEY), _notes);
@@ -6643,7 +6646,8 @@ function noteAttLoad() {
   _noteAttStore = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
 }
 function noteAttSaveAll() {
-  localStorage.setItem(NOTE_ATT_KEY, JSON.stringify(_noteAttStore));
+  try { localStorage.setItem(NOTE_ATT_KEY, JSON.stringify(_noteAttStore)); }
+  catch (e) { showToast('⚠️ Spazio pieno: allegati non salvati. Collega Drive o riduci gli allegati', 7000); return; }
   _setLocalTs(NOTE_ATT_KEY);
   driveAutoBackupOnSave();
 }
@@ -6696,8 +6700,8 @@ function noteAttIcon(type) {
 
 // Gestisce la selezione file dall'input nascosto
 function noteAttPick() {
-  if (_noteCurrentAtts.length >= NOTE_ATT_MAX_COUNT) {
-    showToast('Massimo ' + NOTE_ATT_MAX_COUNT + ' allegati per nota'); return;
+  if (_noteCurrentAtts.length >= noteAttMaxCount()) {
+    showToast('Massimo ' + noteAttMaxCount() + ' allegati per nota'); return;
   }
   document.getElementById('note-att-input').click();
 }
@@ -6705,17 +6709,17 @@ function noteAttPick() {
 async function noteAttHandleFiles(fileList) {
   const files = Array.from(fileList || []);
   for (const file of files) {
-    if (_noteCurrentAtts.length >= NOTE_ATT_MAX_COUNT) {
-      showToast('Massimo ' + NOTE_ATT_MAX_COUNT + ' allegati per nota'); break;
+    if (_noteCurrentAtts.length >= noteAttMaxCount()) {
+      showToast('Massimo ' + noteAttMaxCount() + ' allegati per nota'); break;
     }
     try {
       let dataUrl, size, type = file.type || 'application/octet-stream';
       if (type.startsWith('image/')) {
-        dataUrl = await noteCompressImage(file);
+        dataUrl = noteAttDriveReady() ? await noteCompressImage(file, 1800, 0.8) : await noteCompressImage(file);
         size = Math.round(dataUrl.length * 0.75); // stima byte da base64
       } else {
-        if (file.size > NOTE_ATT_MAX_BYTES) {
-          showToast('⚠️ "'+file.name+'" supera '+noteAttFormatSize(NOTE_ATT_MAX_BYTES)+' — non allegato');
+        if (file.size > noteAttMaxBytes()) {
+          showToast('⚠️ "'+file.name+'" supera '+noteAttFormatSize(noteAttMaxBytes())+' — non allegato');
           continue;
         }
         dataUrl = await new Promise((res, rej) => {
@@ -6726,7 +6730,7 @@ async function noteAttHandleFiles(fileList) {
         });
         size = file.size;
       }
-      if (size > NOTE_ATT_MAX_BYTES) {
+      if (size > noteAttMaxBytes()) {
         showToast('⚠️ "'+file.name+'" ancora troppo grande dopo la compressione — non allegato');
         continue;
       }
@@ -6741,7 +6745,8 @@ async function noteAttHandleFiles(fileList) {
 
 const _noteAttSel = new Set();
 function noteAttToggleSel(id) { if (_noteAttSel.has(id)) _noteAttSel.delete(id); else _noteAttSel.add(id); noteRenderAttachments(); }
-function noteAttPrintSel() {
+async function noteAttPrintSel() {
+  for (const a of _noteCurrentAtts) if (!a.dataUrl && a.driveId && a.type.startsWith('image/') && (!_noteAttSel.size || _noteAttSel.has(a.id))) await noteAttEnsureData(a, true);
   const imgs = _noteCurrentAtts.filter(a => a.type.startsWith('image/'));
   const ids = imgs.filter(a => _noteAttSel.has(a.id)).map(a => a.id);
   noteAttPrint(ids.length ? ids : imgs.map(a => a.id));
@@ -6752,13 +6757,13 @@ function noteRenderAttachments() {
   if (!_noteCurrentAtts.length) { box.innerHTML = ''; box.style.display = 'none'; return; }
   box.style.display = 'flex';
   box.innerHTML = _noteCurrentAtts.map(a => {
-    const thumb = a.type.startsWith('image/')
+    const thumb = (a.type.startsWith('image/') && a.dataUrl)
       ? `<img src="${a.dataUrl}" style="width:100%;height:100%;object-fit:cover;">`
-      : `<div style="font-size:22px;">${noteAttIcon(a.type)}</div>`;
+      : `<div style="font-size:22px;">${(!a.dataUrl && a.driveId) ? '☁️' : noteAttIcon(a.type)}</div>`;
     return `<div style="position:relative;width:64px;flex-shrink:0;">
       <div onclick="noteAttPreview('${a.id}')" style="width:64px;height:64px;border-radius:12px;overflow:hidden;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;">${thumb}</div>
       <div style="font-size:9px;color:var(--text3);margin-top:3px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${noteAttFormatSize(a.size)}</div>
-      ${a.type.startsWith('image/') ? `<button onclick="noteAttToggleSel('${a.id}')" title="Seleziona per stampare" style="position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:7px;border:2px solid #fff;background:${_noteAttSel.has(a.id) ? 'var(--accent)' : 'rgba(0,0,0,.45)'};color:#fff;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">${_noteAttSel.has(a.id) ? '✓' : ''}</button>` : ''}
+      ${(a.type.startsWith('image/') && a.dataUrl) ? `<button onclick="noteAttToggleSel('${a.id}')" title="Seleziona per stampare" style="position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:7px;border:2px solid #fff;background:${_noteAttSel.has(a.id) ? 'var(--accent)' : 'rgba(0,0,0,.45)'};color:#fff;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">${_noteAttSel.has(a.id) ? '✓' : ''}</button>` : ''}
       <button onclick="noteAttRemove('${a.id}')" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:white;border:2px solid var(--bg2);font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;">✕</button>
     </div>`;
   }).join('') + (_noteCurrentAtts.filter(a => a.type.startsWith('image/')).length ? `<button onclick="noteAttPrintSel()" style="flex-shrink:0;width:64px;height:64px;border-radius:12px;border:1px dashed var(--accent);background:var(--surface);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1.3;">🖨<br>Stampa<br>${_noteAttSel.size ? '(' + [..._noteAttSel].filter(i => _noteCurrentAtts.some(a => a.id === i)).length + ')' : 'tutte'}</button>` : '');
@@ -6770,9 +6775,15 @@ function noteAttRemove(id) {
   noteRenderAttachments();
 }
 
-function noteAttPreview(id) {
+async function noteAttPreview(id) {
   const a = _noteCurrentAtts.find(x => x.id === id);
   if (!a) return;
+  if (!a.dataUrl) {
+    showToast('☁️ Scarico l\'allegato da Drive…');
+    const ok = await noteAttEnsureData(a, true);
+    if (!ok) return;
+    noteRenderAttachments();
+  }
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:14px;';
   overlay.onclick = () => overlay.remove();
@@ -6837,10 +6848,175 @@ function noteAttOpenPdf(id) {
   } catch (e) { showToast('Impossibile aprire il PDF'); }
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  ALLEGATI SU DRIVE (cifrati) — cartella "HomeBull Pro/Allegati"
+//  Nel archivio resta solo il riferimento (driveId). Il file su Drive è cifrato
+//  AES-GCM con una chiave dedicata (_noteAttStore._k) che viaggia nel backup,
+//  così si legge da qualsiasi dispositivo. Copia cifrata anche sul dispositivo (IndexedDB).
+// ═══════════════════════════════════════════════════════════
+function _attIdb() {
+  return new Promise((res, rej) => {
+    try {
+      const rq = indexedDB.open('hb_att', 1);
+      rq.onupgradeneeded = () => rq.result.createObjectStore('blobs');
+      rq.onsuccess = () => res(rq.result);
+      rq.onerror = () => rej(rq.error);
+    } catch (e) { rej(e); }
+  });
+}
+async function _attIdbOp(mode, fn) {
+  let db; try { db = await _attIdb(); } catch (e) { return { ok: false }; }
+  try {
+    return await new Promise((res, rej) => {
+      const t = db.transaction('blobs', mode); let val;
+      const rq = fn(t.objectStore('blobs')); if (rq) rq.onsuccess = () => { val = rq.result; };
+      t.oncomplete = () => res({ ok: true, val }); t.onerror = t.onabort = () => rej(t.error);
+    });
+  } catch (e) { return { ok: false }; }
+  finally { try { db.close(); } catch (e) {} }
+}
+async function _attIdbPut(id, buf) { return (await _attIdbOp('readwrite', st => st.put(buf, id))).ok; }
+async function _attIdbGet(id) { const r = await _attIdbOp('readonly', st => st.get(id)); return r.ok ? (r.val || null) : null; }
+async function _attIdbDel(id) { await _attIdbOp('readwrite', st => st.delete(id)); }
+
+async function _attKey() {
+  if (!_noteAttStore._k) {
+    _noteAttStore._k = _hbBytesToB64(crypto.getRandomValues(new Uint8Array(32)));
+    noteAttSaveAll();
+  }
+  const raw = Uint8Array.from(atob(_noteAttStore._k), c => c.charCodeAt(0));
+  return crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']);
+}
+async function _attEncrypt(dataUrl) {
+  const b64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await _attKey(), bytes));
+  const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+  return out;
+}
+async function _attDecryptToDataUrl(buf, type) {
+  const u = new Uint8Array(buf);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u.slice(0, 12) }, await _attKey(), u.slice(12));
+  return 'data:' + (type || 'application/octet-stream') + ';base64,' + _hbBytesToB64(new Uint8Array(pt));
+}
+// Token senza popup (solo se già disponibile) oppure, se interactive, con la finestra di Google
+async function _attToken(interactive) {
+  if (_driveBackupToken) return _driveBackupToken;
+  let t = await driveGetTokenSilent();
+  if (!t && interactive) { try { t = await driveGetBackupToken(); } catch (e) { t = null; } }
+  return t || null;
+}
+async function _attFolderId(token) {
+  let f; try { f = await driveEnsureFolders(token); } catch (e) { return null; }
+  return f.att;
+}
+async function driveUploadAtt(token, att, enc) {
+  for (let tries = 0; tries < 2; tries++) {
+    const folderId = await _attFolderId(token); if (!folderId) throw new Error('cartella');
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify({ name: att.id + '.bin', mimeType: 'application/octet-stream', parents: [folderId] })], { type: 'application/json' }));
+    form.append('file', new Blob([enc], { type: 'application/octet-stream' }));
+    const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form });
+    if (r.status === 404 && tries === 0) { try { localStorage.removeItem('hb_drive_folders'); } catch (e) {} continue; }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return (await r.json()).id;
+  }
+  throw new Error('upload');
+}
+async function driveDeleteAttFile(token, driveId) {
+  const r = await fetch('https://www.googleapis.com/drive/v3/files/' + driveId, { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+  return r.ok || r.status === 404;
+}
+function _attDelQueue() { try { return JSON.parse(localStorage.getItem('hb_att_delq') || '[]'); } catch (e) { return []; } }
+function _attDelQueueSet(a) { try { localStorage.setItem('hb_att_delq', JSON.stringify(a)); } catch (e) {} }
+function noteAttQueueDelete(atts) {
+  const q = _attDelQueue();
+  (atts || []).forEach(a => { if (a && a.driveId && !q.includes(a.driveId)) q.push(a.driveId); if (a && a.id) _attIdbDel(a.id); });
+  _attDelQueueSet(q);
+  setTimeout(() => noteAttSyncPending(false), 500);
+}
+
+// Forma salvata: se l'allegato è su Drive si tiene solo il riferimento (niente dati nel backup)
+function noteAttStoreForm(a) {
+  const c = { id: a.id, name: a.name, type: a.type, size: a.size };
+  if (a.driveId) c.driveId = a.driveId; else c.dataUrl = a.dataUrl;
+  return c;
+}
+
+let _attSyncRunning = false;
+// Carica su Drive gli allegati ancora solo locali e cancella quelli rimossi.
+async function noteAttSyncPending(interactive) {
+  if (_attSyncRunning) return;
+  const pendingList = () => {
+    const out = [];
+    Object.keys(_noteAttStore).forEach(nid => { if (nid === '_k') return; (_noteAttStore[nid] || []).forEach(a => { if (!a.driveId && a.dataUrl) out.push(a); }); });
+    return out;
+  };
+  const delq = _attDelQueue();
+  if (!pendingList().length && !delq.length) return;
+  if (!noteAttDriveReady() && !_driveBackupToken) return; // Drive mai usato: allegati restano locali
+  _attSyncRunning = true;
+  try {
+    const token = await _attToken(interactive);
+    if (!token) { if (interactive) showToast('📎 Allegati salvati qui. Si caricheranno su Drive al prossimo collegamento', 5000); return; }
+    // 1) cancellazioni in coda
+    if (delq.length) {
+      const left = [];
+      for (const id of delq) { try { if (!(await driveDeleteAttFile(token, id))) left.push(id); } catch (e) { left.push(id); } }
+      _attDelQueueSet(left);
+    }
+    // 2) caricamenti
+    const list = pendingList();
+    let okN = 0;
+    for (const a of list) {
+      try {
+        const enc = await _attEncrypt(a.dataUrl);
+        const driveId = await driveUploadAtt(token, a, enc);
+        const stillThere = Object.keys(_noteAttStore).some(nid => nid !== '_k' && (_noteAttStore[nid] || []).includes(a));
+        if (!stillThere) { driveDeleteAttFile(token, driveId).catch(() => {}); continue; }
+        const cached = await _attIdbPut(a.id, enc.buffer.slice(0));
+        if (cached) { a.driveId = driveId; delete a.dataUrl; }
+        else { a.driveId = driveId; } // niente copia locale: resta comunque il dato in memoria finché non si ricarica
+        okN++;
+      } catch (e) { console.warn('Upload allegato fallito', a.name, e); }
+    }
+    if (okN) { noteAttSaveAll(); showToast('☁️ ' + okN + (okN === 1 ? ' allegato cifrato e salvato su Drive' : ' allegati cifrati e salvati su Drive')); }
+    else if (list.length) showToast('⚠️ Caricamento allegati su Drive non riuscito: riproverò', 5000);
+  } catch (e) { console.warn('Sync allegati:', e); }
+  finally { _attSyncRunning = false; }
+}
+
+// Porta in memoria i dati di un allegato: copia locale (IndexedDB) oppure scaricandolo da Drive
+async function noteAttEnsureData(a, interactive) {
+  if (a.dataUrl) return true;
+  if (!a.driveId) return false;
+  try {
+    let buf = await _attIdbGet(a.id);
+    if (!buf) {
+      const token = await _attToken(interactive);
+      if (!token) return false;
+      const r = await fetch('https://www.googleapis.com/drive/v3/files/' + a.driveId + '?alt=media', { headers: { Authorization: 'Bearer ' + token } });
+      if (!r.ok) { if (interactive) showToast(r.status === 404 ? '⚠️ Allegato non trovato su Drive' : '⚠️ Download fallito (' + r.status + ')'); return false; }
+      buf = await r.arrayBuffer();
+      _attIdbPut(a.id, buf.slice(0));
+    }
+    a.dataUrl = await _attDecryptToDataUrl(buf, a.type);
+    return true;
+  } catch (e) { console.warn('Lettura allegato', e); if (interactive) showToast('⚠️ Impossibile leggere l\'allegato'); return false; }
+}
+async function noteAttHydrateCurrent() {
+  let any = false;
+  for (const a of _noteCurrentAtts) { if (!a.dataUrl && a.driveId) { if (await noteAttEnsureData(a, false)) any = true; } }
+  if (any) noteRenderAttachments();
+}
+
 function noteOpen() {
   noteLoad();
   noteAttLoad();
   noteShowFolders();
+  setTimeout(() => noteAttSyncPending(false), 1500);
 }
 
 // ── Lista ────────────────────────────────────────────────
@@ -7145,7 +7321,8 @@ function noteEdit(id) {
   _noteEditId = id;
   _noteNewKind = note.kind || '';
   _noteKindFilter = note.kind || 'free';
-  _noteCurrentAtts = (_noteAttStore[id] || []).slice();
+  _noteCurrentAtts = (_noteAttStore[id] || []).map(a => ({ ...a }));
+  noteAttHydrateCurrent();
   document.getElementById('note-title-inp').value = note.title || '';
   document.getElementById('note-content-inp').value = note.content || '';
   noteDocToggle(note.kind === 'document', note.doc);
@@ -7248,11 +7425,18 @@ function noteSave() {
     if (_doc) nn.doc = _doc;
     _notes.push(nn);
   }
-  if (_noteCurrentAtts.length) _noteAttStore[_noteEditId] = _noteCurrentAtts;
+  const prevAtts = _noteAttStore[_noteEditId] || [];
+  const keepIds = new Set(_noteCurrentAtts.map(a => a.id));
+  const removedAtts = prevAtts.filter(a => !keepIds.has(a.id));
+  const newForms = _noteCurrentAtts.map(noteAttStoreForm);
+  // gli allegati ancora in attesa di upload mantengono il dato: se sono già su Drive resta solo il riferimento
+  if (newForms.length) _noteAttStore[_noteEditId] = newForms;
   else delete _noteAttStore[_noteEditId];
   noteAttSaveAll();
+  if (removedAtts.length) noteAttQueueDelete(removedAtts);
   noteSaveAll();
   showToast('✅ Salvato');
+  if (newForms.some(a => !a.driveId)) noteAttSyncPending(true);
   noteCloseEditor();
 }
 
@@ -7279,7 +7463,7 @@ function noteDelete(id) {
   document.getElementById('_nd_ok').onclick = () => {
     overlay.remove();
     _notes = markDeleted(_notes, id);
-    if (_noteAttStore[id]) { delete _noteAttStore[id]; noteAttSaveAll(); }
+    if (_noteAttStore[id]) { const old = _noteAttStore[id]; delete _noteAttStore[id]; noteAttSaveAll(); noteAttQueueDelete(old); }
     noteSaveAll();
     noteRenderList('');
     showToast('Voce eliminata');
@@ -9833,6 +10017,7 @@ async function driveBackupNow(silent=false) {
 
     if (!response.ok) throw new Error('HTTP ' + response.status);
     if (folders) setTimeout(() => driveMoveOldBackups(token, folders.backup), 3000);
+    setTimeout(() => noteAttSyncPending(false), 6000);
     localStorage.setItem('hb_drive_backup_ts', now.toISOString());
     if (!silent) showToast('✅ Backup su Drive completato!');
     driveUpdateBackupUI();
@@ -11841,7 +12026,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.34.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.35.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
