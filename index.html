@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.35.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.36.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.35.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.36.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.35.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.36.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3031,7 +3031,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.35.0',
+  version: 'v13.36.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -6734,7 +6734,7 @@ async function noteAttHandleFiles(fileList) {
         showToast('⚠️ "'+file.name+'" ancora troppo grande dopo la compressione — non allegato');
         continue;
       }
-      _noteCurrentAtts.push({ id:'att_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:file.name, type, size, dataUrl });
+      _noteCurrentAtts.push({ id:'att_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:file.name, type, size, dataUrl, isNew:true });
     } catch(e) {
       showToast('⚠️ Impossibile allegare "'+file.name+'"');
     }
@@ -6941,17 +6941,43 @@ function noteAttQueueDelete(atts) {
 // Forma salvata: se l'allegato è su Drive si tiene solo il riferimento (niente dati nel backup)
 function noteAttStoreForm(a) {
   const c = { id: a.id, name: a.name, type: a.type, size: a.size };
-  if (a.driveId) c.driveId = a.driveId; else c.dataUrl = a.dataUrl;
+  if (a.driveId) c.driveId = a.driveId; else { c.dataUrl = a.dataUrl; if (a.up || a.isNew) c.up = 1; }
   return c;
 }
 
+function noteAttLocalOnlyCount() {
+  let n = 0;
+  Object.keys(_noteAttStore).forEach(k => { if (k !== '_k') (_noteAttStore[k] || []).forEach(a => { if (!a.driveId && a.dataUrl) n++; }); });
+  return n;
+}
+function noteAttMigrateAsk() {
+  const n = noteAttLocalOnlyCount(); if (!n) return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);">' +
+    '<div style="font-size:32px;margin-bottom:10px;">☁️</div>' +
+    '<div style="font-size:15px;font-weight:800;margin-bottom:6px;">Sposta ' + n + (n === 1 ? ' allegato' : ' allegati') + ' su Drive?</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:18px;line-height:1.5;">Verranno cifrati e caricati in “HomeBull Pro / Allegati”. Una copia cifrata resta anche su questo dispositivo. Fai prima un backup se non l\'hai fatto da poco.</div>' +
+    '<div style="display:flex;gap:10px;"><button id="_am_no" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Non ora</button>' +
+    '<button id="_am_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Sposta</button></div></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_am_no').onclick = () => ov.remove();
+  document.getElementById('_am_ok').onclick = async () => {
+    ov.remove();
+    Object.keys(_noteAttStore).forEach(k => { if (k !== '_k') (_noteAttStore[k] || []).forEach(a => { if (!a.driveId && a.dataUrl) a.up = 1; }); });
+    if (!noteAttDriveReady()) { try { const t = await _attToken(true); if (t) await driveEnsureFolders(t); } catch (e) {} }
+    showToast('☁️ Sposto gli allegati su Drive…');
+    await noteAttSyncPending(true);
+    noteRenderFolders(); noteAttRenderBanner();
+  };
+}
 let _attSyncRunning = false;
 // Carica su Drive gli allegati ancora solo locali e cancella quelli rimossi.
 async function noteAttSyncPending(interactive) {
   if (_attSyncRunning) return;
   const pendingList = () => {
     const out = [];
-    Object.keys(_noteAttStore).forEach(nid => { if (nid === '_k') return; (_noteAttStore[nid] || []).forEach(a => { if (!a.driveId && a.dataUrl) out.push(a); }); });
+    Object.keys(_noteAttStore).forEach(nid => { if (nid === '_k') return; (_noteAttStore[nid] || []).forEach(a => { if (!a.driveId && a.dataUrl && a.up) out.push(a); }); });
     return out;
   };
   const delq = _attDelQueue();
@@ -7163,6 +7189,18 @@ function noteShowFolders() {
   const n = (_notes || []).filter(x => !x.deleted).length;
   document.getElementById('topbar-sub').textContent = n + (n === 1 ? ' voce' : ' voci');
   noteRenderFolders();
+  noteAttRenderBanner();
+}
+function noteAttRenderBanner() {
+  const host = document.getElementById('note-view-folders'); if (!host) return;
+  let b = document.getElementById('note-att-migrate'); if (b) b.remove();
+  const n = noteAttLocalOnlyCount();
+  if (!n || !noteAttDriveReady()) return;
+  b = document.createElement('div'); b.id = 'note-att-migrate';
+  b.style.cssText = 'max-width:640px;width:100%;margin:14px auto 0;padding:14px;border-radius:16px;border:1px dashed var(--accent);background:var(--surface);display:flex;align-items:center;gap:12px;';
+  b.innerHTML = '<div style="font-size:24px;">☁️</div><div style="flex:1;min-width:0;font-size:12px;color:var(--text2);line-height:1.4;"><b>' + n + (n === 1 ? ' allegato è' : ' allegati sono') + ' solo su questo dispositivo.</b> Spostali su Drive per averli ovunque.</div><button style="flex-shrink:0;padding:9px 12px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Sposta</button>';
+  b.querySelector('button').onclick = noteAttMigrateAsk;
+  host.appendChild(b);
 }
 function noteOpenFolder(k) {
   _noteKindFilter = k;
@@ -7436,7 +7474,7 @@ function noteSave() {
   if (removedAtts.length) noteAttQueueDelete(removedAtts);
   noteSaveAll();
   showToast('✅ Salvato');
-  if (newForms.some(a => !a.driveId)) noteAttSyncPending(true);
+  if (newForms.some(a => !a.driveId && a.up)) noteAttSyncPending(true);
   noteCloseEditor();
 }
 
@@ -12026,7 +12064,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.35.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.36.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
