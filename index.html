@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.33.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.34.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.33.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.34.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.33.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.34.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3031,7 +3031,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.33.0',
+  version: 'v13.34.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9729,6 +9729,44 @@ function _tsKey(k){ return 'hb_ts_' + k; }
 
 function markDeleted(arr,id){ return arr.map(i=>i.id===id?{...i,deleted:true,deletedAt:new Date().toISOString()}:i); }
 
+// ── Cartelle su Drive: "HomeBull Pro" con dentro "Backup" e "Allegati" ──
+const HB_FOLDER_MIME = 'application/vnd.google-apps.folder';
+async function driveFindOrCreateFolder(token, name, parentId) {
+  const q = "name='" + name + "' and mimeType='" + HB_FOLDER_MIME + "' and trashed=false" + (parentId ? " and '" + parentId + "' in parents" : '');
+  const r = await fetch('https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) + '&fields=files(id,name)', { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) throw new Error('Cartella Drive: HTTP ' + r.status);
+  const j = await r.json();
+  if (j.files && j.files[0]) return j.files[0].id;
+  const body = { name, mimeType: HB_FOLDER_MIME }; if (parentId) body.parents = [parentId];
+  const c = await fetch('https://www.googleapis.com/drive/v3/files?fields=id', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!c.ok) throw new Error('Cartella Drive: HTTP ' + c.status);
+  return (await c.json()).id;
+}
+async function driveEnsureFolders(token, force) {
+  if (!force) { try { const c = JSON.parse(localStorage.getItem('hb_drive_folders') || 'null'); if (c && c.root && c.backup && c.att) return c; } catch (e) {} }
+  const root = await driveFindOrCreateFolder(token, 'HomeBull Pro', null);
+  const backup = await driveFindOrCreateFolder(token, 'Backup', root);
+  const att = await driveFindOrCreateFolder(token, 'Allegati', root);
+  const f = { root, backup, att };
+  try { localStorage.setItem('hb_drive_folders', JSON.stringify(f)); } catch (e) {}
+  return f;
+}
+// Sposta i backup vecchi (rimasti nella cartella principale di Drive) dentro "Backup": una volta sola
+async function driveMoveOldBackups(token, backupId) {
+  try {
+    if (localStorage.getItem('hb_drive_moved_v1') === backupId) return;
+    const r = await fetch("https://www.googleapis.com/drive/v3/files?q=" + encodeURIComponent("name contains 'HomeBull-backup-' and trashed=false") + "&fields=files(id,parents)&pageSize=100", { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) return;
+    const files = (await r.json()).files || [];
+    for (const f of files) {
+      const ps = f.parents || [];
+      if (ps.includes(backupId)) continue;
+      await fetch('https://www.googleapis.com/drive/v3/files/' + f.id + '?addParents=' + backupId + (ps.length ? '&removeParents=' + ps.join(',') : ''), { method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: '{}' });
+    }
+    localStorage.setItem('hb_drive_moved_v1', backupId);
+  } catch (e) { console.warn('Spostamento vecchi backup:', e); }
+}
+
 async function driveBackupNow(silent=false) {
   try {
     if (!silent) showToast('☁️ Backup Drive in corso...');
@@ -9749,13 +9787,18 @@ async function driveBackupNow(silent=false) {
     const payload = JSON.stringify({ version:'13.0.0', exportedAt: now.toISOString(), data }, null, 2);
     const blob = new Blob([payload], { type: 'application/json' });
 
+    // Cartella "HomeBull Pro/Backup" (se non riesce, si salva come prima nella cartella principale)
+    let folders = null;
+    try { folders = await driveEnsureFolders(token); } catch (e) { console.warn('Cartelle Drive:', e); }
+
     // Cerca se esiste già un backup di oggi
     const search = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=name='${fileName}'+and+trashed=false&fields=files(id,name)`,
+      `https://www.googleapis.com/drive/v3/files?q=name='${fileName}'+and+trashed=false&fields=files(id,name,parents)`,
       { headers: { Authorization: 'Bearer ' + token } }
     );
     const searchResult = await search.json();
     const existingId = searchResult.files?.[0]?.id || null;
+    const existingParents = searchResult.files?.[0]?.parents || [];
 
     // Upload: aggiorna quello di oggi o crea nuovo
     let response;
@@ -9763,22 +9806,33 @@ async function driveBackupNow(silent=false) {
     if (existingId) {
       form.append('metadata', new Blob([JSON.stringify({ name: fileName })], { type: 'application/json' }));
       form.append('file', blob);
+      const mv = folders && !existingParents.includes(folders.backup) ? '&addParents=' + folders.backup + (existingParents.length ? '&removeParents=' + existingParents.join(',') : '') : '';
       response = await fetch(
-        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart`,
+        `https://www.googleapis.com/upload/drive/v3/files/${existingId}?uploadType=multipart${mv}`,
         { method: 'PATCH', headers: { Authorization: 'Bearer ' + token }, body: form }
       );
     } else {
-      form.append('metadata', new Blob([JSON.stringify({ name: fileName, mimeType: 'application/json' })], { type: 'application/json' }));
+      const meta = { name: fileName, mimeType: 'application/json' }; if (folders) meta.parents = [folders.backup];
+      form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
       form.append('file', blob);
       response = await fetch(
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
         { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: form }
       );
+      // Cartella non più valida (es. cancellata o altro account): la ricreo e riprovo una volta
+      if (response.status === 404 && folders) {
+        try { localStorage.removeItem('hb_drive_folders'); folders = await driveEnsureFolders(token, true); meta.parents = [folders.backup]; } catch (e) { delete meta.parents; }
+        const f2 = new FormData();
+        f2.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
+        f2.append('file', blob);
+        response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: f2 });
+      }
       // Mantieni solo gli ultimi 5 backup — elimina i più vecchi
       setTimeout(() => drivePruneOldBackups(token), 2000);
     }
 
     if (!response.ok) throw new Error('HTTP ' + response.status);
+    if (folders) setTimeout(() => driveMoveOldBackups(token, folders.backup), 3000);
     localStorage.setItem('hb_drive_backup_ts', now.toISOString());
     if (!silent) showToast('✅ Backup su Drive completato!');
     driveUpdateBackupUI();
@@ -11787,7 +11841,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.33.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.34.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
