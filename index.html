@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.36.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.37.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.36.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.37.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.36.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.37.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2771,6 +2771,10 @@ Aggiungi nuovo dato
             <textarea id="srv-notes" placeholder="Comandi, connection string, note..."
               style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;resize:none;height:100px;line-height:1.6;"></textarea>
           </div>
+          <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">🔐 Collega un OTP (facoltativo)</div>
+            <div id="srv-otp-wrap"></div>
+          </div>
           <button onclick="serverSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Credenziale</button>
         </div>
 
@@ -3031,7 +3035,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.36.0',
+  version: 'v13.37.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8875,18 +8879,20 @@ function otpEdit(id) {
   ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:360px;width:100%;border:1px solid var(--border);">
     <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica OTP</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Nome servizio</div>
-    <input id="_oe_name" value="${acc.name}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <input id="_oe_name" value="${hbEsc(acc.name)}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Username / Email</div>
-    <input id="_oe_user" value="${acc.user||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
+    <input id="_oe_user" value="${hbEsc(acc.user||'')}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
     ${otpCatSelectHtml('_oe_cat', acc.categoryId||'')}
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Chiave segreta (TOTP)</div>
-    <input id="_oe_secret" value="${acc.secret||''}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
+    <input id="_oe_secret" value="${hbEsc(acc.secret||'')}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
     <div style="display:flex;gap:10px;">
-      <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_oe_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_oe_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
+  document.getElementById('_oe_cancel').onclick = () => ov.remove();
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
   document.getElementById('_oe_save').onclick = () => {
     const name = document.getElementById('_oe_name').value.trim();
     const user = document.getElementById('_oe_user').value.trim();
@@ -9535,6 +9541,7 @@ function serverSave() {
     user:  document.getElementById('srv-user')?.value.trim() || '',
     pw:    document.getElementById('srv-pw')?.value || '',
     notes: document.getElementById('srv-notes')?.value.trim() || '',
+    ...(document.getElementById('srv-otp')?.value ? { otpId: document.getElementById('srv-otp').value } : {}),
   });
   serverSaveAll();
   showToast('✅ ' + label + ' salvato');
@@ -9553,6 +9560,7 @@ function serverShowAdd() {
   });
   const pw = document.getElementById('srv-pw'); if(pw) { pw.value=''; pw.type='password'; }
   _serverType = { id:'ssh', icon:'🔐', label:'SSH' };
+  const _ow = document.getElementById('srv-otp-wrap'); if (_ow) _ow.innerHTML = serverOtpSelectHtml('srv-otp', '');
   document.querySelectorAll('[data-type]').forEach(b =>
     b.classList.toggle('active', b.dataset.type === 'ssh')
   );
@@ -9569,6 +9577,7 @@ function serverShowList() {
 function serverShowDetail(id) {
   const item = _serverItems.find(i => i.id === id);
   if (!item) return;
+  try { otpLoad(); } catch (e) {}
   const existing = document.getElementById('server-detail-overlay');
   if (existing) existing.remove();
   const overlay = document.createElement('div');
@@ -9579,6 +9588,7 @@ function serverShowDetail(id) {
     item.host ? `<div class="pw-field-row"><div class="pw-field-label">Host / URL</div><div class="pw-field-value" style="font-family:monospace;">${item.host}${item.port?':'+item.port:''}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','host')">📋 Copia</button></div></div>` : '',
     item.user ? `<div class="pw-field-row"><div class="pw-field-label">Username</div><div class="pw-field-value" style="font-family:monospace;">${item.user}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','user')">📋 Copia</button></div></div>` : '',
     item.pw   ? `<div class="pw-field-row"><div class="pw-field-label">Password / Token</div><div class="pw-field-value" id="srv-pw-detail-${item.id}" style="font-family:monospace;font-size:12px;word-break:break-all;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverToggleDetailPw('${item.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','pw')">📋 Copia</button></div></div>` : '',
+    (item.otpId && _otpAccounts.find(a => a.id === item.otpId && !a.deleted)) ? `<div class="pw-field-row"><div class="pw-field-label">OTP collegato</div><div class="pw-field-value">🔐 ${hbEsc(_otpAccounts.find(a => a.id === item.otpId).name)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverOpenOtp('${item.id}')">🔐 Apri OTP</button></div></div>` : '',
     item.notes? `<div class="pw-field-row"><div class="pw-field-label">Note / Connection String</div><div class="pw-field-value" style="font-family:monospace;font-size:12px;white-space:pre-wrap;">${item.notes}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','notes')">📋 Copia</button></div></div>` : '',
   ].filter(Boolean).join('');
   overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
@@ -9599,6 +9609,52 @@ function serverShowDetail(id) {
   document.body.appendChild(overlay);
 }
 
+function serverOtpSelectHtml(selId, selected) {
+  try { otpLoad(); } catch (e) {}
+  const opts = _otpAccounts.filter(a => !a.deleted).slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it', { sensitivity: 'base' }))
+    .map(a => `<option value="${hbEsc(a.id)}" ${a.id === selected ? 'selected' : ''}>${hbEsc(a.name)}${a.user ? ' — ' + hbEsc(a.user) : ''}</option>`).join('');
+  return `<select id="${selId}" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;"><option value="">— Nessun OTP —</option>${opts}</select>`;
+}
+// Apre una finestra con il codice OTP collegato al server (si aggiorna da solo, con tasto copia)
+let _srvOtpTimer = null;
+function serverOpenOtp(serverId) {
+  const item = _serverItems.find(i => i.id === serverId); if (!item || !item.otpId) return;
+  try { otpLoad(); } catch (e) {}
+  const acc = _otpAccounts.find(a => a.id === item.otpId && !a.deleted);
+  if (!acc) { showToast('OTP collegato non trovato'); return; }
+  document.getElementById('srv-otp-overlay')?.remove();
+  if (_srvOtpTimer) clearInterval(_srvOtpTimer);
+  const ov = document.createElement('div');
+  ov.id = 'srv-otp-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:340px;width:100%;text-align:center;border:1px solid var(--border);">
+    <div style="font-size:12px;color:var(--text3);font-weight:700;margin-bottom:2px;">${hbEsc(item.label || '')}</div>
+    <div style="font-size:15px;font-weight:800;margin-bottom:2px;">🔐 ${hbEsc(acc.name)}</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">${hbEsc(acc.user || '')}</div>
+    <div id="srv-otp-code" style="font-size:36px;font-weight:800;letter-spacing:.12em;font-family:monospace;margin-bottom:4px;">------</div>
+    <div id="srv-otp-secs" style="font-size:12px;color:var(--text3);margin-bottom:16px;"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button id="srv-otp-close" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+      <button id="srv-otp-copy" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button>
+    </div>
+    <button id="srv-otp-go" style="margin-top:10px;width:100%;padding:10px;border-radius:12px;border:none;background:transparent;color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Vai alla sezione OTP →</button>
+  </div>`;
+  document.body.appendChild(ov);
+  const close = () => { if (_srvOtpTimer) { clearInterval(_srvOtpTimer); _srvOtpTimer = null; } ov.remove(); };
+  const tick = () => {
+    const rem = 30 - (Math.floor(Date.now() / 1000) % 30);
+    const el = document.getElementById('srv-otp-code'); if (!el) { close(); return; }
+    el.textContent = otpFormat(otpGenerate(acc.secret));
+    el.style.color = rem <= 7 ? '#ef4444' : '#10b981';
+    document.getElementById('srv-otp-secs').textContent = 'scade tra ' + rem + 's';
+  };
+  tick(); _srvOtpTimer = setInterval(tick, 1000);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  document.getElementById('srv-otp-close').onclick = close;
+  document.getElementById('srv-otp-copy').onclick = () => otpCopy(acc.id);
+  document.getElementById('srv-otp-go').onclick = () => { close(); document.getElementById('server-detail-overlay')?.remove(); try { switchTab('otp'); } catch (e) {} };
+}
+
 function serverEdit(id) {
   const item = _serverItems.find(i => i.id === id);
   if (!item) return;
@@ -9608,13 +9664,17 @@ function serverEdit(id) {
     <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Server</div>
     ${[['_se_label','Nome/Etichetta',item.label||''],['_se_host','Host/IP',item.host||''],['_se_port','Porta',item.port||''],['_se_user','Username',item.user||''],['_se_pw','Password',item.pw||''],['_se_notes','Note',item.notes||'']].map(([id,label,val])=>`
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
-    <input id="${id}" value="${val}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <input id="${id}" value="${hbEsc(val)}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">🔐 Collega un OTP</div>
+    ${serverOtpSelectHtml('_se_otp', item.otpId || '')}
     <div style="display:flex;gap:10px;margin-top:6px;">
-      <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
+      <button id="_se_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_se_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
     </div>
   </div>`;
   document.body.appendChild(ov);
+  document.getElementById('_se_cancel').onclick = () => ov.remove();
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
   document.getElementById('_se_save').onclick = () => {
     const label = document.getElementById('_se_label').value.trim();
     if (!label) { showToast('Inserisci il nome'); return; }
@@ -9626,7 +9686,10 @@ function serverEdit(id) {
       pw: document.getElementById('_se_pw').value,
       notes: document.getElementById('_se_notes').value.trim(),
       updatedAt: new Date().toISOString()
-    }; }
+    };
+      const ov2 = document.getElementById('_se_otp')?.value || '';
+      if (ov2) _serverItems[idx].otpId = ov2; else delete _serverItems[idx].otpId;
+    }
     serverSaveAll(); serverRender(); ov.remove();
     showToast('✅ Server aggiornato');
   };
@@ -12064,7 +12127,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.36.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.37.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
