@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.37.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.39.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.37.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.39.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.37.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.39.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3035,7 +3035,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.37.0',
+  version: 'v13.39.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4687,6 +4687,7 @@ function pwRenderItems(q='') {
         <span class="pw-strength-badge" style="background:${strength.bg};color:${strength.col};">${strength.label}</span>
         ${expInfo && (expInfo.status==='expired'||expInfo.status==='today'||expInfo.status==='soon') ? `<span style="background:${expInfo.bg};color:${expInfo.col};font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">⏰ ${expInfo.badge}</span>` : ''}
         ${item.pin ? '<span style="background:rgba(234,179,8,0.15);color:#eab308;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">PIN</span>' : ''}
+        ${_hbLinkedOtp(item.otpId) ? `<span onclick="event.stopPropagation();otpQuickOpen('${item.otpId}','${hbEsc(item.title||'').replace(/'/g,'')}')" title="OTP collegato: tocca per vedere il codice" style="background:rgba(59,130,246,0.16);color:#3b82f6;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;cursor:pointer;">🔵 OTP</span>` : ''}
         <button class="pw-copy-btn" onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
@@ -5220,6 +5221,7 @@ function pwShowDetail(itemId) {
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${hbEsc(item.url)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwOpenUrl('${item.id}')">🔗 Apri</button></div></div>` : ''}
+    ${_hbLinkedOtp(item.otpId) ? `<div class="pw-field-row"><div class="pw-field-label">OTP collegato</div><div class="pw-field-value">🔐 ${hbEsc(_hbLinkedOtp(item.otpId).name)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="otpQuickOpen('${item.otpId}','${hbEsc(item.title||'').replace(/'/g,'')}')">🔐 Apri OTP</button></div></div>` : ''}
     ${item.email ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Email</div><div class="pw-field-value">${hbEsc(item.email)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','email')">📋 Copia</button></div></div>` : ''}
     ${item.emailPassword ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Password email</div><div class="pw-field-value" id="pd-ep" style="font-family:monospace;letter-spacing:0.05em;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pdToggleSecret('${item.id}','emailPassword','pd-ep')">👁 Mostra</button><button class="pw-field-btn" onclick="pwCopy('${item.id}','emailPassword')">📋 Copia</button></div></div>` : ''}
     ${item.pec ? `<div class="pw-field-row pw-g-pec"><div class="pw-field-label">PEC</div><div class="pw-field-value">${hbEsc(item.pec)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','pec')">📋 Copia</button></div></div>` : ''}
@@ -6292,6 +6294,7 @@ function _pwFormFields(p, item, isNew) {
       '<button id="' + p + '_exp_today" type="button" title="Imposta a oggi" style="padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Oggi</button></div>' +
       '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data — correggila se la password esisteva già da prima</div>' +
       (!isNew && item.expiryDate ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;">' + ((pwExpiryInfo(item) || {}).text || '') + '</div>' : '') + '</div>',
+    '<div style="margin-bottom:11px;">' + lab('🔐 OTP collegato') + serverOtpSelectHtml(p + '_otp', item.otpId || '') + '</div>',
     '<div style="margin-bottom:16px;">' + lab('Note') + '<textarea id="' + p + '_note" rows="3" style="' + inp + 'font-size:14px;resize:none;font-family:inherit;">' + _pwEsc(item.notes) + '</textarea></div>'
   ].join('');
 }
@@ -6313,7 +6316,7 @@ function _pwFormWire(p) {
 function _pwFormRead(p) {
   const v = id => (document.getElementById(p + '_' + id)?.value || '').trim();
   const raw = id => document.getElementById(p + '_' + id)?.value || '';
-  return { title: v('title'), username: v('user'), email: v('email'), pec: v('pec'), url: v('url'), pin: v('pin'), notes: v('note'), emailPassword: raw('email_pass'), pecPassword: raw('pec_pass') };
+  return { title: v('title'), username: v('user'), email: v('email'), pec: v('pec'), url: v('url'), pin: v('pin'), notes: v('note'), emailPassword: raw('email_pass'), pecPassword: raw('pec_pass'), otpId: (document.getElementById(p + '_otp')?.value || undefined) };
 }
 
 function pwNewItem() {
@@ -9517,6 +9520,7 @@ function serverRender() {
           <div class="pw-item-title">${item.label}</div>
           <div class="pw-item-user">${item.host || ''}${item.port ? ':'+item.port : ''}${item.user ? ' · '+item.user : ''}</div>
         </div>
+        ${_hbLinkedOtp(item.otpId) ? `<span onclick="event.stopPropagation();serverOpenOtp('${item.id}')" title="OTP collegato: tocca per vedere il codice" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(59,130,246,0.16);color:#3b82f6;cursor:pointer;margin-right:6px;">🔵 OTP</span>` : ''}
         <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:99px;background:${col}20;color:${col};">${item.label_type||item.type}</span>
       </div>
       <div style="display:flex;gap:8px;margin-top:8px;">
@@ -9611,16 +9615,44 @@ function serverShowDetail(id) {
 
 function serverOtpSelectHtml(selId, selected) {
   try { otpLoad(); } catch (e) {}
-  const opts = _otpAccounts.filter(a => !a.deleted).slice().sort((a, b) => (a.name || '').localeCompare(b.name || '', 'it', { sensitivity: 'base' }))
+  const live = _otpAccounts.filter(a => !a.deleted);
+  const sel = live.find(a => a.id === selected);
+  const catOf = a => (a.categoryId && _otpCats.find(c => c.id === a.categoryId)) ? a.categoryId : '__none';
+  const startCat = sel ? catOf(sel) : '';
+  const cats = _otpCats.slice().sort((x, y) => (x.name || '').localeCompare(y.name || '', 'it', { numeric: true, sensitivity: 'base' }))
+    .filter(c => live.some(a => catOf(a) === c.id));
+  const hasNone = live.some(a => catOf(a) === '__none');
+  const st = 'width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:8px;font-family:inherit;';
+  const catOpts = '<option value="">— Scegli il gruppo —</option>' + cats.map(c => `<option value="${hbEsc(c.id)}" ${c.id === startCat ? 'selected' : ''}>📁 ${hbEsc(c.name)}</option>`).join('') + (hasNone ? `<option value="__none" ${startCat === '__none' ? 'selected' : ''}>❓ Senza gruppo</option>` : '');
+  return `<div style="margin-bottom:12px;"><select id="${selId}_cat" onchange="hbOtpPickFill('${selId}')" style="${st}">${catOpts}</select>` +
+    `<select id="${selId}" style="${st}margin-bottom:0;">${hbOtpPickOptions(startCat, selected)}</select></div>`;
+}
+function hbOtpPickOptions(cat, selected) {
+  if (!cat) return '<option value="">— Nessun OTP —</option>';
+  const live = (_otpAccounts || []).filter(a => !a.deleted);
+  const catOf = a => (a.categoryId && _otpCats.find(c => c.id === a.categoryId)) ? a.categoryId : '__none';
+  return '<option value="">— Nessun OTP —</option>' + live.filter(a => catOf(a) === cat)
+    .sort((x, y) => (x.name || '').localeCompare(y.name || '', 'it', { sensitivity: 'base' }))
     .map(a => `<option value="${hbEsc(a.id)}" ${a.id === selected ? 'selected' : ''}>${hbEsc(a.name)}${a.user ? ' — ' + hbEsc(a.user) : ''}</option>`).join('');
-  return `<select id="${selId}" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;"><option value="">— Nessun OTP —</option>${opts}</select>`;
+}
+function hbOtpPickFill(selId) {
+  const cat = document.getElementById(selId + '_cat')?.value || '';
+  const el = document.getElementById(selId); if (el) el.innerHTML = hbOtpPickOptions(cat, '');
 }
 // Apre una finestra con il codice OTP collegato al server (si aggiorna da solo, con tasto copia)
 let _srvOtpTimer = null;
+function _hbLinkedOtp(otpId) {
+  if (!otpId) return null;
+  try { if (!_otpAccounts || !_otpAccounts.length) otpLoad(); } catch (e) {}
+  return (_otpAccounts || []).find(a => a.id === otpId && !a.deleted) || null;
+}
 function serverOpenOtp(serverId) {
   const item = _serverItems.find(i => i.id === serverId); if (!item || !item.otpId) return;
-  try { otpLoad(); } catch (e) {}
-  const acc = _otpAccounts.find(a => a.id === item.otpId && !a.deleted);
+  otpQuickOpen(item.otpId, item.label || '');
+}
+function otpQuickOpen(otpId, label) {
+  const item = { label };
+  const acc = _hbLinkedOtp(otpId);
   if (!acc) { showToast('OTP collegato non trovato'); return; }
   document.getElementById('srv-otp-overlay')?.remove();
   if (_srvOtpTimer) clearInterval(_srvOtpTimer);
@@ -12127,7 +12159,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.37.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.39.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
