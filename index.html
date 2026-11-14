@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.42.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.43.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.42.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.43.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.42.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.43.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2780,8 +2780,6 @@ Aggiungi nuovo dato
               style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;resize:none;height:100px;line-height:1.6;"></textarea>
           </div>
           <div style="margin-bottom:20px;">
-            <div class="pw-field-label" style="margin-bottom:6px;">🗂 Categoria</div>
-            <div id="srv-cat-wrap"></div>
             <div class="pw-field-label" style="margin-bottom:6px;">🔗 Collegamenti (facoltativo)</div>
             <div id="srv-lk-wrap"></div>
           </div>
@@ -3045,7 +3043,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.42.0',
+  version: 'v13.43.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -7566,7 +7564,7 @@ let _cardColor = 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';
 function cardsLoad() {
   _cards = _vaultParse(localStorage.getItem(CARDS_KEY), _cards);
 }
-function cardsSaveAll() { localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); _setLocalTs(CARDS_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
+function cardsSaveAll() { hbLkInvalidate(); localStorage.setItem(CARDS_KEY, JSON.stringify(_cards)); _setLocalTs(CARDS_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
 
 let _walletCurrent = 'cards';
 function walletTab(which) {
@@ -7652,7 +7650,7 @@ function cardsRender() {
           <!-- Top: label + circuito -->
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:0.1em;">${card.label}</span>
-            <span style="display:flex;align-items:center;">${circuit}</span>
+            <span style="display:flex;align-items:center;gap:6px;">${hbLkBadge('card', card.id, card)}${circuit}</span>
           </div>
           <!-- Chip + numero -->
           <div>
@@ -7825,6 +7823,7 @@ function cardsEdit(id) {
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:5px;">Intestatario</div>
     <input id="_ce_holder" value="${card.holder||''}" placeholder="NOME COGNOME" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:20px;font-family:monospace;text-transform:uppercase;outline:none;">
 
+${hbLkWidgetHtml('_ce_lk', 'card', card.id, hbLkOwn(card))}
 <div style="margin-bottom:16px;"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);margin-bottom:8px;">Colore carta</div><div id="_ce_palette" style="display:flex;flex-wrap:wrap;gap:8px;"><div title="Viola" data-grad="linear-gradient(135deg,#6366f1,#8b5cf6)" onclick="window._ceColor='linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Navy" data-grad="linear-gradient(135deg,#0f172a,#1e3a5f)" onclick="window._ceColor='linear-gradient(135deg,#0f172a,#1e40af,#3b82f6)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#1e3a5f);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Verde" data-grad="linear-gradient(135deg,#065f46,#10b981)" onclick="window._ceColor='linear-gradient(135deg,#064e3b,#059669,#34d399)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#065f46,#10b981);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Arancio" data-grad="linear-gradient(135deg,#7c2d12,#f97316)" onclick="window._ceColor='linear-gradient(135deg,#7c2d12,#ea580c,#fb923c)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7c2d12,#f97316);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Nero" data-grad="linear-gradient(135deg,#1a1a1a,#374151)" onclick="window._ceColor='linear-gradient(135deg,#111827,#374151,#6b7280)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#1a1a1a,#374151);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Oro" data-grad="linear-gradient(135deg,#92400e,#d97706)" onclick="window._ceColor='linear-gradient(135deg,#78350f,#b45309,#fbbf24)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#92400e,#d97706);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Rosa" data-grad="linear-gradient(135deg,#831843,#ec4899)" onclick="window._ceColor='linear-gradient(135deg,#831843,#db2777,#f9a8d4)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#831843,#ec4899);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Blu" data-grad="linear-gradient(135deg,#1e3a8a,#3b82f6)" onclick="window._ceColor='linear-gradient(135deg,#1e3a8a,#2563eb,#60a5fa)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Rosso" data-grad="linear-gradient(135deg,#7f1d1d,#ef4444)" onclick="window._ceColor='linear-gradient(135deg,#7f1d1d,#dc2626,#f87171)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#7f1d1d,#ef4444);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div><div title="Teal" data-grad="linear-gradient(135deg,#134e4a,#06b6d4)" onclick="window._ceColor='linear-gradient(135deg,#134e4a,#0891b2,#67e8f9)';document.querySelectorAll('#_ce_palette div').forEach(b=>b.style.outline='2px solid transparent');this.style.outline='3px solid white'" style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#134e4a,#06b6d4);cursor:pointer;outline:2px solid transparent;transition:transform 0.15s;flex-shrink:0;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''"></div></div></div>    <div style="display:flex;gap:10px;">
       <button onclick="this.closest('[style*=fixed]').remove()" style="flex:1;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_ce_save" style="flex:2;padding:13px;border-radius:14px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
@@ -7854,6 +7853,7 @@ function cardsEdit(id) {
       cvv:    document.getElementById('_ce_cvv').value.trim(),
       pin:    document.getElementById('_ce_pin').value.trim(),
       holder: document.getElementById('_ce_holder').value.trim().toUpperCase(),
+      links: hbLkReadOrUndef('_ce_lk'),
       color:  window._ceColor || card.color || 'linear-gradient(135deg,#4338ca,#6366f1,#a78bfa)',
       updatedAt: new Date().toISOString()
     }; }
@@ -8036,7 +8036,7 @@ let _financeType = { id:'conto', icon:'🏦', label:'Conto Corrente' };
 function financeLoad() {
   _financeAccounts = _vaultParse(localStorage.getItem(FINANCE_KEY), _financeAccounts);
 }
-function financeSaveAll() { localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); _setLocalTs(FINANCE_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
+function financeSaveAll() { hbLkInvalidate(); localStorage.setItem(FINANCE_KEY, JSON.stringify(_financeAccounts)); _setLocalTs(FINANCE_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
 
 function financeOpen() {
   financeLoad(); financeShowList();
@@ -8088,7 +8088,7 @@ function financeRender() {
           <div class="finance-label">${acc.label}</div>
           <div style="margin-top:3px;"><span class="finance-type-badge">${acc.typeLabel||acc.type}</span></div>
         </div>
-        <button onclick="event.stopPropagation();financeEdit('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
+        ${hbLkBadge('fin', acc.id, acc)}<button onclick="event.stopPropagation();financeEdit('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="event.stopPropagation();financeDelete('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>
       ${ibanMasked ? `<div class="finance-iban">IBAN: ${ibanMasked}</div>` : ''}
@@ -8185,6 +8185,7 @@ function financeEdit(id) {
     </div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">Note</div>
     <input id="_fe_notes" value="${acc.notes||''}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">
+    ${hbLkWidgetHtml('_fe_lk', 'fin', acc.id, hbLkOwn(acc))}
     <div style="display:flex;gap:10px;margin-top:6px;">
       <button onclick="this.closest('div[style*=fixed]').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_fe_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
@@ -8203,6 +8204,7 @@ function financeEdit(id) {
       pin: document.getElementById('_fe_pin').value,
       pw: document.getElementById('_fe_pw').value,
       notes: document.getElementById('_fe_notes').value.trim(),
+      links: hbLkReadOrUndef('_fe_lk'),
       updatedAt: new Date().toISOString()
     }; }
     financeSaveAll(); financeRender(); ov.remove();
@@ -8283,7 +8285,7 @@ let _wifiSec  = 'WPA';
 function wifiLoad() {
   _wifiNets = _vaultParse(localStorage.getItem(WIFI_KEY), _wifiNets);
 }
-function wifiSaveAll() { localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); _setLocalTs(WIFI_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
+function wifiSaveAll() { hbLkInvalidate(); localStorage.setItem(WIFI_KEY, JSON.stringify(_wifiNets)); _setLocalTs(WIFI_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
 
 function wifiOpen() {
   wifiLoad(); wifiShowList();
@@ -8337,7 +8339,7 @@ function wifiRender() {
             ${net.notes ? `<span style="font-size:11px;color:var(--text3);">· ${net.notes}</span>` : ''}
           </div>
         </div>
-        <button onclick="wifiEdit('${net.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
+        ${hbLkBadge('wifi', net.id, net)}<button onclick="wifiEdit('${net.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="wifiDelete('${net.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;font-size:15px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'" title="Elimina">🗑️</button>
       </div>
       ${net.pw ? `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border-radius:10px;margin-top:8px;border:1px solid var(--border);">
@@ -8399,6 +8401,7 @@ function wifiEdit(id) {
       </div>
       <div class="pw-field-label" style="margin-bottom:6px;">Note (opzionale)</div>
       <input id="_we_notes" value="${net.notes||''}" placeholder="es. Casa, Ufficio..." style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;outline:none;">
+      ${hbLkWidgetHtml('_we_lk', 'wifi', net.id, hbLkOwn(net))}
       <div style="display:flex;gap:10px;">
         <button id="_we_cancel" style="flex:1;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
         <button id="_we_save" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">💾 Salva</button>
@@ -8417,7 +8420,7 @@ function wifiEdit(id) {
     const notes = document.getElementById('_we_notes').value.trim();
     if (!ssid) { showToast('Inserisci il nome della rete'); return; }
     const idx = _wifiNets.findIndex(n => n.id === id);
-    if (idx !== -1) { _wifiNets[idx] = {..._wifiNets[idx], ssid, pw, notes, updatedAt: new Date().toISOString()}; }
+    if (idx !== -1) { _wifiNets[idx] = {..._wifiNets[idx], ssid, pw, notes, links: hbLkReadOrUndef('_we_lk'), updatedAt: new Date().toISOString()}; }
     wifiSaveAll(); wifiRender(); ov.remove();
     showToast('✅ Rete aggiornata');
   };
@@ -9533,28 +9536,33 @@ function serverNewCategory(selEl) {
   return c;
 }
 function serverSetFilter(id) { _serverFilter = id; serverRender(); }
+const SERVER_TYPES = [
+  { id:'ssh',   icon:'🔐', label:'SSH',      color:'#6366f1' },
+  { id:'api',   icon:'🔑', label:'API Key',  color:'#10b981' },
+  { id:'db',    icon:'🗄️', label:'Database', color:'#f59e0b' },
+  { id:'ftp',   icon:'📁', label:'FTP/SFTP', color:'#8b5cf6' },
+  { id:'vpn',   icon:'🛡️', label:'VPN',      color:'#06b6d4' },
+  { id:'altro', icon:'💻', label:'Altro',    color:'#64748b' }
+];
+function serverTypeOf(item) { return SERVER_TYPES.some(t => t.id === item.type) ? item.type : 'altro'; }
 function serverRenderCatBar() {
   const bar = document.getElementById('server-cat-bar'); if (!bar) return;
-  const btn = (on, l, dashed) => `<button onclick="${on}" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px ${dashed ? 'dashed' : 'solid'} var(--border);background:${dashed ? 'none' : 'var(--surface)'};color:${dashed ? 'var(--text3)' : 'var(--text)'};font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">${l}</button>`;
-  if (!_serverCats.length) { bar.innerHTML = btn('serverManageCats()', '➕ Categoria', 1); return; }
-  if (_serverFilter === 'all') { bar.innerHTML = btn('serverManageCats()', '⚙️ Gestisci categorie', 1); return; }
-  const nm = _serverFilter === 'none' ? 'Senza categoria' : serverCatName(_serverFilter);
-  bar.innerHTML = btn("serverSetFilter('all')", '← Categorie') + `<div style="align-self:center;font-size:14px;font-weight:800;white-space:nowrap;">🗂 ${hbEsc(nm)}</div>`;
+  if (_serverFilter === 'all') { bar.innerHTML = ''; return; }
+  const t = SERVER_TYPES.find(x => x.id === _serverFilter);
+  bar.innerHTML = `<button onclick="serverSetFilter('all')" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">← Cartelle</button><div style="align-self:center;font-size:14px;font-weight:800;white-space:nowrap;">${t ? t.icon + ' ' + hbEsc(t.label) : ''}</div>`;
 }
 function serverRenderCatTiles(list) {
-  const palette = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
-  const cats = _serverCats.slice().sort((a, b) => a.name.localeCompare(b.name, 'it', { numeric: true, sensitivity: 'base' }));
-  const items = cats.map((c, i) => ({ id: c.id, name: c.name, n: _serverItems.filter(x => x.categoryId === c.id).length, color: palette[i % palette.length] }));
-  const un = _serverItems.filter(x => !serverCatOk(x.categoryId)).length;
-  if (un) items.push({ id: 'none', name: 'Senza categoria', n: un, color: '#64748b' });
   list.style.display = 'grid';
   list.style.gap = '12px';
   list.style.gridTemplateColumns = window.innerWidth >= 700 ? 'repeat(2,1fr)' : '1fr';
-  list.innerHTML = items.map(t => `<div onclick="serverSetFilter('${t.id}')" style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${t.color};border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;">
-    <div style="width:52px;height:52px;border-radius:16px;background:${t.color}20;border:1px solid ${t.color}40;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">🗂</div>
-    <div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(t.name)}</div><div style="font-size:12px;color:var(--text3);">${t.n} ${t.n === 1 ? 'credenziale' : 'credenziali'}</div></div>
-    <div style="min-width:32px;height:32px;border-radius:10px;background:${t.color}15;border:1px solid ${t.color}30;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${t.color};padding:0 8px;">${t.n}</div>
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>`).join('');
+  list.innerHTML = SERVER_TYPES.map(t => {
+    const n = _serverItems.filter(x => serverTypeOf(x) === t.id).length;
+    return `<div onclick="serverSetFilter('${t.id}')" style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${t.color};border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;${n ? '' : 'opacity:.55;'}">
+    <div style="width:52px;height:52px;border-radius:16px;background:${t.color}20;border:1px solid ${t.color}40;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">${t.icon}</div>
+    <div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(t.label)}</div><div style="font-size:12px;color:var(--text3);">${n} ${n === 1 ? 'credenziale' : 'credenziali'}</div></div>
+    <div style="min-width:32px;height:32px;border-radius:10px;background:${t.color}15;border:1px solid ${t.color}30;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${t.color};padding:0 8px;">${n}</div>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>`;
+  }).join('');
 }
 function serverManageCats() {
   document.getElementById('_srv_cats_ov')?.remove();
@@ -9594,10 +9602,9 @@ function serverDeleteCategory(id) {
 function serverRender() {
   const list = document.getElementById('server-list');
   if (!list) return;
-  if (!_serverCats.length) _serverFilter = 'all';
+  if (_serverFilter !== 'all' && !SERVER_TYPES.some(t => t.id === _serverFilter)) _serverFilter = 'all';
   serverRenderCatBar();
-  if (_serverCats.length && _serverItems.length && _serverFilter === 'all') { serverRenderCatTiles(list); return; }
-  if (_serverFilter !== 'all' && !(_serverFilter === 'none' || serverCatOk(_serverFilter))) _serverFilter = 'all';
+  if (_serverItems.length && _serverFilter === 'all') { serverRenderCatTiles(list); return; }
   if (!_serverItems.length) {
     list.innerHTML = `<div style="text-align:center;padding:16px 20px;">
       <div style="font-size:22px;margin-bottom:6px;">📡</div>
@@ -9617,8 +9624,7 @@ function serverRender() {
   }
   list.innerHTML = '';
   let _shown = _serverItems;
-  if (_serverFilter === 'none') _shown = _serverItems.filter(x => !serverCatOk(x.categoryId));
-  else if (_serverFilter !== 'all') _shown = _serverItems.filter(x => x.categoryId === _serverFilter);
+  if (_serverFilter !== 'all') _shown = _serverItems.filter(x => serverTypeOf(x) === _serverFilter);
   _shown.forEach(item => {
     const card = document.createElement('div');
     card.className = 'pw-item-card';
@@ -9661,7 +9667,6 @@ function serverSave() {
     pw:    document.getElementById('srv-pw')?.value || '',
     notes: document.getElementById('srv-notes')?.value.trim() || '',
     ...(hbLkRead('srv_new').length ? { links: hbLkRead('srv_new') } : {}),
-    ...(document.getElementById('srv-cat')?.value && document.getElementById('srv-cat').value !== '__new' ? { categoryId: document.getElementById('srv-cat').value } : {}),
   });
   serverSaveAll();
   showToast('✅ ' + label + ' salvato');
@@ -9679,11 +9684,10 @@ function serverShowAdd() {
     const el = document.getElementById(id); if(el) el.value='';
   });
   const pw = document.getElementById('srv-pw'); if(pw) { pw.value=''; pw.type='password'; }
-  _serverType = { id:'ssh', icon:'🔐', label:'SSH' };
+  { const _ft = SERVER_TYPES.find(t => t.id === _serverFilter) || SERVER_TYPES[0]; _serverType = { id: _ft.id, icon: _ft.icon, label: _ft.label }; }
   const _ow = document.getElementById('srv-lk-wrap'); if (_ow) _ow.innerHTML = hbLkWidgetHtml('srv_new', 'srv', '', [], { label: '' });
-  const _cw = document.getElementById('srv-cat-wrap'); if (_cw) _cw.innerHTML = serverCatSelectHtml('srv-cat', (_serverFilter !== 'all' && _serverFilter !== 'none') ? _serverFilter : '');
   document.querySelectorAll('[data-type]').forEach(b =>
-    b.classList.toggle('active', b.dataset.type === 'ssh')
+    b.classList.toggle('active', b.dataset.type === _serverType.id)
   );
 }
 
@@ -9737,8 +9741,8 @@ function serverShowDetail(id) {
 //  Ogni voce può avere  links:[{t,id}]  (t = otp|pw|srv|note). I collegamenti si vedono
 //  in entrambi i sensi ("Collegato a" / "Usato da"). Compatibile con il vecchio campo otpId.
 // ═══════════════════════════════════════════════════════════
-const HB_LK_TYPES = { otp:{icon:'🔑',name:'OTP'}, pw:{icon:'🔐',name:'Password'}, srv:{icon:'🖥️',name:'Server'}, note:{icon:'🗂️',name:'Archivio'} };
-const HB_LK_ORDER = ['otp','pw','srv','note'];
+const HB_LK_TYPES = { otp:{icon:'🔑',name:'OTP'}, pw:{icon:'🔐',name:'Password'}, srv:{icon:'🖥️',name:'Server'}, note:{icon:'🗂️',name:'Archivio'}, card:{icon:'💳',name:'Carta'}, fin:{icon:'🏦',name:'Conto'}, wifi:{icon:'📶',name:'Wi-Fi'} };
+const HB_LK_ORDER = ['otp','pw','srv','note','card','fin','wifi'];
 let _hbLkMemo = null;
 function hbLkInvalidate() { _hbLkMemo = null; }
 function hbLkEnsure() {
@@ -9746,12 +9750,18 @@ function hbLkEnsure() {
   try { if (!_pwItems.length || !_pwCats.length) pwLoad(); } catch (e) {}
   try { if (!_serverItems.length) serverLoad(); } catch (e) {}
   try { if (!_notes.length) noteLoad(); } catch (e) {}
+  try { if (!_cards.length) cardsLoad(); } catch (e) {}
+  try { if (!_financeAccounts.length) financeLoad(); } catch (e) {}
+  try { if (!_wifiNets.length) wifiLoad(); } catch (e) {}
 }
 function hbLkListRaw(t) {
   const none = { g: '__none', gn: 'Senza categoria' };
   if (t === 'otp') return _otpAccounts.filter(a => !a.deleted).map(a => { const ok = a.categoryId && _otpCats.find(c => c.id === a.categoryId); return { t, id: a.id, name: a.name || '—', sub: a.user || '', ...(ok ? { g: a.categoryId, gn: ok.name } : none), raw: a }; });
   if (t === 'pw') return _pwItems.filter(a => !a.deleted).map(a => { const ok = a.categoryId && _pwCats.find(c => c.id === a.categoryId); return { t, id: a.id, name: a.title || '—', sub: a.username || a.email || '', ...(ok ? { g: a.categoryId, gn: ok.name } : none), raw: a }; });
-  if (t === 'srv') return _serverItems.filter(a => !a.deleted).map(a => { const ok = a.categoryId && _serverCats.find(c => c.id === a.categoryId); return { t, id: a.id, name: a.label || '—', sub: a.user || a.host || '', ...(ok ? { g: a.categoryId, gn: ok.name } : none), raw: a }; });
+  if (t === 'srv') return _serverItems.filter(a => !a.deleted).map(a => { const ty = SERVER_TYPES.find(x => x.id === serverTypeOf(a)); return { t, id: a.id, name: a.label || '—', sub: a.user || a.host || '', g: ty.id, gn: ty.label, raw: a }; });
+  if (t === 'card') return _cards.filter(a => !a.deleted).map(a => ({ t, id: a.id, name: a.label || '—', sub: a.number ? '•••• ' + String(a.number).replace(/\D/g, '').slice(-4) : '', g: 'all', gn: 'Carte', raw: a }));
+  if (t === 'fin') return _financeAccounts.filter(a => !a.deleted).map(a => ({ t, id: a.id, name: a.label || '—', sub: a.iban ? '…' + String(a.iban).slice(-4) : '', g: a.type || 'altro', gn: a.typeLabel || 'Conto', raw: a }));
+  if (t === 'wifi') return _wifiNets.filter(a => !a.deleted).map(a => ({ t, id: a.id, name: a.ssid || '—', sub: a.notes || '', g: 'all', gn: 'Reti Wi-Fi', raw: a }));
   return _notes.filter(a => !a.deleted).map(a => { const f = NOTE_FOLDERS.find(x => x.k === (a.kind || 'free')); return { t, id: a.id, name: a.title || 'Senza titolo', sub: '', g: a.kind || 'free', gn: f ? f.name : 'Note', raw: a }; });
 }
 // collegamenti "propri" di una voce (campo links + vecchio otpId)
@@ -9798,6 +9808,9 @@ function hbLkOpen(t, id) {
   document.getElementById('server-detail-overlay')?.remove();
   if (t === 'pw') { switchTab('passwords'); setTimeout(() => { try { pwLoad(); pwShowDetail(id); } catch (x) {} }, 500); }
   else if (t === 'srv') { switchTab('server'); setTimeout(() => { try { serverShowDetail(id); } catch (x) {} }, 500); }
+  else if (t === 'card') { switchTab('cards'); setTimeout(() => { try { walletTab('cards'); cardsShowDetail(id); } catch (x) {} }, 500); }
+  else if (t === 'fin') { switchTab('cards'); setTimeout(() => { try { walletTab('finance'); financeShowDetail(id); } catch (x) {} }, 500); }
+  else if (t === 'wifi') { switchTab('server'); setTimeout(() => { try { netitTab('wifi'); } catch (x) {} }, 400); }
   else { switchTab('notes'); setTimeout(() => { try { noteEdit(id); } catch (x) {} }, 800); }
 }
 function hbLkPopup(t, id) {
@@ -9984,8 +9997,8 @@ function serverEdit(id) {
     ${[['_se_label','Nome/Etichetta',item.label||''],['_se_host','Host/IP',item.host||''],['_se_link','🔗 Link',item.link||''],['_se_port','Porta',item.port||''],['_se_user','Username',item.user||''],['_se_pw','Password',item.pw||''],['_se_notes','Note',item.notes||'']].map(([id,label,val])=>`
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
     <input id="${id}" value="${hbEsc(val)}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">🗂 Categoria</div>
-    ${serverCatSelectHtml('_se_cat', item.categoryId || '')}
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">📂 Cartella (tipo)</div>
+    <select id="_se_type" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">${SERVER_TYPES.map(t => `<option value="${t.id}" ${serverTypeOf(item) === t.id ? 'selected' : ''}>${t.icon} ${hbEsc(t.label)}</option>`).join('')}</select>
     ${hbLkWidgetHtml('_se_lk', 'srv', item.id, hbLkOwn(item))}
     <div style="display:flex;gap:10px;margin-top:6px;">
       <button id="_se_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
@@ -10008,8 +10021,8 @@ function serverEdit(id) {
       notes: document.getElementById('_se_notes').value.trim(),
       updatedAt: new Date().toISOString()
     };
-      const cv = document.getElementById('_se_cat')?.value || '';
-      if (cv && cv !== '__new') _serverItems[idx].categoryId = cv; else delete _serverItems[idx].categoryId;
+      const _tv = SERVER_TYPES.find(t => t.id === (document.getElementById('_se_type')?.value || ''));
+      if (_tv) { _serverItems[idx].type = _tv.id; _serverItems[idx].icon = _tv.icon; _serverItems[idx].label_type = _tv.label; }
       const lk2 = hbLkRead('_se_lk');
       if (lk2.length) _serverItems[idx].links = lk2; else delete _serverItems[idx].links;
       delete _serverItems[idx].otpId;
@@ -12451,7 +12464,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.42.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.43.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
