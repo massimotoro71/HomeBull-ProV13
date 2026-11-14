@@ -1926,7 +1926,7 @@ div[style*="position: fixed"][style*="align-items: flex-end"] > div { max-height
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.44.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.0.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1996,7 +1996,7 @@ div[style*="position: fixed"][style*="align-items: flex-end"] > div { max-height
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.44.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.0.0</div>
         </div>
       </div>
     </div>
@@ -2101,7 +2101,7 @@ div[style*="position: fixed"][style*="align-items: flex-end"] > div { max-height
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.44.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.0.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3047,7 +3047,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.44.0',
+  version: 'v14.0.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3068,7 +3068,7 @@ const HB = {
 const _SENSITIVE_KEYS = [
   'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
   'hb13_cards','hb13_wifi','hb13_finance',
-  'hb13_server','hb13_server_cats'
+  'hb13_server','hb13_server_cats','hb13_backup_pw'
 ];
 
 let _lsCache = {};
@@ -3950,6 +3950,8 @@ function updateHomeStats() {
       else if (pl <= 30) alerts.push({ icon:'🔑', color:'#f97316', text: 'Password di ' + nm + ' scade tra ' + pl + ' giorni', time: pl + 'gg', action:'hbOpenDocs()' });
     });
   } catch (e) {}
+  // 2c-bis. Backup su Drive non cifrato
+  try { if (localStorage.getItem('hb_drive_backup_ts') && !hbBackupPw()) alerts.push({ icon:'🔒', color:'#f97316', text:'Il backup su Drive non è cifrato — imposta una password', time:'', action:'hbOpenCloudSettings()' }); } catch (e) {}
   // 2d. Promemoria backup (Drive o file): mai fatto, più vecchio di 7 giorni, o con molte modifiche non ancora salvate
   if ((_pwItems||[]).filter(i => !i.deleted).length > 0) {
     const _lb = hbLastBackupTs();
@@ -3969,7 +3971,7 @@ function updateHomeStats() {
 
   // 4. Nessun dato
   if (alerts.length === 0 && (_pwItems||[]).length === 0) {
-    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v13! Inizia aggiungendo i tuoi dati.', time: '', tab: '' });
+    alerts.push({ icon:'👋', color:'var(--accent)', text: 'Benvenuto in HomeBull v14! Inizia aggiungendo i tuoi dati.', time: '', tab: '' });
   } else if (alerts.length === 0) {
     alerts.push({ icon:'✅', color:'#10b981', text: 'Tutto in ordine — nessun documento in scadenza', time: '', tab: '' });
   }
@@ -10463,6 +10465,147 @@ async function driveMoveOldBackups(token, backupId) {
   } catch (e) { console.warn('Spostamento vecchi backup:', e); }
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  BACKUP CIFRATO SU DRIVE (v14)  —  password separata, formato "homebull-enc-1"
+//  La password è custodita nell'archivio cifrato dal PIN, così il backup automatico funziona da solo.
+// ═══════════════════════════════════════════════════════════
+function hbBackupPw() { try { const v = localStorage.getItem('hb13_backup_pw'); return v ? JSON.parse(v) : ''; } catch (e) { return ''; } }
+function hbBackupPwStore(pw) {
+  try { localStorage.setItem('hb13_backup_pw', JSON.stringify(pw || '')); } catch (e) {}
+  try { driveUpdateBackupUI(); } catch (e) {}
+}
+async function hbEncryptBackupText(plain, pass) {
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(pass, salt);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(plain));
+  return JSON.stringify({ format: 'homebull-enc-1', v: 14, salt: _hbB64(salt), iv: _hbB64(iv), ct: _hbB64(ct) });
+}
+async function hbDecryptBackupWith(bk, pass) {
+  try {
+    const key = await deriveKey(pass, _hbUnB64(bk.salt));
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: _hbUnB64(bk.iv) }, key, _hbUnB64(bk.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  } catch (e) { return null; }
+}
+// chiede la password fino a 3 volte; restituisce { bk, pass } oppure null
+async function hbAskAndDecrypt(bk) {
+  for (let t = 0; t < 3; t++) {
+    const pass = await _hbAskPassword(t ? '🔓 Password errata, riprova' : '🔓 Password del backup', false);
+    if (!pass) return null;
+    const ok = await hbDecryptBackupWith(bk, pass);
+    if (ok) return { bk: ok, pass };
+    showToast('⚠️ Password errata');
+  }
+  return null;
+}
+function hbOpenCloudSettings() { openSettings(); setTimeout(() => { try { settingsPage('cloud'); } catch (e) {} }, 200); }
+
+async function hbBackupPwSetup() {
+  const cur = hbBackupPw();
+  if (!cur) {
+    const pass = await _hbAskPassword('🔒 Scegli la password del backup su Drive', true);
+    if (!pass) return;
+    hbBackupPwStore(pass);
+    showToast('🔒 Backup cifrato attivato. Annota la password in un posto sicuro!', 6000);
+    if (localStorage.getItem('hb_drive_backup_ts') || localStorage.getItem('hb_drive_folders')) setTimeout(() => driveBackupNow(false), 400);
+    return;
+  }
+  document.getElementById('hb-bkpw-ov')?.remove();
+  const ov = document.createElement('div'); ov.id = 'hb-bkpw-ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  const b = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:340px;width:100%;border:1px solid var(--border);margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px;">🔒 Backup cifrato attivo</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.5;">I backup su Drive sono illeggibili senza la tua password.</div>
+    <div id="hb-bkpw-show" style="display:none;font-family:monospace;font-size:14px;font-weight:800;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;word-break:break-all;margin-bottom:6px;"></div>
+    <button id="hb-bkpw-b1" style="${b}">👁 Mostra la password</button>
+    <button id="hb-bkpw-b2" style="${b}">🔁 Cambia password</button>
+    <button id="hb-bkpw-b3" style="${b}color:#ef4444;">🔓 Disattiva la cifratura</button>
+    <button id="hb-bkpw-b4" style="${b}">Chiudi</button></div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.getElementById('hb-bkpw-b4').onclick = () => ov.remove();
+  document.getElementById('hb-bkpw-b1').onclick = () => { const el = document.getElementById('hb-bkpw-show'); el.textContent = cur; el.style.display = 'block'; };
+  document.getElementById('hb-bkpw-b2').onclick = async () => {
+    ov.remove();
+    const np = await _hbAskPassword('🔁 Nuova password del backup', true); if (!np) return;
+    hbBackupPwStore(np); showToast('🔒 Password cambiata. I vecchi backup restano con la vecchia password!', 7000);
+    setTimeout(() => driveBackupNow(false), 400);
+  };
+  document.getElementById('hb-bkpw-b3').onclick = () => {
+    if (!confirm('Disattivare la cifratura? I NUOVI backup su Drive torneranno leggibili da chiunque abbia accesso al tuo Drive.')) return;
+    ov.remove(); hbBackupPwStore(''); showToast('🔓 Cifratura disattivata'); setTimeout(() => driveBackupNow(false), 400);
+  };
+}
+
+function _hbCountIn(v) { try { if (typeof v === 'string') v = JSON.parse(v); } catch (e) {} return Array.isArray(v) ? v.filter(x => x && !x.deleted).length : 0; }
+function _hbFmtSize(n) { n = Number(n) || 0; return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
+async function _hbDriveListAll(token, q, fields) {
+  let out = [], pt = '';
+  do {
+    const r = await fetch('https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) + '&fields=nextPageToken,files(' + fields + ')&pageSize=500' + (pt ? '&pageToken=' + pt : ''), { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) throw new Error('Drive HTTP ' + r.status);
+    const j = await r.json(); out = out.concat(j.files || []); pt = j.nextPageToken || '';
+  } while (pt);
+  return out;
+}
+async function hbBackupVerify() {
+  document.getElementById('hb-ver-ov')?.remove();
+  const ov = document.createElement('div'); ov.id = 'hb-ver-ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = '<div id="hb-ver-box" style="background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;width:100%;border:1px solid var(--border);margin:auto;"><div style="font-size:15px;font-weight:800;margin-bottom:10px;">🔎 Verifica backup e spazio</div><div id="hb-ver-body" style="font-size:13px;color:var(--text3);">Controllo in corso…</div><button id="hb-ver-close" style="margin-top:14px;width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>';
+  document.body.appendChild(ov);
+  document.getElementById('hb-ver-close').onclick = () => ov.remove();
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  const body = document.getElementById('hb-ver-body');
+  const row = (ok, t) => `<div style="display:flex;gap:8px;padding:5px 0;line-height:1.4;color:var(--text);"><span>${ok === true ? '✅' : ok === false ? '⚠️' : 'ℹ️'}</span><span style="flex:1;">${t}</span></div>`;
+  try {
+    const token = _driveBackupToken || await driveGetBackupToken();
+    const files = await _hbDriveListAll(token, "name contains 'HomeBull-backup-' and trashed=false", 'id,name,modifiedTime,size');
+    files.sort((a, b) => new Date(b.modifiedTime) - new Date(a.modifiedTime));
+    if (!files.length) { body.innerHTML = row(false, 'Nessun backup trovato su Drive. Premi “Backup ora”.'); return; }
+    const f = files[0];
+    const dl = await fetch('https://www.googleapis.com/drive/v3/files/' + f.id + '?alt=media', { headers: { Authorization: 'Bearer ' + token } });
+    if (!dl.ok) throw new Error('Download HTTP ' + dl.status);
+    let bk = await dl.json(), enc = false, lines = '';
+    if (bk.format === 'homebull-enc-1') {
+      enc = true;
+      let dec = hbBackupPw() ? await hbDecryptBackupWith(bk, hbBackupPw()) : null;
+      if (!dec) { body.innerHTML = 'La password salvata qui non apre questo backup. Inserisci quella giusta…'; const a = await hbAskAndDecrypt(bk); dec = a ? a.bk : null; }
+      if (!dec) { body.innerHTML = row(false, 'Backup <b>cifrato</b> ma non riesco ad aprirlo con la password. Se l\'hai persa, questo backup non è recuperabile.'); return; }
+      bk = dec;
+    }
+    const when = new Date(f.modifiedTime);
+    lines += row(true, 'Ultimo backup: <b>' + when.toLocaleDateString('it-IT') + ' ' + when.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) + '</b> · ' + _hbFmtSize(f.size));
+    lines += row(enc ? true : false, enc ? 'Cifrato, si apre con la tua password ✔' : 'NON cifrato: chi ha accesso al tuo Drive può leggerlo. Imposta la password del backup.');
+    if (!bk.data) { body.innerHTML = lines + row(false, 'Il file non contiene dati validi.'); return; }
+    const names = { hb13_passwords: 'Password', hb13_otp_accounts: 'OTP', hb13_notes: 'Archivio', hb13_server: 'Server', hb13_cards: 'Carte', hb13_finance: 'Conti', hb13_wifi: 'Wi-Fi' };
+    let diffs = [];
+    const cnt = Object.entries(names).map(([k, n]) => {
+      const nb = _hbCountIn(bk.data[k]), nl = _hbCountIn(localStorage.getItem(k));
+      if (nb !== nl) diffs.push(n + ' ' + nb + ' nel backup / ' + nl + ' qui');
+      return n + ' ' + nb;
+    }).join(' · ');
+    lines += row(true, 'Contiene: ' + cnt);
+    lines += diffs.length ? row(null, 'Differenze con i dati su questo dispositivo (normali se hai modificato dopo il backup): ' + diffs.join('; ')) : row(true, 'Coincide con i dati di questo dispositivo');
+    // allegati
+    const refs = []; const attData = bk.data.hb13_note_att || {};
+    Object.keys(attData).forEach(k => { if (k !== '_k' && Array.isArray(attData[k])) attData[k].forEach(a => { if (a.driveId) refs.push(a.driveId); }); });
+    const folders = await driveEnsureFolders(token);
+    const attFiles = await _hbDriveListAll(token, "'" + folders.att + "' in parents and trashed=false", 'id,size');
+    const have = new Set(attFiles.map(x => x.id)); const missing = refs.filter(id => !have.has(id));
+    const attSize = attFiles.reduce((t, x) => t + (Number(x.size) || 0), 0);
+    lines += refs.length ? row(!missing.length, 'Allegati su Drive: ' + (refs.length - missing.length) + ' di ' + refs.length + ' presenti' + (missing.length ? ' — <b>' + missing.length + ' mancanti</b>' : '')) : row(null, 'Nessun allegato su Drive nel backup');
+    const bkFiles = files.reduce((t, x) => t + (Number(x.size) || 0), 0);
+    lines += row(null, 'Spazio su Drive: backup ' + _hbFmtSize(bkFiles) + ' (' + files.length + ' file) · allegati ' + _hbFmtSize(attSize) + ' (' + attFiles.length + ' file)');
+    try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); lines += row(null, 'Spazio su questo dispositivo: ' + _hbFmtSize(e.usage) + (e.quota ? ' su ' + _hbFmtSize(e.quota) : '')); } } catch (e) {}
+    const oldPlain = files.length > 1 && enc ? files.slice(1).length : 0;
+    if (enc && oldPlain) lines += row(null, 'Nota: i ' + oldPlain + ' backup più vecchi possono essere ancora non cifrati; si cancellano da soli man mano (ne tengo 10).');
+    body.innerHTML = lines;
+  } catch (e) { body.innerHTML = row(false, 'Controllo non riuscito: ' + (e.message || e)); }
+}
+
 async function driveBackupNow(silent=false) {
   try {
     if (!silent) showToast('☁️ Backup Drive in corso...');
@@ -10480,8 +10623,10 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'13.0.0', exportedAt: now.toISOString(), data }, null, 2);
-    const blob = new Blob([payload], { type: 'application/json' });
+    const payload = JSON.stringify({ version:'14.0.0', exportedAt: now.toISOString(), data }, null, 2);
+    let bodyText = payload; const _bpw = hbBackupPw();
+    if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
+    const blob = new Blob([bodyText], { type: 'application/json' });
 
     // Cartella "HomeBull Pro/Backup" (se non riesce, si salva come prima nella cartella principale)
     let folders = null;
@@ -10649,11 +10794,13 @@ async function driveDoRestore(fileId, dateLabel, btn) {
         `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
         { headers: { Authorization: 'Bearer ' + token } }
       );
-      const bk = await dl.json();
+      let bk = await dl.json(), _usedPw = '';
+      if (bk.format === 'homebull-enc-1') { const a = await hbAskAndDecrypt(bk); if (!a) return; bk = a.bk; _usedPw = a.pass; }
       if (!bk.data) { showToast('⚠️ File backup non valido'); return; }
       Object.entries(bk.data).forEach(([k, v]) => {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
+      if (_usedPw) { try { localStorage.setItem('hb13_backup_pw', JSON.stringify(_usedPw)); } catch (e) {} }
       localStorage.setItem('hb_drive_backup_ts', new Date().toISOString());
       localStorage.setItem('hb_drive_restore_ts', new Date().toISOString());
       window._driveRemoteNewerDetected = false;
@@ -10872,6 +11019,9 @@ function driveUpdateBackupUI() {
   if (thm) thm.style.left = auto ? '25px' : '3px';
   const modeRow = document.getElementById('drive-mode-row');
   if (modeRow) modeRow.style.display = auto ? 'flex' : 'none';
+  { const _e = hbBackupPw() ? true : false; const st = document.getElementById('drive-enc-status'), bt = document.getElementById('drive-enc-btn');
+    if (st) { st.textContent = _e ? 'Attivo: i backup su Drive sono cifrati con la tua password' : 'Non attivo: i backup su Drive sono leggibili'; st.style.color = _e ? '#10b981' : '#f97316'; }
+    if (bt) bt.textContent = _e ? 'Gestisci' : 'Imposta'; }
   const mode = localStorage.getItem('hb_drive_auto_mode') || '30min';
   const bS = document.getElementById('drive-mode-save');
   const b3 = document.getElementById('drive-mode-30min');
@@ -12344,6 +12494,13 @@ document.addEventListener('keydown', (e) => {
               <button onclick="driveSetAutoMode('30min')" id="drive-mode-30min" style="flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;">🕐 Ogni 30 minuti</button>
             </div>
           </div>
+ <div style="padding:12px 16px;border-top:1px solid var(--border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+              <div style="min-width:0;"><div style="font-size:13px;font-weight:700;">🔒 Backup cifrato</div><div id="drive-enc-status" style="font-size:11px;color:var(--text3);">—</div></div>
+              <button id="drive-enc-btn" onclick="hbBackupPwSetup()" style="flex-shrink:0;padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Imposta</button>
+            </div>
+            <button onclick="hbBackupVerify()" style="margin-top:10px;width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔎 Verifica ultimo backup e spazio</button>
+          </div>
         </div>
         <button onclick="lockApp();closeSettings();" style="width:100%;padding:13px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;">🔒 Blocca app</button>
         <button onclick="settingsLogout()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.08);color:#ef4444;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">🚪 Disconnetti account</button>
@@ -12541,7 +12698,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.44.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.0.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
