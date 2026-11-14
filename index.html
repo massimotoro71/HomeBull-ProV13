@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.41.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.42.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.41.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.42.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.41.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.42.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2393,6 +2393,7 @@ Aggiungi nuovo dato
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Data di scadenza
                 <input id="doc-scadenza" type="date" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);grid-column:1/-1;margin-top:4px;border-top:1px solid var(--border);padding-top:8px;">Accesso online collegato (facoltativo)</label>
+              <div id="doc-pw-host" style="grid-column:1/-1;"></div>
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Email
                 <input id="doc-email" type="email" maxlength="120" autocomplete="off" style="width:100%;margin-top:3px;padding:9px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;"></label>
               <label style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);">Password
@@ -2415,6 +2416,7 @@ Aggiungi nuovo dato
             <input id="note-att-input" type="file" accept="image/*,.pdf" multiple style="display:none;" onchange="noteAttHandleFiles(this.files)">
           </div>
           <div id="note-att-list" style="display:none;gap:10px;padding:0 14px 10px;overflow-x:auto;flex-shrink:0;"></div>
+          <div id="note-lk-host" style="padding:0 14px;flex-shrink:0;"></div>
           <textarea id="note-content-inp" placeholder="Scrivi qui la tua nota..." oninput="if(_noteInPreview)noteRenderPreview()"
             style="flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;line-height:1.7;outline:none;resize:none;-webkit-overflow-scrolling:touch;"></textarea>
           <div id="note-preview-box" style="display:none;flex:1;margin:0 14px 14px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;line-height:1.7;overflow-y:auto;-webkit-overflow-scrolling:touch;"></div>
@@ -2780,8 +2782,8 @@ Aggiungi nuovo dato
           <div style="margin-bottom:20px;">
             <div class="pw-field-label" style="margin-bottom:6px;">🗂 Categoria</div>
             <div id="srv-cat-wrap"></div>
-            <div class="pw-field-label" style="margin-bottom:6px;">🔐 Collega un OTP (facoltativo)</div>
-            <div id="srv-otp-wrap"></div>
+            <div class="pw-field-label" style="margin-bottom:6px;">🔗 Collegamenti (facoltativo)</div>
+            <div id="srv-lk-wrap"></div>
           </div>
           <button onclick="serverSave()" style="width:100%;padding:15px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">Salva Credenziale</button>
         </div>
@@ -3043,7 +3045,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.41.0',
+  version: 'v13.42.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3940,8 +3942,8 @@ function updateHomeStats() {
       if (left < 0) alerts.push({ icon:'📄', color:'#ef4444', text: nm + ' scaduto', time:'Scaduto', action:'hbOpenDocs()' });
       else if (left <= 60) alerts.push({ icon:'📄', color:'#f97316', text: nm + ' scade tra ' + left + ' giorni', time: left + 'gg', action:'hbOpenDocs()' });
     });
-    (typeof _notes !== 'undefined' ? _notes : []).filter(n => !n.deleted && n.kind === 'document' && n.doc && n.doc.pwdScad).forEach(n => {
-      const pl = _docDaysLeft({ scadenza: n.doc.pwdScad }), nm = n.title || _docTipoName(n.doc) || 'Documento';
+    (typeof _notes !== 'undefined' ? _notes : []).filter(n => !n.deleted && n.kind === 'document' && n.doc && (n.doc.pwdScad || n.doc.pwId) && _docEff(n).pwdScad).forEach(n => {
+      const pl = _docDaysLeft({ scadenza: _docEff(n).pwdScad }), nm = n.title || _docTipoName(n.doc) || 'Documento';
       if (pl < 0) alerts.push({ icon:'🔑', color:'#ef4444', text: 'Password di ' + nm + ' scaduta', time:'Scaduta', action:'hbOpenDocs()' });
       else if (pl <= 30) alerts.push({ icon:'🔑', color:'#f97316', text: 'Password di ' + nm + ' scade tra ' + pl + ' giorni', time: pl + 'gg', action:'hbOpenDocs()' });
     });
@@ -4191,6 +4193,7 @@ function pwLoad() {
 
 // Salva
 function pwSave() {
+  hbLkInvalidate();
   localStorage.setItem(PW_CATS, JSON.stringify(_pwCats));
   _setLocalTs(PW_CATS);
   localStorage.setItem(PW_KEY,  JSON.stringify(_pwItems));
@@ -4695,7 +4698,7 @@ function pwRenderItems(q='') {
         <span class="pw-strength-badge" style="background:${strength.bg};color:${strength.col};">${strength.label}</span>
         ${expInfo && (expInfo.status==='expired'||expInfo.status==='today'||expInfo.status==='soon') ? `<span style="background:${expInfo.bg};color:${expInfo.col};font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">⏰ ${expInfo.badge}</span>` : ''}
         ${item.pin ? '<span style="background:rgba(234,179,8,0.15);color:#eab308;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;">PIN</span>' : ''}
-        ${_hbLinkedOtp(item.otpId) ? `<span onclick="event.stopPropagation();otpQuickOpen('${item.otpId}','${hbEsc(item.title||'').replace(/'/g,'')}')" title="OTP collegato: tocca per vedere il codice" style="background:rgba(59,130,246,0.16);color:#3b82f6;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;cursor:pointer;">🔵 OTP</span>` : ''}
+        ${hbLkBadge('pw', item.id, item)}
         <button class="pw-copy-btn" onclick="event.stopPropagation();pwCopy('${item.id}','password')" title="Copia password">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
@@ -5229,7 +5232,7 @@ function pwShowDetail(itemId) {
     </div>
     ${item.pin ? pwPinField(item.id) : ''}
     ${item.url ? `<div class="pw-field-row"><div class="pw-field-label">URL</div><div class="pw-field-value" style="color:var(--accent2);">${hbEsc(item.url)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwOpenUrl('${item.id}')">🔗 Apri</button></div></div>` : ''}
-    ${_hbLinkedOtp(item.otpId) ? `<div class="pw-field-row"><div class="pw-field-label">OTP collegato</div><div class="pw-field-value">🔐 ${hbEsc(_hbLinkedOtp(item.otpId).name)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="otpQuickOpen('${item.otpId}','${hbEsc(item.title||'').replace(/'/g,'')}')">🔐 Apri OTP</button></div></div>` : ''}
+    ${(() => { const _n = hbLkCount('pw', item.id, item); return _n ? `<div class="pw-field-row"><div class="pw-field-label">Collegamenti</div><div class="pw-field-value">🔵 ${_n} ${_n === 1 ? 'collegamento' : 'collegamenti'}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="hbLkPopup('pw','${item.id}')">🔗 Vedi</button></div></div>` : ''; })()}
     ${item.email ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Email</div><div class="pw-field-value">${hbEsc(item.email)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','email')">📋 Copia</button></div></div>` : ''}
     ${item.emailPassword ? `<div class="pw-field-row pw-g-mail"><div class="pw-field-label">Password email</div><div class="pw-field-value" id="pd-ep" style="font-family:monospace;letter-spacing:0.05em;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pdToggleSecret('${item.id}','emailPassword','pd-ep')">👁 Mostra</button><button class="pw-field-btn" onclick="pwCopy('${item.id}','emailPassword')">📋 Copia</button></div></div>` : ''}
     ${item.pec ? `<div class="pw-field-row pw-g-pec"><div class="pw-field-label">PEC</div><div class="pw-field-value">${hbEsc(item.pec)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="pwCopy('${item.id}','pec')">📋 Copia</button></div></div>` : ''}
@@ -6302,7 +6305,7 @@ function _pwFormFields(p, item, isNew) {
       '<button id="' + p + '_exp_today" type="button" title="Imposta a oggi" style="padding:0 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">Oggi</button></div>' +
       '<div style="font-size:10px;color:var(--text3);margin-top:5px;">La scadenza parte da questa data — correggila se la password esisteva già da prima</div>' +
       (!isNew && item.expiryDate ? '<div style="font-size:11px;color:var(--text3);margin-top:5px;">' + ((pwExpiryInfo(item) || {}).text || '') + '</div>' : '') + '</div>',
-    '<div style="margin-bottom:11px;">' + lab('🔐 OTP collegato') + serverOtpSelectHtml(p + '_otp', item.otpId || '') + '</div>',
+    '<div style="margin-bottom:11px;">' + hbLkWidgetHtml(p + '_lk', 'pw', item.id, hbLkOwn(item)) + '</div>',
     '<div style="margin-bottom:16px;">' + lab('Note') + '<textarea id="' + p + '_note" rows="3" style="' + inp + 'font-size:14px;resize:none;font-family:inherit;">' + _pwEsc(item.notes) + '</textarea></div>'
   ].join('');
 }
@@ -6324,7 +6327,7 @@ function _pwFormWire(p) {
 function _pwFormRead(p) {
   const v = id => (document.getElementById(p + '_' + id)?.value || '').trim();
   const raw = id => document.getElementById(p + '_' + id)?.value || '';
-  return { title: v('title'), username: v('user'), email: v('email'), pec: v('pec'), url: v('url'), pin: v('pin'), notes: v('note'), emailPassword: raw('email_pass'), pecPassword: raw('pec_pass'), otpId: (document.getElementById(p + '_otp')?.value || undefined) };
+  return { title: v('title'), username: v('user'), email: v('email'), pec: v('pec'), url: v('url'), pin: v('pin'), notes: v('note'), emailPassword: raw('email_pass'), pecPassword: raw('pec_pass'), otpId: undefined, links: hbLkReadOrUndef(p + '_lk') };
 }
 
 function pwNewItem() {
@@ -6667,6 +6670,7 @@ function noteAttSaveAll() {
   driveAutoBackupOnSave();
 }
 function noteSaveAll() {
+  hbLkInvalidate();
   localStorage.setItem(NOTE_KEY, JSON.stringify(_notes));
   _setLocalTs(NOTE_KEY);
   driveAutoBackupOnSave();
@@ -7112,11 +7116,14 @@ function noteDocFill(doc) {
   document.getElementById('doc-ente').value = d.ente || '';
   document.getElementById('doc-email').value = d.email || '';
   document.getElementById('doc-pwdscad').value = d.pwdScad || '';
+  _docPwWas = false;
+  { const h = document.getElementById('doc-pw-host'); if (h) h.innerHTML = hbLkWidgetHtml('doc_pw', 'note', _noteEditId, d.pwId ? [{ t: 'pw', id: d.pwId }] : [], { only: 'pw', max: 1, label: '🔑 Prendi i dati da una password (email, password e scadenza si aggiornano da sole)' }); }
   _docAutoTitle = _docAutoOf(); { const t = document.getElementById('note-title-inp'); if (t && _docTitleIsAuto(t.value, d.intestatario)) t.value = _docAutoTitle; }
   { const e = document.getElementById('doc-pwd'); e.type = 'password'; e.value = d.pwd || ''; const b = e.parentNode.querySelector('button'); if (b) b.textContent = '👁'; }
   ['doc-pin','doc-puk'].forEach(id => { const e = document.getElementById(id); e.type = 'password'; e.value = d[id === 'doc-pin' ? 'pin' : 'puk'] || ''; const b = e.parentNode.querySelector('button'); if (b) b.textContent = '👁'; });
   document.getElementById('doc-rilascio').value = d.rilascio || '';
   document.getElementById('doc-scadenza').value = d.scadenza || '';
+  hbDocPwSync();
 }
 const _noteShown = new Set(); let _noteShownT = null;
 function _noteColor(n) { const f = NOTE_FOLDERS.find(x => x.k === (n.kind || 'free')); return f ? f.color : '#f59e0b'; }
@@ -7127,7 +7134,7 @@ function noteToggleShow(id, field) {
   noteRenderList('');
 }
 function noteCopyField(id, field) {
-  const n = _notes.find(x => x.id === id); const v = n && n.doc ? n.doc[field] : '';
+  const n = _notes.find(x => x.id === id); const v = n && n.doc ? _docEff(n)[field] : '';
   if (!v) return;
   navigator.clipboard.writeText(String(v)).then(() => showToast('📋 Copiato'), () => showToast('Copia non riuscita'));
 }
@@ -7148,10 +7155,10 @@ function _noteBadge(left, okTxt, soonTxt, lateTxt, soonDays) {
 }
 function noteDocEye(id, btn) { const e = document.getElementById(id); if (!e) return; const show = e.type === 'password'; e.type = show ? 'text' : 'password'; btn.textContent = show ? '🙈' : '👁'; }
 function noteDocRead() {
-  return { tipo: document.getElementById('doc-tipo').value, tipoAltro: document.getElementById('doc-tipo').value === 'Altro documento' ? document.getElementById('doc-tipo-altro').value.trim() : '', intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), email: document.getElementById('doc-email').value.trim(), pwd: document.getElementById('doc-pwd').value, pwdScad: document.getElementById('doc-pwdscad').value, pin: document.getElementById('doc-pin').value.trim(), puk: document.getElementById('doc-puk').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value };
+  return { tipo: document.getElementById('doc-tipo').value, tipoAltro: document.getElementById('doc-tipo').value === 'Altro documento' ? document.getElementById('doc-tipo-altro').value.trim() : '', intestatario: document.getElementById('doc-intest').value.trim(), numero: document.getElementById('doc-num').value.trim(), ente: document.getElementById('doc-ente').value.trim(), email: document.getElementById('doc-email').value.trim(), pwd: document.getElementById('doc-pwd').value, pwdScad: document.getElementById('doc-pwdscad').value, pin: document.getElementById('doc-pin').value.trim(), puk: document.getElementById('doc-puk').value.trim(), rilascio: document.getElementById('doc-rilascio').value, scadenza: document.getElementById('doc-scadenza').value, ...(hbLkRead('doc_pw')[0] ? { pwId: hbLkRead('doc_pw')[0].id, email: '', pwd: '', pwdScad: '' } : {}) };
 }
 function noteDocText(n) {
-  const d = n.doc || {}, r = [];
+  const d = _docEff(n), r = [];
   if (n.title) r.push(n.title);
   if (d.tipo) r.push('Tipo: ' + _docTipoName(d));
   if (d.intestatario) r.push('Intestatario: ' + d.intestatario);
@@ -7274,7 +7281,7 @@ function noteRenderList(q='') {
     card.onclick = () => noteEdit(note.id);
     const d = new Date(note.updatedAt);
     const dateStr = d.toLocaleDateString('it-IT', { day:'numeric', month:'short', year:'numeric' });
-    const kd = NOTE_KINDS[note.kind], col = _noteColor(note), id = note.id, dd = note.doc || {};
+    const kd = NOTE_KINDS[note.kind], col = _noteColor(note), id = note.id, dd = _docEff(note);
     const icon = kd ? kd.icon : '📝';
     let sub = note.kind === 'document' ? [_docTipoName(dd), dd.intestatario].filter(Boolean).join(' · ') : kd ? kd.label : '';
     let body = '';
@@ -7313,6 +7320,7 @@ function noteRenderList(q='') {
       ${body}
       <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text3);">
         <span>🕐 ${dateStr}${att ? ' · 📎 ' + att : ''}</span>
+        ${hbLkBadge('note', id, note)}
         ${note.kind === 'document' ? `<button onclick="event.stopPropagation();noteCopy('${id}')" style="background:none;border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);font-family:inherit;">📋 Copia tutto</button>` : ''}
       </div>`;
     list.appendChild(card);
@@ -7347,6 +7355,7 @@ function noteNewOfKind(kind) {
   _noteKindFilter = kind || 'free';
   _noteEditId = 'note_' + Date.now();
   _noteCurrentAtts = [];
+  { const h = document.getElementById('note-lk-host'); if (h) h.innerHTML = hbLkWidgetHtml('note_e', 'note', _noteEditId, []); }
   const _kd = NOTE_KINDS[_noteNewKind];
   document.getElementById('note-title-inp').value = _kd ? _kd.title : '';
   document.getElementById('note-content-inp').value = _kd ? _kd.body : '';
@@ -7376,6 +7385,7 @@ function noteEdit(id) {
   _noteKindFilter = note.kind || 'free';
   _noteCurrentAtts = (_noteAttStore[id] || []).map(a => ({ ...a }));
   noteAttHydrateCurrent();
+  { const h = document.getElementById('note-lk-host'); if (h) h.innerHTML = hbLkWidgetHtml('note_e', 'note', id, hbLkOwn(note)); }
   document.getElementById('note-title-inp').value = note.title || '';
   document.getElementById('note-content-inp').value = note.content || '';
   noteDocToggle(note.kind === 'document', note.doc);
@@ -7472,10 +7482,12 @@ function noteSave() {
     note.title = title; note.content = content; note.updatedAt = now;
     if (_noteNewKind) note.kind = _noteNewKind; else delete note.kind;
     if (_doc) note.doc = _doc; else delete note.doc;
+    { const _lk = hbLkRead('note_e'); if (_lk.length) note.links = _lk; else delete note.links; }
   } else {
     const nn = { id:_noteEditId, title, content, createdAt:now, updatedAt:now };
     if (_noteNewKind) nn.kind = _noteNewKind;
     if (_doc) nn.doc = _doc;
+    { const _lk = hbLkRead('note_e'); if (_lk.length) nn.links = _lk; }
     _notes.push(nn);
   }
   const prevAtts = _noteAttStore[_noteEditId] || [];
@@ -8622,7 +8634,7 @@ function otpDeleteCategory(id){
   if(_otpFilter===id) _otpFilter='all';
   otpSaveAll(); otpCatsSave(); otpRenderList(''); otpManageCats();
 }
-function otpSaveAll() { localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
+function otpSaveAll() { hbLkInvalidate(); localStorage.setItem(OTP_KEY, JSON.stringify(_otpAccounts)); _setLocalTs(OTP_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
 
 function otpOpen() {
   otpLoad();
@@ -8701,6 +8713,7 @@ function otpRenderList(q='') {
           <div style="font-size:14px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.name}</div>
           ${acc.user ? `<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.user}</div>` : ''}
         </div>
+        ${hbLkBadge('otp', acc.id, acc)}
         <button onclick="event.stopPropagation();otpEdit('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>
@@ -8894,6 +8907,7 @@ function otpEdit(id) {
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Username / Email</div>
     <input id="_oe_user" value="${hbEsc(acc.user||'')}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;">
     ${otpCatSelectHtml('_oe_cat', acc.categoryId||'')}
+    ${hbLkWidgetHtml('_oe_lk', 'otp', acc.id, hbLkOwn(acc))}
     <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Chiave segreta (TOTP)</div>
     <input id="_oe_secret" value="${hbEsc(acc.secret||'')}" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:16px;font-family:inherit;">
     <div style="display:flex;gap:10px;">
@@ -8910,7 +8924,7 @@ function otpEdit(id) {
     const secret = document.getElementById('_oe_secret').value.trim();
     if (!name) { showToast('Inserisci il nome'); return; }
     const idx = _otpAccounts.findIndex(a => a.id === id);
-    if (idx !== -1) { const _cv = document.getElementById('_oe_cat')?.value||''; const _na = {..._otpAccounts[idx], name, user, secret, updatedAt: new Date().toISOString()}; if (_cv && _cv!=='__new') _na.categoryId=_cv; else delete _na.categoryId; _otpAccounts[idx] = _na; }
+    if (idx !== -1) { const _cv = document.getElementById('_oe_cat')?.value||''; const _na = {..._otpAccounts[idx], name, user, secret, updatedAt: new Date().toISOString()}; { const _lk = hbLkRead('_oe_lk'); if (_lk.length) _na.links = _lk; else delete _na.links; } if (_cv && _cv!=='__new') _na.categoryId=_cv; else delete _na.categoryId; _otpAccounts[idx] = _na; }
     otpSaveAll(); otpRenderList(''); ov.remove();
     showToast('✅ Account aggiornato');
   };
@@ -9619,7 +9633,7 @@ function serverRender() {
           ${item.user ? `<div style="font-size:13px;font-weight:800;color:var(--accent);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">👤 ${hbEsc(item.user)}</div>` : ''}
           <div class="pw-item-user">${hbEsc(item.host || '')}${item.port ? ':'+hbEsc(item.port) : ''}</div>
         </div>
-        ${_hbLinkedOtp(item.otpId) ? `<span onclick="event.stopPropagation();serverOpenOtp('${item.id}')" title="OTP collegato: tocca per vedere il codice" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(59,130,246,0.16);color:#3b82f6;cursor:pointer;margin-right:6px;">🔵 OTP</span>` : ''}
+        ${hbLkBadge('srv', item.id, item)}
         <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:99px;background:${col}20;color:${col};">${item.label_type||item.type}</span>
       </div>
       <div style="display:flex;gap:8px;margin-top:8px;">
@@ -9646,7 +9660,7 @@ function serverSave() {
     user:  document.getElementById('srv-user')?.value.trim() || '',
     pw:    document.getElementById('srv-pw')?.value || '',
     notes: document.getElementById('srv-notes')?.value.trim() || '',
-    ...(document.getElementById('srv-otp')?.value ? { otpId: document.getElementById('srv-otp').value } : {}),
+    ...(hbLkRead('srv_new').length ? { links: hbLkRead('srv_new') } : {}),
     ...(document.getElementById('srv-cat')?.value && document.getElementById('srv-cat').value !== '__new' ? { categoryId: document.getElementById('srv-cat').value } : {}),
   });
   serverSaveAll();
@@ -9654,7 +9668,7 @@ function serverSave() {
   serverShowList();
 }
 
-function serverSaveAll() { localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); _setLocalTs(SERVER_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
+function serverSaveAll() { hbLkInvalidate(); localStorage.setItem(SERVER_KEY, JSON.stringify(_serverItems)); _setLocalTs(SERVER_KEY); driveAutoBackupOnSave(); updateSidebarBadges(); }
 
 function serverShowAdd() {
   document.getElementById('server-view-list').style.display = 'none';
@@ -9666,7 +9680,7 @@ function serverShowAdd() {
   });
   const pw = document.getElementById('srv-pw'); if(pw) { pw.value=''; pw.type='password'; }
   _serverType = { id:'ssh', icon:'🔐', label:'SSH' };
-  const _ow = document.getElementById('srv-otp-wrap'); if (_ow) _ow.innerHTML = serverOtpSelectHtml('srv-otp', '');
+  const _ow = document.getElementById('srv-lk-wrap'); if (_ow) _ow.innerHTML = hbLkWidgetHtml('srv_new', 'srv', '', [], { label: '' });
   const _cw = document.getElementById('srv-cat-wrap'); if (_cw) _cw.innerHTML = serverCatSelectHtml('srv-cat', (_serverFilter !== 'all' && _serverFilter !== 'none') ? _serverFilter : '');
   document.querySelectorAll('[data-type]').forEach(b =>
     b.classList.toggle('active', b.dataset.type === 'ssh')
@@ -9696,7 +9710,7 @@ function serverShowDetail(id) {
     item.link ? `<div class="pw-field-row"><div class="pw-field-label">Link</div><div class="pw-field-value" style="color:var(--accent2);word-break:break-all;">${hbEsc(item.link)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverOpenLink('${item.id}')">🔗 Apri</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','link')">📋 Copia</button></div></div>` : '',
     item.user ? `<div class="pw-field-row"><div class="pw-field-label">Username</div><div class="pw-field-value" style="font-family:monospace;">${item.user}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','user')">📋 Copia</button></div></div>` : '',
     item.pw   ? `<div class="pw-field-row"><div class="pw-field-label">Password / Token</div><div class="pw-field-value" id="srv-pw-detail-${item.id}" style="font-family:monospace;font-size:12px;word-break:break-all;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverToggleDetailPw('${item.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','pw')">📋 Copia</button></div></div>` : '',
-    (item.otpId && _otpAccounts.find(a => a.id === item.otpId && !a.deleted)) ? `<div class="pw-field-row"><div class="pw-field-label">OTP collegato</div><div class="pw-field-value">🔐 ${hbEsc(_otpAccounts.find(a => a.id === item.otpId).name)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverOpenOtp('${item.id}')">🔐 Apri OTP</button></div></div>` : '',
+    (() => { const _n = hbLkCount('srv', item.id, item); return _n ? `<div class="pw-field-row"><div class="pw-field-label">Collegamenti</div><div class="pw-field-value">🔵 ${_n} ${_n === 1 ? 'collegamento' : 'collegamenti'}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="hbLkPopup('srv','${item.id}')">🔗 Vedi</button></div></div>` : ''; })(),
     item.notes? `<div class="pw-field-row"><div class="pw-field-label">Note / Connection String</div><div class="pw-field-value" style="font-family:monospace;font-size:12px;white-space:pre-wrap;">${item.notes}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','notes')">📋 Copia</button></div></div>` : '',
   ].filter(Boolean).join('');
   overlay.innerHTML = `<div style="width:100%;max-width:500px;background:var(--bg2);border-radius:24px 24px 0 0;border:1px solid var(--border);border-bottom:none;padding:0 0 calc(20px + env(safe-area-inset-bottom,0px));">
@@ -9715,6 +9729,168 @@ function serverShowDetail(id) {
     </div>
   </div>`;
   document.body.appendChild(overlay);
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  COLLEGAMENTI tra voci (OTP, Password, Server, Archivio)
+//  Ogni voce può avere  links:[{t,id}]  (t = otp|pw|srv|note). I collegamenti si vedono
+//  in entrambi i sensi ("Collegato a" / "Usato da"). Compatibile con il vecchio campo otpId.
+// ═══════════════════════════════════════════════════════════
+const HB_LK_TYPES = { otp:{icon:'🔑',name:'OTP'}, pw:{icon:'🔐',name:'Password'}, srv:{icon:'🖥️',name:'Server'}, note:{icon:'🗂️',name:'Archivio'} };
+const HB_LK_ORDER = ['otp','pw','srv','note'];
+let _hbLkMemo = null;
+function hbLkInvalidate() { _hbLkMemo = null; }
+function hbLkEnsure() {
+  try { if (!_otpAccounts.length) otpLoad(); } catch (e) {}
+  try { if (!_pwItems.length || !_pwCats.length) pwLoad(); } catch (e) {}
+  try { if (!_serverItems.length) serverLoad(); } catch (e) {}
+  try { if (!_notes.length) noteLoad(); } catch (e) {}
+}
+function hbLkListRaw(t) {
+  const none = { g: '__none', gn: 'Senza categoria' };
+  if (t === 'otp') return _otpAccounts.filter(a => !a.deleted).map(a => { const ok = a.categoryId && _otpCats.find(c => c.id === a.categoryId); return { t, id: a.id, name: a.name || '—', sub: a.user || '', ...(ok ? { g: a.categoryId, gn: ok.name } : none), raw: a }; });
+  if (t === 'pw') return _pwItems.filter(a => !a.deleted).map(a => { const ok = a.categoryId && _pwCats.find(c => c.id === a.categoryId); return { t, id: a.id, name: a.title || '—', sub: a.username || a.email || '', ...(ok ? { g: a.categoryId, gn: ok.name } : none), raw: a }; });
+  if (t === 'srv') return _serverItems.filter(a => !a.deleted).map(a => { const ok = a.categoryId && _serverCats.find(c => c.id === a.categoryId); return { t, id: a.id, name: a.label || '—', sub: a.user || a.host || '', ...(ok ? { g: a.categoryId, gn: ok.name } : none), raw: a }; });
+  return _notes.filter(a => !a.deleted).map(a => { const f = NOTE_FOLDERS.find(x => x.k === (a.kind || 'free')); return { t, id: a.id, name: a.title || 'Senza titolo', sub: '', g: a.kind || 'free', gn: f ? f.name : 'Note', raw: a }; });
+}
+// collegamenti "propri" di una voce (campo links + vecchio otpId)
+function hbLkOwn(raw) {
+  const out = []; const add = (t, id) => { if (t && id && !out.some(o => o.t === t && o.id === id)) out.push({ t, id }); };
+  ((raw && raw.links) || []).forEach(l => add(l.t, l.id));
+  if (raw && raw.otpId) add('otp', raw.otpId);
+  return out;
+}
+// collegamenti in uscita, compreso il documento ↔ password
+function hbLkOut(t, raw) {
+  const out = hbLkOwn(raw);
+  if (t === 'note' && raw && raw.doc && raw.doc.pwId && !out.some(o => o.t === 'pw' && o.id === raw.doc.pwId)) out.push({ t: 'pw', id: raw.doc.pwId });
+  return out;
+}
+function hbLkIdx() {
+  if (_hbLkMemo && Date.now() - _hbLkMemo.at < 400) return _hbLkMemo;
+  hbLkEnsure();
+  const by = new Map(), back = new Map(), all = [];
+  HB_LK_ORDER.forEach(t => hbLkListRaw(t).forEach(e => { by.set(t + ':' + e.id, e); all.push(e); }));
+  all.forEach(e => hbLkOut(e.t, e.raw).forEach(o => {
+    const k = o.t + ':' + o.id;
+    if (!by.has(k) || (o.t === e.t && o.id === e.id)) return;
+    if (!back.has(k)) back.set(k, []);
+    back.get(k).push(e);
+  }));
+  _hbLkMemo = { at: Date.now(), by, back };
+  return _hbLkMemo;
+}
+function hbLkFind(t, id) { return hbLkIdx().by.get(t + ':' + id) || null; }
+function hbLkList(t) { return Array.from(hbLkIdx().by.values()).filter(e => e.t === t); }
+function hbLkResolvedOut(t, raw, selfId) { const ix = hbLkIdx(); return hbLkOut(t, raw).map(o => ix.by.get(o.t + ':' + o.id)).filter(e => e && !(e.t === t && e.id === selfId)); }
+function hbLkBackOf(t, id) { return hbLkIdx().back.get(t + ':' + id) || []; }
+function hbLkCount(t, id, raw) { return hbLkResolvedOut(t, raw, id).length + hbLkBackOf(t, id).length; }
+function hbLkBadge(t, id, raw) {
+  let n = 0; try { n = hbLkCount(t, id, raw); } catch (e) {}
+  if (!n) return '';
+  return `<span onclick="event.stopPropagation();hbLkPopup('${t}','${id}')" title="Collegamenti: tocca per vederli" style="background:rgba(59,130,246,0.16);color:#3b82f6;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;cursor:pointer;margin-right:6px;">🔵 ${n}</span>`;
+}
+function hbLkOpen(t, id) {
+  const e = hbLkFind(t, id); if (!e) { showToast('Voce non trovata'); return; }
+  if (t === 'otp') { otpQuickOpen(id, ''); return; }
+  document.getElementById('hb-lk-popup')?.remove();
+  document.getElementById('server-detail-overlay')?.remove();
+  if (t === 'pw') { switchTab('passwords'); setTimeout(() => { try { pwLoad(); pwShowDetail(id); } catch (x) {} }, 500); }
+  else if (t === 'srv') { switchTab('server'); setTimeout(() => { try { serverShowDetail(id); } catch (x) {} }, 500); }
+  else { switchTab('notes'); setTimeout(() => { try { noteEdit(id); } catch (x) {} }, 800); }
+}
+function hbLkPopup(t, id) {
+  const me = hbLkFind(t, id); if (!me) return;
+  document.getElementById('hb-lk-popup')?.remove();
+  const out = hbLkResolvedOut(t, me.raw, id), back = hbLkBackOf(t, id);
+  const row = e => `<div onclick="hbLkOpen('${e.t}','${e.id}')" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);cursor:pointer;margin-bottom:8px;"><div style="font-size:20px;">${HB_LK_TYPES[e.t].icon}</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(e.name)}</div><div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${HB_LK_TYPES[e.t].name}${e.gn ? ' · ' + hbEsc(e.gn) : ''}${e.sub ? ' · ' + hbEsc(e.sub) : ''}</div></div><div style="color:var(--text3);font-size:18px;">›</div></div>`;
+  const sec = (title, arr) => arr.length ? `<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:12px 0 8px;">${title}</div>` + arr.map(row).join('') : '';
+  const ov = document.createElement('div'); ov.id = 'hb-lk-popup';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:20px;max-width:380px;width:100%;max-height:80vh;overflow-y:auto;border:1px solid var(--border);">
+    <div style="font-size:11px;color:var(--text3);font-weight:700;">🔵 Collegamenti di</div>
+    <div style="font-size:16px;font-weight:800;margin-bottom:4px;">${HB_LK_TYPES[t].icon} ${hbEsc(me.name)}</div>
+    ${sec('Collegato a', out)}${sec('Usato da', back)}
+    ${(out.length + back.length) ? '' : '<div style="font-size:13px;color:var(--text3);padding:14px 0;">Nessun collegamento.</div>'}
+    <button id="hb-lk-close" style="margin-top:10px;width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>`;
+  document.body.appendChild(ov);
+  document.getElementById('hb-lk-close').onclick = () => ov.remove();
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+}
+
+// ── Selettore collegamenti (tipo → gruppo → voce) ──
+const _hbLkDraft = {}, _hbLkOwner = {};
+function hbLkWidgetHtml(wid, ownerT, ownerId, links, opts) {
+  _hbLkDraft[wid] = (links || []).filter(l => l && l.t && l.id && HB_LK_TYPES[l.t]).map(l => ({ t: l.t, id: l.id }));
+  _hbLkOwner[wid] = { t: ownerT, id: ownerId || '', opts: opts || {} };
+  return '<div id="lkw_' + wid + '" style="margin-bottom:12px;">' + hbLkWInner(wid, {}) + '</div>';
+}
+function hbLkWInner(wid, st) {
+  st = st || {};
+  const d = _hbLkDraft[wid] || [], ow = _hbLkOwner[wid] || {}, o = ow.opts || {};
+  const stl = 'padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:inherit;box-sizing:border-box;width:100%;margin-top:6px;';
+  const chips = d.map((l, i) => {
+    const e = hbLkFind(l.t, l.id), nm = e ? e.name : '(voce non trovata)';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 10px;border-radius:99px;background:rgba(59,130,246,.14);color:#3b82f6;font-size:12px;font-weight:700;max-width:100%;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + HB_LK_TYPES[l.t].icon + ' ' + hbEsc(nm) + '</span><button type="button" onclick="hbLkWDel(\'' + wid + '\',' + i + ')" style="background:none;border:none;color:#3b82f6;cursor:pointer;font-size:13px;padding:0 2px;line-height:1;">✕</button></span>';
+  }).join('');
+  let picker = '';
+  if (!o.max || d.length < o.max) {
+    const t = o.only || st.t || '';
+    const typeSel = o.only ? '' : '<select id="lkw_' + wid + '_t" onchange="hbLkWChange(\'' + wid + '\',\'t\')" style="' + stl + '"><option value="">➕ Collega a…</option>' + HB_LK_ORDER.map(x => '<option value="' + x + '"' + (x === t ? ' selected' : '') + '>' + HB_LK_TYPES[x].icon + ' ' + HB_LK_TYPES[x].name + '</option>').join('') + '</select>';
+    let grpSel = '', itemSel = '';
+    if (t) {
+      const items = hbLkList(t).filter(e => !(ow.t === t && ow.id === e.id) && !d.some(l => l.t === t && l.id === e.id));
+      const gm = new Map(); items.forEach(e => { if (!gm.has(e.g)) gm.set(e.g, { gn: e.gn, n: 0 }); gm.get(e.g).n++; });
+      const gs = Array.from(gm.entries()).sort((a, b) => (a[0] === '__none') - (b[0] === '__none') || a[1].gn.localeCompare(b[1].gn, 'it', { numeric: true, sensitivity: 'base' }));
+      grpSel = '<select id="lkw_' + wid + '_g" onchange="hbLkWChange(\'' + wid + '\',\'g\')" style="' + stl + '"><option value="">— Scegli il gruppo —</option>' + gs.map(([g, v]) => '<option value="' + hbEsc(g) + '"' + (g === st.g ? ' selected' : '') + '>📁 ' + hbEsc(v.gn) + ' (' + v.n + ')</option>').join('') + '</select>';
+      if (st.g) {
+        itemSel = '<select id="lkw_' + wid + '_i" onchange="hbLkWChange(\'' + wid + '\',\'i\')" style="' + stl + '"><option value="">— Scegli la voce —</option>' + items.filter(e => e.g === st.g).sort((a, b) => a.name.localeCompare(b.name, 'it', { sensitivity: 'base' })).map(e => '<option value="' + hbEsc(e.id) + '">' + hbEsc(e.name) + (e.sub ? ' — ' + hbEsc(e.sub) : '') + '</option>').join('') + '</select>';
+      }
+    }
+    picker = typeSel + grpSel + itemSel;
+  }
+  const _lb = o.label === undefined ? '🔗 Collegamenti' : o.label;
+  return (_lb ? '<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:2px;">' + _lb + '</div>' : '') +
+    (chips ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;">' + chips + '</div>' : '') + picker;
+}
+function hbLkWRefresh(wid, st) {
+  const el = document.getElementById('lkw_' + wid); if (el) el.innerHTML = hbLkWInner(wid, st || {});
+  if (wid === 'doc_pw' && typeof hbDocPwSync === 'function') hbDocPwSync();
+}
+function hbLkWChange(wid, which) {
+  const o = ((_hbLkOwner[wid] || {}).opts) || {};
+  const gv = k => (document.getElementById('lkw_' + wid + '_' + k) || {}).value || '';
+  const t = o.only || gv('t'), g = which === 't' ? '' : gv('g');
+  if (which === 'i') {
+    const iv = gv('i');
+    if (iv) { (_hbLkDraft[wid] = _hbLkDraft[wid] || []).push({ t, id: iv }); hbLkWRefresh(wid, { t, g }); return; }
+  }
+  hbLkWRefresh(wid, { t, g });
+}
+function hbLkWDel(wid, i) { (_hbLkDraft[wid] || []).splice(i, 1); hbLkWRefresh(wid, {}); }
+function hbLkRead(wid) { return (_hbLkDraft[wid] || []).map(l => ({ t: l.t, id: l.id })); }
+function hbLkReadOrUndef(wid) { const a = hbLkRead(wid); return a.length ? a : undefined; }
+
+// Documento ↔ password: email, password e scadenza password si leggono dalla password scelta
+let _docPwWas = false;
+function _docEff(n) {
+  const d = (n && n.doc) || {};
+  if (!d.pwId) return d;
+  try { hbLkEnsure(); } catch (e) {}
+  const p = _pwItems.find(i => i.id === d.pwId && !i.deleted);
+  if (!p) return d;
+  return { ...d, email: p.email || p.username || d.email || '', pwd: p.password || d.pwd || '', pwdScad: p.expiryDate ? String(p.expiryDate).slice(0, 10) : (d.pwdScad || '') };
+}
+function hbDocPwSync() {
+  const e = document.getElementById('doc-email'), pw = document.getElementById('doc-pwd'), sc = document.getElementById('doc-pwdscad');
+  if (!e || !pw || !sc) return;
+  const l = hbLkRead('doc_pw')[0];
+  const it = l ? _pwItems.find(i => i.id === l.id && !i.deleted) : null;
+  [e, pw, sc].forEach(x => { x.disabled = !!it; x.style.opacity = it ? '.65' : '1'; });
+  if (it) { e.value = it.email || it.username || ''; pw.value = it.password || ''; sc.value = it.expiryDate ? String(it.expiryDate).slice(0, 10) : ''; }
+  else if (_docPwWas) { e.value = ''; pw.value = ''; sc.value = ''; }
+  _docPwWas = !!it;
 }
 
 function serverOpenLink(id) {
@@ -9810,8 +9986,7 @@ function serverEdit(id) {
     <input id="${id}" value="${hbEsc(val)}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">🗂 Categoria</div>
     ${serverCatSelectHtml('_se_cat', item.categoryId || '')}
-    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">🔐 Collega un OTP</div>
-    ${serverOtpSelectHtml('_se_otp', item.otpId || '')}
+    ${hbLkWidgetHtml('_se_lk', 'srv', item.id, hbLkOwn(item))}
     <div style="display:flex;gap:10px;margin-top:6px;">
       <button id="_se_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_se_save" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salva</button>
@@ -9835,8 +10010,9 @@ function serverEdit(id) {
     };
       const cv = document.getElementById('_se_cat')?.value || '';
       if (cv && cv !== '__new') _serverItems[idx].categoryId = cv; else delete _serverItems[idx].categoryId;
-      const ov2 = document.getElementById('_se_otp')?.value || '';
-      if (ov2) _serverItems[idx].otpId = ov2; else delete _serverItems[idx].otpId;
+      const lk2 = hbLkRead('_se_lk');
+      if (lk2.length) _serverItems[idx].links = lk2; else delete _serverItems[idx].links;
+      delete _serverItems[idx].otpId;
     }
     serverSaveAll(); serverRender(); ov.remove();
     showToast('✅ Server aggiornato');
@@ -12275,7 +12451,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.41.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.42.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
