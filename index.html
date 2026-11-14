@@ -1922,7 +1922,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.39.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.41.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1992,7 +1992,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.39.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.41.0</div>
         </div>
       </div>
     </div>
@@ -2097,7 +2097,7 @@ html[data-theme="light"][data-home-style="b"] .mob-home-card,html[data-theme="li
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.39.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.41.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2711,6 +2711,7 @@ Aggiungi nuovo dato
 
         <!-- Vista lista -->
         <div id="server-view-list">
+          <div id="server-cat-bar" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;overflow-x:auto;"></div>
           <div id="server-list"></div>
         </div>
 
@@ -2746,6 +2747,11 @@ Aggiungi nuovo dato
             <input id="srv-host" type="text" placeholder="es. 192.168.1.1 o api.example.com"
               style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;">
           </div>
+          <div style="margin-bottom:12px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">🔗 Link (pagina di accesso / pannello)</div>
+            <input id="srv-link" type="url" placeholder="es. https://192.168.1.1:8080 o https://pannello.example.com"
+              style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;">
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
             <div>
               <div class="pw-field-label" style="margin-bottom:6px;">Porta</div>
@@ -2772,6 +2778,8 @@ Aggiungi nuovo dato
               style="width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:'DM Sans',monospace;outline:none;box-sizing:border-box;resize:none;height:100px;line-height:1.6;"></textarea>
           </div>
           <div style="margin-bottom:20px;">
+            <div class="pw-field-label" style="margin-bottom:6px;">🗂 Categoria</div>
+            <div id="srv-cat-wrap"></div>
             <div class="pw-field-label" style="margin-bottom:6px;">🔐 Collega un OTP (facoltativo)</div>
             <div id="srv-otp-wrap"></div>
           </div>
@@ -3017,7 +3025,7 @@ const HOME_PREFS_KEY  = 'hb12_home_prefs';
 const MERGE_KEYS = {
   'hb13_notes':true,'hb13_passwords':true,'hb13_otp_accounts':true,'hb13_otp_cats':true,
   'hb13_cards':true,'hb13_wifi':true,
-  'hb13_finance':true,'hb13_server':true
+  'hb13_finance':true,'hb13_server':true,'hb13_server_cats':true
 };
 // ── Google Drive config (unico servizio esterno — OAuth utente) ──
 const GDRIVE_CLIENT_ID    = '140879408214-fih8n3ed3jp0hre6ujso7lcq2mkbss1d.apps.googleusercontent.com';
@@ -3035,7 +3043,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.39.0',
+  version: 'v13.41.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3056,7 +3064,7 @@ const HB = {
 const _SENSITIVE_KEYS = [
   'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
   'hb13_cards','hb13_wifi','hb13_finance',
-  'hb13_server'
+  'hb13_server','hb13_server_cats'
 ];
 
 let _lsCache = {};
@@ -9002,7 +9010,7 @@ function earlyBackHandler() {
 // Alias globale
 
 const HB_TRACKED_KEYS = ['hb13_passwords','hb13_notes','hb13_otp','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi',
-  'hb13_finance','hb13_server','hb13_pw_cats','hb13_note_att'];
+  'hb13_finance','hb13_server','hb13_server_cats','hb13_pw_cats','hb13_note_att'];
 
 
 // ══ FUNZIONI RIPRISTINATE DA BETA333 ══════════════════════
@@ -9482,13 +9490,100 @@ function serverOpen() {
   document.getElementById('topbar-back').classList.remove('visible');
 }
 
+const SERVER_CATS_KEY = 'hb13_server_cats';
+let _serverCats = [];
+let _serverFilter = 'all';
 function serverLoad() {
   _serverItems = _vaultParse(localStorage.getItem(SERVER_KEY), _serverItems);
+  _serverCats = _vaultParse(localStorage.getItem(SERVER_CATS_KEY), _serverCats);
+  if (!Array.isArray(_serverCats)) _serverCats = [];
+}
+function serverCatsSave() { localStorage.setItem(SERVER_CATS_KEY, JSON.stringify(_serverCats)); _setLocalTs(SERVER_CATS_KEY); driveAutoBackupOnSave(); }
+function serverCatName(id) { const c = _serverCats.find(x => x.id === id); return c ? c.name : ''; }
+function serverCatOk(id) { return !!(id && _serverCats.find(c => c.id === id)); }
+function serverCatSelectHtml(selId, selected) {
+  const opts = _serverCats.slice().sort((a, b) => a.name.localeCompare(b.name, 'it', { numeric: true, sensitivity: 'base' }))
+    .map(c => `<option value="${hbEsc(c.id)}" ${c.id === selected ? 'selected' : ''}>${hbEsc(c.name)}</option>`).join('');
+  return `<select id="${selId}" onchange="if(this.value==='__new'){serverNewCategory(this);}" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:12px;font-family:inherit;"><option value="">— Senza categoria —</option>${opts}<option value="__new">➕ Nuova categoria…</option></select>`;
+}
+function serverNewCategory(selEl) {
+  const name = (prompt('Nome della nuova categoria (es. Ufficio, Casa, Clienti):') || '').trim();
+  if (!name) { if (selEl) selEl.value = ''; return null; }
+  let c = _serverCats.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (!c) { c = { id: 'scat_' + Date.now(), name }; _serverCats.push(c); serverCatsSave(); }
+  if (selEl) {
+    const o = document.createElement('option'); o.value = c.id; o.textContent = c.name;
+    const nw = [...selEl.options].find(x => x.value === '__new'); selEl.insertBefore(o, nw); selEl.value = c.id;
+  }
+  serverRender();
+  return c;
+}
+function serverSetFilter(id) { _serverFilter = id; serverRender(); }
+function serverRenderCatBar() {
+  const bar = document.getElementById('server-cat-bar'); if (!bar) return;
+  const btn = (on, l, dashed) => `<button onclick="${on}" style="flex-shrink:0;padding:8px 14px;border-radius:20px;border:1px ${dashed ? 'dashed' : 'solid'} var(--border);background:${dashed ? 'none' : 'var(--surface)'};color:${dashed ? 'var(--text3)' : 'var(--text)'};font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">${l}</button>`;
+  if (!_serverCats.length) { bar.innerHTML = btn('serverManageCats()', '➕ Categoria', 1); return; }
+  if (_serverFilter === 'all') { bar.innerHTML = btn('serverManageCats()', '⚙️ Gestisci categorie', 1); return; }
+  const nm = _serverFilter === 'none' ? 'Senza categoria' : serverCatName(_serverFilter);
+  bar.innerHTML = btn("serverSetFilter('all')", '← Categorie') + `<div style="align-self:center;font-size:14px;font-weight:800;white-space:nowrap;">🗂 ${hbEsc(nm)}</div>`;
+}
+function serverRenderCatTiles(list) {
+  const palette = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
+  const cats = _serverCats.slice().sort((a, b) => a.name.localeCompare(b.name, 'it', { numeric: true, sensitivity: 'base' }));
+  const items = cats.map((c, i) => ({ id: c.id, name: c.name, n: _serverItems.filter(x => x.categoryId === c.id).length, color: palette[i % palette.length] }));
+  const un = _serverItems.filter(x => !serverCatOk(x.categoryId)).length;
+  if (un) items.push({ id: 'none', name: 'Senza categoria', n: un, color: '#64748b' });
+  list.style.display = 'grid';
+  list.style.gap = '12px';
+  list.style.gridTemplateColumns = window.innerWidth >= 700 ? 'repeat(2,1fr)' : '1fr';
+  list.innerHTML = items.map(t => `<div onclick="serverSetFilter('${t.id}')" style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${t.color};border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;">
+    <div style="width:52px;height:52px;border-radius:16px;background:${t.color}20;border:1px solid ${t.color}40;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">🗂</div>
+    <div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(t.name)}</div><div style="font-size:12px;color:var(--text3);">${t.n} ${t.n === 1 ? 'credenziale' : 'credenziali'}</div></div>
+    <div style="min-width:32px;height:32px;border-radius:10px;background:${t.color}15;border:1px solid ${t.color}30;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${t.color};padding:0 8px;">${t.n}</div>
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>`).join('');
+}
+function serverManageCats() {
+  document.getElementById('_srv_cats_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_srv_cats_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+  const rows = _serverCats.slice().sort((a, b) => a.name.localeCompare(b.name, 'it')).map(c => {
+    const n = _serverItems.filter(x => x.categoryId === c.id).length;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);"><div style="flex:1;min-width:0;font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🗂 ${hbEsc(c.name)} <span style="font-weight:600;color:var(--text3);font-size:12px;">(${n})</span></div>
+    <button onclick="serverRenameCategory('${c.id}')" style="background:none;border:none;cursor:pointer;font-size:15px;" title="Rinomina">✏️</button>
+    <button onclick="serverDeleteCategory('${c.id}')" style="background:none;border:none;cursor:pointer;font-size:15px;" title="Elimina">🗑</button></div>`;
+  }).join('') || '<div style="font-size:13px;color:var(--text3);padding:10px 0;">Nessuna categoria: creane una (es. Ufficio, Casa, Clienti).</div>';
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;width:100%;max-height:80vh;overflow-y:auto;border:1px solid var(--border);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:10px;">🗂 Categorie Server</div>${rows}
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button id="_srv_cats_close" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button>
+      <button onclick="serverNewCategory(null);serverManageCats();" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">➕ Nuova</button></div></div>`;
+  document.body.appendChild(ov);
+  document.getElementById('_srv_cats_close').onclick = () => ov.remove();
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+}
+function serverRenameCategory(id) {
+  const c = _serverCats.find(x => x.id === id); if (!c) return;
+  const name = (prompt('Nuovo nome della categoria:', c.name) || '').trim(); if (!name) return;
+  c.name = name; serverCatsSave(); serverRender(); serverManageCats();
+}
+function serverDeleteCategory(id) {
+  const c = _serverCats.find(x => x.id === id); if (!c) return;
+  const n = _serverItems.filter(x => x.categoryId === id).length;
+  if (!confirm('Eliminare la categoria "' + c.name + '"?' + (n ? '\n\nLe ' + n + ' credenziali al suo interno NON vengono cancellate: passano in "Senza categoria".' : ''))) return;
+  _serverCats = _serverCats.filter(x => x.id !== id);
+  _serverItems.forEach(x => { if (x.categoryId === id) delete x.categoryId; });
+  serverCatsSave(); serverSaveAll();
+  if (_serverFilter === id) _serverFilter = 'all';
+  serverRender(); serverManageCats();
 }
 
 function serverRender() {
   const list = document.getElementById('server-list');
   if (!list) return;
+  if (!_serverCats.length) _serverFilter = 'all';
+  serverRenderCatBar();
+  if (_serverCats.length && _serverItems.length && _serverFilter === 'all') { serverRenderCatTiles(list); return; }
+  if (_serverFilter !== 'all' && !(_serverFilter === 'none' || serverCatOk(_serverFilter))) _serverFilter = 'all';
   if (!_serverItems.length) {
     list.innerHTML = `<div style="text-align:center;padding:16px 20px;">
       <div style="font-size:22px;margin-bottom:6px;">📡</div>
@@ -9507,7 +9602,10 @@ function serverRender() {
     list.style.gap = '0';
   }
   list.innerHTML = '';
-  _serverItems.forEach(item => {
+  let _shown = _serverItems;
+  if (_serverFilter === 'none') _shown = _serverItems.filter(x => !serverCatOk(x.categoryId));
+  else if (_serverFilter !== 'all') _shown = _serverItems.filter(x => x.categoryId === _serverFilter);
+  _shown.forEach(item => {
     const card = document.createElement('div');
     card.className = 'pw-item-card';
     card.onclick = () => serverShowDetail(item.id);
@@ -9517,13 +9615,15 @@ function serverRender() {
       <div class="pw-item-header">
         <div class="pw-item-icon" style="background:${col}20;font-size:20px;">${item.icon||'💻'}</div>
         <div style="flex:1;min-width:0;">
-          <div class="pw-item-title">${item.label}</div>
-          <div class="pw-item-user">${item.host || ''}${item.port ? ':'+item.port : ''}${item.user ? ' · '+item.user : ''}</div>
+          <div class="pw-item-title">${hbEsc(item.label)}</div>
+          ${item.user ? `<div style="font-size:13px;font-weight:800;color:var(--accent);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">👤 ${hbEsc(item.user)}</div>` : ''}
+          <div class="pw-item-user">${hbEsc(item.host || '')}${item.port ? ':'+hbEsc(item.port) : ''}</div>
         </div>
         ${_hbLinkedOtp(item.otpId) ? `<span onclick="event.stopPropagation();serverOpenOtp('${item.id}')" title="OTP collegato: tocca per vedere il codice" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(59,130,246,0.16);color:#3b82f6;cursor:pointer;margin-right:6px;">🔵 OTP</span>` : ''}
         <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:99px;background:${col}20;color:${col};">${item.label_type||item.type}</span>
       </div>
       <div style="display:flex;gap:8px;margin-top:8px;">
+        ${item.link ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverOpenLink('${item.id}')" title="Apri il link" style="font-size:14px;">🔗</button>` : ''}
         ${item.host ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverCopy('${item.id}','host')" title="Copia host"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>` : ''}
         ${item.pw   ? `<button class="pw-copy-btn" onclick="event.stopPropagation();serverCopy('${item.id}','pw')" title="Copia password/token"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>` : ''}
         <button onclick="event.stopPropagation();serverEdit('${item.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
@@ -9541,11 +9641,13 @@ function serverSave() {
     type: _serverType.id, icon: _serverType.icon, label_type: _serverType.label,
     label,
     host:  document.getElementById('srv-host')?.value.trim() || '',
+    link:  document.getElementById('srv-link')?.value.trim() || '',
     port:  document.getElementById('srv-port')?.value.trim() || '',
     user:  document.getElementById('srv-user')?.value.trim() || '',
     pw:    document.getElementById('srv-pw')?.value || '',
     notes: document.getElementById('srv-notes')?.value.trim() || '',
     ...(document.getElementById('srv-otp')?.value ? { otpId: document.getElementById('srv-otp').value } : {}),
+    ...(document.getElementById('srv-cat')?.value && document.getElementById('srv-cat').value !== '__new' ? { categoryId: document.getElementById('srv-cat').value } : {}),
   });
   serverSaveAll();
   showToast('✅ ' + label + ' salvato');
@@ -9559,12 +9661,13 @@ function serverShowAdd() {
   document.getElementById('server-view-add').style.display  = 'block';
   document.getElementById('topbar-back').classList.add('visible');
   document.getElementById('topbar-title').textContent = 'Nuova Credenziale';
-  ['srv-label','srv-host','srv-port','srv-user','srv-notes'].forEach(id => {
+  ['srv-label','srv-host','srv-link','srv-port','srv-user','srv-notes'].forEach(id => {
     const el = document.getElementById(id); if(el) el.value='';
   });
   const pw = document.getElementById('srv-pw'); if(pw) { pw.value=''; pw.type='password'; }
   _serverType = { id:'ssh', icon:'🔐', label:'SSH' };
   const _ow = document.getElementById('srv-otp-wrap'); if (_ow) _ow.innerHTML = serverOtpSelectHtml('srv-otp', '');
+  const _cw = document.getElementById('srv-cat-wrap'); if (_cw) _cw.innerHTML = serverCatSelectHtml('srv-cat', (_serverFilter !== 'all' && _serverFilter !== 'none') ? _serverFilter : '');
   document.querySelectorAll('[data-type]').forEach(b =>
     b.classList.toggle('active', b.dataset.type === 'ssh')
   );
@@ -9590,6 +9693,7 @@ function serverShowDetail(id) {
   overlay.onclick = (e) => { if(e.target===overlay) overlay.remove(); };
   const fields = [
     item.host ? `<div class="pw-field-row"><div class="pw-field-label">Host / URL</div><div class="pw-field-value" style="font-family:monospace;">${item.host}${item.port?':'+item.port:''}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','host')">📋 Copia</button></div></div>` : '',
+    item.link ? `<div class="pw-field-row"><div class="pw-field-label">Link</div><div class="pw-field-value" style="color:var(--accent2);word-break:break-all;">${hbEsc(item.link)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverOpenLink('${item.id}')">🔗 Apri</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','link')">📋 Copia</button></div></div>` : '',
     item.user ? `<div class="pw-field-row"><div class="pw-field-label">Username</div><div class="pw-field-value" style="font-family:monospace;">${item.user}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverCopy('${item.id}','user')">📋 Copia</button></div></div>` : '',
     item.pw   ? `<div class="pw-field-row"><div class="pw-field-label">Password / Token</div><div class="pw-field-value" id="srv-pw-detail-${item.id}" style="font-family:monospace;font-size:12px;word-break:break-all;">••••••••</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverToggleDetailPw('${item.id}')">👁 Mostra</button><button class="pw-field-btn" onclick="serverCopy('${item.id}','pw')">📋 Copia</button></div></div>` : '',
     (item.otpId && _otpAccounts.find(a => a.id === item.otpId && !a.deleted)) ? `<div class="pw-field-row"><div class="pw-field-label">OTP collegato</div><div class="pw-field-value">🔐 ${hbEsc(_otpAccounts.find(a => a.id === item.otpId).name)}</div><div class="pw-field-actions"><button class="pw-field-btn" onclick="serverOpenOtp('${item.id}')">🔐 Apri OTP</button></div></div>` : '',
@@ -9613,6 +9717,13 @@ function serverShowDetail(id) {
   document.body.appendChild(overlay);
 }
 
+function serverOpenLink(id) {
+  const it = _serverItems.find(i => i.id === id); if (!it || !it.link) return;
+  let u = String(it.link).trim();
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = 'https://' + u;
+  if (!/^https?:\/\//i.test(u)) { showToast('Indirizzo non apribile'); return; }
+  window.open(u, '_blank', 'noopener');
+}
 function serverOtpSelectHtml(selId, selected) {
   try { otpLoad(); } catch (e) {}
   const live = _otpAccounts.filter(a => !a.deleted);
@@ -9694,9 +9805,11 @@ function serverEdit(id) {
   ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
   ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:400px;width:100%;border:1px solid var(--border);margin:auto;">
     <div style="font-size:15px;font-weight:800;margin-bottom:16px;">✏️ Modifica Server</div>
-    ${[['_se_label','Nome/Etichetta',item.label||''],['_se_host','Host/IP',item.host||''],['_se_port','Porta',item.port||''],['_se_user','Username',item.user||''],['_se_pw','Password',item.pw||''],['_se_notes','Note',item.notes||'']].map(([id,label,val])=>`
+    ${[['_se_label','Nome/Etichetta',item.label||''],['_se_host','Host/IP',item.host||''],['_se_link','🔗 Link',item.link||''],['_se_port','Porta',item.port||''],['_se_user','Username',item.user||''],['_se_pw','Password',item.pw||''],['_se_notes','Note',item.notes||'']].map(([id,label,val])=>`
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">${label}</div>
     <input id="${id}" value="${hbEsc(val)}" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;">`).join('')}
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">🗂 Categoria</div>
+    ${serverCatSelectHtml('_se_cat', item.categoryId || '')}
     <div style="font-size:12px;color:var(--text3);margin-bottom:4px;">🔐 Collega un OTP</div>
     ${serverOtpSelectHtml('_se_otp', item.otpId || '')}
     <div style="display:flex;gap:10px;margin-top:6px;">
@@ -9713,12 +9826,15 @@ function serverEdit(id) {
     const idx = _serverItems.findIndex(i => i.id === id);
     if (idx !== -1) { _serverItems[idx] = {..._serverItems[idx],
       label, host: document.getElementById('_se_host').value.trim(),
+      link: document.getElementById('_se_link').value.trim(),
       port: document.getElementById('_se_port').value.trim(),
       user: document.getElementById('_se_user').value.trim(),
       pw: document.getElementById('_se_pw').value,
       notes: document.getElementById('_se_notes').value.trim(),
       updatedAt: new Date().toISOString()
     };
+      const cv = document.getElementById('_se_cat')?.value || '';
+      if (cv && cv !== '__new') _serverItems[idx].categoryId = cv; else delete _serverItems[idx].categoryId;
       const ov2 = document.getElementById('_se_otp')?.value || '';
       if (ov2) _serverItems[idx].otpId = ov2; else delete _serverItems[idx].otpId;
     }
@@ -10091,7 +10207,7 @@ async function driveBackupNow(silent=false) {
 
     // Raccoglie tutti i dati
     const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats',
-                  'hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
+                  'hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats'];
     const data = {};
     keys.forEach(k => {
       const v = localStorage.getItem(k);
@@ -10721,7 +10837,7 @@ async function authLogout() {
 // ── Backup locale ──────────────────────────────────────────
 function settingsExport(){
   const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
-               'hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
+               'hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats'];
   const data={};
   keys.forEach(k=>{
     const v=localStorage.getItem(k);
@@ -10767,7 +10883,7 @@ async function settingsExportEncrypted() {
   const pass = await _hbAskPassword('🔒 Password per proteggere il file', true);
   if (!pass) return;
   try {
-    const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi','hb13_finance','hb13_server'];
+    const keys=['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats'];
     const data={};
     keys.forEach(k=>{ const v=localStorage.getItem(k); if(v) try{ data[k]=JSON.parse(v); }catch(e){ data[k]=v; } });
     const plain = JSON.stringify({version:'13.0.0',exportedAt:new Date().toISOString(),data});
@@ -11581,7 +11697,7 @@ const SECTION_KEYS = {
   'notes':     ['hb13_notes'],
   'otp':       ['hb13_otp_accounts','hb13_otp_cats'],
   'cards':     ['hb13_cards','hb13_finance'],
-  'server':    ['hb13_server','hb13_wifi'],
+  'server':    ['hb13_server','hb13_server_cats','hb13_wifi'],
 };
 const SECTION_LABELS = {
   'passwords': '🔐 Password',
@@ -12159,7 +12275,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.39.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.41.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
