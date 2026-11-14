@@ -1926,7 +1926,7 @@ div[style*="position: fixed"][style*="align-items: flex-end"] > div { max-height
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.43.2</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v13.44.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1996,7 +1996,7 @@ div[style*="position: fixed"][style*="align-items: flex-end"] > div { max-height
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.43.2</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v13.44.0</div>
         </div>
       </div>
     </div>
@@ -2101,7 +2101,7 @@ div[style*="position: fixed"][style*="align-items: flex-end"] > div { max-height
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.43.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v13.44.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3047,7 +3047,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v13.43.2',
+  version: 'v13.44.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -8720,7 +8720,8 @@ function otpRenderList(q='') {
           <div style="font-size:14px;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.name}</div>
           ${acc.user ? `<div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${acc.user}</div>` : ''}
         </div>
-        ${hbLkBadge('otp', acc.id, acc)}
+ ${hbLkBadge('otp', acc.id, acc)}
+        <button onclick="event.stopPropagation();otpShowQr('${acc.id}')" title="Esporta in QR" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;">📤</button>
         <button onclick="event.stopPropagation();otpEdit('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text3)'" title="Modifica">✏️</button>
         <button onclick="event.stopPropagation();otpDeleteConfirm('${acc.id}')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:4px;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='var(--text3)'">🗑</button>
       </div>
@@ -9834,6 +9835,75 @@ function hbLkPopup(t, id) {
   document.body.appendChild(ov);
   document.getElementById('hb-lk-close').onclick = () => ov.remove();
   ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+}
+
+
+// ═══════════════════════════════════════════════════════════
+//  ESPORTA OTP IN QR  (singolo: otpauth://  ·  tutti: formato "Trasferisci codici" di Google Authenticator)
+// ═══════════════════════════════════════════════════════════
+function _pbVi(n) { const o = []; n = Math.floor(n); while (n > 127) { o.push((n % 128) | 128); n = Math.floor(n / 128); } o.push(n); return o; }
+function _pbLen(f, bytes) { return [..._pbVi(f * 8 + 2), ..._pbVi(bytes.length), ...bytes]; }
+function _pbInt(f, v) { return [..._pbVi(f * 8), ..._pbVi(v)]; }
+function _otpAuthUri(a) {
+  const issuer = a.name || 'Account', who = a.user || a.name || 'account';
+  return 'otpauth://totp/' + encodeURIComponent(issuer) + ':' + encodeURIComponent(who) + '?secret=' + encodeURIComponent(String(a.secret || '').replace(/\s/g, '').toUpperCase()) + '&issuer=' + encodeURIComponent(issuer) + '&algorithm=SHA1&digits=6&period=30';
+}
+function _otpMigrationUris(list, perBatch) {
+  const enc = new TextEncoder();
+  const batches = []; for (let i = 0; i < list.length; i += perBatch) batches.push(list.slice(i, i + perBatch));
+  const batchId = Math.floor(Math.random() * 2147483647);
+  return batches.map((grp, bi) => {
+    let payload = [];
+    grp.forEach(a => {
+      const key = Array.from(base32Decode(String(a.secret || '').replace(/\s/g, '').toUpperCase()));
+      const issuer = a.name || 'Account', label = a.user ? issuer + ':' + a.user : issuer;
+      const params = [..._pbLen(1, key), ..._pbLen(2, Array.from(enc.encode(label))), ..._pbLen(3, Array.from(enc.encode(issuer))), ..._pbInt(4, 1), ..._pbInt(5, 1), ..._pbInt(6, 2)];
+      payload = payload.concat(_pbLen(1, params));
+    });
+    payload = payload.concat(_pbInt(2, 1), _pbInt(3, batches.length), _pbInt(4, bi), _pbInt(5, batchId));
+    let bin = ''; payload.forEach(b => { bin += String.fromCharCode(b); });
+    return 'otpauth-migration://offline?data=' + encodeURIComponent(btoa(bin));
+  });
+}
+let _otpQrTimer = null;
+function otpShowQr(id) {
+  try { otpLoad(); } catch (e) {}
+  const all = _otpAccounts.filter(a => !a.deleted && a.secret);
+  const list = id ? all.filter(a => a.id === id) : all;
+  if (!list.length) { showToast('Nessun codice OTP da esportare'); return; }
+  document.getElementById('otp-qr-ov')?.remove(); if (_otpQrTimer) clearTimeout(_otpQrTimer);
+  const single = list.length === 1;
+  const uris = single ? [_otpAuthUri(list[0])] : _otpMigrationUris(list, 4);
+  let page = 0, shown = false;
+  const ov = document.createElement('div'); ov.id = 'otp-qr-ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9700;background:rgba(0,0,0,.8);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  const names = list.map(a => hbEsc(a.name)).join(', ');
+  ov.innerHTML = `<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:360px;width:100%;border:1px solid var(--border);text-align:center;margin:auto;">
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px;">📤 ${single ? 'Esporta ' + hbEsc(list[0].name) : 'Esporta ' + list.length + ' codici OTP'}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.4;">${single ? 'Scansiona con la fotocamera dell\'altra app (Google Authenticator, Aegis, 2FAS, Microsoft Authenticator…).' : 'Nell\'altra app scegli <b>Importa / Trasferisci codici</b> e inquadra i QR uno alla volta.'}</div>
+    <div style="position:relative;display:inline-block;"><canvas id="otp-qr-cv" style="border-radius:12px;max-width:100%;filter:blur(14px);transition:filter .2s;"></canvas>
+      <button id="otp-qr-show" style="position:absolute;inset:0;margin:auto;width:150px;height:44px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">👁 Mostra QR</button></div>
+    <div id="otp-qr-pg" style="font-size:12px;font-weight:700;color:var(--text2);margin-top:10px;"></div>
+    <div id="otp-qr-nav" style="display:${uris.length > 1 ? 'flex' : 'none'};gap:10px;margin-top:8px;">
+      <button id="otp-qr-prev" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:700;cursor:pointer;font-family:inherit;">← Indietro</button>
+      <button id="otp-qr-next" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:700;cursor:pointer;font-family:inherit;">Avanti →</button></div>
+    ${single ? '' : '<div style="font-size:11px;color:var(--text3);margin-top:8px;">' + names + '</div>'}
+    <div style="background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);border-radius:12px;padding:10px 12px;font-size:11px;color:var(--text3);line-height:1.5;margin:12px 0;text-align:left;">⚠️ Il QR contiene i codici segreti: chi lo inquadra può generare i tuoi codici. Non fare screenshot e chiudi la finestra appena finito (si chiude da sola dopo 2 minuti).</div>
+    <button id="otp-qr-close" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>`;
+  document.body.appendChild(ov);
+  const cv = document.getElementById('otp-qr-cv');
+  const draw = () => {
+    qrDraw(cv, uris[page], 260);
+    document.getElementById('otp-qr-pg').textContent = uris.length > 1 ? 'QR ' + (page + 1) + ' di ' + uris.length : '';
+  };
+  const close = () => { if (_otpQrTimer) clearTimeout(_otpQrTimer); _otpQrTimer = null; ov.remove(); };
+  draw();
+  document.getElementById('otp-qr-show').onclick = (e) => { shown = true; cv.style.filter = 'none'; e.target.remove(); };
+  document.getElementById('otp-qr-prev').onclick = () => { page = (page + uris.length - 1) % uris.length; draw(); };
+  document.getElementById('otp-qr-next').onclick = () => { page = (page + 1) % uris.length; draw(); };
+  document.getElementById('otp-qr-close').onclick = close;
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  _otpQrTimer = setTimeout(close, 120000);
 }
 
 // ── Selettore collegamenti (tipo → gruppo → voce) ──
@@ -12367,6 +12437,9 @@ document.addEventListener('keydown', (e) => {
           <button onclick="importOtpScan()" style="width:100%;padding:14px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;text-align:left;">
             <span style="font-size:24px;">📷</span><div>Scansiona il QR con la fotocamera<div style="font-size:12px;color:var(--text3);font-weight:500;margin-top:2px;">Da Google Authenticator: ⋮ → Trasferisci codici → Esporta</div></div>
           </button>
+          <button onclick="otpShowQr()" style="width:100%;padding:14px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;box-sizing:border-box;text-align:left;">
+            <span style="font-size:24px;">📤</span><div>Esporta tutti i codici OTP in QR<div style="font-size:12px;color:var(--text3);font-weight:500;margin-top:2px;">Per passare ad un altro telefono o app (Google Authenticator, Aegis, 2FAS…). Un singolo OTP si esporta dal tasto 📤 sulla sua scheda.</div></div>
+          </button>
           <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.5;">
             🧹 I file CSV e gli screenshot dei QR contengono password e codici in chiaro: dopo l'importazione cancellali dal dispositivo.
           </div>
@@ -12468,7 +12541,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.43.2</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v13.44.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
