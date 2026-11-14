@@ -1933,7 +1933,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.3.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.3.1</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -2004,7 +2004,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.3.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.3.1</div>
         </div>
       </div>
     </div>
@@ -2109,7 +2109,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.3.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.3.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3056,7 +3056,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v14.3.0',
+  version: 'v14.3.1',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -9162,33 +9162,6 @@ function setHomeStyle(s){
 hbApplyHomeStyle();
 
 
-// ══ Svuota gli appunti dopo la copia di password/codici ══
-(function () {
-  try {
-    const cb = navigator.clipboard;
-    if (!cb || cb.__hbWrapped || typeof cb.writeText !== 'function') return;
-    const orig = cb.writeText.bind(cb);
-    let timer = null, due = 0, pending = false;
-    const secs = () => { try { const v = parseInt(localStorage.getItem('hb_clip_clear_sec'), 10); return isNaN(v) ? 30 : v; } catch (e) { return 30; } };
-    const clearNow = () => {
-      clearTimeout(timer); pending = false;
-      orig('').then(() => { try { showToast('🧹 Appunti svuotati'); } catch (e) {} }).catch(() => {});
-    };
-    const wrapped = function (text) {
-      const p = orig(text);
-      p.then(() => {
-        clearTimeout(timer); pending = false;
-        const sc = secs();
-        if (text && sc > 0) { pending = true; due = Date.now() + sc * 1000; timer = setTimeout(clearNow, sc * 1000); }
-      }).catch(() => {});
-      return p;
-    };
-    Object.defineProperty(cb, 'writeText', { value: wrapped, configurable: true, writable: true });
-    Object.defineProperty(cb, '__hbWrapped', { value: true });
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && pending && Date.now() >= due) clearNow(); });
-  } catch (e) {}
-})();
-
 function settingsPage(page) {
   if (page === 'sicurezza') { try { hbDocWarnInit(); } catch (e) {} }
   ['main','grafica','backup','import','sicurezza','info','cloud'].forEach(p => {
@@ -9199,7 +9172,7 @@ function settingsPage(page) {
   const t = document.getElementById('set-title'); if(t) t.textContent = titles[page]||'⚙️ Impostazioni';
   const back = document.getElementById('set-back-btn'); if(back) back.style.display = page==='main'?'none':'flex';
   if(page==='grafica') { try{ hbRefreshHomeStyleUI(); }catch(e){} }
-  if(page==='sicurezza') { try{ const cs=document.getElementById('clip-clear-sel'); if(cs){ const v=parseInt(localStorage.getItem('hb_clip_clear_sec'),10); cs.value=String(isNaN(v)?30:v); } }catch(e){} settingsCheckBio(); try { pwLoad(); pwUpdateBreachStatusUI(pwLastBreachCheckSummary()); } catch(e) {} }
+  if(page==='sicurezza') { try{ const al=document.getElementById('autolock-sel'); if(al) al.value=String(parseInt(localStorage.getItem('hb_autolock_min')||'0',10)||0); }catch(e){} settingsCheckBio(); try { pwLoad(); pwUpdateBreachStatusUI(pwLastBreachCheckSummary()); } catch(e) {} }
 }
 
 function settingsRefreshUI() {
@@ -9334,8 +9307,8 @@ function autolockStop() {
 
 function autolockReset() {
   const min = parseInt(localStorage.getItem('hb_autolock_min') || '0');
-  if (!min) return;
   clearTimeout(_autolockTimer);
+  if (!min) return;
   _autolockTimer = setTimeout(() => {
     if (document.getElementById('app').classList.contains('visible')) {
       lockApp();
@@ -10775,7 +10748,12 @@ async function hbBackupVerify() {
     lines += refs.length ? row(!missing.length, 'Allegati su Drive: ' + (refs.length - missing.length) + ' di ' + refs.length + ' presenti' + (missing.length ? ' — <b>' + missing.length + ' mancanti</b>' : '')) : row(null, 'Nessun allegato su Drive nel backup');
     const bkFiles = files.reduce((t, x) => t + (Number(x.size) || 0), 0);
     lines += row(null, 'Spazio su Drive: backup ' + _hbFmtSize(bkFiles) + ' (' + files.length + ' file) · allegati ' + _hbFmtSize(attSize) + ' (' + attFiles.length + ' file)');
-    try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); lines += row(null, 'Spazio su questo dispositivo: ' + _hbFmtSize(e.usage) + (e.quota ? ' su ' + _hbFmtSize(e.quota) : '')); } } catch (e) {}
+    try {
+      // Il limite vero è quello della memoria locale del browser (circa 5 milioni di caratteri), non la quota enorme del disco
+      let chars = 0; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); chars += k.length + String(Object.getPrototypeOf(localStorage).__origGet.call(localStorage, k) || '').length; }
+      const LIM = 5 * 1024 * 1024, pct = Math.round(chars / LIM * 100);
+      lines += row(pct < 70 ? true : (pct < 90 ? null : false), 'Memoria dati di HomeBull su questo dispositivo: ' + _hbFmtSize(chars) + ' su circa ' + _hbFmtSize(LIM) + ' (' + pct + '%)' + (pct >= 70 ? ' — se si riempie non si riescono più a salvare modifiche: sposta gli allegati su Drive' : ''));
+    } catch (e) {}
     const oldPlain = files.length > 1 && enc ? files.slice(1).length : 0;
     if (enc && oldPlain) lines += row(null, 'Nota: i ' + oldPlain + ' backup più vecchi possono essere ancora non cifrati; si cancellano da soli man mano (ne tengo 10).');
     body.innerHTML = lines;
@@ -10800,7 +10778,7 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'14.3.0', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'14.3.1', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -12854,17 +12832,6 @@ document.addEventListener('keydown', (e) => {
             </select>
           </div>
 
-          <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:13px;font-weight:800;margin-bottom:4px;">🧹 Svuota appunti</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Dopo aver copiato una password o un codice, li cancello dagli appunti. Funziona se l'app è aperta.</div>
-            <select id="clip-clear-sel" onchange="localStorage.setItem('hb_clip_clear_sec',this.value);showToast(this.value==='0'?'Svuotamento appunti disattivato':'✅ Appunti svuotati dopo '+this.value+' secondi')" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;">
-              <option value="0">Mai</option>
-              <option value="15">15 secondi</option>
-              <option value="30">30 secondi</option>
-              <option value="60">1 minuto</option>
-              <option value="120">2 minuti</option>
-            </select>
-          </div>
 
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:13px;font-weight:800;margin-bottom:4px;">⏰ Avviso scadenze</div>
@@ -12889,7 +12856,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.3.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.3.1</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
