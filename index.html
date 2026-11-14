@@ -1933,7 +1933,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.2.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.3.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -1968,6 +1968,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
       </div>
       <div class="auth-error" id="pin-error"></div>
       <button onclick="lockApp()" style="margin-top:10px;background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;font-family:inherit;">🔒 Blocca</button>
+      <button id="forgot-pin-btn" onclick="hbForgotPin()" style="display:none;margin-top:6px;background:none;border:none;color:var(--accent2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">PIN dimenticato?</button>
     </div>
 
     <!-- STEP 4: BIOMETRIA OPZIONALE (solo primo accesso) -->
@@ -2003,7 +2004,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.2.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.3.0</div>
         </div>
       </div>
     </div>
@@ -2108,7 +2109,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.2.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.3.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3055,7 +3056,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v14.2.0',
+  version: 'v14.3.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3076,7 +3077,7 @@ const HB = {
 const _SENSITIVE_KEYS = [
   'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
   'hb13_cards','hb13_wifi','hb13_finance',
-  'hb13_server','hb13_server_cats','hb13_backup_pw'
+  'hb13_server','hb13_server_cats','hb13_backup_pw','hb13_puk'
 ];
 
 let _lsCache = {};
@@ -4064,6 +4065,16 @@ function hbLastBackupTs() {
   return max || null;
 }
 // ═══ SCHEDA STAMPABILE DEL DOCUMENTO (v14.2) — non include mai PIN, PUK né password ═══
+function hbPrintSheet(html) {
+  document.getElementById('hb-print-ov')?.remove(); document.getElementById('hb-print-css')?.remove();
+  const css = document.createElement('style'); css.id = 'hb-print-css';
+  css.textContent = '#hb-print-ov .hbp-sheet{background:#fff;color:#111;max-width:640px;margin:0 auto;padding:28px 26px;border-radius:12px;font-family:Arial,Helvetica,sans-serif}#hb-print-ov h1{font-size:22px;margin:0 0 2px}#hb-print-ov h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 6px;color:#555}#hb-print-ov .hbp-sub{font-size:14px;color:#555;margin-bottom:16px}#hb-print-ov table{width:100%;border-collapse:collapse}#hb-print-ov th{text-align:left;width:38%;padding:9px 8px;border-bottom:1px solid #ddd;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.04em}#hb-print-ov td{padding:9px 8px;border-bottom:1px solid #ddd;font-size:15px;font-weight:600}#hb-print-ov .hbp-note{white-space:pre-wrap;font-size:14px;line-height:1.5}#hb-print-ov .hbp-foot{margin-top:26px;font-size:11px;color:#777;border-top:1px solid #ddd;padding-top:8px}@media print{body>*:not(#hb-print-ov){display:none!important}#hb-print-ov{position:static!important;background:#fff!important;padding:0!important;overflow:visible!important}#hb-print-ov .noprint{display:none!important}#hb-print-ov .hbp-sheet{border-radius:0;padding:0}}';
+  document.head.appendChild(css);
+  const ov = document.createElement('div'); ov.id = 'hb-print-ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.8);overflow-y:auto;padding:16px;';
+  ov.innerHTML = '<div class="noprint" style="max-width:640px;margin:0 auto 12px;display:flex;gap:10px;"><button onclick="window.print()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">🖨️ Stampa / Salva PDF</button><button onclick="document.getElementById(\'hb-print-ov\').remove();document.getElementById(\'hb-print-css\').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>' + html;
+  document.body.appendChild(ov);
+}
 function noteDocPrint() {
   let d, title, extra;
   try { d = noteDocRead(); title = (document.getElementById('note-title-inp').value || '').trim(); extra = (document.getElementById('note-content-inp').value || '').trim(); } catch (e) { return; }
@@ -4075,14 +4086,7 @@ function noteDocPrint() {
     '<table>' + row('Intestatario', d.intestatario) + row('Numero', d.numero) + row('Ente di rilascio', d.ente) + row('Data di rilascio', _docFmtDate(d.rilascio)) + row('Scadenza', d.scadenza ? _docFmtDate(d.scadenza) + st : '') + '</table>' +
     (extra ? '<h2>Note</h2><div class="hbp-note">' + hbEsc(extra) + '</div>' : '') +
     '<div class="hbp-foot">Stampato da HomeBull il ' + new Date().toLocaleDateString('it-IT') + ' · Non contiene PIN, PUK né password · Conservare in un luogo sicuro</div></div>';
-  document.getElementById('hb-print-ov')?.remove(); document.getElementById('hb-print-css')?.remove();
-  const css = document.createElement('style'); css.id = 'hb-print-css';
-  css.textContent = '#hb-print-ov .hbp-sheet{background:#fff;color:#111;max-width:640px;margin:0 auto;padding:28px 26px;border-radius:12px;font-family:Arial,Helvetica,sans-serif}#hb-print-ov h1{font-size:22px;margin:0 0 2px}#hb-print-ov h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:20px 0 6px;color:#555}#hb-print-ov .hbp-sub{font-size:14px;color:#555;margin-bottom:16px}#hb-print-ov table{width:100%;border-collapse:collapse}#hb-print-ov th{text-align:left;width:38%;padding:9px 8px;border-bottom:1px solid #ddd;font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.04em}#hb-print-ov td{padding:9px 8px;border-bottom:1px solid #ddd;font-size:15px;font-weight:600}#hb-print-ov .hbp-note{white-space:pre-wrap;font-size:14px;line-height:1.5}#hb-print-ov .hbp-foot{margin-top:26px;font-size:11px;color:#777;border-top:1px solid #ddd;padding-top:8px}@media print{body>*:not(#hb-print-ov){display:none!important}#hb-print-ov{position:static!important;background:#fff!important;padding:0!important;overflow:visible!important}#hb-print-ov .noprint{display:none!important}#hb-print-ov .hbp-sheet{border-radius:0;padding:0}}';
-  document.head.appendChild(css);
-  const ov = document.createElement('div'); ov.id = 'hb-print-ov';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.8);overflow-y:auto;padding:16px;';
-  ov.innerHTML = '<div class="noprint" style="max-width:640px;margin:0 auto 12px;display:flex;gap:10px;"><button onclick="window.print()" style="flex:1;padding:13px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">🖨️ Stampa / Salva PDF</button><button onclick="document.getElementById(\'hb-print-ov\').remove();document.getElementById(\'hb-print-css\').remove()" style="padding:13px 18px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>' + html;
-  document.body.appendChild(ov);
+  hbPrintSheet(html);
 }
 
 // ═══ LISTA DI CONTROLLO SICUREZZA (v14.2) ═══
@@ -4095,6 +4099,7 @@ function hbChecklistData() {
   rows.push({ ok: days !== null && days <= 7, ic: '💾', t: 'Backup recente', d: days === null ? 'Nessun backup fatto' : (days === 0 ? 'Fatto oggi' : 'Ultimo backup: ' + days + ' giorni fa'), act: "hbOpenBackupSettings()" });
   if (localStorage.getItem('hb_drive_backup_ts')) rows.push({ ok: !!hbBackupPw(), ic: '🔒', t: 'Backup su Drive cifrato', d: hbBackupPw() ? 'Protetto da password separata' : 'Imposta una password per il backup', act: "hbOpenCloudSettings()" });
   else rows.push({ ok: false, ic: '☁️', t: 'Backup su Google Drive', d: 'Non ancora attivato', act: "hbOpenCloudSettings()" });
+  if (hbBackupPw()) rows.push({ ok: !!hbPuk(), ic: '🆘', t: 'Codice di emergenza (PUK)', d: hbPuk() ? 'Creato — tienilo su carta' : 'Non ancora creato: serve se dimentichi password o PIN', act: "hbOpenCloudSettings()" });
   // Password
   rows.push({ ok: !h.pwned, ic: '🚨', t: 'Password compromesse', d: h.pwned ? h.pwned + ' trovate in violazioni note' : 'Nessuna', act: "switchTab('passwords');setTimeout(()=>pwShowFilteredList('pwned'),150)" });
   rows.push({ ok: !h.weak, ic: '🔴', t: 'Password deboli', d: h.weak ? h.weak + ' da rafforzare' : 'Nessuna', act: "switchTab('passwords');setTimeout(()=>pwShowFilteredList('weak'),150)" });
@@ -10537,11 +10542,116 @@ function hbBackupPwStore(pw) {
   try { localStorage.setItem('hb13_backup_pw', JSON.stringify(pw || '')); } catch (e) {}
   try { driveUpdateBackupUI(); } catch (e) {}
 }
+// ═══ CODICE DI EMERGENZA (PUK) v14.3 ═══
+// Un solo codice casuale che apre il backup cifrato anche se dimentichi la password.
+// Il PUK cifra una copia della password del backup, salvata nell'intestazione di ogni backup su Drive ("rec").
+const _PUK_ALPHA = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function hbPuk() { try { return localStorage.getItem('hb13_puk') || ''; } catch (e) { return ''; } }
+function hbPukNorm(s) { return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+function hbPukFmt(s) { return (hbPukNorm(s).match(/.{1,5}/g) || []).join('-'); }
+function hbPukGen() {
+  let out = '';
+  while (out.length < 25) {
+    const b = crypto.getRandomValues(new Uint8Array(32));
+    for (const x of b) { if (x < 248 && out.length < 25) out += _PUK_ALPHA[x % 31]; }
+  }
+  return hbPukFmt(out);
+}
+async function hbPukWrap(pw, puk) {
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(hbPukNorm(puk), salt);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(pw));
+  return { salt: _hbB64(salt), iv: _hbB64(iv), ct: _hbB64(ct) };
+}
+async function hbPukUnwrap(rec, input) {
+  try {
+    if (!rec || hbPukNorm(input).length !== 25) return null;
+    const key = await deriveKey(hbPukNorm(input), _hbUnB64(rec.salt));
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: _hbUnB64(rec.iv) }, key, _hbUnB64(rec.ct));
+    return new TextDecoder().decode(pt);
+  } catch (e) { return null; }
+}
+function hbPukShow(puk, isNew) {
+  document.getElementById('_puk_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_puk_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:24px;max-width:380px;width:100%;border:1px solid var(--border);">' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:6px;">🆘 Codice di emergenza (PUK)</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.5;">' + (isNew ? 'Questo è il tuo nuovo codice. <b>Scrivilo o stampalo ora</b> e tienilo su carta in un posto sicuro.' : 'Tienilo su carta in un posto sicuro.') + ' Apre il backup cifrato se dimentichi la password e ti permette di ripartire se dimentichi il PIN.</div>' +
+    '<div id="_puk_code" style="font-family:monospace;font-size:19px;font-weight:800;letter-spacing:1px;text-align:center;padding:16px 8px;border-radius:14px;background:var(--surface);border:1px dashed var(--accent);color:var(--accent);word-break:break-all;">' + hbEsc(puk) + '</div>' +
+    '<div style="font-size:11px;color:#f97316;margin:12px 0;line-height:1.5;">⚠️ Chi ha il PUK e il tuo file di backup può aprire tutti i tuoi dati. Non salvarlo su Drive, nelle note o nelle foto.</div>' +
+    '<div style="display:flex;gap:8px;"><button id="_puk_copy" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button><button id="_puk_print" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🖨️ Stampa</button></div>' +
+    '<button id="_puk_ok" style="width:100%;margin-top:10px;padding:13px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">L\'ho salvato</button></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_puk_copy').onclick = () => { try { navigator.clipboard.writeText(puk); showToast('📋 Copiato — incollalo solo su carta o in un posto sicuro'); } catch (e) { showToast('Copia non riuscita: scrivilo a mano'); } };
+  document.getElementById('_puk_print').onclick = () => hbPrintSheet('<div class="hbp-sheet"><h1>🆘 HomeBull — Codice di emergenza (PUK)</h1><div class="hbp-sub">Conservare su carta, in un luogo sicuro</div><div style="font-family:monospace;font-size:26px;font-weight:800;letter-spacing:2px;text-align:center;padding:28px 8px;border:2px dashed #333;border-radius:12px;margin:24px 0;">' + hbEsc(puk) + '</div><div class="hbp-note">Apre il backup cifrato di HomeBull se dimentichi la password del backup e permette di ripartire se dimentichi il PIN.\n\nChi possiede questo codice e il file di backup può leggere tutti i dati: non fotografarlo e non salvarlo online.</div><div class="hbp-foot">Generato il ' + new Date().toLocaleDateString('it-IT') + '</div></div>');
+  document.getElementById('_puk_ok').onclick = () => ov.remove();
+}
+async function hbPukMenu() {
+  if (!hbBackupPw()) { showToast('Prima imposta la password del backup cifrato'); return; }
+  const cur = hbPuk();
+  if (!cur) { await hbPukCreate(false); return; }
+  document.getElementById('_pukm_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_pukm_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  const bs = 'width:100%;padding:13px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:340px;width:100%;border:1px solid var(--border);"><div style="font-size:15px;font-weight:800;">🆘 Codice di emergenza</div><div style="font-size:12px;color:var(--text3);margin:4px 0 8px;">Attivo: il backup si può aprire anche col PUK.</div><button id="_pm_show" style="' + bs + '">👁 Mostra il PUK</button><button id="_pm_new" style="' + bs + '">🔄 Genera un nuovo PUK</button><button id="_pm_x" style="' + bs + 'color:var(--text3);">Chiudi</button></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_pm_x').onclick = () => ov.remove();
+  document.getElementById('_pm_show').onclick = () => { ov.remove(); hbPukShow(hbPuk(), false); };
+  document.getElementById('_pm_new').onclick = async () => { ov.remove(); await hbPukCreate(true); };
+}
+async function hbPukCreate(isRegen) {
+  const puk = hbPukGen();
+  try { localStorage.setItem('hb13_puk', puk); } catch (e) { showToast('⚠️ Non riesco a salvare il PUK'); return; }
+  hbPukShow(puk, true);
+  try { driveUpdateBackupUI(); } catch (e) {}
+  try { if (localStorage.getItem('hb_drive_backup_ts')) driveBackupNow(true); } catch (e) {}
+}
+
+// ═══ PIN DIMENTICATO: ripartenza guidata (cancella i dati di QUESTO dispositivo e li ripristina dal backup) ═══
+function hbForgotPin() {
+  document.getElementById('_fp_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_fp_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.8);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:360px;width:100%;border:1px solid var(--border);">' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:8px;">🔑 PIN dimenticato</div>' +
+    '<div style="font-size:12px;color:var(--text2);line-height:1.6;">I dati di questo dispositivo sono cifrati con il PIN e <b>nessuno può leggerli senza</b>, nemmeno io. Puoi però ripartire:<br><br>' +
+    '1. Cancello i dati <b>solo di questo dispositivo</b><br>2. Scegli un nuovo PIN<br>3. Ripristini l\'ultimo backup da Google Drive, con la password del backup <b>oppure con il PUK</b><br><br>' +
+    '<span style="color:#f97316;">⚠️ Le modifiche fatte dopo l\'ultimo backup, e gli allegati non ancora caricati su Drive, andranno persi. Gli altri dispositivi non vengono toccati.</span></div>' +
+    '<input id="_fp_in" type="text" autocomplete="off" placeholder="Scrivi RIPARTI per confermare" style="width:100%;margin-top:14px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;box-sizing:border-box;font-family:inherit;">' +
+    '<div style="display:flex;gap:10px;margin-top:12px;"><button id="_fp_no" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button><button id="_fp_go" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;">Cancella e riparti</button></div></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_fp_no').onclick = () => ov.remove();
+  document.getElementById('_fp_go').onclick = async () => {
+    if (document.getElementById('_fp_in').value.trim().toUpperCase() !== 'RIPARTI') { showToast('Scrivi RIPARTI per confermare'); return; }
+    await hbWipeDevice(true);
+  };
+}
+async function hbWipeDevice(reload) {
+  try {
+    const kill = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      const v = Object.getPrototypeOf(localStorage).__origGet.call(localStorage, k);
+      if (k === 'hb13_note_att' || k === 'hb12_pin_hash' || k === 'hb12_salt' || k === HB_BIO_KEY || k === HB_BIO_PIN_KEY || (typeof v === 'string' && v.startsWith('hb13enc:'))) kill.push(k);
+    }
+    _SENSITIVE_KEYS.forEach(k => kill.push(k));
+    kill.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    try { localStorage.setItem('hb_bio', '0'); } catch (e) {}
+    for (const n of ['hb_att']) { try { await new Promise(r => { const q = indexedDB.deleteDatabase(n); q.onsuccess = q.onerror = q.onblocked = () => r(); setTimeout(r, 1500); }); } catch (e) {} }
+    try { localStorage.removeItem('hb_att_delq'); } catch (e) {}
+    try { sessionStorage.clear(); } catch (e) {}
+  } finally { if (reload) setTimeout(() => location.reload(), 300); }
+}
+
 async function hbEncryptBackupText(plain, pass) {
   const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveKey(pass, salt);
   const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(plain));
-  return JSON.stringify({ format: 'homebull-enc-1', v: 14, salt: _hbB64(salt), iv: _hbB64(iv), ct: _hbB64(ct) });
+  const out = { format: 'homebull-enc-1', v: 14, salt: _hbB64(salt), iv: _hbB64(iv), ct: _hbB64(ct) };
+  if (hbPuk()) { try { out.rec = await hbPukWrap(pass, hbPuk()); } catch (e) {} }
+  return JSON.stringify(out);
 }
 async function hbDecryptBackupWith(bk, pass) {
   try {
@@ -10553,11 +10663,15 @@ async function hbDecryptBackupWith(bk, pass) {
 // chiede la password fino a 3 volte; restituisce { bk, pass } oppure null
 async function hbAskAndDecrypt(bk) {
   for (let t = 0; t < 3; t++) {
-    const pass = await _hbAskPassword(t ? '🔓 Password errata, riprova' : '🔓 Password del backup', false);
+    const pass = await _hbAskPassword(t ? '🔓 Non corretto, riprova' : '🔓 Password del backup' + (bk.rec ? ' (oppure il PUK di emergenza)' : ''), false);
     if (!pass) return null;
-    const ok = await hbDecryptBackupWith(bk, pass);
-    if (ok) return { bk: ok, pass };
-    showToast('⚠️ Password errata');
+    let ok = await hbDecryptBackupWith(bk, pass), real = pass, puk = '';
+    if (!ok && bk.rec) {
+      const pw = await hbPukUnwrap(bk.rec, pass);
+      if (pw) { ok = await hbDecryptBackupWith(bk, pw); if (ok) { real = pw; puk = hbPukFmt(pass); } }
+    }
+    if (ok) { if (puk) showToast('🆘 PUK riconosciuto: backup aperto'); return { bk: ok, pass: real, puk }; }
+    showToast('⚠️ Password o PUK errati');
   }
   return null;
 }
@@ -10682,10 +10796,11 @@ async function driveBackupNow(silent=false) {
       if (v) try { data[k] = JSON.parse(v); } catch(e) { data[k] = v; }
     });
 
+    if (hbBackupPw() && hbPuk()) data['hb13_puk'] = hbPuk();
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'14.2.0', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'14.3.0', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -10856,13 +10971,14 @@ async function driveDoRestore(fileId, dateLabel, btn) {
         `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
         { headers: { Authorization: 'Bearer ' + token } }
       );
-      let bk = await dl.json(), _usedPw = '';
-      if (bk.format === 'homebull-enc-1') { const a = await hbAskAndDecrypt(bk); if (!a) return; bk = a.bk; _usedPw = a.pass; }
+      let bk = await dl.json(), _usedPw = '', _usedPuk = '';
+      if (bk.format === 'homebull-enc-1') { const a = await hbAskAndDecrypt(bk); if (!a) return; bk = a.bk; _usedPw = a.pass; _usedPuk = a.puk || ''; }
       if (!bk.data) { showToast('⚠️ File backup non valido'); return; }
       Object.entries(bk.data).forEach(([k, v]) => {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
       if (_usedPw) { try { localStorage.setItem('hb13_backup_pw', JSON.stringify(_usedPw)); } catch (e) {} }
+      if (_usedPuk) { try { localStorage.setItem('hb13_puk', _usedPuk); } catch (e) {} }
       localStorage.setItem('hb_drive_backup_ts', new Date().toISOString());
       localStorage.setItem('hb_drive_restore_ts', new Date().toISOString());
       window._driveRemoteNewerDetected = false;
@@ -12561,6 +12677,7 @@ document.addEventListener('keydown', (e) => {
               <div style="min-width:0;"><div style="font-size:13px;font-weight:700;">🔒 Backup cifrato</div><div id="drive-enc-status" style="font-size:11px;color:var(--text3);">—</div></div>
               <button id="drive-enc-btn" onclick="hbBackupPwSetup()" style="flex-shrink:0;padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Imposta</button>
             </div>
+            <button id="drive-puk-btn" onclick="hbPukMenu()" style="margin-top:10px;width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🆘 Codice di emergenza (PUK)</button>
             <button onclick="hbBackupVerify()" style="margin-top:10px;width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">🔎 Verifica ultimo backup e spazio</button>
           </div>
         </div>
@@ -12772,7 +12889,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.2.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.3.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
