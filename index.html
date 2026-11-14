@@ -1933,7 +1933,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.3.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.4.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -2004,7 +2004,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.3.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.4.0</div>
         </div>
       </div>
     </div>
@@ -2109,7 +2109,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.3.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.4.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3056,7 +3056,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v14.3.1',
+  version: 'v14.4.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3077,7 +3077,7 @@ const HB = {
 const _SENSITIVE_KEYS = [
   'hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats',
   'hb13_cards','hb13_wifi','hb13_finance',
-  'hb13_server','hb13_server_cats','hb13_backup_pw','hb13_puk'
+  'hb13_server','hb13_server_cats','hb13_backup_pw','hb13_puk','hb13_trash','hb13_snapshot'
 ];
 
 let _lsCache = {};
@@ -3452,6 +3452,7 @@ function unlockApp() {
     updateHomeStats();
     updateSidebarBadges();
     if (typeof updateSyncBadge === 'function') updateSyncBadge();
+    setTimeout(hbTrashAutoPurge, 2500);
     setTimeout(driveStartAutoTimer, 2000);
     setTimeout(checkExpiryNotifications, 3000);
     // Controllo periodico password compromesse (Have I Been Pwned) — ricontrolla quelle scadute/non ancora verificate
@@ -3964,10 +3965,12 @@ function updateHomeStats() {
   // 2d. Promemoria backup (Drive o file): mai fatto, più vecchio di 7 giorni, o con molte modifiche non ancora salvate
   if ((_pwItems||[]).filter(i => !i.deleted).length > 0) {
     const _lb = hbLastBackupTs();
+    const _modSince = _lb ? hbDataModifiedSince(_lb) : true;
     const _days = _lb ? Math.floor((Date.now() - _lb) / 86400000) : null;
     const _chg = _lb ? [...(_pwItems||[]), ...(typeof _notes !== 'undefined' ? _notes : [])].filter(x => !x.deleted && x.updatedAt && new Date(x.updatedAt).getTime() > _lb).length : 0;
-    const _chgTxt = _chg ? ' · ' + _chg + ' modific' + (_chg === 1 ? 'a' : 'he') + ' non ancora salvat' + (_chg === 1 ? 'a' : 'e') : '';
-    if (_days === null) alerts.unshift({ icon:'💾', color:'#ef4444', text:'Nessun backup fatto — salva subito una copia dei tuoi dati', time:'', action:'hbOpenBackupSettings()' });
+    const _chgTxt = _chg ? ' · ' + _chg + ' modific' + (_chg === 1 ? 'a' : 'he') + ' non ancora salvat' + (_chg === 1 ? 'a' : 'e') : (_modSince ? ' · hai modifiche non salvate' : '');
+    if (_lb && !_modSince) { /* niente da salvare dall'ultimo backup */ }
+    else if (_days === null) alerts.unshift({ icon:'💾', color:'#ef4444', text:'Nessun backup fatto — salva subito una copia dei tuoi dati', time:'', action:'hbOpenBackupSettings()' });
     else if (_days > 14 || _chg >= 50) alerts.unshift({ icon:'💾', color:'#ef4444', text:'Ultimo backup ' + (_days === 0 ? 'oggi' : _days + ' giorni fa') + _chgTxt + ' — rifallo adesso', time:'', action:'hbOpenBackupSettings()' });
     else if (_days > 7 || _chg >= 20) alerts.push({ icon:'💾', color:'#f97316', text:'Ultimo backup ' + (_days === 0 ? 'oggi' : _days + ' giorni fa') + _chgTxt + ' — conviene rifarlo', time:'', action:'hbOpenBackupSettings()' });
   }
@@ -4096,7 +4099,7 @@ function hbChecklistData() {
   const live = (_pwItems || []).filter(i => !i.deleted && i.password);
   // Backup
   const ts = hbLastBackupTs(), days = ts ? Math.floor((Date.now() - ts) / 86400000) : null;
-  rows.push({ ok: days !== null && days <= 7, ic: '💾', t: 'Backup recente', d: days === null ? 'Nessun backup fatto' : (days === 0 ? 'Fatto oggi' : 'Ultimo backup: ' + days + ' giorni fa'), act: "hbOpenBackupSettings()" });
+  rows.push({ ok: days !== null && (days <= 7 || !hbDataModifiedSince(ts)), ic: '💾', t: 'Backup recente', d: days === null ? 'Nessun backup fatto' : (days === 0 ? 'Fatto oggi' : 'Ultimo backup: ' + days + ' giorni fa') + (days > 7 && !hbDataModifiedSince(ts) ? ' · nessuna modifica da allora' : ''), act: "hbOpenBackupSettings()" });
   if (localStorage.getItem('hb_drive_backup_ts')) rows.push({ ok: !!hbBackupPw(), ic: '🔒', t: 'Backup su Drive cifrato', d: hbBackupPw() ? 'Protetto da password separata' : 'Imposta una password per il backup', act: "hbOpenCloudSettings()" });
   else rows.push({ ok: false, ic: '☁️', t: 'Backup su Google Drive', d: 'Non ancora attivato', act: "hbOpenCloudSettings()" });
   if (hbBackupPw()) rows.push({ ok: !!hbPuk(), ic: '🆘', t: 'Codice di emergenza (PUK)', d: hbPuk() ? 'Creato — tienilo su carta' : 'Non ancora creato: serve se dimentichi password o PIN', act: "hbOpenCloudSettings()" });
@@ -4132,6 +4135,123 @@ function hbShowChecklist() {
     '<button onclick="document.getElementById(\'_cl_ov\').remove()" style="width:100%;margin-top:16px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div>';
   ov.onclick = e => { if (e.target === ov) ov.remove(); };
   document.body.appendChild(ov);
+}
+
+// ═══ CESTINO (v14.4) — le voci eliminate restano 30 giorni e si possono ripristinare ═══
+const HB_TRASH_KEY = 'hb13_trash', HB_TRASH_DAYS = 30;
+let _trash = [];
+const HB_TRASH_T = { pw:['🔐','Password'], otp:['🔑','OTP'], srv:['🖥️','Server'], wifi:['📶','Wi-Fi'], fin:['💰','Conto'], note:['📝','Archivio'], card:['💳','Carta'] };
+function hbTrashLoad() { try { _trash = JSON.parse(localStorage.getItem(HB_TRASH_KEY) || '[]') || []; } catch (e) { _trash = []; } if (!Array.isArray(_trash)) _trash = []; }
+function hbTrashSave() { try { localStorage.setItem(HB_TRASH_KEY, JSON.stringify(_trash)); } catch (e) {} }
+function hbTrashPush(t, item) {
+  try {
+    hbTrashLoad();
+    _trash.unshift({ tid: 'tr_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), t, item, at: new Date().toISOString() });
+    if (_trash.length > 300) _trash.length = 300;
+    hbTrashSave();
+  } catch (e) {}
+}
+function hbTrashName(t, it) { it = it || {}; return t === 'pw' ? (it.title || 'Password') : t === 'otp' ? (it.name || 'OTP') : t === 'wifi' ? (it.ssid || 'Wi-Fi') : t === 'note' ? (it.title || 'Senza titolo') : (it.label || it.name || it.holder || HB_TRASH_T[t][1]); }
+function hbTrashAll() {
+  hbTrashLoad();
+  const out = _trash.map(e => ({ kind: 't', e, at: e.at, t: e.t, name: hbTrashName(e.t, e.item) }));
+  (typeof _notes !== 'undefined' ? _notes : []).filter(n => n.deleted).forEach(n => out.push({ kind: 'note', item: n, at: n.deletedAt || '', t: 'note', name: hbTrashName('note', n) }));
+  (typeof _cards !== 'undefined' ? _cards : []).filter(c => c.deleted).forEach(c => out.push({ kind: 'card', item: c, at: c.deletedAt || '', t: 'card', name: hbTrashName('card', c) }));
+  return out.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+}
+function _hbTrashLeft(at) { if (!at) return HB_TRASH_DAYS; return Math.max(0, HB_TRASH_DAYS - Math.floor((Date.now() - new Date(at).getTime()) / 86400000)); }
+function hbTrashRestore(x) {
+  try {
+    if (x.kind === 'note') { _notes = _notes.map(n => n.id === x.item.id ? { ...n, deleted: false, deletedAt: undefined } : n); noteSaveAll(); }
+    else if (x.kind === 'card') { _cards = _cards.map(c => c.id === x.item.id ? { ...c, deleted: false, deletedAt: undefined } : c); cardsSaveAll(); }
+    else {
+      const it = x.e.item, t = x.e.t;
+      if (t === 'pw') { pwLoad(); if (!_pwItems.some(i => i.id === it.id)) { if (!_pwCats.some(c => c.id === it.categoryId) && _pwCats[0]) it.categoryId = _pwCats[0].id; _pwItems.push(it); } pwSave(); }
+      else if (t === 'otp') { otpLoad(); if (!_otpAccounts.some(i => i.id === it.id)) _otpAccounts.push(it); otpSaveAll(); }
+      else if (t === 'srv') { serverLoad(); if (!_serverItems.some(i => i.id === it.id)) _serverItems.push(it); serverSaveAll(); }
+      else if (t === 'wifi') { wifiLoad(); if (!_wifiNets.some(i => i.id === it.id)) _wifiNets.push(it); wifiSaveAll(); }
+      else if (t === 'fin') { financeLoad(); if (!_financeAccounts.some(i => i.id === it.id)) _financeAccounts.push(it); financeSaveAll(); }
+      _trash = _trash.filter(e => e.tid !== x.e.tid); hbTrashSave();
+    }
+    try { updateHomeStats(); } catch (e) {}
+    showToast('♻️ Ripristinato: ' + x.name);
+  } catch (e) { showToast('⚠️ Ripristino non riuscito'); }
+}
+function _hbTrashPurgeNote(id) {
+  const old = _noteAttStore && _noteAttStore[id];
+  if (old) { try { delete _noteAttStore[id]; noteAttSaveAll(); noteAttQueueDelete(old); } catch (e) {} }
+  _notes = _notes.filter(n => n.id !== id); noteSaveAll();
+}
+function hbTrashPurge(x) {
+  if (x.kind === 'note') _hbTrashPurgeNote(x.item.id);
+  else if (x.kind === 'card') { _cards = _cards.filter(c => c.id !== x.item.id); cardsSaveAll(); }
+  else { _trash = _trash.filter(e => e.tid !== x.e.tid); hbTrashSave(); }
+}
+// all'avvio: elimina definitivamente ciò che è nel cestino da più di 30 giorni
+function hbTrashAutoPurge() {
+  try {
+    hbTrashAll().forEach(x => { if (x.at && _hbTrashLeft(x.at) <= 0) hbTrashPurge(x); });
+  } catch (e) {}
+}
+function hbTrashOpen() {
+  document.getElementById('_tr_ov')?.remove();
+  const list = hbTrashAll();
+  const ov = document.createElement('div'); ov.id = '_tr_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  const btn = 'padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:20px;max-width:420px;width:100%;border:1px solid var(--border);">' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px;">🗑️ Cestino</div>' +
+    '<div style="font-size:12px;color:var(--text3);margin-bottom:10px;">Le voci eliminate restano qui ' + HB_TRASH_DAYS + ' giorni, poi spariscono per sempre.</div>' +
+    '<div id="_tr_list">' + (list.length ? '' : '<div style="padding:26px 0;text-align:center;color:var(--text3);font-size:13px;">Il cestino è vuoto ✨</div>') + '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:14px;">' + (list.length ? '<button id="_tr_empty" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(239,68,68,.4);background:rgba(239,68,68,.08);color:#ef4444;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Svuota cestino</button>' : '') + '<button id="_tr_x" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div></div>';
+  document.body.appendChild(ov);
+  ov.onclick = e => { if (e.target === ov) ov.remove(); };
+  document.getElementById('_tr_x').onclick = () => ov.remove();
+  const box = document.getElementById('_tr_list');
+  list.forEach(x => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);';
+    const d = x.at ? new Date(x.at).toLocaleDateString('it-IT') : '—', left = _hbTrashLeft(x.at);
+    row.innerHTML = '<div style="font-size:20px;">' + HB_TRASH_T[x.t][0] + '</div><div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(x.name) + '</div><div style="font-size:11px;color:var(--text3);">' + HB_TRASH_T[x.t][1] + ' · eliminato il ' + d + ' · ancora ' + left + ' gg</div></div>' +
+      '<button data-a="r" title="Ripristina" style="' + btn + '">♻️</button><button data-a="d" title="Elimina per sempre" style="' + btn + 'color:#ef4444;">✖</button>';
+    row.querySelector('[data-a=r]').onclick = () => { hbTrashRestore(x); hbTrashOpen(); };
+    row.querySelector('[data-a=d]').onclick = () => { if (confirm('Eliminare per sempre "' + x.name + '"?')) { hbTrashPurge(x); hbTrashOpen(); } };
+    box.appendChild(row);
+  });
+  const em = document.getElementById('_tr_empty');
+  if (em) em.onclick = () => { if (confirm('Svuotare il cestino? Le ' + list.length + ' voci spariranno per sempre.')) { list.forEach(hbTrashPurge); hbTrashOpen(); } };
+}
+
+// ═══ COPIA DI SICUREZZA PRIMA DI OPERAZIONI DELICATE (v14.4) ═══
+const _HB_SNAP_KEYS = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats','hb13_trash'];
+function hbSnapshotTake(reason) {
+  try {
+    const data = {}; let n = 0;
+    _HB_SNAP_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v) { data[k] = v; n += v.length; } });
+    let used = 0; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); used += k.length + (Object.getPrototypeOf(localStorage).__origGet.call(localStorage, k) || '').length; }
+    if (used + n * 1.4 > 4.6 * 1024 * 1024) { try { localStorage.removeItem('hb13_snapshot'); } catch (e) {} return false; }
+    localStorage.setItem('hb13_snapshot', JSON.stringify({ at: new Date().toISOString(), reason: reason || '', data }));
+    return !!localStorage.getItem('hb13_snapshot');
+  } catch (e) { try { localStorage.removeItem('hb13_snapshot'); } catch (_) {} return false; }
+}
+function hbSnapshotInfo() { try { const s = JSON.parse(localStorage.getItem('hb13_snapshot') || 'null'); return s && s.data ? s : null; } catch (e) { return null; } }
+function hbSnapshotUndo() {
+  const s = hbSnapshotInfo();
+  if (!s) { showToast('Nessuna copia di sicurezza disponibile'); return; }
+  if (!confirm('Tornare ai dati com\'erano il ' + new Date(s.at).toLocaleString('it-IT') + ' (' + (s.reason || 'prima dell\'ultima operazione') + ')?\n\nI dati attuali verranno sostituiti.')) return;
+  Object.entries(s.data).forEach(([k, v]) => { try { localStorage.setItem(k, v); } catch (e) {} });
+  showToast('↩️ Dati riportati indietro — ricarico...');
+  setTimeout(() => location.reload(), 1200);
+}
+function hbSnapshotUI() {
+  const b = document.getElementById('snap-undo-btn'); if (!b) return;
+  const s = hbSnapshotInfo();
+  b.style.display = s ? 'flex' : 'none';
+  if (s) { const t = b.querySelector('[data-t]'); if (t) t.textContent = new Date(s.at).toLocaleString('it-IT') + ' · ' + (s.reason || ''); }
+}
+// ci sono modifiche fatte dopo il tempo ts?
+function hbDataModifiedSince(ts) {
+  try { return ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats'].some(k => { const t = parseInt(localStorage.getItem('hb_ts_' + k), 10); return t && t > ts; }); } catch (e) { return true; }
 }
 
 function hbOpenBackupSettings() { openSettings(); setTimeout(() => { try { settingsPage('backup'); } catch(e){} }, 200); }
@@ -4865,7 +4985,8 @@ function pwSelFav() {
 function pwSelDelete() {
   const n = _pwSel.size;
   if (!n) { showToast('Seleziona prima qualche password'); return; }
-  if (!confirm('Eliminare ' + n + (n === 1 ? ' password' : ' password') + '?\n\nL\'operazione non è reversibile: se non hai un backup recente, fallo prima.')) return;
+  if (!confirm('Eliminare ' + n + (n === 1 ? ' password' : ' password') + '?\n\nFiniscono nel Cestino per 30 giorni.')) return;
+  _pwItems.filter(i => _pwSel.has(i.id)).forEach(i => hbTrashPush('pw', i));
   _pwItems = _pwItems.filter(i => !_pwSel.has(i.id));
   pwSave();
   _pwSelDone('🗑 ' + n + ' password eliminate');
@@ -5020,7 +5141,7 @@ function pwQuickFix(id) {
     if (idx < 0) { ov.remove(); return; }
     const it = _pwItems[idx];
     const history = it.pwHistory || [];
-    if (it.password) { history.unshift({ password: it.password, changedAt: new Date().toISOString() }); if (history.length > 5) history.length = 5; }
+    if (it.password) { history.unshift({ password: it.password, changedAt: new Date().toISOString() }); if (history.length > 10) history.length = 10; }
     const expDays = it.expiryDays || 'none';
     _pwItems[idx] = {
       ...it,
@@ -5387,7 +5508,7 @@ function pwDeleteConfirm(itemId) {
   box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">🔐</div>
     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa password?</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Finisce nel Cestino: puoi recuperarla per 30 giorni.</div>
     <div style="display:flex;gap:10px;">
       <button id="_pwd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_pwd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
@@ -5397,6 +5518,7 @@ function pwDeleteConfirm(itemId) {
   document.getElementById('_pwd_cancel').onclick = () => overlay.remove();
   document.getElementById('_pwd_ok').onclick = () => {
     overlay.remove();
+    { const _t = _pwItems.find(i => i.id === itemId); if (_t) hbTrashPush('pw', _t); }
     _pwItems = _pwItems.filter(i => i.id !== itemId);
     pwSave();
     pwBackToItems();
@@ -7567,7 +7689,7 @@ function noteSave() {
     if (changed) {
       const history = note.history || [];
       history.unshift({ title: note.title, content: note.content, changedAt: note.updatedAt || now });
-      if (history.length > 5) history.length = 5; // max 5 versioni precedenti
+      if (history.length > 10) history.length = 10; // max 5 versioni precedenti
       note.history = history;
     }
     note.title = title; note.content = content; note.updatedAt = now;
@@ -7608,7 +7730,7 @@ function noteDelete(id) {
   box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">🗑</div>
     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa voce?</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Finisce nel Cestino: puoi recuperarla per 30 giorni.</div>
     <div style="display:flex;gap:10px;">
       <button id="_nd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_nd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
@@ -7619,10 +7741,9 @@ function noteDelete(id) {
   document.getElementById('_nd_ok').onclick = () => {
     overlay.remove();
     _notes = markDeleted(_notes, id);
-    if (_noteAttStore[id]) { const old = _noteAttStore[id]; delete _noteAttStore[id]; noteAttSaveAll(); noteAttQueueDelete(old); }
     noteSaveAll();
     noteRenderList('');
-    showToast('Voce eliminata');
+    showToast('Voce spostata nel Cestino');
   };
 }
 
@@ -7963,7 +8084,7 @@ function cardsDelete(id) {
   box.innerHTML = `
     <div style="font-size:28px;margin-bottom:10px;">💳</div>
     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Eliminare questa carta?</div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">L'operazione non è reversibile.</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:18px;">Finisce nel Cestino: puoi recuperarla per 30 giorni.</div>
     <div style="display:flex;gap:10px;">
       <button id="_cd_cancel" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Annulla</button>
       <button id="_cd_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:#ef4444;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Elimina</button>
@@ -8308,9 +8429,10 @@ function financeEdit(id) {
 function financeDelete(id) {
   const acc = _financeAccounts.find(a => a.id === id);
   if (!confirm('Eliminare "' + acc?.label + '"?')) return;
+  if (acc) hbTrashPush('fin', acc);
   _financeAccounts = _financeAccounts.filter(a => a.id !== id);
   financeSaveAll(); financeRender();
-  showToast('Conto rimosso');
+  showToast('Conto spostato nel Cestino');
 }
 
 // ── Aggiungi ─────────────────────────────────────────────
@@ -8541,9 +8663,10 @@ async function wifiCopyPw(id) {
 function wifiDelete(id) {
   const net = _wifiNets.find(n => n.id === id);
   if (!confirm('Rimuovere "' + net?.ssid + '"?')) return;
+  if (net) hbTrashPush('wifi', net);
   _wifiNets = _wifiNets.filter(n => n.id !== id);
   wifiSaveAll(); wifiRender();
-  showToast('Rete rimossa');
+  showToast('Rete spostata nel Cestino');
 }
 
 
@@ -9029,11 +9152,12 @@ function otpEdit(id) {
 
 function otpDeleteConfirm(id) {
   const acc = _otpAccounts.find(a => a.id === id);
-  if (!confirm(`Rimuovere ${acc?.name || 'account'}?\n\nSenza questo account potresti perdere l\'accesso al servizio.`)) return;
+  if (!confirm(`Spostare ${acc?.name || 'account'} nel Cestino?\n\nSenza questo account potresti perdere l\'accesso al servizio.`)) return;
+  if (acc) hbTrashPush('otp', acc);
   _otpAccounts = _otpAccounts.filter(a => a.id !== id);
   otpSaveAll();
   otpRenderList('');
-  showToast('Account rimosso');
+  showToast('Account spostato nel Cestino');
 }
 
 // ── Fine OTP ──────────────────────────────────────────────
@@ -9164,6 +9288,7 @@ hbApplyHomeStyle();
 
 function settingsPage(page) {
   if (page === 'sicurezza') { try { hbDocWarnInit(); } catch (e) {} }
+  if (page === 'backup') { try { hbSnapshotUI(); } catch (e) {} }
   ['main','grafica','backup','import','sicurezza','info','cloud'].forEach(p => {
     const el = document.getElementById('set-page-'+p);
     if(el) el.style.display = p===page ? 'block' : 'none';
@@ -10149,9 +10274,10 @@ function serverEdit(id) {
 }
 
 function serverDelete(id) {
+  { const _t = _serverItems.find(i => i.id === id); if (_t) hbTrashPush('srv', _t); }
   _serverItems = _serverItems.filter(i => i.id !== id);
   serverSaveAll(); serverRender();
-  showToast('Credenziale rimossa');
+  showToast('Spostato nel Cestino');
 }
 
 async function serverCopy(id, field) {
@@ -10767,7 +10893,7 @@ async function driveBackupNow(silent=false) {
 
     // Raccoglie tutti i dati
     const keys = ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_note_att','hb13_otp_accounts','hb13_otp_cats',
-                  'hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats'];
+                  'hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats','hb13_trash'];
     const data = {};
     keys.forEach(k => {
       const v = localStorage.getItem(k);
@@ -10778,7 +10904,7 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'14.3.1', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'14.4.0', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -10952,6 +11078,7 @@ async function driveDoRestore(fileId, dateLabel, btn) {
       let bk = await dl.json(), _usedPw = '', _usedPuk = '';
       if (bk.format === 'homebull-enc-1') { const a = await hbAskAndDecrypt(bk); if (!a) return; bk = a.bk; _usedPw = a.pass; _usedPuk = a.puk || ''; }
       if (!bk.data) { showToast('⚠️ File backup non valido'); return; }
+      if (!hbSnapshotTake('prima del ripristino da Drive')) showToast('ℹ️ Spazio insufficiente per la copia di sicurezza: procedo senza');
       Object.entries(bk.data).forEach(([k, v]) => {
         localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
       });
@@ -11227,7 +11354,7 @@ function pwEditItem(itemId) {
       const passChanged = pass && oldPass && pass !== oldPass;
       if (passChanged) {
         history.unshift({ password: oldPass, changedAt: new Date().toISOString() });
-        if (history.length > 5) history.length = 5; // max 5 voci
+        if (history.length > 10) history.length = 10; // max 5 voci
       }
       // Ricalcola la data di scadenza se è cambiata l'opzione scelta, la data di inizio, o se la password è stata rinnovata
       const expDays  = document.getElementById('_pwe_exp')?.value || 'none';
@@ -11238,7 +11365,7 @@ function pwEditItem(itemId) {
         : (expDays === 'none' ? '' : item.expiryDate);
       const _fr = _pwFormRead('_pwe');
       // Cronologia anche per password Email e PEC (max 5 ciascuna, come la principale)
-      const _histOf = (oldV, newV, arr) => { const h = (arr || []).slice(); if (newV && oldV && newV !== oldV) { h.unshift({ password: oldV, changedAt: new Date().toISOString() }); if (h.length > 5) h.length = 5; } return h; };
+      const _histOf = (oldV, newV, arr) => { const h = (arr || []).slice(); if (newV && oldV && newV !== oldV) { h.unshift({ password: oldV, changedAt: new Date().toISOString() }); if (h.length > 10) h.length = 10; } return h; };
       const _emailHist = _histOf(item.emailPassword, _fr.emailPassword, item.emailPwHistory);
       const _pecHist = _histOf(item.pecPassword, _fr.pecPassword, item.pecPwHistory);
       const _resetPwn = passChanged || (_fr.emailPassword || '') !== (item.emailPassword || '') || (_fr.pecPassword || '') !== (item.pecPassword || '');
@@ -11347,6 +11474,7 @@ function pwDeleteCategory(catId, catName, count) {
   document.getElementById('_dcat_ok').onclick = () => {
     // Rimuovi categoria e tutte le sue password
     _pwCats = _pwCats.filter(c => c.id !== catId);
+    _pwItems.filter(i => i.categoryId === catId).forEach(i => hbTrashPush('pw', i));
     _pwItems = _pwItems.filter(i => i.categoryId !== catId);
     pwSave();
     overlay.remove();
@@ -11691,6 +11819,7 @@ function settingsImport(event){
       document.body.appendChild(ov);
       document.getElementById('_ic').onclick=()=>ov.remove();
       document.getElementById('_io').onclick=()=>{
+        hbSnapshotTake('prima dell\'importazione da file');
         Object.entries(bk.data).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
         ov.remove();
         closeSettings();
@@ -12479,6 +12608,12 @@ document.addEventListener('keydown', (e) => {
             <div style="font-size:12px;color:var(--text3);line-height:1.4;">Da Chrome, Bitwarden, LastPass, Google Authenticator</div>
           </button>
 
+          <button onclick="closeSettings();hbTrashOpen()" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;">
+            <div style="font-size:32px;margin-bottom:10px;">🗑️</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Cestino</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.4;">Recupera le voci eliminate (30 giorni)</div>
+          </button>
+
           <button onclick="settingsPage('info')" style="padding:20px 16px;border-radius:18px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:left;font-family:inherit;transition:background 0.15s;">
             <div style="font-size:32px;margin-bottom:10px;">ℹ️</div>
             <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px;">Info</div>
@@ -12666,6 +12801,9 @@ document.addEventListener('keydown', (e) => {
       <!-- ── PAGINA BACKUP ── -->
       <div id="set-page-backup" style="display:none;padding:20px;">
         <div style="display:flex;flex-direction:column;gap:12px;">
+          <button id="snap-undo-btn" onclick="hbSnapshotUndo()" style="display:none;width:100%;padding:16px;border-radius:16px;border:1px solid rgba(249,115,22,.4);background:rgba(249,115,22,.08);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;align-items:center;gap:12px;">
+            <span style="font-size:26px;">↩️</span><div><div>Annulla ultimo ripristino / importazione</div><div data-t style="font-size:11px;color:var(--text3);font-weight:500;margin-top:2px;"></div></div>
+          </button>
           <button onclick="settingsExport()" style="width:100%;padding:18px 16px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:14px;text-align:left;">
             <span style="font-size:28px;">📤</span>
             <div><div style="margin-bottom:3px;">Esporta backup</div><div style="font-size:12px;color:var(--text3);font-weight:500;">Salva tutti i dati in un file JSON</div></div>
@@ -12856,7 +12994,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.3.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.4.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
