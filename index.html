@@ -1814,7 +1814,7 @@ body::before {
   to   { opacity: 1; transform: translateY(0); }
 }
 .mob-home-card {
-  animation: cardIn 0.35s ease both;
+  animation: cardIn calc(0.35s * var(--am,1)) ease both;
 }
 .mob-home-card:nth-child(1) { animation-delay: 0.05s; }
 .mob-home-card:nth-child(2) { animation-delay: 0.10s; }
@@ -1823,6 +1823,30 @@ body::before {
 .mob-home-card:nth-child(5) { animation-delay: 0.25s; }
 .mob-home-card:nth-child(6) { animation-delay: 0.30s; }
 
+/* ══ v14.5: animazioni regolabili, densità elenchi ═════════ */
+html{--am:1;}
+html[data-anim="fast"]{--am:.5;}
+html[data-anim="slow"]{--am:2.2;}
+html[data-anim="off"] *,html[data-anim="off"] *::before,html[data-anim="off"] *::after{animation:none !important;transition:none !important;}
+@media (prefers-reduced-motion: reduce){html:not([data-anim]) *,html:not([data-anim]) *::before,html:not([data-anim]) *::after{animation:none !important;transition:none !important;}}
+@keyframes hbPop{from{opacity:0;transform:translateY(8px) scale(.97);}to{opacity:1;transform:none;}}
+@keyframes hbFade{from{opacity:0;}to{opacity:1;}}
+div[style*="position:fixed"][style*="inset:0"] > div:first-child,div[style*="position: fixed"][style*="inset: 0"] > div:first-child{animation:hbPop calc(.22s * var(--am,1)) ease both;}
+.tab-panel.active{animation:hbFade calc(.25s * var(--am,1)) ease both;}
+.mob-home-card:active,.qa-card:active,.pw-copy-btn:active{transform:scale(.95);}
+html[data-density="compact"] .pw-item-card,html[data-density="compact"] .note-card{padding:8px 12px;margin-bottom:5px;border-radius:12px;}
+html[data-density="compact"] .pw-item-header{margin-bottom:4px;gap:9px;}
+html[data-density="compact"] .pw-item-icon{width:30px;height:30px;font-size:16px;border-radius:9px;}
+html[data-density="compact"] .pw-item-title{font-size:13.5px;}
+html[data-density="compact"] .pw-item-user{font-size:11px;margin-top:0;}
+html[data-density="compact"] .finance-card,html[data-density="compact"] .wifi-card{padding:10px 12px;margin-bottom:6px;border-radius:13px;}
+html[data-density="compact"] .note-card-preview{display:none;}
+html[data-density="comfort"] .pw-item-card,html[data-density="comfort"] .note-card{padding:18px 18px;margin-bottom:12px;}
+html[data-density="comfort"] .pw-item-header{gap:14px;margin-bottom:12px;}
+html[data-density="comfort"] .pw-item-icon{width:48px;height:48px;font-size:24px;border-radius:14px;}
+html[data-density="comfort"] .pw-item-title{font-size:16px;}
+html[data-density="comfort"] .finance-card,html[data-density="comfort"] .wifi-card{padding:20px;margin-bottom:14px;}
+.pw-item-icon{position:relative;}
 /* ══ COPIA CON FEEDBACK ═════════════════════════════════════ */
 @keyframes copyPulse {
   0%   { box-shadow: 0 0 0 0 rgba(99,102,241,0.5); }
@@ -1839,7 +1863,7 @@ body::before {
 .tab-panel.active .pw-cat-card,
 .tab-panel.active .wifi-card,
 .tab-panel.active .finance-card {
-  animation: itemFadeIn 0.3s ease both;
+  animation: itemFadeIn calc(0.3s * var(--am,1)) ease both;
 }
 @keyframes itemFadeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -1933,7 +1957,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.4.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.5.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -2004,7 +2028,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.4.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.5.0</div>
         </div>
       </div>
     </div>
@@ -2109,7 +2133,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
             <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.4.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.5.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3056,7 +3080,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v14.4.0',
+  version: 'v14.5.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3175,6 +3199,8 @@ window._hbLogBuffer = [];
   };
 })();
 
+try { hbApplyAnim(); hbApplyDensity(); hbBioApplyNames(); } catch (e) {}
+
 // ── Service Worker ─────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(console.warn);
@@ -3271,7 +3297,7 @@ function checkAuthStatus() {
     // Avvia biometria automatica su mobile
     setTimeout(() => {
       checkBiometricAvailable();
-      if (/Android|iPhone|iPad/i.test(navigator.userAgent) && localStorage.getItem(HB_BIO_KEY)) {
+      if (localStorage.getItem(HB_BIO_KEY) && localStorage.getItem('hb_bio') !== '0') {
         setTimeout(tryBiometric, 600);
       }
     }, 300);
@@ -3996,6 +4022,7 @@ function updateHomeStats() {
       <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:800;color:var(--text);">Salute password</div>
       <div style="font-size:12px;color:var(--text3);margin-top:2px;">${_h.pwned} compromesse · ${_h.weak} deboli · ${_h.reused} condivise</div></div>
       <div style="font-size:14px;color:var(--text3);">›</div></div>` : '';
+  try { hbRenderTimeline(); } catch (e) {}
   alertBox.innerHTML = _scoreCard + alerts.slice(0, 5).map(a => `
     <div onclick="${a.action ? a.action : (a.tab ? `switchTab('${a.tab}')` : '')}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;${(a.tab || a.action) ? 'cursor:pointer;' : ''}">
       <div style="font-size:20px;flex-shrink:0;">${a.icon}</div>
@@ -4252,6 +4279,108 @@ function hbSnapshotUI() {
 // ci sono modifiche fatte dopo il tempo ts?
 function hbDataModifiedSince(ts) {
   try { return ['hb13_passwords','hb13_pw_cats','hb13_notes','hb13_otp_accounts','hb13_otp_cats','hb13_cards','hb13_wifi','hb13_finance','hb13_server','hb13_server_cats'].some(k => { const t = parseInt(localStorage.getItem('hb_ts_' + k), 10); return t && t > ts; }); } catch (e) { return true; }
+}
+
+// ═══ v14.5: densità, animazioni, icone siti, scadenze in Home, biometria rinforzata ═══
+function hbDensity() { try { const v = localStorage.getItem('hb_density'); return ['compact','normal','comfort'].includes(v) ? v : 'normal'; } catch (e) { return 'normal'; } }
+function hbApplyDensity() { document.documentElement.setAttribute('data-density', hbDensity()); }
+function hbRefreshDensityUI() {
+  const d = hbDensity();
+  ['compact','normal','comfort'].forEach(k => { const b = document.getElementById('dn-' + k); if (!b) return; b.style.border = k === d ? '2px solid var(--accent)' : '1px solid var(--border)'; b.style.background = k === d ? 'var(--accent-bg)' : 'var(--surface)'; b.style.color = k === d ? 'var(--accent)' : 'var(--text2)'; });
+}
+function setDensity(d) { try { localStorage.setItem('hb_density', d); } catch (e) {} hbApplyDensity(); hbRefreshDensityUI(); showToast(d === 'compact' ? '📐 Elenchi compatti' : d === 'comfort' ? '📐 Elenchi spaziosi' : '📐 Densità normale'); }
+function hbApplyAnim(a) {
+  try { a = a || localStorage.getItem('hb_anim'); } catch (e) {}
+  if (!a) document.documentElement.removeAttribute('data-anim'); else document.documentElement.setAttribute('data-anim', a);
+}
+
+// ── Icone dei siti (facoltative: il dominio viene chiesto a DuckDuckGo) ──
+function hbSiteIconsOn() { try { return localStorage.getItem('hb_site_icons') === '1'; } catch (e) { return false; } }
+function hbSiteIconsSet(on) { try { localStorage.setItem('hb_site_icons', on ? '1' : '0'); } catch (e) {} hbSiteIconsUI(); showToast(on ? '🌐 Icone dei siti attivate' : 'Icone dei siti disattivate'); try { if (document.getElementById('pw-items-list')) pwRenderItems(); } catch (e) {} }
+function hbSiteIconsUI() { const b = document.getElementById('siteicons-btn'); if (!b) return; const on = hbSiteIconsOn(); b.textContent = on ? 'Attive — tocca per disattivare' : 'Disattivate — tocca per attivare'; b.style.background = on ? 'var(--accent-bg)' : 'var(--surface)'; b.style.color = on ? 'var(--accent)' : 'var(--text2)'; b.style.border = on ? '2px solid var(--accent)' : '1px solid var(--border)'; }
+function hbSiteDomain(url) {
+  try {
+    let u = String(url || '').trim(); if (!u) return '';
+    if (!/^[a-z]+:\/\//i.test(u)) u = 'https://' + u;
+    const h = new URL(u).hostname.toLowerCase();
+    if (!h || !h.includes('.') || /^(\d{1,3}\.){3}\d{1,3}$/.test(h) || h.endsWith('.local') || h.endsWith('.lan')) return '';
+    return h.replace(/^www\./, '');
+  } catch (e) { return ''; }
+}
+// emoji in fondo + icona vera sopra, se si carica
+function hbIconHtml(url, emoji) {
+  const d = hbSiteIconsOn() ? hbSiteDomain(url) : '';
+  if (!d) return emoji;
+  return '<span>' + emoji + '</span><img src="https://icons.duckduckgo.com/ip3/' + encodeURIComponent(d) + '.ico" alt="" loading="lazy" referrerpolicy="no-referrer" style="position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);object-fit:contain;border-radius:6px;background:var(--surface);" onload="if(this.naturalWidth<8){this.remove()}else{this.previousSibling.style.visibility=\'hidden\'}" onerror="this.remove()">';
+}
+
+// ── Prossime scadenze in Home ──
+function hbTimelineOn() { try { return localStorage.getItem('hb_home_timeline') !== '0'; } catch (e) { return true; } }
+function hbTimelineSet(on) { try { localStorage.setItem('hb_home_timeline', on ? '1' : '0'); } catch (e) {} hbTimelineUI(); try { updateHomeStats(); } catch (e) {} }
+function hbTimelineUI() { const b = document.getElementById('timeline-btn'); if (!b) return; const on = hbTimelineOn(); b.textContent = on ? 'Mostrate — tocca per nascondere' : 'Nascoste — tocca per mostrare'; b.style.background = on ? 'var(--accent-bg)' : 'var(--surface)'; b.style.color = on ? 'var(--accent)' : 'var(--text2)'; b.style.border = on ? '2px solid var(--accent)' : '1px solid var(--border)'; }
+function hbTimelineItems() {
+  const out = [], now = Date.now(), dayOf = d => Math.ceil((d.getTime() - now) / 86400000);
+  try { (_notes || []).filter(n => !n.deleted && n.kind === 'document' && n.doc && n.doc.scadenza).forEach(n => { const l = _docDaysLeft(n.doc); if (l !== null) out.push({ days: l, icon: '📄', label: n.title || _docTipoName(n.doc) || 'Documento', act: 'hbOpenDocs()' }); }); } catch (e) {}
+  try {
+    (_cards || []).filter(c => !c.deleted && c.exp).forEach(c => {
+      const p = String(c.exp).split('/'); let d;
+      if (p.length === 2) { const mm = parseInt(p[0], 10), yy = parseInt(p[1], 10); if (isNaN(mm) || isNaN(yy)) return; d = new Date(yy < 100 ? 2000 + yy : yy, mm, 0, 23, 59); }
+      else if (String(c.exp).includes('-')) d = new Date(c.exp); else return;
+      if (isNaN(d.getTime())) return;
+      out.push({ days: dayOf(d), icon: '💳', label: c.label || c.bank || 'Carta', act: "switchTab('cards')" });
+    });
+  } catch (e) {}
+  try { (_pwItems || []).filter(i => !i.deleted && i.expiryDate).forEach(i => { const d = new Date(String(i.expiryDate).slice(0, 10)); if (!isNaN(d.getTime())) out.push({ days: dayOf(d), icon: '🔐', label: 'Password ' + (i.title || ''), act: "switchTab('passwords')" }); }); } catch (e) {}
+  return out.filter(x => x.days <= 90 && x.days >= -30).sort((a, b) => a.days - b.days);
+}
+function hbRenderTimeline() {
+  let box = document.getElementById('home-timeline');
+  if (!box) { const sec = document.getElementById('home-alerts-section'); if (!sec) return; box = document.createElement('div'); box.id = 'home-timeline'; box.style.cssText = 'margin-bottom:24px;'; sec.parentNode.insertBefore(box, sec.nextSibling); }
+  const items = hbTimelineOn() ? hbTimelineItems() : [];
+  if (!items.length) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = 'block';
+  const col = d => d < 0 ? '#ef4444' : d <= 30 ? '#f97316' : d <= 60 ? '#eab308' : '#10b981';
+  const pos = d => Math.max(0, Math.min(100, (Math.max(d, 0) / 90) * 100));
+  const dots = items.slice(0, 12).map(x => '<div title="' + hbEsc(x.label) + '" style="position:absolute;left:' + pos(x.days) + '%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:' + col(x.days) + ';border:2px solid var(--bg2);box-shadow:0 0 0 1px ' + col(x.days) + '55;"></div>').join('');
+  box.innerHTML = '<div class="home-section-title" style="margin-bottom:10px;">📅 Prossime scadenze</div>' +
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">' +
+    '<div style="position:relative;height:22px;margin:4px 7px 6px;"><div style="position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:4px;background:linear-gradient(90deg,#ef4444 0%,#f97316 25%,#eab308 55%,#10b981 100%);opacity:.35;"></div>' + dots + '</div>' +
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-weight:700;margin:0 2px 10px;"><span>Oggi</span><span>30 gg</span><span>60 gg</span><span>90 gg</span></div>' +
+    items.slice(0, 5).map(x => '<div onclick="' + x.act + '" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border);cursor:pointer;"><div style="font-size:18px;">' + x.icon + '</div><div style="flex:1;min-width:0;font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(x.label) + '</div><div style="font-size:11px;font-weight:800;color:' + col(x.days) + ';flex-shrink:0;">' + (x.days < 0 ? 'scaduto' : x.days === 0 ? 'oggi' : 'tra ' + x.days + ' gg') + '</div></div>').join('') +
+    (items.length > 5 ? '<div style="font-size:11px;color:var(--text3);text-align:center;padding-top:6px;">+ altre ' + (items.length - 5) + '</div>' : '') + '</div>';
+}
+
+// ── Biometria: nome secondo il dispositivo e protezione rinforzata (PRF) ──
+function hbBioName() {
+  const u = navigator.userAgent || '';
+  if (/Windows/i.test(u)) return 'Windows Hello';
+  if (/iPhone|iPad|Mac/i.test(u)) return 'Touch ID / Face ID';
+  if (/Android/i.test(u)) return 'Impronta / sblocco schermo';
+  return 'Biometria';
+}
+const _HB_PRF_SALT = new TextEncoder().encode('homebull-prf-v1');
+async function _hbPrfKey(bytes) {
+  const h = await crypto.subtle.digest('SHA-256', bytes);
+  return crypto.subtle.importKey('raw', h, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+}
+// chiede all'autenticatore il segreto PRF; ritorna ArrayBuffer oppure null
+async function _hbPrfSecret(credBytes) {
+  try {
+    const a = await navigator.credentials.get({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ type: 'public-key', id: credBytes }],
+      userVerification: 'required', timeout: 60000,
+      extensions: { prf: { eval: { first: _HB_PRF_SALT } } }
+    } });
+    const r = a && a.getClientExtensionResults && a.getClientExtensionResults();
+    return r && r.prf && r.prf.results && r.prf.results.first ? r.prf.results.first : null;
+  } catch (e) { return null; }
+}
+function hbBioApplyNames() {
+  const n = hbBioName();
+  const b = document.querySelector('button[onclick="setupBioAndEnter()"]'); if (b) b.textContent = 'Abilita ' + n;
+  const s = document.getElementById('bio-status');
+  if (s && localStorage.getItem('hb_bio') === '1') s.textContent = n + (localStorage.getItem('hb_bio_prf') === '1' ? ' · protezione avanzata ✔' : ' · protezione base (riattivala per rafforzarla)');
 }
 
 function hbOpenBackupSettings() { openSettings(); setTimeout(() => { try { settingsPage('backup'); } catch(e){} }, 200); }
@@ -4890,7 +5019,7 @@ function pwRenderItems(q='') {
     card.onclick = () => pwShowDetail(item.id);
     card.innerHTML = `
       <div class="pw-item-header">
-        <div class="pw-item-icon" style="background:${cat?.color||'rgba(99,102,241,0.1)'}20;">${icon}</div>
+        <div class="pw-item-icon" style="background:${cat?.color||'rgba(99,102,241,0.1)'}20;">${hbIconHtml(item.url, icon)}</div>
         <div style="flex:1;min-width:0;">
           <div class="pw-item-title">${hbEsc(item.title||'—')}</div>
           <div class="pw-item-user">${hbEsc(item.username||item.email||'')}</div>
@@ -9289,6 +9418,8 @@ hbApplyHomeStyle();
 function settingsPage(page) {
   if (page === 'sicurezza') { try { hbDocWarnInit(); } catch (e) {} }
   if (page === 'backup') { try { hbSnapshotUI(); } catch (e) {} }
+  if (page === 'sicurezza') { setTimeout(() => { try { hbBioApplyNames(); } catch (e) {} }, 50); }
+  if (page === 'grafica') { try { hbRefreshDensityUI(); hbTimelineUI(); hbSiteIconsUI(); } catch (e) {} }
   ['main','grafica','backup','import','sicurezza','info','cloud'].forEach(p => {
     const el = document.getElementById('set-page-'+p);
     if(el) el.style.display = p===page ? 'block' : 'none';
@@ -9339,6 +9470,7 @@ async function settingsToggleBio(){
     localStorage.setItem('hb_bio','0');
     localStorage.removeItem(HB_BIO_KEY);
     localStorage.removeItem(HB_BIO_PIN_KEY);
+    localStorage.removeItem('hb_bio_prf');
     settingsCheckBio();
     showToast('Biometria disattivata');
   }
@@ -9568,7 +9700,7 @@ function runSearch(q) {
   (typeof _pwItems !== 'undefined' ? _pwItems : []).filter(i => !i.deleted).forEach(item => {
     const cat = _pwCats?.find(c => c.id === item.categoryId);
     add('🔐 Password', score(item.title, [item.username, item.email, item.pec, item.url, item.notes, cat && cat.name]), {
-      icon: cat?.icon || '🔐', title: item.title || 'Senza titolo',
+      icon: cat?.icon || '🔐', iconHtml: hbIconHtml(item.url, cat?.icon || '🔐'), title: item.title || 'Senza titolo',
       sub: (item.username || item.email || item.url || 'Password') + (cat ? ' · ' + cat.name : ''),
       action: () => { switchTab('passwords'); setTimeout(() => pwShowDetail(item.id), 300); }
     });
@@ -9640,7 +9772,7 @@ function runSearch(q) {
     el.style.cursor = 'pointer';
     el.style.animationDelay = Math.min((n++) * 25, 200) + 'ms';
     el.innerHTML =
-      '<div class="search-result-icon">' + r.icon + '</div>' +
+      '<div class="search-result-icon" style="position:relative;">' + (r.iconHtml || r.icon) + '</div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div class="search-result-title">' + searchHighlight(r.title, q) + '</div>' +
         '<div class="search-result-sub">' + searchHighlight(r.sub, q) + '</div>' +
@@ -10388,7 +10520,7 @@ function setRadius(r){const m={sharp:'4px',normal:'14px',round:'22px'};document.
 
 function setShadow(s){document.documentElement.style.setProperty('--card-shadow',s==='on'?'0 4px 16px rgba(0,0,0,0.25)':'none');localStorage.setItem('hb_shadow',s);settingsRefreshUI();}
 
-function setAnim(a){const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
+function setAnim(a){hbApplyAnim(a);const m={off:'0s',fast:'0.08s',normal:'0.18s',slow:'0.4s'};document.documentElement.style.setProperty('--anim-speed',m[a]);localStorage.setItem('hb_anim',a);settingsRefreshUI();}
 
 function applyCustomColors(){const bg=localStorage.getItem('hb_bg_color');const card=localStorage.getItem('hb_card_color');const sidebar=localStorage.getItem('hb_sidebar_color');const text=localStorage.getItem('hb_text_color');if(bg){document.documentElement.style.setProperty('--bg',bg);document.documentElement.style.setProperty('--bg2',bg);document.body.style.background=bg;}if(card){document.documentElement.style.setProperty('--surface',card);document.documentElement.style.setProperty('--surface2',card);}if(sidebar){const sb=document.querySelector('.sidebar');if(sb)sb.style.background=sidebar;}if(text){document.documentElement.style.setProperty('--text',text);}
 // Aggiorna i color picker con i valori salvati
@@ -10399,7 +10531,7 @@ function resetColors(){['hb_bg_color','hb_card_color','hb_sidebar_color','hb_tex
 function resetAllGraphics(){
   // Reset tutti i valori grafici
   ['hb_theme','hb_accent','hb13_accent','hb_font','hb_fs','hb_radius','hb_shadow','hb_anim','hb_bg',
-   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color','hb_home_style','hb_preset'].forEach(k=>localStorage.removeItem(k));
+   'hb_bg_color','hb_card_color','hb_sidebar_color','hb_text_color','hb_home_style','hb_preset','hb_density','hb_home_timeline'].forEach(k=>localStorage.removeItem(k));
   // Ripristina stili CSS
   document.documentElement.removeAttribute('style');
   document.body.style.cssText = '';
@@ -10470,6 +10602,7 @@ async function registerBiometric() {
         userVerification: 'required',
         residentKey: 'discouraged'
       },
+      extensions: { prf: {} },
       timeout: 60000
     }});
     if (!credential) return false;
@@ -10480,11 +10613,24 @@ async function registerBiometric() {
     // Salva PIN cifrato se disponibile
     const currentPin = HB._lastPin || '';
     if (currentPin) {
-      const bioKey = await _deriveBioKey(rawId);
-      const encPin = await _bioEncrypt(bioKey, currentPin);
-      localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+      // Protezione avanzata: la chiave nasce da un segreto che esce dall'autenticatore solo dopo la tua verifica (Windows Hello, impronta…)
+      let prfOk = false;
+      try {
+        const ext = credential.getClientExtensionResults ? credential.getClientExtensionResults() : {};
+        if (ext.prf && ext.prf.enabled) {
+          const sec = await _hbPrfSecret(rawId);
+          if (sec) { const k = await _hbPrfKey(sec); localStorage.setItem(HB_BIO_PIN_KEY, await _bioEncrypt(k, currentPin)); prfOk = true; }
+        }
+      } catch (e) { prfOk = false; }
+      if (!prfOk) {
+        const bioKey = await _deriveBioKey(rawId);
+        const encPin = await _bioEncrypt(bioKey, currentPin);
+        localStorage.setItem(HB_BIO_PIN_KEY, encPin);
+      }
+      localStorage.setItem('hb_bio_prf', prfOk ? '1' : '0');
     }
-    showToast('✅ Impronta registrata! Al prossimo avvio premi 👆 per entrare.');
+    showToast('✅ ' + hbBioName() + ' registrato! Al prossimo avvio premi 👆 per entrare.' + (localStorage.getItem('hb_bio_prf') === '1' ? ' (protezione avanzata)' : ''));
+    try { hbBioApplyNames(); } catch (e) {}
     checkBiometricAvailable();
     return true;
   } catch(e) {
@@ -10510,14 +10656,25 @@ async function tryBiometric() {
   }
   try {
     const credIdBytes = new Uint8Array(atob(credIdB64).split('').map(c=>c.charCodeAt(0)));
+    const usePrf = localStorage.getItem('hb_bio_prf') === '1';
     const assertion   = await navigator.credentials.get({ publicKey: {
       challenge: crypto.getRandomValues(new Uint8Array(32)),
       allowCredentials: [{type:'public-key', id:credIdBytes}],
-      userVerification: 'required', timeout: 60000
+      userVerification: 'required', timeout: 60000,
+      ...(usePrf ? { extensions: { prf: { eval: { first: _HB_PRF_SALT } } } } : {})
     }});
     if (!assertion) return;
     const encPin = localStorage.getItem(HB_BIO_PIN_KEY);
-    if (encPin) {
+    if (encPin && usePrf) {
+      try {
+        const r = assertion.getClientExtensionResults && assertion.getClientExtensionResults();
+        const sec = r && r.prf && r.prf.results && r.prf.results.first;
+        if (sec) {
+          const pin = await _bioDecrypt(await _hbPrfKey(sec), encPin);
+          if (pin && await verifyPIN(pin)) { showToast('👆 Accesso con ' + hbBioName()); unlockApp(); return; }
+        }
+      } catch (e3) { console.warn('[Bio prf]', e3); }
+    } else if (encPin) {
       // Prova a decifrare il PIN e verificarlo
       try {
         const rawId  = new Uint8Array(assertion.rawId);
@@ -10904,7 +11061,7 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'14.4.0', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'14.5.0', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -12724,6 +12881,30 @@ document.addEventListener('keydown', (e) => {
           </div>
         </div>
 
+        <!-- Densità elenchi -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">📐 Densità elenchi</div>
+          <div style="display:flex;gap:8px;">
+            <button id="dn-compact" onclick="setDensity('compact')" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▤ Compatta</button>
+            <button id="dn-normal"  onclick="setDensity('normal')"  style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▦ Normale</button>
+            <button id="dn-comfort" onclick="setDensity('comfort')" style="flex:1;padding:10px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">▣ Comoda</button>
+          </div>
+        </div>
+
+        <!-- Home: scadenze -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:6px;">📅 Scadenze in Home</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px;">Linea del tempo con documenti, carte e password in scadenza nei prossimi 90 giorni.</div>
+          <button id="timeline-btn" onclick="hbTimelineSet(!hbTimelineOn())" style="width:100%;padding:11px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
+        </div>
+
+        <!-- Icone dei siti -->
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:6px;">🌐 Icone dei siti</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.5;">Mostra il logo del sito accanto a ogni password. Per farlo l'app chiede l'icona a DuckDuckGo inviando <b>solo il nome del sito</b> (mai utente o password). Se non ti fidi, lasciala disattivata.</div>
+          <button id="siteicons-btn" onclick="hbSiteIconsSet(!hbSiteIconsOn())" style="width:100%;padding:11px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;"></button>
+        </div>
+
         <!-- Font -->
         <div style="padding:16px 20px;">
           <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:10px;">🔡 Font</div>
@@ -12994,7 +13175,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.4.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.5.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
