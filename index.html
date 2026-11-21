@@ -1986,7 +1986,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.5.2</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.6.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -2057,7 +2057,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.5.2</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.6.0</div>
         </div>
       </div>
     </div>
@@ -2161,11 +2161,12 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         </div>
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
-            <div style="width:6px;height:6px;border-radius:50%;background:#10b981;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.5.2</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <div id="sync-dot" style="width:9px;height:9px;border-radius:50%;background:#9ca3af;transition:background .3s;"></div>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.6.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.4;" id="sync-dd-state">⚪ Non verificato</div>
             <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="sync-dd-saved">📦 Ultimo salvataggio: —</div>
             <div style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="sync-dd-backup">☁️ Ultimo backup: —</div>
             <div style="font-size:12px;color:var(--text2);margin-bottom:12px;" id="sync-dd-restore">⬇️ Ultimo ripristino: —</div>
@@ -3109,7 +3110,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v14.5.2',
+  version: 'v14.6.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -3993,7 +3994,7 @@ function updateHomeStats() {
 
   // 1b. Backup più recente trovato su Drive (fatto da un altro dispositivo) — rilevato in background, nessun ripristino automatico
   if (window._driveRemoteNewerDetected) {
-    alerts.unshift({ icon:'☁️', color:'#6366f1', text: 'Trovato un backup più recente su Drive — probabilmente da un altro dispositivo', time: '', action: "driveRestoreNow()" });
+    alerts.unshift({ icon: window._hbSyncState === 'conflict' ? '🔴' : '☁️', color: window._hbSyncState === 'conflict' ? '#ef4444' : '#6366f1', text: window._hbSyncState === 'conflict' ? 'Dati diversi: modifiche qui e backup più nuovo su Drive — tocca per decidere' : 'Trovato un backup più recente su Drive — probabilmente da un altro dispositivo', time: '', action: "hbSyncPopup()" });
   }
 
   // 2c. Password compromesse (violazioni note, via Have I Been Pwned) — massima priorità
@@ -4410,6 +4411,106 @@ function hbBioApplyNames() {
   const b = document.querySelector('button[onclick="setupBioAndEnter()"]'); if (b) b.textContent = 'Abilita ' + n;
   const s = document.getElementById('bio-status');
   if (s && localStorage.getItem('hb_bio') === '1') s.textContent = n + (localStorage.getItem('hb_bio_prf') === '1' ? ' · protezione avanzata ✔' : ' · protezione base (riattivala per rafforzarla)');
+}
+
+// ═══ CONTROLLO SINCRONIZZAZIONE CON DRIVE (v14.6) ═══
+// Confronta il backup più recente su Drive con questo dispositivo. Mostra una "luce" nella Home
+// (verde / arancione / blu / rossa / grigia) e, se i dati qui sono vecchi, un avviso prima di sovrascrivere qualcosa.
+window._hbSyncState = 'unknown'; window._hbSyncInfo = null; window._hbSyncBlock = false;
+const _HB_SYNC = {
+  ok:       ['#10b981', '🟢 Aggiornato: questi dati coincidono con Drive'],
+  local:    ['#f59e0b', '🟠 Hai modifiche non ancora salvate su Drive'],
+  remote:   ['#6366f1', '🔵 Su Drive c\'è un backup più recente di questi dati'],
+  conflict: ['#ef4444', '🔴 Dati diversi: modifiche qui e backup più nuovo su Drive'],
+  unknown:  ['#9ca3af', '⚪ Non verificato: Drive non è collegato in questa sessione'],
+  none:     ['#9ca3af', '⚪ Nessun backup ancora su Drive']
+};
+function hbDeviceLabel() {
+  const u = navigator.userAgent || '';
+  const br = /Firefox/i.test(u) ? 'Firefox' : /Edg\//i.test(u) ? 'Edge' : /OPR|Opera/i.test(u) ? 'Opera' : /Chrome/i.test(u) ? 'Chrome' : /Safari/i.test(u) ? 'Safari' : 'Browser';
+  const os = /Windows/i.test(u) ? 'Windows' : /Android/i.test(u) ? 'Android' : /iPhone|iPad/i.test(u) ? 'iPhone/iPad' : /Mac/i.test(u) ? 'Mac' : /Linux/i.test(u) ? 'Linux' : '';
+  return br + (os ? ' su ' + os : '');
+}
+function hbSyncPaint() {
+  const st = window._hbSyncState, c = _HB_SYNC[st] || _HB_SYNC.unknown;
+  const dot = document.getElementById('sync-dot');
+  if (dot) { dot.style.background = c[0]; dot.style.boxShadow = '0 0 7px ' + c[0]; dot.title = c[1].slice(3); }
+  const l = document.getElementById('sync-dd-state'); if (l) { l.textContent = c[1]; }
+  window._driveRemoteNewerDetected = (st === 'remote' || st === 'conflict');
+  window._hbSyncBlock = window._driveRemoteNewerDetected;
+  try { updateHomeStats(); } catch (e) {}
+}
+async function hbSyncCheck(interactive) {
+  try {
+    let token = _driveBackupToken || await driveGetTokenSilent();
+    if (!token && interactive) token = await driveGetBackupToken();
+    if (!token) { if (!window._hbSyncBlock) window._hbSyncState = 'unknown'; hbSyncPaint(); return window._hbSyncState; }
+    const r = await fetch('https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent("name contains 'HomeBull-backup-' and trashed=false") + '&fields=files(id,name,modifiedTime,appProperties)&pageSize=30', { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    // il più recente è quello con la data più alta nel nome (spostare un vecchio backup non lo rende "nuovo")
+    const files = ((await r.json()).files || []).sort((a, b) => b.name.localeCompare(a.name) || new Date(b.modifiedTime) - new Date(a.modifiedTime));
+    const latest = files[0];
+    const lts = localStorage.getItem('hb_drive_backup_ts'), lt = lts ? new Date(lts).getTime() : 0;
+    let st;
+    if (!latest) st = 'none';
+    else {
+      const rt = new Date(latest.modifiedTime).getTime();
+      const remoteNewer = rt - lt > 2 * 60 * 1000;
+      const localChg = lt ? hbDataModifiedSince(lt) : !!((_pwItems || []).length || (_notes || []).length);
+      st = remoteNewer ? (localChg ? 'conflict' : 'remote') : (localChg ? 'local' : 'ok');
+      window._hbSyncInfo = { name: latest.name, rt, dev: latest.appProperties && latest.appProperties.dev || '' };
+    }
+    window._hbSyncState = st; window._hbSyncCheckedAt = Date.now();
+    hbSyncPaint();
+    if ((st === 'remote' || st === 'conflict') && !window._hbSyncPopupShown) { window._hbSyncPopupShown = true; hbSyncPopup(); }
+    return st;
+  } catch (e) { console.warn('[Sync check]', e); if (interactive) showToast('⚠️ Controllo non riuscito: ' + (e.message || e)); return window._hbSyncState; }
+}
+function hbSyncPopup() {
+  const st = window._hbSyncState, inf = window._hbSyncInfo || {};
+  if (st !== 'remote' && st !== 'conflict') return;
+  document.getElementById('_sy_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_sy_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,0.75);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  const when = inf.rt ? new Date(inf.rt).toLocaleString('it-IT') : '', col = st === 'conflict' ? '#ef4444' : '#6366f1';
+  const bs = 'width:100%;padding:13px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:380px;width:100%;border:2px solid ' + col + ';">' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:8px;">' + (st === 'conflict' ? '🔴 Dati diversi su Drive e qui' : '🔵 Backup più recente su Drive') + '</div>' +
+    '<div style="font-size:13px;color:var(--text2);line-height:1.6;">Su Drive c\'è un backup più nuovo' + (when ? ' (<b>' + hbEsc(when) + '</b>' + (inf.dev ? ', fatto da <b>' + hbEsc(inf.dev) + '</b>' : '') + ')' : '') + ' dei dati che vedi qui.' +
+    (st === 'conflict' ? '<br><br><span style="color:#f97316;">Hai anche <b>modifiche non salvate</b> su questo dispositivo: se fai un backup adesso, cancelli quelle fatte altrove.</span>' : '<br><br>Questi dati potrebbero essere vecchi.') + '</div>' +
+    '<button id="_sy_rest" style="' + bs + 'border:none;background:var(--accent);color:#fff;">⬇️ Ripristina da Drive</button>' +
+    (st === 'conflict' ? '<button id="_sy_keep" style="' + bs + 'border:1px solid var(--border);background:var(--surface);color:var(--text);">Tieni questi dati e fai backup</button>' : '') +
+    '<button id="_sy_later" style="' + bs + 'border:1px solid var(--border);background:transparent;color:var(--text3);">Decido dopo</button></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_sy_later').onclick = () => ov.remove();
+  document.getElementById('_sy_rest').onclick = () => { ov.remove(); driveRestoreNow(); };
+  const k = document.getElementById('_sy_keep');
+  if (k) k.onclick = () => { if (confirm('Fare il backup adesso sovrascrive il backup più recente su Drive con i dati di questo dispositivo. Continuare?')) { ov.remove(); window._hbSyncBlock = false; driveBackupNow(false); } };
+}
+document.addEventListener('visibilitychange', () => {
+  try { if (!document.hidden && HB && HB.sessionKey && Date.now() - (window._hbSyncCheckedAt || 0) > 15 * 60 * 1000) hbSyncCheck(false); } catch (e) {}
+});
+
+// ═══ Diagnostica biometria (v14.6): mostra l'errore vero invece di un messaggio generico ═══
+let _bioAbort = null;
+async function hbBioShowError(e, ctx) {
+  let platform = 'sconosciuto';
+  try { if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) platform = (await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()) ? 'sì' : 'NO'; } catch (x) {}
+  const info = [
+    ctx + ': ' + (e && e.name || 'Errore') + (e && e.message ? ' — ' + e.message : ''),
+    'Browser: ' + hbDeviceLabel(),
+    'Contesto sicuro (https): ' + (window.isSecureContext ? 'sì' : 'NO'),
+    'Lettore biometrico del sistema disponibile: ' + platform,
+    'Sito: ' + location.hostname
+  ].join('\n');
+  document.getElementById('_be_ov')?.remove();
+  const ov = document.createElement('div'); ov.id = '_be_ov';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,0.75);display:flex;align-items:center;align-items:safe center;justify-content:center;padding:20px;overflow-y:auto;';
+  const hint = platform === 'NO' ? 'Il browser non vede nessun lettore biometrico: controlla che Windows Hello (o l\'impronta) sia attivo e configurato nelle impostazioni del sistema, poi riavvia il browser.' : 'Prova a chiudere e riaprire il browser; se hai aggiornato Firefox/Windows da poco, verifica che Windows Hello funzioni (es. sblocco del PC). Intanto puoi entrare col PIN.';
+  ov.innerHTML = '<div style="background:var(--bg2);border-radius:20px;padding:22px;max-width:400px;width:100%;border:1px solid var(--border);"><div style="font-size:16px;font-weight:800;margin-bottom:8px;">👆 Biometria non riuscita</div><div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px;">' + hbEsc(hint) + '</div><pre id="_be_txt" style="white-space:pre-wrap;word-break:break-word;font-size:11px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;margin:0 0 12px;color:var(--text2);">' + hbEsc(info) + '</pre><div style="display:flex;gap:8px;"><button id="_be_copy" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">📋 Copia</button><button id="_be_ok" style="flex:1;padding:12px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Chiudi</button></div></div>';
+  document.body.appendChild(ov);
+  document.getElementById('_be_ok').onclick = () => ov.remove();
+  document.getElementById('_be_copy').onclick = () => { try { navigator.clipboard.writeText(info); showToast('📋 Copiato'); } catch (x) {} };
 }
 
 function hbOpenBackupSettings() { openSettings(); setTimeout(() => { try { settingsPage('backup'); } catch(e){} }, 200); }
@@ -10619,22 +10720,32 @@ async function registerBiometric() {
     showToast('⚠️ Biometrico non supportato'); return false;
   }
   try {
-    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    try { if (_bioAbort) _bioAbort.abort(); } catch (x) {}   // chiude eventuali richieste biometriche rimaste aperte
     const userId    = new TextEncoder().encode('homebull-local-device');
     const hostname  = location.hostname || 'localhost';
-    const credential = await navigator.credentials.create({ publicKey: {
-      challenge,
+    const mk = (withPrf, platformOnly) => ({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
       rp: { name:'HomeBull Pro', id: hostname },
       user: { id: userId.slice(0,64), name:'homebull-local-device', displayName:'HomeBull' },
       pubKeyCredParams: [{type:'public-key',alg:-7},{type:'public-key',alg:-257}],
-      authenticatorSelection: {
-        authenticatorAttachment: 'platform',
-        userVerification: 'required',
-        residentKey: 'discouraged'
-      },
-      extensions: { prf: {} },
+      authenticatorSelection: Object.assign({ userVerification: 'required', residentKey: 'discouraged' }, platformOnly ? { authenticatorAttachment: 'platform' } : {}),
+      ...(withPrf ? { extensions: { prf: {} } } : {}),
       timeout: 60000
     }});
+    // 1) completa (con protezione avanzata) → 2) senza estensioni (alcuni browser, es. Firefox, non le gradiscono) → 3) senza vincolo "solo questo dispositivo"
+    let credential = null, lastErr = null;
+    const attempts = [[true, true], [false, true], [false, false]];
+    for (let i = 0; i < attempts.length; i++) {
+      const t0 = Date.now();
+      try { credential = await navigator.credentials.create(mk(attempts[i][0], attempts[i][1])); lastErr = null; break; }
+      catch (er) {
+        lastErr = er;
+        if (er && er.name === 'InvalidStateError') break;
+        // rifiuto lento = l'utente ha annullato; rifiuto immediato = il browser non gradisce qualcosa → riprova in modo più semplice (al massimo una volta se è NotAllowed)
+        if (er && er.name === 'NotAllowedError' && (Date.now() - t0 > 2500 || i >= 1)) break;
+      }
+    }
+    if (lastErr) throw lastErr;
     if (!credential) return false;
     // Salva credId
     const rawId = new Uint8Array(credential.rawId);
@@ -10665,17 +10776,14 @@ async function registerBiometric() {
     return true;
   } catch(e) {
     console.warn('[Bio register]', e);
-    if (e.name === 'NotAllowedError') {
-      showToast('⚠️ Registrazione annullata');
-    } else if (e.name === 'InvalidStateError') {
-      showToast('⚠️ Impronta già registrata su questo dispositivo');
-      // Prova comunque a sbloccare
+    if (e && e.name === 'InvalidStateError') {
+      showToast('⚠️ Biometria già registrata su questo dispositivo');
       checkBiometricAvailable();
-    } else if (e.name === 'NotSupportedError') {
-      showToast('⚠️ Questo dispositivo non supporta la biometria');
     } else {
-      showToast('⚠️ Errore: ' + e.name + ' — ' + e.message);
+      showToast('⚠️ Registrazione biometria non riuscita');
+      hbBioShowError(e, 'Registrazione');
     }
+    return false;
   }
 }
 
@@ -10687,7 +10795,9 @@ async function tryBiometric() {
   try {
     const credIdBytes = new Uint8Array(atob(credIdB64).split('').map(c=>c.charCodeAt(0)));
     const usePrf = localStorage.getItem('hb_bio_prf') === '1';
-    const assertion   = await navigator.credentials.get({ publicKey: {
+    try { if (_bioAbort) _bioAbort.abort(); } catch (x) {}
+    _bioAbort = new AbortController();
+    const assertion   = await navigator.credentials.get({ signal: _bioAbort.signal, publicKey: {
       challenge: crypto.getRandomValues(new Uint8Array(32)),
       allowCredentials: [{type:'public-key', id:credIdBytes}],
       userVerification: 'required', timeout: 60000,
@@ -10724,10 +10834,14 @@ async function tryBiometric() {
     showPinError('Verifica biometrica incompleta — inserisci il PIN');
   } catch(e) {
     console.warn('[Bio auth]', e);
-    if (e.name === 'NotAllowedError') {
-      showToast('Biometria annullata');
+    if (e.name === 'AbortError') { /* sostituita da una richiesta più recente */ }
+    else if (e.name === 'NotAllowedError') {
+      showToast('Biometria annullata o non riconosciuta — usa il PIN');
+      window._bioFails = (window._bioFails || 0) + 1;
+      if (window._bioFails >= 2) { window._bioFails = 0; hbBioShowError(e, 'Accesso'); }
     } else {
       showToast('Biometrico non riuscito — usa il PIN');
+      hbBioShowError(e, 'Accesso');
     }
   }
 }
@@ -11075,6 +11189,10 @@ async function hbBackupVerify() {
 
 async function driveBackupNow(silent=false) {
   try {
+    if (window._hbSyncBlock) {
+      if (silent) return; // non sovrascrivere in automatico un backup più recente
+      if (!confirm('Su Drive c\'è un backup PIÙ RECENTE di questi dati (probabilmente fatto da un altro dispositivo).\n\nFare il backup adesso lo sovrascrive. Continuare?')) return;
+    }
     if (!silent) showToast('☁️ Backup Drive in corso...');
     const token = _driveBackupToken || await driveGetBackupToken();
 
@@ -11091,7 +11209,7 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'14.5.2', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'14.6.0', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -11113,7 +11231,7 @@ async function driveBackupNow(silent=false) {
     let response;
     const form = new FormData();
     if (existingId) {
-      form.append('metadata', new Blob([JSON.stringify({ name: fileName })], { type: 'application/json' }));
+      form.append('metadata', new Blob([JSON.stringify({ name: fileName, appProperties: { dev: hbDeviceLabel() } })], { type: 'application/json' }));
       form.append('file', blob);
       const mv = folders && !existingParents.includes(folders.backup) ? '&addParents=' + folders.backup + (existingParents.length ? '&removeParents=' + existingParents.join(',') : '') : '';
       response = await fetch(
@@ -11121,7 +11239,7 @@ async function driveBackupNow(silent=false) {
         { method: 'PATCH', headers: { Authorization: 'Bearer ' + token }, body: form }
       );
     } else {
-      const meta = { name: fileName, mimeType: 'application/json' }; if (folders) meta.parents = [folders.backup];
+      const meta = { name: fileName, mimeType: 'application/json', appProperties: { dev: hbDeviceLabel() } }; if (folders) meta.parents = [folders.backup];
       form.append('metadata', new Blob([JSON.stringify(meta)], { type: 'application/json' }));
       form.append('file', blob);
       response = await fetch(
@@ -11144,6 +11262,7 @@ async function driveBackupNow(silent=false) {
     if (folders) setTimeout(() => driveMoveOldBackups(token, folders.backup), 3000);
     setTimeout(() => noteAttSyncPending(false), 6000);
     localStorage.setItem('hb_drive_backup_ts', now.toISOString());
+    window._hbSyncBlock = false; window._hbSyncState = 'ok'; try { hbSyncPaint(); } catch (e) {}
     if (!silent) showToast('✅ Backup su Drive completato!');
     driveUpdateBackupUI();
   } catch(e) {
@@ -11343,58 +11462,17 @@ async function driveGetTokenSilent() {
   });
 }
 
-async function driveCheckRemoteNewer() {
-  try {
-    const token = _driveBackupToken || await driveGetTokenSilent();
-    if (!token) return; // nessuna sessione Google disponibile in silenzio — niente avviso, niente popup
-    const search = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&pageSize=1`,
-      { headers: { Authorization: 'Bearer ' + token } }
-    );
-    if (!search.ok) return;
-    const result = await search.json();
-    const latest = result.files?.[0];
-    if (!latest) return;
-    const remoteTime = new Date(latest.modifiedTime).getTime();
-    const localTs = localStorage.getItem('hb_drive_backup_ts');
-    const localTime = localTs ? new Date(localTs).getTime() : 0;
-    // Margine di 2 minuti per evitare falsi positivi da piccoli sfasamenti d'orario
-    if (remoteTime - localTime > 2*60*1000) {
-      window._driveRemoteNewerDetected = true;
-      updateHomeStats();
-    }
-  } catch(e) { /* controllo best-effort: nessun avviso in caso di errore di rete */ }
-}
+async function driveCheckRemoteNewer() { return hbSyncCheck(false); }
 
 // Controllo manuale (avviato dall'utente): se la sessione silenziosa non basta, può aprire il login Google.
 async function driveCheckNowManual() {
-  document.getElementById('sync-dropdown').style.display = 'none';
-  try {
-    showToast('🔄 Controllo Drive in corso...');
-    const token = _driveBackupToken || await driveGetTokenSilent() || await driveGetBackupToken();
-    const search = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=name+contains+'HomeBull-backup-'+and+trashed=false&fields=files(id,name,modifiedTime)&orderBy=modifiedTime+desc&pageSize=1`,
-      { headers: { Authorization: 'Bearer ' + token } }
-    );
-    if (!search.ok) throw new Error('HTTP ' + search.status);
-    const latest = (await search.json()).files?.[0];
-    if (!latest) { showToast('⚠️ Nessun backup trovato su Drive'); return; }
-    const remoteTime = new Date(latest.modifiedTime).getTime();
-    const localTs = localStorage.getItem('hb_drive_backup_ts');
-    const localTime = localTs ? new Date(localTs).getTime() : 0;
-    if (remoteTime - localTime > 2*60*1000) {
-      window._driveRemoteNewerDetected = true;
-      updateHomeStats();
-      showToast('☁️ Su Drive c\'è un backup più recente');
-      driveRestoreNow();
-    } else {
-      window._driveRemoteNewerDetected = false;
-      updateHomeStats();
-      showToast('✅ Sei già aggiornato: nessun backup più recente su Drive');
-    }
-  } catch(e) {
-    showToast('⚠️ Controllo non riuscito: ' + (e.message || e));
-  }
+  try { document.getElementById('sync-dropdown').style.display = 'none'; } catch (e) {}
+  showToast('🔄 Controllo Drive in corso...');
+  const st = await hbSyncCheck(true);
+  if (st === 'ok') showToast('✅ Tutto aggiornato: i dati coincidono con Drive');
+  else if (st === 'local') showToast('🟠 Hai modifiche non ancora salvate su Drive');
+  else if (st === 'none') showToast('⚪ Nessun backup su Drive: fai il primo');
+  else if (st === 'remote' || st === 'conflict') { window._hbSyncPopupShown = true; hbSyncPopup(); }
 }
 
 async function drivePruneOldBackups(token) {
@@ -13205,7 +13283,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.5.2</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.6.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
