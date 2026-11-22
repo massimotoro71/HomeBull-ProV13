@@ -1986,7 +1986,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v15.0.1</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v15.0.3</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -2057,7 +2057,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v15.0.1</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v15.0.3</div>
         </div>
       </div>
     </div>
@@ -2161,7 +2161,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         </div>
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v15.0.1</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v15.0.3</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -2279,7 +2279,7 @@ Aggiungi nuovo dato
         <!-- Usati di recente -->
         <div id="home-recent-section" style="margin-bottom:24px;display:none;">
           <div class="home-section-title" style="margin-bottom:10px;">🕘 Usati di recente</div>
-          <div id="home-recent" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;"></div>
+          <div id="home-recent" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;"></div>
         </div>
 
         <!-- Salute dell'app -->
@@ -3118,7 +3118,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v15.0.1',
+  version: 'v15.0.3',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4579,10 +4579,10 @@ function hbRecentResolve(x) {
 function hbRenderRecent() {
   const sec = document.getElementById('home-recent-section'), box = document.getElementById('home-recent');
   if (!sec || !box) return;
-  const items = hbHomeOpt('hb_home_recent') ? hbRecentList().map(x => Object.assign({ x }, hbRecentResolve(x))).filter(r => r.name).slice(0, 8) : [];
+  const items = hbHomeOpt('hb_home_recent') ? hbRecentList().map(x => Object.assign({ x }, hbRecentResolve(x))).filter(r => r.name).slice(0, 6) : [];
   if (!items.length) { sec.style.display = 'none'; box.innerHTML = ''; return; }
   sec.style.display = 'block';
-  box.innerHTML = items.map(r => '<div onclick="hbFromHome();' + r.act.replace(/"/g, '&quot;') + '" style="flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:9px 14px 9px 10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;max-width:200px;"><div class="pw-item-icon" style="width:30px;height:30px;font-size:15px;border-radius:9px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">' + r.icon + '</div><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(r.name) + '</div></div>').join('');
+  box.innerHTML = items.map(r => '<div onclick="hbFromHome();' + r.act.replace(/"/g, '&quot;') + '" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;min-width:0;"><div class="pw-item-icon" style="width:34px;height:34px;font-size:17px;border-radius:10px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">' + r.icon + '</div><div style="font-size:12px;font-weight:700;color:var(--text);width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(r.name) + '</div></div>').join('');
 }
 
 // ── Scheda emergenza famiglia: istruzioni stampabili per chi deve accedere ai tuoi dati. Mai PIN né PUK. ──
@@ -5910,7 +5910,7 @@ function updateHomeFavorites() {
   const favs = hbHomeOpt('hb_home_fav') ? (_pwItems || []).filter(i => i.favorite && !i.deleted) : [];
   if (!favs.length) { section.style.display = 'none'; box.innerHTML = ''; return; }
   section.style.display = 'block';
-  box.innerHTML = favs.slice(0, 6).map(item => {
+  box.innerHTML = favs.slice(0, 3).map(item => {
     const cat = _pwCats.find(c => c.id === item.categoryId);
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
     return `<div onclick="hbFromHome();pwOpenDirect('${item.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;">
@@ -11537,7 +11537,7 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'15.0.1', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'15.0.3', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -13559,7 +13559,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v15.0.1</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v15.0.3</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
