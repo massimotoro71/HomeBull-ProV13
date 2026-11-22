@@ -1986,7 +1986,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
   </div>
   <h1 class="auth-title">HomeBull</h1>
   <p class="auth-sub">Il tuo vault personale, sempre cifrato</p>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.8.0</div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:-8px;margin-bottom:4px;letter-spacing:0.05em;">v14.9.0</div>
   <div class="auth-card">
 
     <!-- STEP 3: PIN MASTER -->
@@ -2057,7 +2057,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         <div class="sidebar-logo-text">HomeBull</div>
         <div>
           <div class="sidebar-logo-ver">Pro v13</div>
-          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.8.0</div>
+          <div class="sidebar-logo-ver" style="color:var(--accent);font-size:9px;">v14.9.0</div>
         </div>
       </div>
     </div>
@@ -2161,8 +2161,7 @@ Based on jsqrencode | (C) 2010 tz@execpc.com | GPL v3 License
         </div>
         <div style="position:relative;margin:10px 0 18px;">
           <div onclick="toggleSyncDropdown()" style="display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:3px 10px;cursor:pointer;">
-            <div id="sync-dot" style="width:9px;height:9px;border-radius:50%;background:#9ca3af;transition:background .3s;"></div>
-            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.8.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
+            <span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.04em;" id="home-version-badge">v14.9.0</span><span id="sync-time-badge" style="font-size:10px;color:var(--text3);margin-left:8px;"></span>
             <span style="font-size:9px;color:var(--text3);margin-left:2px;">▾</span>
           </div>
           <div id="sync-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,0.3);">
@@ -3116,7 +3115,7 @@ let _autolockTimer   = null;
 
 // ── State ──────────────────────────────────────────────────
 const HB = {
-  version: 'v14.8.0',
+  version: 'v14.9.0',
   currentTab: 'home',
   authState: 'pin-setup', // pin-setup | pin-login
   user: null,           // { email, uid }
@@ -4579,7 +4578,7 @@ function hbRenderRecent() {
   const items = hbHomeOpt('hb_home_recent') ? hbRecentList().map(x => Object.assign({ x }, hbRecentResolve(x))).filter(r => r.name).slice(0, 8) : [];
   if (!items.length) { sec.style.display = 'none'; box.innerHTML = ''; return; }
   sec.style.display = 'block';
-  box.innerHTML = items.map(r => '<div onclick="' + r.act.replace(/"/g, '&quot;') + '" style="flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:9px 14px 9px 10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;max-width:200px;"><div class="pw-item-icon" style="width:30px;height:30px;font-size:15px;border-radius:9px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">' + r.icon + '</div><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(r.name) + '</div></div>').join('');
+  box.innerHTML = items.map(r => '<div onclick="hbFromHome();' + r.act.replace(/"/g, '&quot;') + '" style="flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:9px 14px 9px 10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;max-width:200px;"><div class="pw-item-icon" style="width:30px;height:30px;font-size:15px;border-radius:9px;background:rgba(99,102,241,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">' + r.icon + '</div><div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + hbEsc(r.name) + '</div></div>').join('');
 }
 
 // ── Scheda emergenza famiglia: istruzioni stampabili per chi deve accedere ai tuoi dati. Mai PIN né PUK. ──
@@ -4719,6 +4718,43 @@ function hbGuidedOpen(id) {
   };
   paint();
 }
+
+// ═══ v14.9: ritorno rapido alla Home dopo un accesso da "Preferiti / Recenti" ═══
+function hbFromHome() { window._hbHomeOpen = 'pending'; }
+function hbHomePillShow(on) {
+  let p = document.getElementById('hb-home-back');
+  if (!on) { if (p) p.style.display = 'none'; return; }
+  if (!p) {
+    p = document.createElement('button'); p.id = 'hb-home-back'; p.textContent = '🏠 Torna alla Home';
+    p.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:9000;padding:12px 22px;border-radius:99px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(0,0,0,.35);';
+    p.onclick = hbBackHome; document.body.appendChild(p);
+  }
+  p.style.display = 'block';
+}
+function hbBackHome() {
+  window._hbHomeOpen = '';
+  try { if (document.getElementById('note-view-editor')?.style.display !== 'none' && typeof noteCloseEditor === 'function' && HB.currentTab === 'notes') noteCloseEditor(); } catch (e) {}
+  ['server-detail-overlay', 'finance-detail-overlay', 'card-detail-overlay', 'srv-otp-overlay'].forEach(id => document.getElementById(id)?.remove());
+  hbHomePillShow(false); switchTab('home');
+}
+(function () {
+  const _st = switchTab;
+  switchTab = function (tab) {
+    if (window._hbHomeOpen === 'pending' && tab !== 'home') { window._hbHomeOpen = 'active'; setTimeout(() => { if (window._hbHomeOpen === 'active') hbHomePillShow(true); }, 400); }
+    else { window._hbHomeOpen = ''; hbHomePillShow(false); }
+    return _st.apply(this, arguments);
+  };
+  const _tb = topbarBack;
+  topbarBack = function () {
+    if (window._hbHomeOpen === 'active') {
+      const d = document.getElementById('pw-view-detail');
+      const inPw = HB.currentTab === 'passwords' && d && d.style.display !== 'none';
+      const ov = ['server-detail-overlay', 'finance-detail-overlay', 'card-detail-overlay'].some(id => document.getElementById(id));
+      if (inPw || ov) { hbBackHome(); return; }
+    }
+    return _tb.apply(this, arguments);
+  };
+})();
 
 function hbOpenBackupSettings() { openSettings(); setTimeout(() => { try { settingsPage('backup'); } catch(e){} }, 200); }
 function hbShowHealth() {
@@ -5804,7 +5840,7 @@ function updateHomeFavorites() {
   box.innerHTML = favs.slice(0, 6).map(item => {
     const cat = _pwCats.find(c => c.id === item.categoryId);
     const icon = getCatIcon(cat?.id, cat?.name, cat?.icon);
-    return `<div onclick="pwOpenDirect('${item.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;">
+    return `<div onclick="hbFromHome();pwOpenDirect('${item.id}')" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;">
       <div style="width:38px;height:38px;border-radius:11px;background:${cat?.color||'rgba(99,102,241,0.1)'}20;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">${icon}</div>
       <div style="flex:1;min-width:0;">
         <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${hbEsc(item.title||'—')}</div>
@@ -11426,7 +11462,7 @@ async function driveBackupNow(silent=false) {
     const now = new Date();
     const dateStr = now.toISOString().slice(0,10); // es. 2026-06-10
     const fileName = `HomeBull-backup-${dateStr}.json`;
-    const payload = JSON.stringify({ version:'14.8.0', exportedAt: now.toISOString(), data }, null, 2);
+    const payload = JSON.stringify({ version:'14.9.0', exportedAt: now.toISOString(), data }, null, 2);
     let bodyText = payload; const _bpw = hbBackupPw();
     if (_bpw) { try { bodyText = await hbEncryptBackupText(payload, _bpw); } catch (e) { throw new Error('cifratura del backup non riuscita'); } }
     const blob = new Blob([bodyText], { type: 'application/json' });
@@ -13476,7 +13512,7 @@ document.addEventListener('keydown', (e) => {
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;">
             <div style="width:72px;height:72px;border-radius:22px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 14px;">🏠</div>
             <div style="font-size:13px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;">Pro v13</div>
-            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.8.0</div>
+            <div style="font-size:22px;font-weight:900;color:var(--accent);letter-spacing:0.04em;margin-top:4px;" id="settings-version-badge">v14.9.0</div>
           </div>
           <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;">
             <div style="font-size:12px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Funzionalità</div>
